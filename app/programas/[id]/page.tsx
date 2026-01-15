@@ -1,0 +1,80 @@
+'use client';
+
+import React, { useState, use } from 'react';
+import Link from 'next/link';
+import { FontStyles } from '../../components/FontStyles';
+import { Header } from '../../components/Header';
+import { Footer } from '../../components/Footer';
+import { ProgramHeroSection } from '../../components/ProgramHeroSection';
+import { ProgramOverview } from '../../components/ProgramOverview';
+import { ProgramCurriculum } from '../../components/ProgramCurriculum';
+import { ProgramAudience } from '../../components/ProgramAudience';
+import { ProgramCTASection } from '../../components/ProgramCTASection';
+import { COMPLETE_PROGRAMS } from '../../data/programs';
+
+interface ProgramPageProps {
+  params: Promise<{
+    id: string;
+  }> | {
+    id: string;
+  };
+}
+
+export default function ProgramPage({ params }: ProgramPageProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const resolvedParams = use(params instanceof Promise ? params : Promise.resolve(params));
+  const programId = parseInt(resolvedParams.id, 10);
+  const program = COMPLETE_PROGRAMS.find(p => p.id === programId);
+
+  if (!program) {
+    return (
+      <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+        <FontStyles />
+        <div className="grain" />
+        
+        <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+
+        <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
+          <div className="text-center max-w-2xl">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6">
+              404
+            </h1>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Programa no encontrado
+            </h2>
+            <p className="text-neutral-400 mb-8 font-light">
+              El programa que buscas no existe o ha sido eliminado.
+            </p>
+            <Link
+              href="/programas"
+              className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-base font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300"
+            >
+              Ver todos los programas
+            </Link>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+      <FontStyles />
+      <div className="grain" />
+      
+      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+
+      <main className="relative z-10">
+        <ProgramHeroSection program={program} />
+        <ProgramOverview program={program} />
+        <ProgramCurriculum program={program} />
+        <ProgramAudience program={program} />
+        <ProgramCTASection program={program} />
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

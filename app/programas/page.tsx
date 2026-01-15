@@ -7,16 +7,16 @@ import { Footer } from '../components/Footer';
 import { CatalogHeader } from '../components/CatalogHeader';
 import { CatalogFilterBar } from '../components/CatalogFilterBar';
 import { CatalogGrid } from '../components/CatalogGrid';
-import { ALL_PROGRAMS, Program } from '../data/programs';
+import { COMPLETE_PROGRAMS, Program } from '../data/programs';
 
 export default function CursosPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPrograms, setFilteredPrograms] = useState<Program[]>(ALL_PROGRAMS);
+  const [filteredPrograms, setFilteredPrograms] = useState<Program[]>(COMPLETE_PROGRAMS);
 
   useEffect(() => {
-    let result = ALL_PROGRAMS;
+    let result = COMPLETE_PROGRAMS;
     
     // Apply Category Filter
     if (activeFilter !== 'Todos') {

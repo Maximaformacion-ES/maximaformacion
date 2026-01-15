@@ -205,9 +205,8 @@ const ContactPage = () => {
                   <div className="flex gap-4">
                     <MapPin className="shrink-0 text-white" />
                     <p className="text-sm leading-relaxed">
-                      Sede Central <br />
-                      Calle Principal, 123 <br />
-                      28001 Madrid, España
+                      Av. de la Innovación, 1, <br />
+                      18016 Granada <br />
                     </p>
                   </div>
                   <div className="flex gap-4">

@@ -13,7 +13,7 @@ export const StatsSection: React.FC = () => {
   ];
   
   return (
-    <section className="relative py-24 md:py-32 bg-[#0a0a0a]">
+    <section className="relative -mt-20 pt-0 pb-12 md:pb-12 bg-[#0a0a0a]">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, i) => (

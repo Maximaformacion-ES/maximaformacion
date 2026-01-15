@@ -17,7 +17,7 @@ export const HeroSection: React.FC = () => {
   const titleY = useSpring(useTransform(scrollYProgress, [0, 0.3], [0, -100]), { stiffness: 100, damping: 30 });
   
   return (
-    <section ref={containerRef} className="relative h-[200vh]">
+    <section ref={containerRef} className="relative h-[120vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
         {/* Background */}
         <motion.div 
@@ -82,7 +82,7 @@ export const HeroSection: React.FC = () => {
             className="flex flex-col sm:flex-row gap-4 mt-12"
           >
             <motion.a
-              href="#masters"
+              href="/programas"
               className="group flex items-center justify-center gap-3 bg-white text-black px-8 py-4 text-base font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
@@ -91,7 +91,7 @@ export const HeroSection: React.FC = () => {
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </motion.a>
             <motion.a
-              href="#cursos"
+              href="/programas"
               className="flex items-center justify-center gap-3 border border-white/30 text-white px-8 py-4 text-base font-light rounded-full hover:bg-white/10 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}

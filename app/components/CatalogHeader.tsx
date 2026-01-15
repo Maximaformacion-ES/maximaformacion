@@ -12,7 +12,7 @@ export const CatalogHeader: React.FC = () => {
         transition={{ duration: 0.8 }}
         className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-6"
       >
-        NUESTROS <span className="text-stroke text-transparent">PROGRAMAS</span>
+        NUESTROS <span className="text-stroke text-white">PROGRAMAS</span>
       </motion.h1>
       <motion.p 
         initial={{ opacity: 0 }}
