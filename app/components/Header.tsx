@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Menu, X, ChevronDown, User, Crown, Check } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   SignedIn,
   SignedOut,
@@ -72,10 +73,17 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
           <div className="flex items-center justify-between">
             <motion.a 
               href="/" 
-              className="text-amber-500 text-xl md:text-2xl font-bold tracking-tight"
+              className="flex items-center"
               whileHover={{ scale: 1.02 }}
             >
-              MAXIMA<span className="text-white font-light">FORMACIÓN</span>
+              <Image 
+                src="/logo.png" 
+                alt="Maxima Formación" 
+                width={180} 
+                height={60}
+                className="h-8 md:h-10 w-auto"
+                priority
+              />
             </motion.a>
             
             <div className="hidden lg:flex items-center gap-8">
@@ -97,8 +105,9 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 <div className="hidden md:flex items-center gap-3">
                   <Link href="/sign-in">
                     <motion.button
-                      className="flex items-center gap-2 text-white text-sm font-light hover:text-amber-500 transition-colors duration-300"
-                      whileHover={{ scale: 1.02 }}
+                      className="flex items-center gap-2 border border-white/30 text-white px-4 py-2 text-sm font-medium rounded-full hover:border-amber-500 hover:text-amber-500 hover:bg-white/5 transition-all duration-300"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <User size={16} />
                       Iniciar sesión

@@ -10,7 +10,6 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-amber-500/30 overflow-hidden">
       <FontStyles />
-      <div className="grain" />
 
       {/* Background Pattern */}
       <div className="fixed inset-0 z-0">

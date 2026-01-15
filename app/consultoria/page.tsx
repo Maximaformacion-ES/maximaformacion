@@ -17,7 +17,6 @@ export default function ConsultoriaPage() {
   return (
     <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
       <FontStyles />
-      <div className="grain" />
       
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 

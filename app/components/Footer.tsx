@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
 
 export const Footer: React.FC = () => {
   const footerLinks = {
@@ -17,8 +18,14 @@ export const Footer: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="/" className="text-amber-500 text-2xl font-bold tracking-tight">
-              MAXIMA<span className="text-white font-light">FORMACIÓN</span>
+            <a href="/" className="inline-block">
+              <Image 
+                src="/logo.png" 
+                alt="Maxima Formación" 
+                width={200} 
+                height={66}
+                className="h-10 md:h-12 w-auto"
+              />
             </a>
             <p className="text-white/50 text-sm font-light mt-4 max-w-xs leading-relaxed">
               Formación profesional de élite para impulsar tu carrera al siguiente nivel.
