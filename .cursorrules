@@ -1,0 +1,396 @@
+# Máxima Formación - Project Rules
+
+## Project Overview
+This is a Next.js 16 application for Máxima Formación, an educational platform offering courses, masters programs, consulting services, and innovation solutions. The design follows a cinematic noir aesthetic with dark backgrounds and amber accents.
+
+## Tech Stack
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Authentication**: Clerk (@clerk/nextjs)
+- **State Management**: React useState/useEffect (no external state library)
+
+## Project Structure
+
+```
+app/
+├── components/          # Reusable UI components
+│   ├── Header.tsx       # Global navigation header
+│   ├── Footer.tsx       # Global footer
+│   ├── FontStyles.tsx   # Custom font definitions
+│   └── [Feature]*.tsx   # Feature-specific section components
+├── data/               # Mock data and type definitions
+│   ├── programs.ts     # Course/Master data
+│   └── blogs.ts        # Blog post data
+├── [page]/             # Route directories
+│   ├── page.tsx        # Page component
+│   └── [id]/           # Dynamic routes
+│       └── page.tsx
+├── globals.css         # Global styles and utilities
+├── layout.tsx          # Root layout
+└── page.tsx            # Homepage
+```
+
+## Design System
+
+### Color Palette
+```css
+/* Primary Colors */
+--black: #000000
+--dark-bg: #0a0a0a
+--neutral-950: rgb(10, 10, 10)
+
+/* Accent Colors */
+--amber-500: rgb(245, 158, 11)  /* Primary accent */
+--amber-400: rgb(251, 191, 36)  /* Hover state */
+
+/* Text Colors */
+--white: #ffffff               /* Primary text */
+--white-80: rgba(255,255,255,0.8)
+--white-60: rgba(255,255,255,0.6)
+--white-40: rgba(255,255,255,0.4)
+--neutral-400: rgb(163, 163, 163)
+
+/* Border Colors */
+--border-light: rgba(255,255,255,0.1)
+--border-hover: rgba(245,158,11,0.5)
+```
+
+### Typography
+- **Font Family**: ZTNature (custom), system fallbacks
+- **Headings**: font-black, tracking-tighter
+  - H1: text-5xl to text-9xl (responsive)
+  - H2: text-4xl to text-6xl
+  - H3: text-2xl to text-3xl
+- **Body**: font-light, leading-relaxed
+- **Labels**: text-xs to text-sm, tracking-[0.5em], uppercase
+
+### Spacing
+- Section padding: py-32 px-6 md:px-12
+- Container max-width: max-w-7xl or max-w-[1400px]
+- Card padding: p-8 to p-10
+- Component gaps: gap-6 to gap-12
+
+### Animation Patterns
+Always use Framer Motion with these patterns:
+
+```tsx
+// Scroll-triggered fade-in
+<motion.div
+  initial={{ opacity: 0, y: 30 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+>
+
+// Staggered children
+transition={{ delay: idx * 0.1 }}
+
+// Parallax scroll effect
+const { scrollYProgress } = useScroll();
+const yRange = useTransform(scrollYProgress, [0, 1], [0, -200]);
+```
+
+## Component Patterns
+
+### Page Structure
+Every page should follow this pattern:
+
+```tsx
+'use client';
+
+import React, { useState } from 'react';
+import { FontStyles } from '../components/FontStyles';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+// Import page-specific sections
+
+export default function PageName() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  return (
+    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+      <FontStyles />
+      <div className="grain" />
+      
+      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+
+      <main className="relative z-10">
+        {/* Page sections */}
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+```
+
+### Section Component Pattern
+
+```tsx
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { IconName } from 'lucide-react';
+
+export const SectionName: React.FC = () => {
+  return (
+    <section className="py-32 px-6 md:px-12 bg-[#0a0a0a]">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-20"
+        >
+          <span className="text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            Section Label
+          </span>
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+            Section Title
+          </h2>
+          <p className="text-white/60 text-lg font-light max-w-2xl mx-auto">
+            Section description
+          </p>
+        </motion.div>
+        
+        {/* Section content */}
+      </div>
+    </section>
+  );
+};
+```
+
+### Hero Section Pattern
+
+```tsx
+<section className="relative h-screen flex items-center justify-center overflow-hidden">
+  <motion.div style={{ y: yRange }} className="absolute inset-0 z-0 h-[120%]">
+    <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-transparent to-black z-10" />
+    <img src="..." className="w-full h-full object-cover" />
+  </motion.div>
+  
+  <div className="relative z-20 text-center px-6 max-w-5xl mx-auto">
+    {/* Hero content */}
+  </div>
+</section>
+```
+
+### Card Pattern
+
+```tsx
+<motion.div
+  initial={{ opacity: 0, y: 30 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  className="p-8 border border-white/10 bg-white/5 hover:border-amber-500/50 hover:bg-white/10 transition-all duration-300"
+>
+  <Icon className="text-amber-500 mb-6" size={32} />
+  <h3 className="text-2xl font-bold mb-4">Title</h3>
+  <p className="text-white/60 font-light leading-relaxed">Description</p>
+</motion.div>
+```
+
+### Button Patterns
+
+```tsx
+// Primary button (white bg)
+<a className="group inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-base font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300">
+  Button Text
+  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+</a>
+
+// Secondary button (outline)
+<a className="border border-white/30 text-white px-8 py-4 rounded-full hover:bg-white/10 transition-colors">
+  Button Text
+</a>
+```
+
+## Naming Conventions
+
+### Components
+- PascalCase for component names
+- Prefix with feature name: `Blog*`, `Program*`, `Innovacion*`
+- Suffix with type: `*Section`, `*Card`, `*Grid`, `*Header`
+
+### Files
+- Components: `ComponentName.tsx`
+- Pages: `page.tsx` (Next.js convention)
+- Data: `feature.ts` (lowercase)
+
+### CSS Classes
+- Use Tailwind utilities
+- Custom classes in globals.css: kebab-case
+- Animation classes: descriptive names
+
+## Data Patterns
+
+### Data File Structure
+
+```typescript
+// Interface definition
+export interface DataItem {
+  id: number;
+  title: string;
+  // ... other fields
+}
+
+// Data array
+export const ALL_ITEMS: DataItem[] = [
+  { id: 1, title: '...', ... },
+];
+
+// Helper functions
+export const getItemById = (id: number): DataItem | undefined => {
+  return ALL_ITEMS.find(item => item.id === id);
+};
+```
+
+### Dynamic Route Pattern
+
+```tsx
+'use client';
+
+import { use } from 'react';
+
+interface PageProps {
+  params: Promise<{ id: string }> | { id: string };
+}
+
+export default function DynamicPage({ params }: PageProps) {
+  const resolvedParams = use(params instanceof Promise ? params : Promise.resolve(params));
+  const id = parseInt(resolvedParams.id, 10);
+  const item = getItemById(id);
+
+  if (!item) {
+    return <NotFoundContent />;
+  }
+
+  return <PageContent item={item} />;
+}
+```
+
+## Common Utilities
+
+### Grain Effect
+Add film grain overlay for cinematic effect:
+```tsx
+<div className="grain" />
+```
+
+### Text Stroke Effect
+For outlined text headings:
+```tsx
+<span className="text-stroke text-white">TEXT</span>
+```
+
+### No Scrollbar
+Hide scrollbar in horizontal scroll areas:
+```tsx
+<div className="overflow-x-auto no-scrollbar">
+```
+
+## Best Practices
+
+1. **Always use 'use client'** for components with interactivity
+2. **Prefer composition** over complex conditional rendering
+3. **Keep sections modular** - one responsibility per component
+4. **Use consistent spacing** - follow the py-32 px-6 pattern
+5. **Animate on scroll** - use whileInView for performance
+6. **Mobile-first responsive** - start with mobile, add md: and lg: breakpoints
+7. **Accessibility** - use semantic HTML, proper heading hierarchy
+8. **External links** - always use target="_blank" rel="noopener noreferrer"
+
+## Authentication (Clerk)
+
+### Setup
+Authentication is handled by Clerk using `@clerk/nextjs`. The middleware (`middleware.ts`) protects routes using `clerkMiddleware()`.
+
+### Environment Variables
+Required in `.env.local`:
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
+CLERK_SECRET_KEY=YOUR_SECRET_KEY
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+```
+
+### Auth Components
+Import from `@clerk/nextjs`:
+- `<SignedIn>` / `<SignedOut>` - Conditional rendering based on auth state
+- `<UserButton>` - User avatar with dropdown menu
+- `<SignIn>` / `<SignUp>` - Embedded auth forms
+
+### Custom Auth Pages Pattern
+Custom sign-in/sign-up pages follow the design system:
+
+```tsx
+// app/sign-in/[[...sign-in]]/page.tsx
+import { SignIn } from '@clerk/nextjs';
+
+<SignIn
+  appearance={{
+    variables: {
+      colorPrimary: '#f59e0b',      // amber-500
+      colorBackground: '#0a0a0a',    // dark-bg
+      colorText: '#ffffff',
+      colorInputBackground: '#171717',
+    },
+    elements: {
+      card: 'bg-[#0a0a0a] border border-white/10',
+      formButtonPrimary: 'bg-amber-500 hover:bg-amber-400 text-black',
+      formFieldInput: 'bg-white/5 border-white/10 text-white focus:border-amber-500',
+      socialButtonsBlockButton: 'bg-white/5 border border-white/10 hover:border-amber-500/50',
+    }
+  }}
+/>
+```
+
+### Protecting Routes
+In `middleware.ts`, public routes are defined with `createRouteMatcher`:
+
+```typescript
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/programas(.*)',
+  // ... other public routes
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+});
+```
+
+## Routes Overview
+
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage with hero, stats, courses |
+| `/sign-in` | Custom sign-in page |
+| `/sign-up` | Custom sign-up page |
+| `/perfil` | User profile management (protected) |
+| `/pricing` | Pro plan pricing and comparison |
+| `/conocenos` | About us page |
+| `/programas` | Course/Master catalog |
+| `/programas/[id]` | Individual program details |
+| `/consultoria` | Statistical consulting services |
+| `/innovacion` | Biomáxima innovation page |
+| `/blog` | Blog listing |
+| `/blog/[id]` | Individual blog post |
+| `/contacto` | Contact page |
+
+## External Links
+
+| Service | URL |
+|---------|-----|
+| Campus E-Learning | https://maximaformacion.com.es/ |
+| Campus Data Science | https://www.maximacampus.es/ |
+| Maxymia | https://maxymia.com/ |
+| Biomáxima | https://biomaximainnovacion.es/ |

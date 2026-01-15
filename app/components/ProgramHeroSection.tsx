@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Clock, BookOpen, Award } from 'lucide-react';
+import { Clock, BookOpen, Award, Crown } from 'lucide-react';
 import { Program } from '../data/programs';
 
 interface ProgramHeroSectionProps {
@@ -41,7 +41,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mb-6"
+          className="mb-6 flex items-center justify-center gap-3 flex-wrap"
         >
           <span className={`inline-block px-4 py-1.5 text-xs font-black tracking-[0.2em] uppercase border ${
             program.type === 'Master' 
@@ -50,8 +50,13 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program 
           }`}>
             {program.type}
           </span>
+          {program.isPro && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full shadow-lg shadow-amber-500/30">
+              <Crown size={12} /> PRO
+            </span>
+          )}
           {program.featured && (
-            <span className="ml-4 inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase tracking-widest">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase tracking-widest">
               <Award size={12} /> Destacado
             </span>
           )}

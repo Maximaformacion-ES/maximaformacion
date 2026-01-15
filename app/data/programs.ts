@@ -26,6 +26,7 @@ export interface Program {
   audience: string[];
   careers: string[];
   objectives: string[];
+  isPro: boolean; // Whether this program requires Pro subscription
 }
 
 export const ALL_PROGRAMS: Partial<Program>[] = [
@@ -37,6 +38,7 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     ects: '60 ECTS', 
     tags: ['Tecnología', 'Innovación'], 
     featured: true,
+    isPro: true, // Pro-only program
     description: 'Domina las técnicas más avanzadas de IA y Machine Learning para aplicarlas en proyectos reales.',
     longDescription: 'Este máster te prepara para liderar proyectos de inteligencia artificial en empresas tecnológicas. Aprenderás desde los fundamentos hasta las técnicas más avanzadas de deep learning, procesamiento de lenguaje natural y visión por computadora.',
     image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80',
@@ -100,6 +102,7 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     ects: '60 ECTS', 
     tags: ['Seguridad', 'Gestión'], 
     featured: true,
+    isPro: true, // Pro-only program
     description: 'Lidera la estrategia de seguridad informática en organizaciones de cualquier tamaño.',
     longDescription: 'Formación ejecutiva para profesionales que buscan dirigir equipos de ciberseguridad y diseñar estrategias de protección para empresas. Combina aspectos técnicos y de gestión.',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80',
@@ -265,6 +268,7 @@ const getDefaultProgramData = (base: Partial<Program>): Program => ({
   ects: base.ects!,
   tags: base.tags!,
   featured: base.featured ?? false,
+  isPro: base.isPro ?? false, // Default to free program
   description: base.description || `${base.title} - Formación especializada de alta calidad.`,
   longDescription: base.longDescription || `Este programa te prepara para destacar en el sector. ${base.description || ''}`,
   image: base.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80',

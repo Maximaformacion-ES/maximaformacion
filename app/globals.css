@@ -79,3 +79,849 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Clerk Auth Form Customizations */
+.cl-internal-b3fm6y {
+  background-color: #1a1a1a !important;
+}
+
+.cl-formFieldInput {
+  background-color: #1a1a1a !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.cl-formFieldInput:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+}
+
+.cl-formFieldInput::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.cl-formButtonPrimary {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+.cl-formButtonPrimary:hover {
+  background: linear-gradient(to right, #fbbf24, #f59e0b) !important;
+}
+
+.cl-socialButtonsBlockButton {
+  background-color: #1a1a1a !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.cl-socialButtonsBlockButton:hover {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-color: #f59e0b !important;
+}
+
+.cl-dividerLine {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.cl-dividerText {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.cl-formFieldLabel {
+  color: #ffffff !important;
+}
+
+.cl-footerActionLink {
+  color: #f59e0b !important;
+}
+
+.cl-footerActionLink:hover {
+  color: #fbbf24 !important;
+}
+
+.cl-card {
+  background-color: #141414 !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.cl-headerTitle,
+.cl-headerSubtitle {
+  color: #ffffff !important;
+}
+
+.cl-identityPreview {
+  background-color: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.cl-identityPreviewText {
+  color: #ffffff !important;
+}
+
+.cl-identityPreviewEditButtonIcon {
+  color: #f59e0b !important;
+}
+
+.cl-formFieldInputShowPasswordIcon {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-formFieldInputShowPasswordButton:hover .cl-formFieldInputShowPasswordIcon {
+  color: #f59e0b !important;
+}
+
+.cl-otpCodeFieldInput {
+  background-color: #1a1a1a !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.cl-otpCodeFieldInput:focus {
+  border-color: #f59e0b !important;
+}
+
+/* Hide Clerk footer branding */
+.cl-footer {
+  display: none !important;
+}
+
+/* UserButton Customizations */
+.cl-userButtonAvatarBox {
+  width: 44px !important;
+  height: 44px !important;
+  border: 2px solid rgba(245, 158, 11, 0.5) !important;
+  transition: all 0.3s ease !important;
+}
+
+.cl-userButtonAvatarBox:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3) !important;
+}
+
+.cl-userButtonAvatarImage {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.cl-userButtonPopoverCard {
+  background-color: #141414 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.1) !important;
+}
+
+.cl-userButtonPopoverCard * {
+  color: #ffffff !important;
+}
+
+.cl-userButtonPopoverMain {
+  background-color: #141414 !important;
+}
+
+.cl-userButtonPopoverActions {
+  background-color: #141414 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-userButtonPopoverActionButton {
+  color: #ffffff !important;
+  background-color: transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #f59e0b !important;
+}
+
+.cl-userButtonPopoverActionButtonText {
+  color: #ffffff !important;
+}
+
+.cl-userButtonPopoverActionButton:hover .cl-userButtonPopoverActionButtonText {
+  color: #f59e0b !important;
+}
+
+.cl-userButtonPopoverActionButtonIcon {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-userButtonPopoverActionButton:hover .cl-userButtonPopoverActionButtonIcon {
+  color: #f59e0b !important;
+}
+
+.cl-userButtonPopoverActionButtonIcon svg {
+  color: inherit !important;
+}
+
+.cl-userButtonPopoverFooter {
+  display: none !important;
+}
+
+.cl-userPreview {
+  background-color: #141414 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 16px !important;
+}
+
+.cl-userPreviewMainIdentifier {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.cl-userPreviewSecondaryIdentifier {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-userPreviewTextContainer {
+  color: #ffffff !important;
+}
+
+.cl-userPreviewTextContainer * {
+  color: inherit !important;
+}
+
+/* Fix for any remaining white backgrounds in popover */
+.cl-internal-1dauvpw,
+.cl-internal-1hp5nqm,
+.cl-internal-nwpxj3 {
+  background-color: #141414 !important;
+  color: #ffffff !important;
+}
+
+/* UserProfile Component Customizations */
+.cl-profilePage {
+  background-color: #141414 !important;
+}
+
+.cl-navbar {
+  background-color: #0a0a0a !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-navbarButton {
+  color: rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-navbarButton:hover {
+  color: #f59e0b !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.cl-navbarButton[data-active="true"] {
+  color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+.cl-navbarButtonIcon {
+  color: currentColor !important;
+}
+
+.cl-pageScrollBox {
+  background-color: #141414 !important;
+}
+
+.cl-profileSection {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-profileSectionTitle,
+.cl-profileSectionTitleText {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.cl-profileSectionSubtitle,
+.cl-profileSectionSubtitleText {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-profileSectionContent {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.cl-profileSectionPrimaryButton {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+.cl-profileSectionPrimaryButton:hover {
+  background: linear-gradient(to right, #fbbf24, #f59e0b) !important;
+}
+
+.cl-accordionTriggerButton {
+  color: #ffffff !important;
+}
+
+.cl-accordionTriggerButton:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.cl-accordionContent {
+  background-color: #0a0a0a !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-badge {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.cl-menuButton {
+  color: #ffffff !important;
+}
+
+.cl-menuButton:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #f59e0b !important;
+}
+
+.cl-menuList {
+  background-color: #141414 !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.cl-menuItem {
+  color: #ffffff !important;
+}
+
+.cl-menuItem:hover {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: #f59e0b !important;
+}
+
+.cl-breadcrumbs {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-breadcrumbsItem {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-breadcrumbsItemDivider {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.cl-breadcrumbsItem[data-current="true"] {
+  color: #f59e0b !important;
+}
+
+/* User Profile Container */
+.user-profile-container .cl-rootBox {
+  width: 100% !important;
+}
+
+.user-profile-container .cl-card {
+  background-color: #141414 !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.05) !important;
+}
+
+/* Hide Clerk's built-in billing (we use Stripe directly) */
+.cl-billingPage,
+.cl-billingSection,
+[data-localization-key*="billing"],
+button[data-localization-key*="billing"],
+a[href*="/billing"],
+.cl-navbarButton[href*="billing"],
+.cl-navbar button[data-localization-key*="billing"],
+[class*="billing"] {
+  display: none !important;
+}
+
+/* Pricing Table Container */
+.pricing-table-container .cl-rootBox {
+  width: 100% !important;
+}
+
+/* ==============================================
+   CLERK CHECKOUT STYLING (Modal & Drawer)
+   Dark theme with amber accents
+   ============================================== */
+
+/* Ensure checkout appears above everything (header is z-50) */
+.cl-rootBox[data-clerk-checkout],
+[data-clerk-modal],
+[data-clerk-drawer],
+.cl-modalRoot,
+.cl-drawerRoot,
+[class*="cl-modal"],
+[class*="cl-drawer"] {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+/* Backdrop for both modal and drawer */
+.cl-modalBackdrop,
+[data-clerk-modal-backdrop],
+[class*="cl-modalBackdrop"],
+[class*="Backdrop"] {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 9998 !important;
+  position: fixed !important;
+  inset: 0 !important;
+}
+
+/* Drawer styling - right side panel */
+.cl-drawer,
+[data-clerk-drawer],
+[class*="cl-drawer"],
+[class*="drawer"] {
+  background-color: #0a0a0a !important;
+  border-left: 1px solid rgba(245, 158, 11, 0.3) !important;
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8) !important;
+  z-index: 9999 !important;
+}
+
+/* Modal container styling */
+.cl-modalContent,
+[class*="cl-modalContent"],
+[class*="modalContent"] {
+  background-color: #0a0a0a !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 
+    0 0 0 1px rgba(245, 158, 11, 0.1),
+    0 25px 50px -12px rgba(0, 0, 0, 0.9),
+    0 0 100px rgba(245, 158, 11, 0.1) !important;
+  z-index: 9999 !important;
+  position: relative !important;
+}
+
+/* Close button for both */
+.cl-modalCloseButton,
+.cl-drawer__closeButton,
+[class*="closeButton"] {
+  color: rgba(255, 255, 255, 0.6) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-modalCloseButton:hover,
+.cl-drawer__closeButton:hover,
+[class*="closeButton"]:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Checkout container inside modal/drawer */
+[class*="checkout"],
+.cl-checkout {
+  background-color: #0a0a0a !important;
+}
+
+/* Card container */
+[class*="checkout"] .cl-card,
+[class*="checkout"] .cl-cardBox,
+[class*="checkout"] [class*="card"] {
+  background-color: #0a0a0a !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Plan Summary Section */
+.cl-planSummary,
+.cl-checkout__planSummary {
+  background: linear-gradient(135deg, #141414 0%, #1a1a1a 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-radius: 1rem !important;
+  padding: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.cl-planSummary__title,
+.cl-planSummaryTitle {
+  color: #ffffff !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+.cl-planSummary__subtitle {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-planSummary__price,
+.cl-planSummaryPrice {
+  font-size: 2.5rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+}
+
+.cl-planSummary__pricePeriod,
+.cl-planSummaryPricePeriod {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 400 !important;
+}
+
+/* Features in plan summary */
+.cl-planSummary__features,
+.cl-planSummaryFeatures {
+  margin-top: 1rem !important;
+  padding-top: 1rem !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-planSummary__feature,
+.cl-planSummaryFeature {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 0.875rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+.cl-planSummary__featureIcon,
+.cl-planSummaryFeatureIcon {
+  color: #f59e0b !important;
+}
+
+/* Billing Period Toggle in checkout */
+.cl-checkout__periodToggle,
+.cl-billingPeriodToggle {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.25rem !important;
+}
+
+.cl-checkout__periodToggleButton,
+.cl-billingPeriodToggleButton {
+  color: rgba(255, 255, 255, 0.6) !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-checkout__periodToggleButton[data-active="true"],
+.cl-billingPeriodToggleButton[data-active="true"] {
+  background-color: #f59e0b !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Payment Methods Section */
+.cl-checkout__paymentMethods,
+.cl-paymentMethods {
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.cl-checkout__paymentMethodsTitle,
+.cl-paymentMethodsTitle {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.75rem !important;
+}
+
+/* Payment Method Item */
+.cl-paymentMethod,
+.cl-checkout__paymentMethod {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.75rem !important;
+  padding: 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-paymentMethod:hover,
+.cl-checkout__paymentMethod:hover {
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  background-color: rgba(245, 158, 11, 0.05) !important;
+}
+
+.cl-paymentMethod[data-selected="true"],
+.cl-checkout__paymentMethod[data-selected="true"] {
+  border-color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+.cl-paymentMethod__brand,
+.cl-paymentMethodBrand {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.cl-paymentMethod__last4,
+.cl-paymentMethodLast4 {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-paymentMethod__badge,
+.cl-paymentMethodBadge {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #f59e0b !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.375rem !important;
+}
+
+/* Add Payment Method Button */
+.cl-addPaymentMethod,
+.cl-checkout__addPaymentMethod {
+  color: rgba(255, 255, 255, 0.6) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+  border-radius: 0.75rem !important;
+  padding: 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-addPaymentMethod:hover,
+.cl-checkout__addPaymentMethod:hover {
+  color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+}
+
+/* Total Section */
+.cl-checkout__total,
+.cl-checkoutTotal {
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.cl-checkout__totalLabel,
+.cl-checkoutTotalLabel {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.cl-checkout__totalAmount,
+.cl-checkoutTotalAmount {
+  color: #ffffff !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+/* Submit Button */
+.cl-checkout__submitButton,
+.cl-checkoutSubmitButton,
+.cl-formButtonPrimary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  padding: 1rem 2rem !important;
+  border-radius: 0.75rem !important;
+  border: none !important;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+}
+
+.cl-checkout__submitButton:hover,
+.cl-checkoutSubmitButton:hover,
+.cl-formButtonPrimary:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 15px 30px -5px rgba(245, 158, 11, 0.5) !important;
+}
+
+.cl-checkout__submitButton:active,
+.cl-checkoutSubmitButton:active,
+.cl-formButtonPrimary:active {
+  transform: translateY(0) !important;
+}
+
+/* Form Fields */
+.cl-checkout .cl-formFieldLabel {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.cl-checkout .cl-formFieldInput {
+  background-color: #141414 !important;
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 0.75rem !important;
+  padding: 0.875rem 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-checkout .cl-formFieldInput:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important;
+  outline: none !important;
+}
+
+.cl-checkout .cl-formFieldInput::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Security Footer */
+.cl-checkout__footer,
+.cl-checkoutFooter {
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.75rem !important;
+  text-align: center !important;
+  margin-top: 1rem !important;
+}
+
+.cl-checkout__footer a,
+.cl-checkoutFooter a {
+  color: #f59e0b !important;
+}
+
+/* Security badges */
+.cl-checkout__securityBadge,
+.cl-securityBadge {
+  color: rgba(255, 255, 255, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+}
+
+/* Loading spinner */
+.cl-checkout__spinner,
+.cl-spinner {
+  color: #f59e0b !important;
+}
+
+/* Error messages */
+.cl-checkout .cl-formFieldErrorText {
+  color: #ef4444 !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Success state */
+.cl-checkout__success {
+  text-align: center !important;
+  padding: 2rem !important;
+}
+
+.cl-checkout__successIcon {
+  color: #22c55e !important;
+  margin-bottom: 1rem !important;
+}
+
+.cl-checkout__successTitle {
+  color: #ffffff !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.cl-checkout__successMessage {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Pricing Table Customizations */
+.cl-pricingTable {
+  gap: 1.5rem !important;
+}
+
+.cl-pricingTableCard {
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.cl-pricingTableCard:hover {
+  border-color: rgba(245, 158, 11, 0.5) !important;
+}
+
+.cl-pricingTableCard[data-highlighted="true"] {
+  background: linear-gradient(to bottom, rgba(245, 158, 11, 0.1), #141414) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.1) !important;
+}
+
+.cl-pricingTableCardName {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.cl-pricingTableCardBadge {
+  background-color: #f59e0b !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+.cl-pricingTableCardPrice {
+  font-size: 3rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+}
+
+.cl-pricingTableCardPricePeriod {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-weight: 300 !important;
+}
+
+.cl-pricingTableCardDescription {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-weight: 300 !important;
+}
+
+.cl-pricingTableCardFeatures {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.cl-pricingTableCardFeatureItem {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 300 !important;
+}
+
+.cl-pricingTableCardFeatureIcon {
+  color: #f59e0b !important;
+}
+
+.cl-pricingTableCardButton {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  transition: all 0.3s ease !important;
+}
+
+.cl-pricingTableCardButton:hover {
+  background: linear-gradient(to right, #fbbf24, #f59e0b) !important;
+}
+
+.cl-pricingTableCard[data-highlighted="true"] .cl-pricingTableCardButton {
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Period Toggle */
+.cl-pricingTablePeriodToggle {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 9999px !important;
+}
+
+.cl-pricingTablePeriodToggleButton {
+  color: rgba(255, 255, 255, 0.6) !important;
+  transition: all 0.2s ease !important;
+}
+
+.cl-pricingTablePeriodToggleButton:hover {
+  color: #ffffff !important;
+}
+
+.cl-pricingTablePeriodToggleButton[data-active="true"] {
+  background-color: #f59e0b !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Discount badge */
+.cl-pricingTablePeriodDiscountBadge {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #f59e0b !important;
+}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, BookOpen, Award, ArrowUpRight } from 'lucide-react';
+import { Clock, BookOpen, Award, ArrowUpRight, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { Program } from '../data/programs';
 
@@ -24,13 +24,20 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
       <div className="p-10 h-full flex flex-col">
         {/* Header Tags */}
         <div className="flex items-center justify-between mb-8">
-          <span className={`px-4 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase border ${
-            program.type === 'Master' 
-              ? 'border-amber-500 text-amber-500 bg-amber-500/5' 
-              : 'border-white/20 text-white/50 bg-white/5'
-          }`}>
-            {program.type}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`px-4 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase border ${
+              program.type === 'Master' 
+                ? 'border-amber-500 text-amber-500 bg-amber-500/5' 
+                : 'border-white/20 text-white/50 bg-white/5'
+            }`}>
+              {program.type}
+            </span>
+            {program.isPro && (
+              <span className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full">
+                <Crown size={10} /> PRO
+              </span>
+            )}
+          </div>
           {program.featured && (
             <span className="flex items-center gap-1.5 text-[10px] font-bold text-amber-500 uppercase tracking-widest">
               <Award size={12} /> Destacado
