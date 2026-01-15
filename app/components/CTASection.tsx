@@ -52,7 +52,7 @@ export const CTASection: React.FC = () => {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <motion.a
-            href="#contact"
+            href="/contacto"
             className="group flex items-center justify-center gap-3 bg-white text-black px-10 py-5 text-lg font-medium rounded-full"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
@@ -61,7 +61,7 @@ export const CTASection: React.FC = () => {
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </motion.a>
           <motion.a
-            href="#call"
+            href="tel:+34635659391"
             className="flex items-center justify-center gap-3 border border-white/30 text-white px-10 py-5 text-lg font-light rounded-full hover:bg-white/10 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
