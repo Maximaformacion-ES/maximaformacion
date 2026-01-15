@@ -19,7 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Conócenos', path: '/conocenos' },
   { name: 'Formación', path: '/programas' },
   { name: 'Consultoría', path: '/consultoria' },
-  { name: 'Blog', path: '/#blog' },
+  { name: 'Blog', path: '/blog' },
   { name: 'Contacto', path: '/contacto' },
 ];
 
