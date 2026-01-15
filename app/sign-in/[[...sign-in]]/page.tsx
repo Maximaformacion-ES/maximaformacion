@@ -5,6 +5,7 @@ import { SignIn } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { FontStyles } from '../../components/FontStyles';
+import { Header } from '@/app/components/Header';
 
 export default function SignInPage() {
   return (
@@ -24,26 +25,7 @@ export default function SignInPage() {
       </div>
 
       {/* Header */}
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10"
-      >
-        <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-6">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="text-amber-500 text-xl md:text-2xl font-bold tracking-tight">
-              MAXIMA<span className="text-white font-light">FORMACIÓN</span>
-            </Link>
-            <Link
-              href="/sign-up"
-              className="text-white/60 text-sm font-light hover:text-amber-500 transition-colors"
-            >
-              ¿No tienes cuenta? <span className="text-amber-500">Regístrate</span>
-            </Link>
-          </div>
-        </div>
-      </motion.nav>
+      <Header isMenuOpen={false} setIsMenuOpen={() => {}} />
 
       {/* Main Content */}
       <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12">
