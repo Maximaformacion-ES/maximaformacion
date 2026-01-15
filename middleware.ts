@@ -14,7 +14,17 @@ const isPublicRoute = createRouteMatcher([
   '/pricing(.*)',
 ]);
 
+// Define webhook routes that should bypass Clerk auth (they use their own signature verification)
+const isWebhookRoute = createRouteMatcher([
+  '/api/webhooks/stripe(.*)',
+]);
+
 export default clerkMiddleware(async (auth, req) => {
+  // Skip authentication for webhook routes (they use Stripe signature verification)
+  if (isWebhookRoute(req)) {
+    return;
+  }
+  
   // Protect all non-public routes
   if (!isPublicRoute(req)) {
     await auth.protect();
