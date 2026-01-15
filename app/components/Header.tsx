@@ -79,9 +79,9 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
               <Image 
                 src="/logo.png" 
                 alt="Maxima Formación" 
-                width={180} 
-                height={60}
-                className="h-8 md:h-10 w-auto"
+                width={200} 
+                height={80}
+                className="h-12 md:h-14 w-auto"
                 priority
               />
             </motion.a>
