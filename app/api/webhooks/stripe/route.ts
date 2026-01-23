@@ -41,18 +41,85 @@ export async function POST(request: Request) {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
         const customerId = session.customer as string;
-        const subscriptionId = session.subscription as string;
+        const paymentType = session.metadata?.type || 'subscription';
 
-        if (userId) {
-          // Update Clerk user with Pro status
+        if (!userId) {
+          console.error('No userId in session metadata');
+          break;
+        }
+
+        // Get current user metadata
+        const user = await client.users.getUser(userId);
+        const currentMetadata = user.publicMetadata || {};
+
+        if (paymentType === 'course' && session.mode === 'payment') {
+          // Handle course purchase
+          const programId = session.metadata?.programId;
+          const documentId = session.metadata?.documentId;
+          const programTitle = session.metadata?.programTitle;
+          const paymentIntentId = session.payment_intent as string;
+
+          if (!programId || !documentId) {
+            console.error('Missing programId or documentId in session metadata');
+            break;
+          }
+
+          // Add to user's purchased courses
+          interface PurchasedCourse {
+            programId: number;
+            documentId: string;
+            purchasedAt: string;
+            stripePaymentId: string;
+            price: number;
+            title?: string;
+          }
+
+          const existingPurchases = (currentMetadata.purchasedCourses as PurchasedCourse[]) || [];
+
+          // Check if already purchased to avoid duplicates
+          const alreadyPurchased = existingPurchases.some(
+            (p) => p.documentId === documentId || p.programId === Number(programId)
+          );
+
+          if (!alreadyPurchased) {
+            const newPurchase: PurchasedCourse = {
+              programId: Number(programId),
+              documentId,
+              purchasedAt: new Date().toISOString(),
+              stripePaymentId: paymentIntentId,
+              price: (session.amount_total || 0) / 100,
+              title: programTitle,
+            };
+
+            await client.users.updateUserMetadata(userId, {
+              publicMetadata: {
+                ...currentMetadata,
+                stripeCustomerId: customerId || currentMetadata.stripeCustomerId,
+                purchasedCourses: [...existingPurchases, newPurchase],
+              },
+              privateMetadata: {
+                ...user.privateMetadata,
+                stripeCustomerId: customerId || (user.privateMetadata as Record<string, unknown>)?.stripeCustomerId,
+              },
+            });
+            console.log(`✅ User ${userId} purchased course: ${programTitle} (${documentId})`);
+          } else {
+            console.log(`ℹ️ User ${userId} already owns course ${documentId}`);
+          }
+        } else {
+          // Handle subscription (existing logic)
+          const subscriptionId = session.subscription as string;
+
           await client.users.updateUserMetadata(userId, {
             publicMetadata: {
+              ...currentMetadata,
               plan: 'pro',
               stripeCustomerId: customerId,
               stripeSubscriptionId: subscriptionId,
               subscribedAt: new Date().toISOString(),
             },
             privateMetadata: {
+              ...user.privateMetadata,
               stripeCustomerId: customerId,
               stripeSubscriptionId: subscriptionId,
             },

@@ -1,62 +1,27 @@
-'use client';
+import { draftMode } from 'next/headers';
+import { getBlogPosts } from '@/lib/strapi/queries';
+import { ALL_BLOG_POSTS } from '../data/blogs';
+import BlogClient from './BlogClient';
 
-import React, { useState, useEffect } from 'react';
-import { FontStyles } from '../components/FontStyles';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { BlogHeader } from '../components/BlogHeader';
-import { BlogFilterBar } from '../components/BlogFilterBar';
-import { BlogGrid } from '../components/BlogGrid';
-import { ALL_BLOG_POSTS, BlogPost } from '../data/blogs';
+export const revalidate = 60;
 
-export default function BlogPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('Todos');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(ALL_BLOG_POSTS);
+export default async function BlogPage() {
+  const { isEnabled: isDraft } = await draftMode();
 
-  useEffect(() => {
-    let result = ALL_BLOG_POSTS;
-    
-    // Apply Category Filter
-    if (activeFilter !== 'Todos') {
-      result = result.filter(post => post.category === activeFilter);
-    }
-    
-    // Apply Search
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(post => 
-        post.title.toLowerCase().includes(q) || 
-        post.excerpt.toLowerCase().includes(q) ||
-        post.tags.some(t => t.toLowerCase().includes(q))
-      );
-    }
-    
-    setFilteredPosts(result);
-  }, [activeFilter, searchQuery]);
+  let posts;
 
-  return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
-      <FontStyles />
-      
-      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+  try {
+    // Try to fetch from Strapi
+    const { posts: strapiPosts } = await getBlogPosts({ draft: isDraft });
+    posts = strapiPosts;
+  } catch {
+    // Fallback to local data if Strapi is unavailable
+    // Error already logged by strapiRequest
+    posts = ALL_BLOG_POSTS.map(post => ({
+      ...post,
+      documentId: post.id.toString(),
+    }));
+  }
 
-      <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10">
-        <BlogHeader />
-        
-        <BlogFilterBar
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          resultsCount={filteredPosts.length}
-        />
-
-        <BlogGrid posts={filteredPosts} />
-      </main>
-
-      <Footer />
-    </div>
-  );
+  return <BlogClient initialPosts={posts} />;
 }

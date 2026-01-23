@@ -1,39 +1,149 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile, useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { FontStyles } from '../../components/FontStyles';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { GraduationCap, BookOpen, Award, Crown, Check, ArrowRight, Sparkles, ExternalLink, Loader2, CreditCard } from 'lucide-react';
+import { GraduationCap, BookOpen, Award, Crown, Check, ArrowRight, Sparkles, ExternalLink, Loader2, CreditCard, Play } from 'lucide-react';
 import Link from 'next/link';
+import CourseProgressCard from '../../components/CourseProgressCard';
+import type { UserCourseData } from '@/lib/strapi/types';
 
 // Custom page component for "Mis Cursos"
-const MisCursosPage = () => (
-  <div className="p-6">
-    <h2 className="text-2xl font-bold text-white mb-6">Mis Cursos</h2>
-    <div className="space-y-4">
-      <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/50 transition-colors">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center">
-            <BookOpen className="text-amber-500" size={24} />
+const MisCursosPage = () => {
+  const [courses, setCourses] = useState<UserCourseData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasProAccess, setHasProAccess] = useState(false);
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const response = await fetch('/api/user/courses');
+        if (!response.ok) throw new Error('Failed to fetch courses');
+        const data = await response.json();
+        setCourses(data.courses || []);
+        setHasProAccess(data.hasProAccess || false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error loading courses');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchCourses();
+  }, []);
+
+  // Find the course with most recent activity for "Continue where you left off"
+  const inProgressCourse = courses.find(
+    (c) => c.progress && c.progress.progressPercent > 0 && c.progress.progressPercent < 100
+  );
+
+  if (isLoading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[300px]">
+        <Loader2 className="text-amber-500 animate-spin" size={32} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <p className="text-red-400">{error}</p>
+      </div>
+    );
+  }
+
+  if (courses.length === 0) {
+    return (
+      <div className="p-6">
+        <h2 className="text-2xl font-bold text-white mb-6">Mis Cursos</h2>
+        <div className="p-6 bg-white/5 border border-white/10 rounded-xl text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-amber-500/20 rounded-full flex items-center justify-center">
+            <BookOpen className="text-amber-500" size={28} />
           </div>
-          <div>
-            <h3 className="text-white font-medium">No tienes cursos activos</h3>
-            <p className="text-white/60 text-sm">Explora nuestro catálogo de formación</p>
-          </div>
+          <h3 className="text-white font-semibold text-lg mb-2">No tienes cursos aún</h3>
+          <p className="text-white/60 mb-6">
+            {hasProAccess
+              ? 'Tu suscripción Pro te da acceso a todos los cursos premium.'
+              : 'Explora nuestro catálogo y empieza tu formación hoy.'}
+          </p>
+          <Link
+            href="/programas"
+            className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded-full font-medium transition-colors"
+          >
+            Explorar cursos
+            <ArrowRight size={18} />
+          </Link>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold text-white mb-6">Mis Cursos</h2>
+
+      {/* Continue Learning Section */}
+      {inProgressCourse && (
+        <div className="mb-8 p-4 bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/30 rounded-xl">
+          <p className="text-amber-500 text-sm font-medium mb-3">Continuar donde lo dejaste</p>
+          <div className="flex items-center gap-4">
+            <img
+              src={inProgressCourse.program.image}
+              alt={inProgressCourse.program.title}
+              className="w-20 h-14 object-cover rounded-lg"
+            />
+            <div className="flex-1 min-w-0">
+              <h4 className="text-white font-medium truncate">{inProgressCourse.program.title}</h4>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-amber-500 rounded-full"
+                    style={{ width: `${inProgressCourse.progress?.progressPercent || 0}%` }}
+                  />
+                </div>
+                <span className="text-amber-500 text-xs font-medium">
+                  {inProgressCourse.progress?.progressPercent || 0}%
+                </span>
+              </div>
+            </div>
+            <Link
+              href={`/cursos/${inProgressCourse.program.documentId}${
+                inProgressCourse.progress?.currentLessonId
+                  ? `/lesson/${inProgressCourse.progress.currentLessonId}`
+                  : ''
+              }`}
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-full font-medium transition-colors"
+            >
+              <Play size={16} fill="currentColor" />
+              Continuar
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Courses Grid */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {courses.map((courseData, index) => (
+          <CourseProgressCard key={courseData.program.id} courseData={courseData} index={index} />
+        ))}
+      </div>
+
+      {/* Explore More */}
+      <div className="mt-8 text-center">
+        <Link
+          href="/programas"
+          className="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors"
+        >
+          Ver más cursos →
+        </Link>
+      </div>
     </div>
-    <a 
-      href="/programas" 
-      className="inline-flex items-center gap-2 mt-6 bg-amber-500 text-black px-6 py-3 rounded-full font-medium hover:bg-amber-400 transition-colors"
-    >
-      Ver catálogo de cursos
-    </a>
-  </div>
-);
+  );
+};
 
 // Custom page component for "Certificados"
 const CertificadosPage = () => (

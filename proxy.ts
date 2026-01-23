@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/conocenos(.*)',
   '/programas(.*)',
+  '/cursos(.*)',  // Course pages - access control handled by CourseAccessGate component
   '/consultoria(.*)',
   '/innovacion(.*)',
   '/blog(.*)',
@@ -14,9 +15,10 @@ const isPublicRoute = createRouteMatcher([
   '/pricing(.*)',
 ]);
 
-// Define webhook routes that should bypass Clerk auth (they use their own signature verification)
+// Define routes that should bypass Clerk auth (they use their own verification)
 const isWebhookRoute = createRouteMatcher([
   '/api/webhooks/stripe(.*)',
+  '/api/preview(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

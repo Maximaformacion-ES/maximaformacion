@@ -1,76 +1,72 @@
-'use client';
+import { draftMode } from 'next/headers';
+import { getBlogPostById, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
+import { ALL_BLOG_POSTS, getRelatedPosts as getLocalRelatedPosts } from '../../data/blogs';
+import BlogDetailClient from './BlogDetailClient';
 
-import React, { useState, use } from 'react';
-import Link from 'next/link';
-import { FontStyles } from '../../components/FontStyles';
-import { Header } from '../../components/Header';
-import { Footer } from '../../components/Footer';
-import { BlogHeroSection } from '../../components/BlogHeroSection';
-import { BlogContent } from '../../components/BlogContent';
-import { BlogAuthor } from '../../components/BlogAuthor';
-import { BlogRelated } from '../../components/BlogRelated';
-import { ALL_BLOG_POSTS } from '../../data/blogs';
+export const revalidate = 60;
 
 interface BlogPageProps {
   params: Promise<{
     id: string;
-  }> | {
-    id: string;
-  };
+  }>;
 }
 
-export default function BlogPage({ params }: BlogPageProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const resolvedParams = use(params instanceof Promise ? params : Promise.resolve(params));
-  const postId = parseInt(resolvedParams.id, 10);
-  const post = ALL_BLOG_POSTS.find(p => p.id === postId);
+// Generate static params for SSG
+export async function generateStaticParams() {
+  try {
+    const slugs = await getAllBlogSlugs();
+    return slugs.map((slug) => ({ id: slug }));
+  } catch {
+    // Fallback to local data IDs (error logged by strapiRequest)
+    return ALL_BLOG_POSTS.map((p) => ({ id: p.id.toString() }));
+  }
+}
 
-  if (!post) {
-    return (
-      <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
-        <FontStyles />
-        
-        <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+export default async function BlogPage({ params }: BlogPageProps) {
+  const { isEnabled: isDraft } = await draftMode();
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
 
-        <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
-          <div className="text-center max-w-2xl">
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6">
-              404
-            </h1>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Artículo no encontrado
-            </h2>
-            <p className="text-neutral-400 mb-8 font-light">
-              El artículo que buscas no existe o ha sido eliminado.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-base font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300"
-            >
-              Ver todos los artículos
-            </Link>
-          </div>
-        </main>
+  let post = null;
+  let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];
 
-        <Footer />
-      </div>
-    );
+  try {
+    // First try to fetch by ID (for numeric IDs)
+    const numericId = parseInt(id, 10);
+    if (!isNaN(numericId)) {
+      post = await getBlogPostById(numericId, isDraft);
+    }
+
+    // If not found by numeric ID, try by documentId or slug
+    if (!post) {
+      post = await getBlogPostById(id, isDraft);
+    }
+
+    // Fetch related posts
+    if (post) {
+      relatedPosts = await getRelatedPosts(post.id, 3);
+    }
+  } catch {
+    // Error already logged by strapiRequest
   }
 
-  return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
-      <FontStyles />
-      
-      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+  // Fallback to local data if Strapi is unavailable or post not found
+  if (!post) {
+    const numericId = parseInt(id, 10);
+    const localPost = ALL_BLOG_POSTS.find((p) => p.id === numericId);
+    if (localPost) {
+      post = {
+        ...localPost,
+        documentId: localPost.id.toString(),
+      };
+      // Get related posts from local data
+      const localRelated = getLocalRelatedPosts(localPost.id, 3);
+      relatedPosts = localRelated.map(p => ({
+        ...p,
+        documentId: p.id.toString(),
+      }));
+    }
+  }
 
-      <main className="relative z-10">
-        <BlogHeroSection post={post} />
-        <BlogContent post={post} />
-        <BlogAuthor post={post} />
-        <BlogRelated currentPostId={post.id} />
-      </main>
-
-      <Footer />
-    </div>
-  );
+  return <BlogDetailClient post={post} relatedPosts={relatedPosts} />;
 }

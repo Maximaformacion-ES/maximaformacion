@@ -1,5 +1,5 @@
 {
-  "name": "maximaformacion",
+  "name": "maximaformacion-front",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,6 +14,7 @@
     "@stripe/stripe-js": "^8.6.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.26.2",
+    "jose": "^6.1.3",
     "lucide-react": "^0.562.0",
     "next": "16.1.2",
     "react": "19.2.3",
