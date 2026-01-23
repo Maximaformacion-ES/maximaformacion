@@ -52,6 +52,8 @@ function getFallbackProgram(id: string): ProgramWithLessons | null {
     moduleRelations,
     totalLessons,
     totalDuration,
+    stripeProductId: null,
+    stripePriceId: null,
   };
 }
 

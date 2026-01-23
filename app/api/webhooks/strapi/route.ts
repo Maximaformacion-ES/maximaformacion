@@ -1,4 +1,4 @@
-import { revalidateTag } from 'next/cache';
+import { revalidateTag, revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Revalidate collection tags
     for (const tag of tagsToRevalidate) {
       console.log(`[Strapi Webhook] Revalidating tag: ${tag}`);
-      revalidateTag(tag);
+      revalidateTag(tag, { expire: 0 });
     }
 
     // Also revalidate specific entry tags if we have an ID or slug
@@ -94,9 +94,13 @@ export async function POST(request: NextRequest) {
 
       for (const tag of specificTags) {
         console.log(`[Strapi Webhook] Revalidating specific tag: ${tag}`);
-        revalidateTag(tag);
+        revalidateTag(tag, { expire: 0 });
       }
     }
+
+    // Also revalidate main paths
+    revalidatePath('/programas');
+    revalidatePath('/blog');
 
     return NextResponse.json({
       revalidated: true,
