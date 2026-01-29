@@ -329,19 +329,13 @@ export async function getBlogPostBySlug(
 }
 
 export async function getRelatedPosts(
-  currentPostId: number | string,
+  currentPost: BlogPost,
   limit = 3
 ): Promise<BlogPost[]> {
   try {
-    // First get the current post to know its category and tags
-    const currentPost = await getBlogPostById(currentPostId);
-    if (!currentPost) {
-      return [];
-    }
-
     // Fetch posts from the same category, excluding current
     const response = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
-      `/api/blog-posts?filters[id][$ne]=${currentPostId}&filters[category][$eq]=${encodeURIComponent(currentPost.category)}&populate=*&pagination[pageSize]=${limit}&sort=publishedAt:desc`,
+      `/api/blog-posts?filters[documentId][$ne]=${currentPost.documentId}&filters[category][$eq]=${encodeURIComponent(currentPost.category)}&populate=*&pagination[pageSize]=${limit}&sort=publishedAt:desc`,
       {
         revalidate: 60,
         tags: ['blog-posts', 'related-posts'],
@@ -350,7 +344,7 @@ export async function getRelatedPosts(
 
     let relatedPosts = response.data.map(transformBlogPost);
 
-    // If not enough posts from same category, fetch more
+    // If not enough posts from same category, fetch more by tags
     if (relatedPosts.length < limit && currentPost.tags.length > 0) {
       const tagFilter = currentPost.tags
         .slice(0, 3)
@@ -358,7 +352,7 @@ export async function getRelatedPosts(
         .join('&');
 
       const moreResponse = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
-        `/api/blog-posts?filters[id][$ne]=${currentPostId}&${tagFilter}&populate=*&pagination[pageSize]=${limit - relatedPosts.length}`,
+        `/api/blog-posts?filters[documentId][$ne]=${currentPost.documentId}&${tagFilter}&populate=*&pagination[pageSize]=${limit - relatedPosts.length}`,
         {
           revalidate: 60,
           tags: ['blog-posts', 'related-posts'],
@@ -375,7 +369,7 @@ export async function getRelatedPosts(
 
     return relatedPosts;
   } catch (error) {
-    console.error(`Error fetching related posts for ${currentPostId}:`, error);
+    console.error(`Error fetching related posts for ${currentPost.documentId}:`, error);
     return [];
   }
 }
