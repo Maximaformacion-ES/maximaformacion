@@ -297,3 +297,23 @@ export interface ProgramWithStripe extends Program {
   stripeProductId: string | null;
   stripePriceId: string | null;
 }
+
+// ============ Hero Section Types (Single Types) ============
+
+// Strapi Single Type for Hero Sections
+export interface StrapiHeroSection {
+  id: number;
+  documentId: string;
+  heroImage: StrapiMedia | null;
+  heroOverline: string;
+  heroTitle: string;
+  heroDescription: string | null;
+}
+
+// Frontend type for Hero Sections
+export interface HeroSection {
+  heroImage: string;
+  heroOverline: string;
+  heroTitle: string;
+  heroDescription: string;
+}
