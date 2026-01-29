@@ -59,7 +59,7 @@ function transformProgram(strapi: StrapiProgram): Program {
 function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
   const imageUrl = strapi.image
     ? getStrapiMediaUrl(strapi.image)
-    : strapi.imageUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80';
+    : strapi.imageUrl || 'placeholder-image-programs.webp';
 
   const author: BlogAuthor = strapi.author
     ? {
