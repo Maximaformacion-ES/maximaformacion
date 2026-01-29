@@ -1,29 +1,35 @@
-'use client';
+import { draftMode } from 'next/headers';
+import { getPrograms } from '@/lib/strapi/queries';
+import { COMPLETE_PROGRAMS } from './data/programs';
+import HomeClient from './HomeClient';
+import type { Program } from '@/lib/strapi/types';
 
-import React, { useState } from 'react';
-import { FontStyles } from './components/FontStyles';
-import { Header } from './components/Header';
-import { HeroSection } from './components/HeroSection';
-import { StatsSection } from './components/StatsSection';
-import { CoursesSection } from './components/CoursesSection';
-import { TestimonialsSection } from './components/TestimonialsSection';
-import { CTASection } from './components/CTASection';
-import { Footer } from './components/Footer';
+export const revalidate = 60;
 
-export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
-      <FontStyles />
-      
-      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-      <HeroSection />
-      <StatsSection />
-      <CoursesSection />
-      <TestimonialsSection />
-      <CTASection />
-      <Footer />
-    </div>
-  );
+export default async function Home() {
+  const { isEnabled: isDraft } = await draftMode();
+
+  let programs: Program[];
+
+  try {
+    // Try to fetch from Strapi
+    const { programs: strapiPrograms } = await getPrograms({ draft: isDraft });
+    programs = strapiPrograms;
+  } catch {
+    // Fallback to local data if Strapi is unavailable
+    programs = COMPLETE_PROGRAMS.map((p) => ({
+      ...p,
+      documentId: p.id.toString(),
+      slug: p.title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim(),
+    }));
+  }
+
+  return <HomeClient programs={programs} />;
 }

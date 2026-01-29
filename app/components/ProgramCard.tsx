@@ -1,36 +1,68 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, BookOpen, Award, ArrowUpRight, Crown } from 'lucide-react';
+import { Star, ArrowUpRight, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { Program } from '@/lib/strapi/types';
 
-interface ProgramCardProps {
-  program: Program;
+// Generate a consistent rating between 4 and 5 based on program id
+function generateRating(id: number): number {
+  const seed = (id * 7919) % 100;
+  return 4 + (seed / 100);
 }
 
-export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
+// Generate consistent student count
+function generateStudents(id: number): string {
+  const seed = (id * 3571) % 30 + 10;
+  return `${(seed / 10).toFixed(1)}K`;
+}
+
+interface ProgramCardProps {
+  program: Program;
+  rating?: number;
+  students?: string;
+  index?: number;
+}
+
+export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, students, index = 0 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Use provided rating/students or generate them
+  const displayRating = rating ?? generateRating(program.id);
+  const displayStudents = students ?? generateStudents(program.id);
+
+  // Get first tag as category, or use program type
+  const category = program.tags?.[0] || program.type;
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay: index * 0.1, duration: 0.8 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ y: -5 }}
-      className="group relative bg-[#0a0a0a] border border-white/10 rounded-none overflow-hidden hover:border-amber-500/50 transition-colors duration-500 flex flex-col min-h-[420px]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group relative bg-[#111] rounded-2xl overflow-hidden cursor-pointer"
     >
-      {/* Card Content */}
-      <div className="p-10 h-full flex flex-col">
-        {/* Header Tags */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2">
-            <span className={`px-4 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase border ${
-              program.type === 'Master' 
-                ? 'border-amber-500 text-amber-500 bg-amber-500/5' 
-                : 'border-white/20 text-white/50 bg-white/5'
-            }`}>
-              {program.type}
+      <Link href={`/programas/${program.slug}`} className="flex flex-col h-full">
+        {/* Image */}
+        <div className="relative h-56 md:h-64 overflow-hidden">
+          <motion.img
+            src={program.image}
+            alt={program.title}
+            className="w-full h-full object-cover"
+            animate={{ scale: isHovered ? 1.1 : 1 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent" />
+
+          {/* Category badge */}
+          <div className="absolute top-4 left-4 flex items-center gap-2">
+            <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white text-xs font-medium rounded-full">
+              {category}
             </span>
             {program.isPro && (
               <span className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full">
@@ -38,39 +70,61 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
               </span>
             )}
           </div>
-          {program.featured && (
-            <span className="flex items-center gap-1.5 text-[10px] font-bold text-amber-500 uppercase tracking-widest">
-              <Award size={12} /> Destacado
-            </span>
-          )}
-        </div>
 
-        {/* Title */}
-        <h3 className="text-3xl font-bold text-white mb-auto group-hover:text-amber-500 transition-colors duration-300 leading-tight">
-          {program.title}
-        </h3>
-
-        {/* Metadata */}
-        <div className="pt-8 mt-8 border-t border-white/5 flex items-center justify-between text-neutral-500">
-          <div className="flex gap-6">
-            <span className="flex items-center gap-2 text-xs font-bold">
-              <Clock size={14} /> {program.duration}
-            </span>
-            <span className="flex items-center gap-2 text-xs font-bold">
-              <BookOpen size={14} /> {program.ects}
-            </span>
-          </div>
-          <Link 
-            href={`/programas/${program.slug}`}
-            className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-amber-500 group-hover:border-amber-500 transition-all duration-500"
+          {/* Hover action button */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
+            className="absolute inset-0 flex items-center justify-center"
           >
-            <ArrowUpRight size={16} className="text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </Link>
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+              <ArrowUpRight size={24} className="text-white ml-1" />
+            </div>
+          </motion.div>
         </div>
-      </div>
-      
-      {/* Hover Overlay Action - Bottom Bar */}
-      <div className="absolute bottom-0 left-0 h-1 bg-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-in-out origin-left" />
+
+        {/* Content */}
+        <div className="p-6 flex flex-col flex-grow">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={12}
+                  className={i < Math.floor(displayRating) ? "text-amber-400" : "text-white/20"}
+                  fill={i < Math.floor(displayRating) ? "#f59e0b" : "transparent"}
+                />
+              ))}
+            </div>
+            <span className="text-white/50 text-sm">{displayRating.toFixed(1)}</span>
+            <span className="text-white/30 text-sm">({displayStudents} estudiantes)</span>
+          </div>
+
+          <h3 className="text-white text-xl font-bold mb-2 line-clamp-2 group-hover:text-amber-400 transition-colors">
+            {program.title}
+          </h3>
+
+          <p className="text-white/50 text-sm font-light line-clamp-2 mb-6">
+            {program.description}
+          </p>
+
+          <div className="flex items-center justify-between pt-4 mt-auto border-t border-white/10">
+            <div>
+              {program.originalPrice && (
+                <span className="text-white/40 text-sm line-through mr-2">{program.originalPrice}€</span>
+              )}
+              <span className="text-white text-xl font-bold">{program.price}€</span>
+            </div>
+
+            <motion.div
+              animate={{ x: isHovered ? 4 : 0 }}
+              className="text-amber-400"
+            >
+              <ArrowUpRight size={20} />
+            </motion.div>
+          </div>
+        </div>
+      </Link>
     </motion.div>
   );
 };
