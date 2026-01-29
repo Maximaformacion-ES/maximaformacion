@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Play, ArrowUpRight, Crown } from 'lucide-react';
+import { Star, ArrowUpRight, Crown } from 'lucide-react';
 import Link from 'next/link';
 import { Program } from '@/lib/strapi/types';
 
@@ -20,13 +20,17 @@ function generateStudents(id: number): string {
 
 interface ProgramCardProps {
   program: Program;
+  rating?: number;
+  students?: string;
+  index?: number;
 }
 
-export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
+export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, students, index = 0 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const rating = generateRating(program.id);
-  const students = generateStudents(program.id);
+  // Use provided rating/students or generate them
+  const displayRating = rating ?? generateRating(program.id);
+  const displayStudents = students ?? generateStudents(program.id);
 
   // Get first tag as category, or use program type
   const category = program.tags?.[0] || program.type;
@@ -34,14 +38,16 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay: index * 0.1, duration: 0.8 }}
       exit={{ opacity: 0, scale: 0.9 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative bg-[#111] rounded-2xl overflow-hidden cursor-pointer"
     >
-      <Link href={`/programas/${program.slug}`} className="block">
+      <Link href={`/programas/${program.slug}`} className="flex flex-col h-full">
         {/* Image */}
         <div className="relative h-56 md:h-64 overflow-hidden">
           <motion.img
@@ -65,9 +71,9 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
             )}
           </div>
 
-          {/* Play button for video preview */}
+          {/* Hover action button */}
           <motion.div
-            initial={{ opacity: 1, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
             className="absolute inset-0 flex items-center justify-center"
           >
@@ -78,31 +84,31 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-grow">
           <div className="flex items-center gap-2 mb-3">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   size={12}
-                  className={i < Math.floor(rating) ? "text-amber-400" : "text-white/20"}
-                  fill={i < Math.floor(rating) ? "#f59e0b" : "transparent"}
+                  className={i < Math.floor(displayRating) ? "text-amber-400" : "text-white/20"}
+                  fill={i < Math.floor(displayRating) ? "#f59e0b" : "transparent"}
                 />
               ))}
             </div>
-            <span className="text-white/50 text-sm">{rating.toFixed(1)}</span>
-            <span className="text-white/30 text-sm">({students} estudiantes)</span>
+            <span className="text-white/50 text-sm">{displayRating.toFixed(1)}</span>
+            <span className="text-white/30 text-sm">({displayStudents} estudiantes)</span>
           </div>
 
           <h3 className="text-white text-xl font-bold mb-2 line-clamp-2 group-hover:text-amber-400 transition-colors">
             {program.title}
           </h3>
 
-          <p className="text-white/50 text-sm font-light mb-4 line-clamp-2">
+          <p className="text-white/50 text-sm font-light line-clamp-2 mb-6">
             {program.description}
           </p>
 
-          <div className="flex items-center justify-between pt-4 border-t border-white/10">
+          <div className="flex items-center justify-between pt-4 mt-auto border-t border-white/10">
             <div>
               {program.originalPrice && (
                 <span className="text-white/40 text-sm line-through mr-2">{program.originalPrice}€</span>

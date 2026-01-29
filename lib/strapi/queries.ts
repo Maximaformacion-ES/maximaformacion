@@ -13,7 +13,7 @@ import type {
 } from './types';
 
 // Default values for missing program data
-const DEFAULT_PROGRAM_IMAGE = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80';
+const DEFAULT_PROGRAM_IMAGE = 'placeholder-image-programs.webp';
 
 // Transform Strapi Program to frontend Program
 function transformProgram(strapi: StrapiProgram): Program {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontStyles } from './components/FontStyles';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';

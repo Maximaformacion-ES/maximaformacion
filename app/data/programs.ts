@@ -285,7 +285,7 @@ const getDefaultProgramData = (base: Partial<Program>): Program => ({
   isPro: base.isPro ?? false, // Default to free program
   description: base.description || `${base.title} - Formación especializada de alta calidad.`,
   longDescription: base.longDescription || `Este programa te prepara para destacar en el sector. ${base.description || ''}`,
-  image: base.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80',
+  image: base.image || 'placeholder-image-programs.webp',
   format: base.format || 'Online',
   language: base.language || 'Español',
   startDate: base.startDate || 'Próximamente',

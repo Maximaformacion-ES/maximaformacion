@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { CourseCard } from './CourseCard';
+import { ProgramCard } from './ProgramCard';
 import type { Program } from '@/lib/strapi/types';
 
 // Generate a consistent rating between 4 and 5 based on program id
@@ -26,7 +26,7 @@ interface CoursesSectionProps {
 export const CoursesSection: React.FC<CoursesSectionProps> = ({ programs }) => {
   // Sort by rating (highest first) and take top 6
   const sortedPrograms = [...programs]
-    .map(p => ({ ...p, rating: generateRating(p.id) }))
+    .map(p => ({ program: p, rating: generateRating(p.id) }))
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 6);
 
@@ -72,12 +72,12 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ programs }) => {
 
         {/* Course Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {sortedPrograms.map((program, i) => (
-            <CourseCard
-              key={program.id}
-              program={program}
-              rating={program.rating}
-              students={generateStudents(program.id)}
+          {sortedPrograms.map((item, i) => (
+            <ProgramCard
+              key={item.program.id}
+              program={item.program}
+              rating={item.rating}
+              students={generateStudents(item.program.id)}
               index={i}
             />
           ))}
