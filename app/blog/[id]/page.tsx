@@ -43,8 +43,8 @@ export default async function BlogPage({ params }: BlogPageProps) {
       const strapiPost = await getBlogPostBySlug(slug, isDraft);
       if (strapiPost) {
         post = strapiPost;
-        // Only fetch related from Strapi if we got the post from Strapi
-        const strapiRelated = await getRelatedPosts(strapiPost.id, 3);
+        // Fetch related posts passing the full post
+        const strapiRelated = await getRelatedPosts(strapiPost, 3);
         if (strapiRelated.length > 0) {
           relatedPosts = strapiRelated;
         }
