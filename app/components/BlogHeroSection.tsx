@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Clock, Calendar, Award } from 'lucide-react';
-import { BlogPost } from '../data/blogs';
+import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogHeroSectionProps {
   post: BlogPost;

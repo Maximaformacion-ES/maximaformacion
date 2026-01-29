@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Calendar, ArrowUpRight, Award } from 'lucide-react';
 import Link from 'next/link';
-import { BlogPost } from '../data/blogs';
+import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -14,6 +14,15 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -82,15 +91,29 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
         {/* Footer */}
         <div className="pt-6 border-t border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img 
-              src={post.author.avatar} 
-              alt={post.author.name}
-              className="w-8 h-8 rounded-full border border-white/20"
-            />
-            <div>
-              <p className="text-xs font-bold text-white">{post.author.name}</p>
-              <p className="text-xs text-neutral-500">{post.author.role}</p>
-            </div>
+            {post.author.name && (
+              <>
+                {post.author.avatar ? (
+                  <img
+                    src={post.author.avatar}
+                    alt={post.author.name}
+                    className="w-8 h-8 rounded-full border border-white/20 object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center">
+                    <span className="text-xs font-bold text-amber-500">
+                      {getInitials(post.author.name)}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs font-bold text-white">{post.author.name}</p>
+                  {post.author.role && (
+                    <p className="text-xs text-neutral-500">{post.author.role}</p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
           <Link
             href={`/blog/${post.slug}`}
