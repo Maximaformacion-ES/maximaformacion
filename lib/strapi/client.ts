@@ -1,6 +1,11 @@
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
 
+// Check if Strapi is properly configured
+export function isStrapiConfigured(): boolean {
+  return Boolean(STRAPI_API_TOKEN && STRAPI_URL);
+}
+
 export interface FetchOptions {
   cache?: RequestCache;
   revalidate?: number;

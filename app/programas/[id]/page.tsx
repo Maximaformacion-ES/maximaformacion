@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers';
 import { getProgramBySlug, getAllProgramSlugs } from '@/lib/strapi/queries';
+import { isStrapiConfigured } from '@/lib/strapi/client';
 import { COMPLETE_PROGRAMS } from '../../data/programs';
 import ProgramDetailClient from './ProgramDetailClient';
 
@@ -25,15 +26,20 @@ interface ProgramPageProps {
 
 // Generate static params for SSG
 export async function generateStaticParams() {
-  try {
-    const slugs = await getAllProgramSlugs();
-    return slugs.map((slug) => ({ id: slug }));
-  } catch {
-    // Fallback to local data slugs
-    return COMPLETE_PROGRAMS.map((p) => ({
-      id: generateSlug(p.title),
-    }));
+  if (isStrapiConfigured()) {
+    try {
+      const slugs = await getAllProgramSlugs();
+      if (slugs.length > 0) {
+        return slugs.map((slug) => ({ id: slug }));
+      }
+    } catch {
+      // Strapi unavailable, use local data
+    }
   }
+  // Fallback to local data slugs
+  return COMPLETE_PROGRAMS.map((p) => ({
+    id: generateSlug(p.title),
+  }));
 }
 
 export default async function ProgramPage({ params }: ProgramPageProps) {
@@ -43,10 +49,12 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
 
   let program = null;
 
-  try {
-    program = await getProgramBySlug(slug, isDraft);
-  } catch {
-    // Error already logged by strapiRequest
+  if (isStrapiConfigured()) {
+    try {
+      program = await getProgramBySlug(slug, isDraft);
+    } catch {
+      // Strapi unavailable, will use local fallback below
+    }
   }
 
   // Fallback to local data if Strapi is unavailable or program not found
