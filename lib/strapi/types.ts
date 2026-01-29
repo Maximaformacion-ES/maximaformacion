@@ -324,3 +324,33 @@ export interface HeroSection {
   heroTitle: string;
   heroDescription: string;
 }
+
+// ============ Metadata Types (Single Type) ============
+
+export interface StrapiSiteMetadata {
+  id: number;
+  documentId: string;
+  metaTitle: string;
+  metaDescription: string | null;
+  keywords: string | null;
+  canonicalUrl: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: StrapiMedia | null;
+  ogType: 'website' | 'article' | 'profile' | 'product' | null;
+  twitterCard: 'summary' | 'summary_large_image' | null;
+  noIndex: boolean;
+}
+
+export interface SiteMetadata {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  ogType: string;
+  twitterCard: string;
+  noIndex: boolean;
+}

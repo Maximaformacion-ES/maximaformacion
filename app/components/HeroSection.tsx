@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="text-white/60 text-sm md:text-base tracking-[0.3em] uppercase mb-8"
           >
-            Formación Profesional de Élite
+            Formación Profesional experta
           </motion.p>
           
           <motion.h1 

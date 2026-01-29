@@ -28,7 +28,7 @@ export const Footer: React.FC = () => {
               />
             </a>
             <p className="text-white/50 text-sm font-light mt-4 max-w-xs leading-relaxed">
-              Formación profesional de élite para impulsar tu carrera al siguiente nivel.
+              Formación profesional experta para impulsar tu carrera al siguiente nivel.
             </p>
             
             {/* Social links */}
