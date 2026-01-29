@@ -21,7 +21,6 @@ const ContactPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formState);
     alert('Mensaje enviado correctamente. Te contactaremos pronto.');
   };
 

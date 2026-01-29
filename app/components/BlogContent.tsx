@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BlogPost } from '../data/blogs';
+import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogContentProps {
   post: BlogPost;

@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { BlogCard } from './BlogCard';
-import { BlogPost } from '../data/blogs';
+import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogGridProps {
   posts: BlogPost[];

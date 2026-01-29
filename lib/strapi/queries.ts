@@ -67,14 +67,20 @@ function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
     ? {
         name: strapi.author.name,
         role: strapi.author.role,
+        roleDescription: strapi.author.roleDescription || '',
         avatar: strapi.author.avatar
           ? getStrapiMediaUrl(strapi.author.avatar)
-          : 'https://i.pravatar.cc/150',
+          : '',
+        email: strapi.author.email || '',
+        linkedin: strapi.author.linkedin || '',
       }
     : {
-        name: 'Equipo Máxima',
-        role: 'Autor',
-        avatar: 'https://i.pravatar.cc/150',
+        name: '',
+        role: '',
+        roleDescription: '',
+        avatar: '',
+        email: '',
+        linkedin: '',
       };
 
   return {
@@ -139,8 +145,9 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
 function buildBlogQuery(options: BlogQueryOptions = {}): string {
   const params = new URLSearchParams();
 
-  // Populate relations
-  params.set('populate', '*');
+  // Populate relations with nested author avatar
+  params.set('populate[image]', 'true');
+  params.set('populate[author][populate][avatar]', 'true');
 
   // Filters
   const filters: string[] = [];
@@ -286,7 +293,7 @@ export async function getBlogPostById(
 ): Promise<BlogPost | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiBlogPost>>(
-      `/api/blog-posts/${id}?populate=*`,
+      `/api/blog-posts/${id}?populate[image]=true&populate[author][populate][avatar]=true`,
       {
         revalidate: 60,
         tags: ['blog-posts', `blog-post-${id}`],
@@ -311,7 +318,7 @@ export async function getBlogPostBySlug(
 ): Promise<BlogPost | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
-      `/api/blog-posts?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`,
+      `/api/blog-posts?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[author][populate][avatar]=true`,
       {
         revalidate: 60,
         tags: ['blog-posts', `blog-post-slug-${slug}`],
@@ -337,7 +344,7 @@ export async function getRelatedPosts(
   try {
     // Fetch posts from the same category, excluding current
     const response = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
-      `/api/blog-posts?filters[documentId][$ne]=${currentPost.documentId}&filters[category][$eq]=${encodeURIComponent(currentPost.category)}&populate=*&pagination[pageSize]=${limit}&sort=publishedAt:desc`,
+      `/api/blog-posts?filters[documentId][$ne]=${currentPost.documentId}&filters[category][$eq]=${encodeURIComponent(currentPost.category)}&populate[image]=true&populate[author][populate][avatar]=true&pagination[pageSize]=${limit}&sort=publishedAt:desc`,
       {
         revalidate: 60,
         tags: ['blog-posts', 'related-posts'],
@@ -354,7 +361,7 @@ export async function getRelatedPosts(
         .join('&');
 
       const moreResponse = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
-        `/api/blog-posts?filters[documentId][$ne]=${currentPost.documentId}&${tagFilter}&populate=*&pagination[pageSize]=${limit - relatedPosts.length}`,
+        `/api/blog-posts?filters[documentId][$ne]=${currentPost.documentId}&${tagFilter}&populate[image]=true&populate[author][populate][avatar]=true&pagination[pageSize]=${limit - relatedPosts.length}`,
         {
           revalidate: 60,
           tags: ['blog-posts', 'related-posts'],

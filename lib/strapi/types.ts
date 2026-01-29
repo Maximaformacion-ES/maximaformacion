@@ -123,9 +123,13 @@ export interface StrapiProgram {
 
 export interface StrapiAuthor {
   id: number;
+  documentId: string;
   name: string;
   role: string;
+  roleDescription: string | null;
   avatar: StrapiMedia | null;
+  email: string | null;
+  linkedin: string | null;
 }
 
 export interface StrapiBlogPost {
@@ -184,7 +188,10 @@ export interface Program {
 export interface BlogAuthor {
   name: string;
   role: string;
+  roleDescription: string;
   avatar: string;
+  email: string;
+  linkedin: string;
 }
 
 export interface BlogPost {
