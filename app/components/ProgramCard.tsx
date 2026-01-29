@@ -48,19 +48,33 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
       className="group relative bg-[#111] rounded-2xl overflow-hidden cursor-pointer"
     >
       <Link href={`/programas/${program.slug}`} className="flex flex-col h-full">
-        {/* Image */}
+        {/* Image with hero-style effects */}
         <div className="relative h-56 md:h-64 overflow-hidden">
-          <motion.img
-            src={program.image}
-            alt={program.title}
-            className="w-full h-full object-cover"
-            animate={{ scale: isHovered ? 1.1 : 1 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          {/* Vignette overlay */}
+          <div
+            className="absolute inset-0 z-10 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 95% 80% at center, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.8) 100%)'
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent" />
+          {/* Image with noise and tint */}
+          <div className="noise w-full h-full relative">
+            <motion.img
+              src={program.image}
+              alt={program.title}
+              className="w-full h-full object-cover opacity-80"
+              animate={{ scale: isHovered ? 1.1 : 1 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            />
+            {/* Amber tint overlay */}
+            <div
+              className="absolute inset-0 mix-blend-color pointer-events-none"
+              style={{ backgroundColor: '#ff9b06', opacity: 0.3 }}
+            />
+          </div>
 
           {/* Category badge */}
-          <div className="absolute top-4 left-4 flex items-center gap-2">
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
             <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white text-xs font-medium rounded-full">
               {category}
             </span>
@@ -75,7 +89,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 z-20 flex items-center justify-center"
           >
             <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
               <ArrowUpRight size={24} className="text-white ml-1" />

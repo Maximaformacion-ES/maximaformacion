@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Clock, Calendar, ArrowUpRight, Award } from 'lucide-react';
-import Link from 'next/link';
-import type { BlogPost } from '@/lib/strapi/types';
+import React from "react";
+import { motion } from "framer-motion";
+import { Clock, Calendar, ArrowUpRight, Award } from "lucide-react";
+import Link from "next/link";
+import type { BlogPost } from "@/lib/strapi/types";
 
 interface BlogCardProps {
   post: BlogPost;
@@ -13,14 +13,18 @@ interface BlogCardProps {
 export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+    return date.toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -34,20 +38,39 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
       whileHover={{ y: -5 }}
       className="group relative bg-[#0a0a0a] border border-white/10 rounded-none overflow-hidden hover:border-amber-500/50 transition-colors duration-500 flex flex-col"
     >
-      {/* Featured Image */}
+      {/* Featured Image with hero-style effects */}
       <div className="relative h-64 overflow-hidden bg-neutral-900">
-        <img 
-          src={post.image} 
-          alt={post.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+        {/* Vignette overlay */}
+        <div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 95% 80% at center, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.8) 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        {/* Image with noise and tint */}
+        <div className="noise w-full h-full relative">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-700"
+          />
+          {/* Amber tint overlay */}
+          <div
+            className="absolute inset-0 mix-blend-color"
+            style={{ backgroundColor: '#000' }}
+          />
+          <div
+            className="absolute inset-0 mix-blend-color"
+            style={{ backgroundColor: '#ff9b06', opacity: 0.5 }}
+          />
+        </div>
         {post.featured && (
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-black text-[10px] font-bold uppercase tracking-widest">
+          <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-black text-[10px] font-bold uppercase tracking-widest">
             <Award size={12} /> Destacado
           </div>
         )}
-        <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-widest">
+        <div className="absolute bottom-4 left-4 z-20 px-3 py-1 bg-black/80 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-widest">
           {post.category}
         </div>
       </div>
@@ -78,8 +101,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {post.tags.slice(0, 3).map(tag => (
-            <span 
+          {post.tags.slice(0, 3).map((tag) => (
+            <span
               key={tag}
               className="px-3 py-1 bg-white/5 border border-white/10 text-xs text-neutral-400"
             >
@@ -107,9 +130,13 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
                   </div>
                 )}
                 <div>
-                  <p className="text-xs font-bold text-white">{post.author.name}</p>
+                  <p className="text-xs font-bold text-white">
+                    {post.author.name}
+                  </p>
                   {post.author.role && (
-                    <p className="text-xs text-neutral-500">{post.author.role}</p>
+                    <p className="text-xs text-neutral-500">
+                      {post.author.role}
+                    </p>
                   )}
                 </div>
               </>
@@ -119,11 +146,14 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
             href={`/blog/${post.slug}`}
             className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-amber-500 group-hover:border-amber-500 transition-all duration-500"
           >
-            <ArrowUpRight size={16} className="text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            <ArrowUpRight
+              size={16}
+              className="text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+            />
           </Link>
         </div>
       </div>
-      
+
       {/* Hover Overlay Action - Bottom Bar */}
       <div className="absolute bottom-0 left-0 h-1 bg-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-in-out origin-left" />
     </motion.article>

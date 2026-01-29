@@ -26,16 +26,38 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
 
   return (
     <section ref={containerRef} className="relative h-screen flex items-center justify-center overflow-hidden">
-      <motion.div 
+      <motion.div
         style={{ y }}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 h-[120%]"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-black z-10" />
-        <img 
-          src={post.image} 
-          alt={post.title}
-          className="w-full h-full object-cover"
+        {/* Vignette overlay */}
+        <div
+          className="absolute inset-0 z-10"
+          style={{
+            background: 'radial-gradient(ellipse 90% 60% at center, transparent 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 80%, black 100%)'
+          }}
         />
+        {/* Top fade */}
+        <div className="absolute inset-x-0 top-0 h-[50%] bg-gradient-to-b from-black via-black/90 via-10% to-transparent z-10" />
+        {/* Bottom fade */}
+        <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black via-black/90 via-54% to-transparent z-10" />
+        {/* Image with noise and amber tint */}
+        <div className="noise w-full h-full relative">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="w-full h-full object-cover opacity-70"
+          />
+          {/* Color tint overlay */}
+          <div
+            className="absolute inset-0 mix-blend-color"
+            style={{ backgroundColor: '#000' }}
+          />
+          <div
+            className="absolute inset-0 mix-blend-color"
+            style={{ backgroundColor: '#ff9b06', opacity: 0.5 }}
+          />
+        </div>
       </motion.div>
       
       <motion.div 
