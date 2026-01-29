@@ -5,9 +5,11 @@ import type {
   StrapiProgram,
   StrapiBlogPost,
   StrapiHeroSection,
+  StrapiSiteMetadata,
   Program,
   BlogPost,
   HeroSection,
+  SiteMetadata,
   ProgramQueryOptions,
   BlogQueryOptions,
   ProgramModule,
@@ -470,6 +472,44 @@ export async function getInnovacionSection(): Promise<HeroSection | null> {
     return transformHeroSection(response.data);
   } catch (error) {
     console.error('Error fetching innovacion section:', error);
+    return null;
+  }
+}
+
+// ============ Site Metadata Query (Single Type) ============
+
+function transformSiteMetadata(strapi: StrapiSiteMetadata): SiteMetadata {
+  return {
+    metaTitle: strapi.metaTitle,
+    metaDescription: strapi.metaDescription || '',
+    keywords: strapi.keywords || '',
+    canonicalUrl: strapi.canonicalUrl || '',
+    ogTitle: strapi.ogTitle || strapi.metaTitle,
+    ogDescription: strapi.ogDescription || strapi.metaDescription || '',
+    ogImage: strapi.ogImage ? getStrapiMediaUrl(strapi.ogImage) : '',
+    ogType: (strapi.ogType || 'website').toLowerCase(),
+    twitterCard: (strapi.twitterCard || 'summary_large_image').toLowerCase(),
+    noIndex: strapi.noIndex,
+  };
+}
+
+export async function getSiteMetadata(): Promise<SiteMetadata | null> {
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiSiteMetadata>>(
+      '/api/metadata?populate=*',
+      {
+        revalidate: 3600,
+        tags: ['site-metadata'],
+      }
+    );
+
+    if (!response.data) {
+      return null;
+    }
+
+    return transformSiteMetadata(response.data);
+  } catch (error) {
+    console.error('Error fetching site metadata:', error);
     return null;
   }
 }
