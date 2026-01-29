@@ -2,6 +2,7 @@ import { draftMode } from 'next/headers';
 import { getBlogPostBySlug, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
 import { isStrapiConfigured } from '@/lib/strapi/client';
 import { ALL_BLOG_POSTS, getBlogPostBySlug as getLocalBlogPostBySlug, getRelatedPosts as getLocalRelatedPosts } from '../../data/blogs';
+import { markdownToHtml } from '@/lib/markdown';
 import BlogDetailClient from './BlogDetailClient';
 
 export const revalidate = 60;
@@ -75,6 +76,14 @@ export default async function BlogPage({ params }: BlogPageProps) {
         documentId: p.id.toString(),
       }));
     }
+  }
+
+  // Parse markdown content to HTML
+  if (post) {
+    post = {
+      ...post,
+      content: await markdownToHtml(post.content),
+    };
   }
 
   return <BlogDetailClient post={post} relatedPosts={relatedPosts} />;
