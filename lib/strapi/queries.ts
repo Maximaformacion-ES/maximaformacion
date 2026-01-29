@@ -4,8 +4,10 @@ import type {
   StrapiSingleResponse,
   StrapiProgram,
   StrapiBlogPost,
+  StrapiHeroSection,
   Program,
   BlogPost,
+  HeroSection,
   ProgramQueryOptions,
   BlogQueryOptions,
   ProgramModule,
@@ -59,7 +61,7 @@ function transformProgram(strapi: StrapiProgram): Program {
 function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
   const imageUrl = strapi.image
     ? getStrapiMediaUrl(strapi.image)
-    : strapi.imageUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80';
+    : strapi.imageUrl || 'placeholder-image-programs.webp';
 
   const author: BlogAuthor = strapi.author
     ? {
@@ -384,4 +386,83 @@ export async function getAllBlogSlugs(): Promise<string[]> {
   );
 
   return response.data.map((p) => p.slug);
+}
+
+// ============ Hero Section Queries (Single Types) ============
+
+// Transform Strapi Hero Section to frontend HeroSection
+function transformHeroSection(strapi: StrapiHeroSection): HeroSection {
+  const imageUrl = strapi.heroImage
+    ? getStrapiMediaUrl(strapi.heroImage)
+    : '';
+
+  return {
+    heroImage: imageUrl,
+    heroOverline: strapi.heroOverline,
+    heroTitle: strapi.heroTitle,
+    heroDescription: strapi.heroDescription || '',
+  };
+}
+
+export async function getConocenosSection(): Promise<HeroSection | null> {
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiHeroSection>>(
+      '/api/conocenos-section?populate=*',
+      {
+        revalidate: 60,
+        tags: ['conocenos-section'],
+      }
+    );
+
+    if (!response.data) {
+      return null;
+    }
+
+    return transformHeroSection(response.data);
+  } catch (error) {
+    console.error('Error fetching conocenos section:', error);
+    return null;
+  }
+}
+
+export async function getConsultoriaSection(): Promise<HeroSection | null> {
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiHeroSection>>(
+      '/api/consultoria-section?populate=*',
+      {
+        revalidate: 60,
+        tags: ['consultoria-section'],
+      }
+    );
+
+    if (!response.data) {
+      return null;
+    }
+
+    return transformHeroSection(response.data);
+  } catch (error) {
+    console.error('Error fetching consultoria section:', error);
+    return null;
+  }
+}
+
+export async function getInnovacionSection(): Promise<HeroSection | null> {
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiHeroSection>>(
+      '/api/innovacion-section?populate=*',
+      {
+        revalidate: 60,
+        tags: ['innovacion-section'],
+      }
+    );
+
+    if (!response.data) {
+      return null;
+    }
+
+    return transformHeroSection(response.data);
+  } catch (error) {
+    console.error('Error fetching innovacion section:', error);
+    return null;
+  }
 }
