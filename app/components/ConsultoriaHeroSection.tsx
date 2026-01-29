@@ -37,7 +37,7 @@ export const ConsultoriaHeroSection: React.FC<ConsultoriaHeroSectionProps> = ({ 
         <div className="noise w-full h-full relative">
           <img
             src={heroImage}
-            className="w-full h-full object-contain object-[center_25%] rotate-y-180 opacity-70"
+            className="w-full h-full object-cover object-[center_25%] rotate-y-180 opacity-70"
             alt="Máxima Formación"
           />
           {/* Color tint overlay */}
