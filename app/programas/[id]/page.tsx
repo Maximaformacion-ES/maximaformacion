@@ -1,9 +1,21 @@
 import { draftMode } from 'next/headers';
-import { getProgramById, getAllProgramSlugs } from '@/lib/strapi/queries';
+import { getProgramBySlug, getAllProgramSlugs } from '@/lib/strapi/queries';
 import { COMPLETE_PROGRAMS } from '../../data/programs';
 import ProgramDetailClient from './ProgramDetailClient';
 
 export const revalidate = 60;
+
+// Helper to generate slug from title
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
 
 interface ProgramPageProps {
   params: Promise<{
@@ -17,42 +29,36 @@ export async function generateStaticParams() {
     const slugs = await getAllProgramSlugs();
     return slugs.map((slug) => ({ id: slug }));
   } catch {
-    // Fallback to local data IDs (error logged by strapiRequest)
-    return COMPLETE_PROGRAMS.map((p) => ({ id: p.id.toString() }));
+    // Fallback to local data slugs
+    return COMPLETE_PROGRAMS.map((p) => ({
+      id: generateSlug(p.title),
+    }));
   }
 }
 
 export default async function ProgramPage({ params }: ProgramPageProps) {
   const { isEnabled: isDraft } = await draftMode();
   const resolvedParams = await params;
-  const id = resolvedParams.id;
+  const slug = resolvedParams.id;
 
   let program = null;
 
   try {
-    // First try to fetch by ID (for numeric IDs)
-    const numericId = parseInt(id, 10);
-    if (!isNaN(numericId)) {
-      program = await getProgramById(numericId, isDraft);
-    }
-
-    // If not found by numeric ID, try by documentId or slug
-    if (!program) {
-      program = await getProgramById(id, isDraft);
-    }
+    program = await getProgramBySlug(slug, isDraft);
   } catch {
     // Error already logged by strapiRequest
   }
 
   // Fallback to local data if Strapi is unavailable or program not found
   if (!program) {
-    const numericId = parseInt(id, 10);
-    const localProgram = COMPLETE_PROGRAMS.find((p) => p.id === numericId);
+    const localProgram = COMPLETE_PROGRAMS.find(
+      (p) => generateSlug(p.title) === slug
+    );
     if (localProgram) {
       program = {
         ...localProgram,
         documentId: localProgram.id.toString(),
-        slug: localProgram.title.toLowerCase().replace(/\s+/g, '-'),
+        slug: generateSlug(localProgram.title),
       };
     }
   }

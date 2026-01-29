@@ -10,6 +10,7 @@ export interface Program {
   type: 'Master' | 'Curso';
   title: string;
   duration: string;
+  slug: string;
   ects: string;
   tags: string[];
   featured: boolean;
@@ -258,12 +259,25 @@ export const getProgramById = (id: number): Program | undefined => {
   return COMPLETE_PROGRAMS.find(p => p.id === id);
 };
 
+// Helper to generate slug from title (without accents)
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove accents
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .replace(/-+/g, '-') // Remove consecutive dashes
+    .trim();
+};
+
 // Helper function to get default program data (for programs without full details)
 const getDefaultProgramData = (base: Partial<Program>): Program => ({
   ...base,
   id: base.id!,
   type: base.type!,
   title: base.title!,
+  slug: base.slug || generateSlug(base.title!),
   duration: base.duration!,
   ects: base.ects!,
   tags: base.tags!,
@@ -294,10 +308,13 @@ const getDefaultProgramData = (base: Partial<Program>): Program => ({
 // Complete remaining programs with default data
 const completePrograms = (programs: Partial<Program>[]): Program[] => {
   return programs.map(p => {
+    // Always ensure slug exists
+    const slug = p.slug || generateSlug(p.title!);
+
     if (p.description && p.modules && p.modules.length > 0) {
-      return p as Program;
+      return { ...p, slug } as Program;
     }
-    return getDefaultProgramData(p);
+    return getDefaultProgramData({ ...p, slug });
   });
 };
 

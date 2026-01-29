@@ -21,7 +21,6 @@ export default async function CursosPage() {
     programs = COMPLETE_PROGRAMS.map((p) => ({
       ...p,
       documentId: p.id.toString(),
-      slug: p.title.toLowerCase().replace(/\s+/g, '-'),
     }));
   }
 

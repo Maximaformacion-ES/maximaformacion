@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronDown } from 'lucide-react';
 import { ProgramCard } from './ProgramCard';
-import { Program } from '../data/programs';
+import { Program } from '@/lib/strapi/types';
 
 interface CatalogGridProps {
   programs: Program[];

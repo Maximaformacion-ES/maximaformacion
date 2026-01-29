@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, BookOpen, Award, ArrowUpRight, Crown } from 'lucide-react';
 import Link from 'next/link';
-import { Program } from '../data/programs';
+import { Program } from '@/lib/strapi/types';
 
 interface ProgramCardProps {
   program: Program;
@@ -61,7 +61,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
             </span>
           </div>
           <Link 
-            href={`/programas/${program.id}`}
+            href={`/programas/${program.slug}`}
             className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-amber-500 group-hover:border-amber-500 transition-all duration-500"
           >
             <ArrowUpRight size={16} className="text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

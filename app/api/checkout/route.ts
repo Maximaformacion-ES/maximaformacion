@@ -102,7 +102,7 @@ export async function POST(request: Request) {
           },
         ],
         success_url: `${baseUrl}/cursos/${program.documentId}?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/programas/${program.documentId}?canceled=true`,
+        cancel_url: `${baseUrl}/programas/${program.slug}?canceled=true`,
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
         metadata: {
           userId,

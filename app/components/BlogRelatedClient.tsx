@@ -59,7 +59,7 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
                   {post.excerpt}
                 </p>
                 <Link
-                  href={`/blog/${post.id}`}
+                  href={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 text-sm font-medium group/link"
                 >
                   Leer más
