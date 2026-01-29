@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers';
 import { getBlogPostBySlug, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
+import { isStrapiConfigured } from '@/lib/strapi/client';
 import { ALL_BLOG_POSTS, getBlogPostBySlug as getLocalBlogPostBySlug, getRelatedPosts as getLocalRelatedPosts } from '../../data/blogs';
 import BlogDetailClient from './BlogDetailClient';
 
@@ -13,13 +14,19 @@ interface BlogPageProps {
 
 // Generate static params for SSG
 export async function generateStaticParams() {
-  try {
-    const slugs = await getAllBlogSlugs();
-    return slugs.map((slug) => ({ id: slug }));
-  } catch {
-    // Fallback to local data slugs (error logged by strapiRequest)
-    return ALL_BLOG_POSTS.map((p) => ({ id: p.slug }));
+  // Only try Strapi if configured
+  if (isStrapiConfigured()) {
+    try {
+      const slugs = await getAllBlogSlugs();
+      if (slugs.length > 0) {
+        return slugs.map((slug) => ({ id: slug }));
+      }
+    } catch {
+      // Strapi unavailable, use local data
+    }
   }
+  // Fallback to local data slugs
+  return ALL_BLOG_POSTS.map((p) => ({ id: p.slug }));
 }
 
 export default async function BlogPage({ params }: BlogPageProps) {
@@ -30,16 +37,21 @@ export default async function BlogPage({ params }: BlogPageProps) {
   let post = null;
   let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];
 
-  try {
-    // Fetch by slug
-    post = await getBlogPostBySlug(slug, isDraft);
-
-    // Fetch related posts
-    if (post) {
-      relatedPosts = await getRelatedPosts(post.id, 3);
+  // Only try Strapi if configured
+  if (isStrapiConfigured()) {
+    try {
+      const strapiPost = await getBlogPostBySlug(slug, isDraft);
+      if (strapiPost) {
+        post = strapiPost;
+        // Only fetch related from Strapi if we got the post from Strapi
+        const strapiRelated = await getRelatedPosts(strapiPost.id, 3);
+        if (strapiRelated.length > 0) {
+          relatedPosts = strapiRelated;
+        }
+      }
+    } catch {
+      // Strapi unavailable, will use local fallback below
     }
-  } catch {
-    // Error already logged by strapiRequest
   }
 
   // Fallback to local data if Strapi is unavailable or post not found
@@ -50,7 +62,13 @@ export default async function BlogPage({ params }: BlogPageProps) {
         ...localPost,
         documentId: localPost.id.toString(),
       };
-      // Get related posts from local data
+    }
+  }
+
+  // Get related posts from local data if we don't have them yet
+  if (post && relatedPosts.length === 0) {
+    const localPost = getLocalBlogPostBySlug(slug);
+    if (localPost) {
       const localRelated = getLocalRelatedPosts(localPost.id, 3);
       relatedPosts = localRelated.map(p => ({
         ...p,
