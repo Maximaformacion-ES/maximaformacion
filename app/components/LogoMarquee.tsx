@@ -67,6 +67,8 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Log
 export const LogoMarquee: React.FC<LogoMarqueeProps> = ({ logos = [] }) => {
   const displayLogos = logos.length > 0 ? logos : FALLBACK_LOGOS;
 
+  console.log('LogoMarquee URLs:', displayLogos.map(l => l.imageUrl));
+
   return (
     <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full]">
       {/* Header */}

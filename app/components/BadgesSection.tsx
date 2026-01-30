@@ -49,10 +49,8 @@ interface BadgesSectionProps {
   badges?: Badge[];
 }
 
-export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges }) => {
-  if (!badges || badges.length === 0) return null;
-
-  const rows = buildRows(badges);
+export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => {
+  const rows = badges.length > 0 ? buildRows(badges) : [];
 
   rows.map(row => row.map(cell => cell.badge.imageUrl)).forEach((r, i) => {
     console.log(`Row ${i}: `, r);
