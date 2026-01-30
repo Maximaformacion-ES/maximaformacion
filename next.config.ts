@@ -1,13 +1,16 @@
 import type { NextConfig } from "next";
 
+const strapiUrl = process.env.STRAPI_URL || 'http://localhost:1337';
+const strapiParsed = new URL(strapiUrl);
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      // Strapi local development
+      // Strapi (dynamic from STRAPI_URL env)
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '1337',
+        protocol: strapiParsed.protocol.replace(':', '') as 'http' | 'https',
+        hostname: strapiParsed.hostname,
+        ...(strapiParsed.port && { port: strapiParsed.port }),
         pathname: '/uploads/**',
       },
       // Cloudflare R2
