@@ -3,7 +3,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { Badge } from '@/lib/strapi/types';
-import Image from 'next/image';
 
 // 7 columns × 4 rows. Each row is offset by half a cell to create a brick pattern.
 const COLS = 7;
@@ -100,6 +99,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
                           src={cell.badge.imageUrl}
                           alt={cell.badge.name}
                           fill
+                          unoptimized
                           className="object-contain p-2"
                           sizes="(max-width: 768px) 20vw, (max-width: 1200px) 13vw, 10vw"
                         />
