@@ -9,16 +9,17 @@ import { CoursesSection } from "./components/CoursesSection";
 import { TestimonialsSection } from "./components/TestimonialsSection";
 import { CTASection } from "./components/CTASection";
 import { Footer } from "./components/Footer";
-import type { Program, Logo } from "@/lib/strapi/types";
+import type { Program, Logo, Badge } from "@/lib/strapi/types";
 import { LogoMarquee } from "./components/LogoMarquee";
 import { BadgesSection } from "./components/BadgesSection";
 
 interface HomeClientProps {
   programs: Program[];
   logos: Logo[];
+  badges: Badge[];
 }
 
-export default function HomeClient({ programs, logos }: HomeClientProps) {
+export default function HomeClient({ programs, logos, badges }: HomeClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -31,7 +32,7 @@ export default function HomeClient({ programs, logos }: HomeClientProps) {
       <CoursesSection programs={programs} />
       <LogoMarquee logos={logos} />
       <TestimonialsSection />
-      <BadgesSection />
+      <BadgesSection badges={badges} />
       <CTASection />
       <Footer />
     </div>

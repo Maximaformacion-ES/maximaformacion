@@ -8,12 +8,14 @@ import type {
   StrapiHeroSection,
   StrapiSiteMetadata,
   StrapiLogo,
+  StrapiBadge,
   Program,
   Topic,
   BlogPost,
   HeroSection,
   SiteMetadata,
   Logo,
+  Badge,
   ProgramQueryOptions,
   BlogQueryOptions,
   ProgramModule,
@@ -565,6 +567,31 @@ export async function getLogos(): Promise<Logo[]> {
       }));
   } catch (error) {
     console.error('Error fetching logos:', error);
+    return [];
+  }
+}
+
+// ============ Badge Queries ============
+
+export async function getBadges(): Promise<Badge[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiBadge[]>>(
+      '/api/badges?populate[badge]=true&pagination[pageSize]=100&sort=name:asc',
+      {
+        revalidate: 3600,
+        tags: ['badges'],
+      }
+    );
+
+    return response.data
+      .filter((b) => b.badge)
+      .map((b) => ({
+        id: b.id,
+        name: b.name,
+        imageUrl: getStrapiMediaUrl(b.badge!),
+      }));
+  } catch (error) {
+    console.error('Error fetching badges:', error);
     return [];
   }
 }
