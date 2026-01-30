@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import type { Badge } from '@/lib/strapi/types';
+import React from "react";
+import { motion } from "framer-motion";
+import type { Badge } from "@/lib/strapi/types";
+import Image from "next/image";
 
 // 7 columns × 4 rows. Each row is offset by half a cell to create a brick pattern.
 const COLS = 7;
@@ -17,13 +18,7 @@ const ROW_ORDERS = [
 ];
 
 // Colored cell positions clustered at center.
-const COLORED_SET = new Set([
-  '1-2',
-  '1-3',
-  '2-2',
-  '2-3',
-  '2-4',
-]);
+const COLORED_SET = new Set(["1-2", "1-3", "2-2", "2-3", "2-4"]);
 
 function buildRows(badges: Badge[]) {
   const usedBadges = new Set<number>();
@@ -48,12 +43,16 @@ interface BadgesSectionProps {
   badges?: Badge[];
 }
 
-export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => {
+export const BadgesSection: React.FC<BadgesSectionProps> = ({
+  badges = [],
+}) => {
   const rows = badges.length > 0 ? buildRows(badges) : [];
 
-  rows.map(row => row.map(cell => cell.badge.imageUrl)).forEach((r, i) => {
-    console.log(`Row ${i}: `, r);
-  });
+  rows
+    .map((row) => row.map((cell) => cell.badge.imageUrl))
+    .forEach((r, i) => {
+      console.log(`Row ${i}: `, r);
+    });
 
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
@@ -68,44 +67,48 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
             <div
               style={{
                 maskImage:
-                  'radial-gradient(ellipse 60% 55% at 50% 50%, black 20%, transparent 80%)',
+                  "radial-gradient(ellipse 60% 55% at 50% 50%, black 20%, transparent 80%)",
                 WebkitMaskImage:
-                  'radial-gradient(ellipse 60% 58% at 50% 50%, black 20%, transparent 80%)',
+                  "radial-gradient(ellipse 60% 58% at 50% 50%, black 20%, transparent 80%)",
               }}
             >
               <div className="flex flex-col gap-2 md:gap-3 -mx-8">
                 {rows.map((row, r) => {
                   const slideFrom = r % 2 === 0 ? -40 : 40;
                   return (
-                  <motion.div
-                    key={r}
-                    initial={{ opacity: 0, x: slideFrom }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.1 * r }}
-                    className="flex gap-2 md:gap-3 justify-center"
-                    style={r % 2 === 1 ? { paddingLeft: 'calc(100% / 7 / 2)' } : undefined}
-                  >
-                    {row.map((cell, c) => (
-                      <div
-                        key={`${r}-${c}`}
-                        className={`relative flex-shrink-0 aspect-square rounded-xl overflow-hidden transition-all duration-500 ${
-                          cell.colored
-                            ? 'opacity-100 w-[16%] -m-[0%] z-10'
-                            : 'opacity-30 grayscale w-[13%]'
-                        }`}
-                      >
-                        <Image
-                          src={cell.badge.imageUrl}
-                          alt={cell.badge.name}
-                          fill
-                          unoptimized
-                          className="object-contain p-2"
-                          sizes="(max-width: 768px) 20vw, (max-width: 1200px) 13vw, 10vw"
-                        />
-                      </div>
-                    ))}
-                  </motion.div>
+                    <motion.div
+                      key={r}
+                      initial={{ opacity: 0, x: slideFrom }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: 0.1 * r }}
+                      className="flex gap-2 md:gap-3 justify-center"
+                      style={
+                        r % 2 === 1
+                          ? { paddingLeft: "calc(100% / 7 / 2)" }
+                          : undefined
+                      }
+                    >
+                      {row.map((cell, c) => (
+                        <div
+                          key={`${r}-${c}`}
+                          className={`relative flex-shrink-0 aspect-square rounded-xl overflow-hidden transition-all duration-500 ${
+                            cell.colored
+                              ? "opacity-100 w-[16%] -m-[0%] z-10"
+                              : "opacity-30 grayscale w-[13%]"
+                          }`}
+                        >
+                          <Image
+                            src={cell.badge.imageUrl}
+                            alt={cell.badge.name}
+                            fill
+                            unoptimized
+                            className="object-contain p-2"
+                            sizes="(max-width: 768px) 20vw, (max-width: 1200px) 13vw, 10vw"
+                          />
+                        </div>
+                      ))}
+                    </motion.div>
                   );
                 })}
               </div>
@@ -128,7 +131,8 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
               viewport={{ once: true }}
               className="text-white text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
-              CALIDAD<br />
+              CALIDAD
+              <br />
               <span className="text-stroke">ACREDITADA</span>
             </motion.h2>
             <motion.p
@@ -138,7 +142,9 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
               transition={{ delay: 0.2 }}
               className="text-neutral-400 text-base md:text-lg font-light max-w-md leading-relaxed"
             >
-              Contamos con certificaciones ISO 9001, ISO 14001 e ISO 27001, el sello Cum Laude de Emagister desde 2018 y una valoración de 5.0 en Google con más de 120 reseñas.
+              Contamos con certificaciones ISO 9001, ISO 14001 e ISO 27001, el
+              sello Cum Laude de Emagister desde 2018 y una valoración de 5.0 en
+              Google con más de 120 reseñas.
             </motion.p>
           </div>
         </div>
