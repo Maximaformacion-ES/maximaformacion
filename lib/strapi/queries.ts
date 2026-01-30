@@ -3,10 +3,12 @@ import type {
   StrapiResponse,
   StrapiSingleResponse,
   StrapiProgram,
+  StrapiTopic,
   StrapiBlogPost,
   StrapiHeroSection,
   StrapiSiteMetadata,
   Program,
+  Topic,
   BlogPost,
   HeroSection,
   SiteMetadata,
@@ -41,6 +43,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     duration: strapi.duration,
     ects: strapi.ects,
     tags: strapi.tags || [],
+    topic: strapi.topic?.name || '',
     featured: strapi.featured,
     description: strapi.description,
     longDescription: strapi.longDescription || strapi.description,
@@ -107,7 +110,9 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
   const params = new URLSearchParams();
 
   // Populate relations
-  params.set('populate', '*');
+  params.set('populate[image]', 'true');
+  params.set('populate[modules]', 'true');
+  params.set('populate[topic][fields][0]', 'name');
 
   // Filters
   const filters: string[] = [];
@@ -211,7 +216,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate=*`,
+      `/api/programs/${id}?populate[image]=true&populate[modules]=true&populate[topic][fields][0]=name`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -236,7 +241,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[modules]=true&populate[topic][fields][0]=name`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],
@@ -265,6 +270,29 @@ export async function getAllProgramSlugs(): Promise<string[]> {
   );
 
   return response.data.map((p) => p.slug);
+}
+
+// ============ Topic Queries ============
+
+export async function getTopics(): Promise<Topic[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiTopic[]>>(
+      '/api/topics?fields[0]=name&sort=name:asc&pagination[pageSize]=100',
+      {
+        revalidate: 3600,
+        tags: ['topics'],
+      }
+    );
+
+    return response.data.map((t) => ({
+      id: t.id,
+      documentId: t.documentId,
+      name: t.name,
+    }));
+  } catch (error) {
+    console.error('Error fetching topics:', error);
+    return [];
+  }
 }
 
 // ============ Blog Post Queries ============

@@ -1,9 +1,9 @@
 import { draftMode } from 'next/headers';
-import { getPrograms } from '@/lib/strapi/queries';
+import { getPrograms, getTopics } from '@/lib/strapi/queries';
 import { isStrapiConfigured } from '@/lib/strapi/client';
 import { COMPLETE_PROGRAMS } from '../data/programs';
 import ProgramsClient from './ProgramsClient';
-import type { Program } from '@/lib/strapi/types';
+import type { Program, Topic } from '@/lib/strapi/types';
 
 export const revalidate = 60;
 
@@ -18,30 +18,52 @@ function generateSlug(title: string): string {
     .trim();
 }
 
+function extractTopicsFromPrograms(programs: Program[]): Topic[] {
+  const unique = new Map<string, Topic>();
+  let syntheticId = 1;
+  for (const p of programs) {
+    if (p.topic && !unique.has(p.topic)) {
+      unique.set(p.topic, {
+        id: syntheticId++,
+        documentId: `local-${syntheticId}`,
+        name: p.topic,
+      });
+    }
+  }
+  return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export default async function CursosPage() {
   const { isEnabled: isDraft } = await draftMode();
 
   let programs: Program[];
+  let topics: Topic[] = [];
 
   if (isStrapiConfigured()) {
     try {
-      const { programs: strapiPrograms } = await getPrograms({ draft: isDraft });
+      const [{ programs: strapiPrograms }, strapiTopics] = await Promise.all([
+        getPrograms({ draft: isDraft }),
+        getTopics(),
+      ]);
+
       if (strapiPrograms.length > 0) {
         programs = strapiPrograms;
+        topics = strapiTopics.length > 0 ? strapiTopics : extractTopicsFromPrograms(strapiPrograms);
       } else {
         programs = COMPLETE_PROGRAMS.map((p) => ({
           ...p,
           documentId: p.id.toString(),
           slug: generateSlug(p.title),
         }));
+        topics = extractTopicsFromPrograms(programs);
       }
     } catch {
-      // Fallback to local data if Strapi is unavailable
       programs = COMPLETE_PROGRAMS.map((p) => ({
         ...p,
         documentId: p.id.toString(),
         slug: generateSlug(p.title),
       }));
+      topics = extractTopicsFromPrograms(programs);
     }
   } else {
     programs = COMPLETE_PROGRAMS.map((p) => ({
@@ -49,7 +71,8 @@ export default async function CursosPage() {
       documentId: p.id.toString(),
       slug: generateSlug(p.title),
     }));
+    topics = extractTopicsFromPrograms(programs);
   }
 
-  return <ProgramsClient initialPrograms={programs} />;
+  return <ProgramsClient initialPrograms={programs} availableTopics={topics} />;
 }

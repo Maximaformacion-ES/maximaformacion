@@ -32,8 +32,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
   const displayRating = rating ?? generateRating(program.id);
   const displayStudents = students ?? generateStudents(program.id);
 
-  // Get first tag as category, or use program type
-  const category = program.tags?.[0] || program.type;
+  const isMaster = program.type === 'Master';
 
   return (
     <motion.div
@@ -73,17 +72,30 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
             />
           </div>
 
-          {/* Category badge */}
+          {/* Badges */}
           <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-            <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white text-xs font-medium rounded-full">
-              {category}
+            <span className={`px-3 py-1.5 backdrop-blur-md text-xs font-semibold rounded-full ${
+              isMaster
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                : 'bg-white/10 text-white border border-white/10'
+            }`}>
+              {program.type}
             </span>
-            {program.isPro && (
-              <span className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full">
-                <Crown size={10} /> PRO
+            {program.topic && (
+              <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white/70 text-xs font-medium rounded-full">
+                {program.topic}
               </span>
             )}
           </div>
+
+          {/* Pro badge */}
+          {program.isPro && (
+            <div className="absolute top-4 right-4 z-20">
+              <span className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full shadow-lg shadow-amber-500/25">
+                <Crown size={10} /> PRO
+              </span>
+            </div>
+          )}
 
           {/* Hover action button */}
           <motion.div
