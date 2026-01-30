@@ -112,7 +112,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges: badgesProp
                       >
                         <Image
                           src={cell.badge.imageUrl}
-                          alt={cell.colored ? cell.badge.name : ''}
+                          alt={cell.badge.name}
                           fill
                           unoptimized={cell.badge.imageUrl.includes('localhost')}
                           className="object-contain p-2"
