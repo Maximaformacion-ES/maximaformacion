@@ -10,7 +10,7 @@ const FALLBACK_BADGES: Badge[] = [
   { id: 2, name: 'ISO 14001 – Environmental Management Certified', imageUrl: '/parches/ISO 14001.png' },
   { id: 3, name: 'ISO 27001 – Information Security Certified', imageUrl: '/parches/ISO 27001.png' },
   { id: 4, name: 'Cum Laude Emagister 2018–2025', imageUrl: '/parches/cum_laude_emagister_2018_2025.png' },
-  { id: 5, name: 'Google Reviews – 5.0 de 120 reseñas', imageUrl: '/parches/parche_reseñas_google.png' },
+  { id: 5, name: 'Google Reviews – 5.0 de 120 resenias', imageUrl: '/parches/parche_resenias_google.png' },
 ];
 
 // 7 columns × 5 rows. Each row is offset by half a cell to create a brick pattern.
@@ -70,7 +70,8 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges: badgesProp
   const badges = badgesProp && badgesProp.length > 0 ? badgesProp : FALLBACK_BADGES;
   const rows = buildRows(badges);
 
-  console.log('BadgesSection render with badges:', badges);
+  // Don't render if no badges available (fallback files don't exist in public/)
+  if (!badgesProp || badgesProp.length === 0) return null;
 
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
