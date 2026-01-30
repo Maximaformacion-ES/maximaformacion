@@ -48,12 +48,6 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
 }) => {
   const rows = badges.length > 0 ? buildRows(badges) : [];
 
-  rows
-    .map((row) => row.map((cell) => cell.badge.imageUrl))
-    .forEach((r, i) => {
-      console.log(`Row ${i}: `, r);
-    });
-
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background accent – mirrored from testimonials */}

@@ -578,12 +578,11 @@ export async function getBadges(): Promise<Badge[]> {
     const response = await strapiRequest<StrapiResponse<StrapiBadge[]>>(
       '/api/badges?populate[badge]=true&pagination[pageSize]=100&sort=name:asc',
       {
-        revalidate: 3600,
+        revalidate: 600,
         tags: ['badges'],
       }
     );
 
-    console.log('[getBadges] raw response:', JSON.stringify(response.data?.length), response.data?.map((b: StrapiBadge) => ({ name: b.name, hasBadge: !!b.badge })));
     return response.data
       .filter((b) => b.badge)
       .map((b) => ({

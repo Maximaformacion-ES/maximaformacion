@@ -18,6 +18,8 @@ const MODEL_TAG_MAP: Record<string, string[]> = {
   module: ['programs', 'lessons'], // Modules affect program and lesson views
   lesson: ['lessons', 'programs'], // Lessons affect lesson views and program course content
   'blog-post': ['blog-posts'],
+  logo: ['logos'],
+  badge: ['badges'],
 };
 
 interface StrapiWebhookPayload {
@@ -99,6 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Also revalidate main paths
+    revalidatePath('/');
     revalidatePath('/programas');
     revalidatePath('/blog');
 
