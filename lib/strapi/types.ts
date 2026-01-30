@@ -47,6 +47,18 @@ export interface StrapiMedia {
 
 // Strapi content types
 
+export interface StrapiTopic {
+  id: number;
+  documentId: string;
+  name: string;
+}
+
+export interface Topic {
+  id: number;
+  documentId: string;
+  name: string;
+}
+
 // Legacy module component (embedded in programs)
 export interface StrapiModuleComponent {
   id: number;
@@ -106,6 +118,7 @@ export interface StrapiProgram {
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
   startDate: string | null;
+  topic: StrapiTopic | null;
   certification: string | null;
   price: number | null;
   originalPrice: number | null;
@@ -168,6 +181,7 @@ export interface Program {
   duration: string;
   ects: string;
   tags: string[];
+  topic: string;
   featured: boolean;
   description: string;
   longDescription: string;

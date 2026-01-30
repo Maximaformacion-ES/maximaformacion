@@ -1,22 +1,25 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { CatalogHeader } from '../components/CatalogHeader';
 import { CatalogFilterBar } from '../components/CatalogFilterBar';
 import { CatalogGrid } from '../components/CatalogGrid';
-import type { Program } from '@/lib/strapi/types';
+import type { Program, Topic } from '@/lib/strapi/types';
 
 interface ProgramsClientProps {
   initialPrograms: Program[];
+  availableTopics: Topic[];
 }
 
-export default function ProgramsClient({ initialPrograms }: ProgramsClientProps) {
+export default function ProgramsClient({ initialPrograms, availableTopics }: ProgramsClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
   const filteredPrograms = useMemo(() => {
     let result = initialPrograms;
@@ -27,17 +30,23 @@ export default function ProgramsClient({ initialPrograms }: ProgramsClientProps)
       result = result.filter(p => p.type === filterType);
     }
 
+    // Apply Topic Filter
+    if (selectedTopics.length > 0) {
+      result = result.filter(p => selectedTopics.includes(p.topic));
+    }
+
     // Apply Search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
         p.title.toLowerCase().includes(q) ||
-        p.tags.some(t => t.toLowerCase().includes(q))
+        p.tags.some(t => t.toLowerCase().includes(q)) ||
+        p.topic.toLowerCase().includes(q)
       );
     }
 
     return result;
-  }, [initialPrograms, activeFilter, searchQuery]);
+  }, [initialPrograms, activeFilter, searchQuery, selectedTopics]);
 
   return (
     <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
@@ -48,15 +57,30 @@ export default function ProgramsClient({ initialPrograms }: ProgramsClientProps)
       <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10">
         <CatalogHeader />
 
-        <CatalogFilterBar
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          resultsCount={filteredPrograms.length}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <CatalogFilterBar
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            resultsCount={filteredPrograms.length}
+            availableTopics={availableTopics}
+            selectedTopics={selectedTopics}
+            setSelectedTopics={setSelectedTopics}
+          />
+        </motion.div>
 
-        <CatalogGrid programs={filteredPrograms} />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+        >
+          <CatalogGrid programs={filteredPrograms} />
+        </motion.div>
       </main>
 
       <Footer />

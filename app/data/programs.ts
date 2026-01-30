@@ -13,6 +13,7 @@ export interface Program {
   slug: string;
   ects: string;
   tags: string[];
+  topic: string;
   featured: boolean;
   description: string;
   longDescription: string;

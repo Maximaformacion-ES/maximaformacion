@@ -102,6 +102,7 @@ function transformProgramWithLessons(strapi: StrapiProgram): ProgramWithLessons 
     audience: strapi.audience || [],
     careers: strapi.careers || [],
     objectives: strapi.objectives || [],
+    topic: strapi.topic?.name || '',
     isPro: strapi.isPro,
     moduleRelations,
     totalLessons,
