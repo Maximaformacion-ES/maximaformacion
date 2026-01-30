@@ -56,8 +56,6 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
     console.log(`Row ${i}: `, r);
   });
 
-  console.log('BadgesSection URLs:', badges.map(b => b.imageUrl));
-
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background accent – mirrored from testimonials */}
@@ -98,11 +96,9 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
                             : 'opacity-30 grayscale w-[13%]'
                         }`}
                       >
-                        <Image
+                        <img
                           src={cell.badge.imageUrl}
                           alt={cell.badge.name}
-                          fill
-                          unoptimized={cell.badge.imageUrl.includes('localhost')}
                           className="object-contain p-2"
                           sizes="(max-width: 768px) 20vw, (max-width: 1200px) 13vw, 10vw"
                         />
