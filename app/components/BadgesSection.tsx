@@ -5,34 +5,19 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import type { Badge } from '@/lib/strapi/types';
 
-const FALLBACK_BADGES: Badge[] = [
-  { id: 1, name: 'ISO 9001:2015 – Quality Management Certified', imageUrl: '/parches/ISO 9001.png' },
-  { id: 2, name: 'ISO 14001 – Environmental Management Certified', imageUrl: '/parches/ISO 14001.png' },
-  { id: 3, name: 'ISO 27001 – Information Security Certified', imageUrl: '/parches/ISO 27001.png' },
-  { id: 4, name: 'Cum Laude Emagister 2018–2025', imageUrl: '/parches/cum_laude_emagister_2018_2025.png' },
-  { id: 5, name: 'Google Reviews – 5.0 de 120 resenias', imageUrl: '/parches/parche_resenias_google.png' },
-];
-
-// 7 columns × 5 rows. Each row is offset by half a cell to create a brick pattern.
-// The 5 colored badges sit in the visual center (row 2 center cluster).
+// 7 columns × 4 rows. Each row is offset by half a cell to create a brick pattern.
 const COLS = 7;
 const ROWS = 4;
 
 // Each row shuffled independently so badges are interleaved.
-// Center colored cells are designed so each has a unique badge type.
 const ROW_ORDERS = [
   [3, 0, 4, 1, 2, 3, 1],
-  [1, 4, 2, 0, 3, 2, 4],  // col 2 → badge 2 (ISO 27001), col 3 → badge 0 (ISO 9001)
-  [4, 2, 3, 4, 1, 0, 2],  // col 1 → badge 2 (ISO 27001), col 2 → badge 3 (Cum Laude), col 3 → badge 4 (Google)
+  [1, 4, 2, 0, 3, 2, 4],
+  [4, 2, 3, 4, 1, 0, 2],
   [0, 3, 1, 4, 2, 1, 3],
 ];
 
-// Colored cell positions: (row, col) — one per badge type, clustered at center.
-//   1-2 → badge 2 (ISO 27001)
-//   1-3 → badge 0 (ISO 9001)
-//   2-2 → badge 3 (Cum Laude)
-//   2-3 → badge 4 (Google — right of Cum Laude)
-//   2-4 → badge 1 (ISO 14001)
+// Colored cell positions clustered at center.
 const COLORED_SET = new Set([
   '1-2',
   '1-3',
@@ -41,8 +26,6 @@ const COLORED_SET = new Set([
   '2-4',
 ]);
 
-// Map: "row-col" → true if that specific badge index at that cell should be colored
-// We mark the cell colored only if the badge there hasn't been colored yet.
 function buildRows(badges: Badge[]) {
   const usedBadges = new Set<number>();
   const rows: { badge: Badge; colored: boolean }[][] = [];
@@ -66,12 +49,10 @@ interface BadgesSectionProps {
   badges?: Badge[];
 }
 
-export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges: badgesProp }) => {
-  const badges = badgesProp && badgesProp.length > 0 ? badgesProp : FALLBACK_BADGES;
-  const rows = buildRows(badges);
+export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges }) => {
+  if (!badges || badges.length === 0) return null;
 
-  // Don't render if no badges available (fallback files don't exist in public/)
-  if (!badgesProp || badgesProp.length === 0) return null;
+  const rows = buildRows(badges);
 
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
