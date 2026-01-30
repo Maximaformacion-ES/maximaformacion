@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import type { Badge } from '@/lib/strapi/types';
 
 // 7 columns × 4 rows. Each row is offset by half a cell to create a brick pattern.

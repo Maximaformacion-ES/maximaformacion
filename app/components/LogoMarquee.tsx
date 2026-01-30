@@ -5,27 +5,6 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import type { Logo } from '@/lib/strapi/types';
 
-const FALLBACK_LOGOS: Logo[] = [
-  'AEC-LOGO 1.svg',
-  'Abbott.svg',
-  'Coviran 1.svg',
-  'Enac 1.svg',
-  'Incarlopsa 1.svg',
-  'Itss 1.svg',
-  'Logo_RTVE.svg 1.svg',
-  'Logotipo_del_CSIC.svg 1.svg',
-  'Logotipo_del_Servicio_Andaluz_de_Salud.svg 1.svg',
-  'Mapfre_logo.svg 1.svg',
-  'Mercamadrid 1.svg',
-  'grupotragsa 1.svg',
-  'logo-asispa 1.svg',
-  'logo_hero_c 1.svg',
-].map((file, i) => ({
-  id: i,
-  companyName: file.replace(/\.svg.*$/, '').replace(/\s*1$/, ''),
-  imageUrl: `/logos/${file}`,
-}));
-
 interface LogoMarqueeProps {
   logos?: Logo[];
 }
@@ -65,9 +44,7 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Log
 }
 
 export const LogoMarquee: React.FC<LogoMarqueeProps> = ({ logos = [] }) => {
-  const displayLogos = logos.length > 0 ? logos : FALLBACK_LOGOS;
-
-  console.log('LogoMarquee URLs:', displayLogos.map(l => l.imageUrl));
+  const displayLogos = logos;
 
   return (
     <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full]">
