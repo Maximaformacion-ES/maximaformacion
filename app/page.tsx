@@ -1,9 +1,9 @@
 import { draftMode } from 'next/headers';
-import { getPrograms } from '@/lib/strapi/queries';
+import { getPrograms, getLogos } from '@/lib/strapi/queries';
 import { isStrapiConfigured } from '@/lib/strapi/client';
 import { COMPLETE_PROGRAMS } from './data/programs';
 import HomeClient from './HomeClient';
-import type { Program } from '@/lib/strapi/types';
+import type { Program, Logo } from '@/lib/strapi/types';
 
 export const revalidate = 60;
 
@@ -22,10 +22,15 @@ export default async function Home() {
   const { isEnabled: isDraft } = await draftMode();
 
   let programs: Program[];
+  let logos: Logo[] = [];
 
   if (isStrapiConfigured()) {
     try {
-      const { programs: strapiPrograms } = await getPrograms({ draft: isDraft });
+      const [{ programs: strapiPrograms }, strapiLogos] = await Promise.all([
+        getPrograms({ draft: isDraft }),
+        getLogos(),
+      ]);
+      logos = strapiLogos;
       if (strapiPrograms.length > 0) {
         programs = strapiPrograms;
       } else {
@@ -52,5 +57,5 @@ export default async function Home() {
     }));
   }
 
-  return <HomeClient programs={programs} />;
+  return <HomeClient programs={programs} logos={logos} />;
 }
