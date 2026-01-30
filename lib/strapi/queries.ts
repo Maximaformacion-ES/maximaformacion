@@ -583,6 +583,7 @@ export async function getBadges(): Promise<Badge[]> {
       }
     );
 
+    console.log('[getBadges] raw response:', JSON.stringify(response.data?.length), response.data?.map((b: StrapiBadge) => ({ name: b.name, hasBadge: !!b.badge })));
     return response.data
       .filter((b) => b.badge)
       .map((b) => ({
@@ -591,7 +592,7 @@ export async function getBadges(): Promise<Badge[]> {
         imageUrl: getStrapiMediaUrl(b.badge!),
       }));
   } catch (error) {
-    console.error('Error fetching badges:', error);
+    console.error('[getBadges] Error:', error);
     return [];
   }
 }
