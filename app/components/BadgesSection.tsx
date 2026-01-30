@@ -70,6 +70,8 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges: badgesProp
   const badges = badgesProp && badgesProp.length > 0 ? badgesProp : FALLBACK_BADGES;
   const rows = buildRows(badges);
 
+  console.log('BadgesSection render with badges:', badges);
+
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background accent – mirrored from testimonials */}
