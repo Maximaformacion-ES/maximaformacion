@@ -56,6 +56,8 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges = [] }) => 
     console.log(`Row ${i}: `, r);
   });
 
+  console.log('BadgesSection URLs:', badges.map(b => b.imageUrl));
+
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       {/* Background accent – mirrored from testimonials */}
