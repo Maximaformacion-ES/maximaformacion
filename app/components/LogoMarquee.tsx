@@ -27,7 +27,7 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Log
         {items.map((logo, i) => (
           <div
             key={`${logo.id}-${i}`}
-            className="flex-shrink-0 h-8 md:h-10 w-24 md:w-32 relative opacity-80 transition-opacity duration-300 grayscale"
+            className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-80 transition-opacity duration-300 grayscale"
           >
             <Image
               src={logo.imageUrl}

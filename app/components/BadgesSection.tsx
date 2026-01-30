@@ -7,21 +7,21 @@ import Image from "next/image";
 
 // 7 columns × 4 rows. Each row is offset by half a cell to create a brick pattern.
 const COLS = 7;
-const ROWS = 4;
+const ROWS = 5;
 
 // Each row shuffled independently so badges are interleaved.
 const ROW_ORDERS = [
   [3, 0, 4, 1, 2, 3, 1],
-  [1, 4, 2, 0, 3, 2, 4],
-  [4, 2, 3, 4, 1, 0, 2],
-  [0, 3, 1, 4, 2, 1, 3],
+  [1, 4, 2, 5, 3, 2, 4],
+  [4, 2, 3, 1, 4, 0, 2],
+  [0, 3, 1, 0, 2, 1, 3],
+  [3, 4, 2, 1, 3, 0, 0]
 ];
 
 // Colored cell positions clustered at center.
-const COLORED_SET = new Set(["1-2", "1-3", "2-2", "2-3", "2-4"]);
+const COLORED_SET = new Set(["1-2", "1-3", "2-2", "2-3", "2-4", "3-3"]);
 
 function buildRows(badges: Badge[]) {
-  const usedBadges = new Set<number>();
   const rows: { badge: Badge; colored: boolean }[][] = [];
 
   for (let r = 0; r < ROWS; r++) {
@@ -30,8 +30,7 @@ function buildRows(badges: Badge[]) {
       const badgeIdx = ROW_ORDERS[r][c] % badges.length;
       const badge = badges[badgeIdx];
       const key = `${r}-${c}`;
-      const colored = COLORED_SET.has(key) && !usedBadges.has(badgeIdx);
-      if (colored) usedBadges.add(badgeIdx);
+      const colored = COLORED_SET.has(key);
       row.push({ badge, colored });
     }
     rows.push(row);
@@ -61,9 +60,9 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
             <div
               style={{
                 maskImage:
-                  "radial-gradient(ellipse 60% 55% at 50% 50%, black 20%, transparent 80%)",
+                  "radial-gradient(ellipse 60% 90% at 50% 50%, black 20%, transparent 80%)",
                 WebkitMaskImage:
-                  "radial-gradient(ellipse 60% 58% at 50% 50%, black 20%, transparent 80%)",
+                  "radial-gradient(ellipse 60% 90% at 50% 55%, black 20%, transparent 80%)",
               }}
             >
               <div className="flex flex-col gap-2 md:gap-3 -mx-8">
