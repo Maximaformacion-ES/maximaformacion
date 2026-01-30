@@ -239,6 +239,21 @@ export interface Logo {
   imageUrl: string;
 }
 
+// ============ Badge Types ============
+
+export interface StrapiBadge {
+  id: number;
+  documentId: string;
+  name: string;
+  badge: StrapiMedia | null;
+}
+
+export interface Badge {
+  id: number;
+  name: string;
+  imageUrl: string;
+}
+
 // Query options
 export interface ProgramQueryOptions {
   type?: 'Master' | 'Curso';

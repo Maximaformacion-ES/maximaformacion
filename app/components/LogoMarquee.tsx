@@ -37,7 +37,9 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Log
   const to = direction === 'left' ? -25 : 0;
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden relative"
+      style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
+    >
       <motion.div
         className="flex items-center gap-12 md:gap-16 w-max"
         animate={{ x: [`${from}%`, `${to}%`] }}
@@ -66,9 +68,9 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({ logos = [] }) => {
   const displayLogos = logos.length > 0 ? logos : FALLBACK_LOGOS;
 
   return (
-    <section className="pb-24 md:pb-32 overflow-hidden h-[full]">
+    <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full]">
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -95,7 +97,7 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({ logos = [] }) => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1, delay: 0.3 }}
-        className="flex flex-col gap-8"
+        className="flex flex-col gap-8 max-w-[1400px] mx-auto"
       >
         <LogoRow direction="right" logos={displayLogos} />
         <LogoRow direction="left" logos={displayLogos} />
