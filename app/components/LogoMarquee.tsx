@@ -7,7 +7,7 @@ import type { Logo } from '@/lib/strapi/types';
 
 const FALLBACK_LOGOS: Logo[] = [
   'AEC-LOGO 1.svg',
-  'Abbott_Laboratories_logo.svg',
+  'Abbott.svg',
   'Coviran 1.svg',
   'Enac 1.svg',
   'Incarlopsa 1.svg',
