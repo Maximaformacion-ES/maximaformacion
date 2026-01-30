@@ -224,6 +224,21 @@ export interface BlogPost {
   featured: boolean;
 }
 
+// ============ Logo Types ============
+
+export interface StrapiLogo {
+  id: number;
+  documentId: string;
+  companyName: string;
+  image: StrapiMedia | null;
+}
+
+export interface Logo {
+  id: number;
+  companyName: string;
+  imageUrl: string;
+}
+
 // Query options
 export interface ProgramQueryOptions {
   type?: 'Master' | 'Curso';

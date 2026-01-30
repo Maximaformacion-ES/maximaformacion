@@ -7,11 +7,13 @@ import type {
   StrapiBlogPost,
   StrapiHeroSection,
   StrapiSiteMetadata,
+  StrapiLogo,
   Program,
   Topic,
   BlogPost,
   HeroSection,
   SiteMetadata,
+  Logo,
   ProgramQueryOptions,
   BlogQueryOptions,
   ProgramModule,
@@ -539,5 +541,30 @@ export async function getSiteMetadata(): Promise<SiteMetadata | null> {
   } catch (error) {
     console.error('Error fetching site metadata:', error);
     return null;
+  }
+}
+
+// ============ Logo Queries ============
+
+export async function getLogos(): Promise<Logo[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiLogo[]>>(
+      '/api/logos?populate[image]=true&pagination[pageSize]=100&sort=companyName:asc',
+      {
+        revalidate: 3600,
+        tags: ['logos'],
+      }
+    );
+
+    return response.data
+      .filter((logo) => logo.image)
+      .map((logo) => ({
+        id: logo.id,
+        companyName: logo.companyName,
+        imageUrl: getStrapiMediaUrl(logo.image!),
+      }));
+  } catch (error) {
+    console.error('Error fetching logos:', error);
+    return [];
   }
 }

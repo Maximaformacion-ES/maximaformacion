@@ -1,26 +1,30 @@
-'use client';
+"use client";
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { ChevronDown, ArrowRight } from 'lucide-react';
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { ChevronDown, ArrowRight } from "lucide-react";
+import { LogoMarquee } from "./LogoMarquee";
 
 export const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"]
+    offset: ["start start", "end start"],
   });
-  
+
   const y = useTransform(scrollYProgress, [0, 1], [0, 300]);
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const titleY = useSpring(useTransform(scrollYProgress, [0, 0.3], [0, -100]), { stiffness: 100, damping: 30 });
-  
+  const titleY = useSpring(useTransform(scrollYProgress, [0, 0.3], [0, -100]), {
+    stiffness: 100,
+    damping: 30,
+  });
+
   return (
-    <section ref={containerRef} className="relative h-[120vh]">
+    <section ref={containerRef} className="relative h-[120dvh]">
       <div className="sticky top-0 h-screen overflow-hidden">
         {/* Background */}
-        <motion.div 
+        <motion.div
           style={{ y }}
           className="absolute inset-0 bg-linear-to-b from-[#0a0a0a] via-[#111] to-[#0a0a0a]"
         >
@@ -28,25 +32,22 @@ export const HeroSection: React.FC = () => {
           <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[150px]" />
           <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-white/3 rounded-full blur-[120px]" />
         </motion.div>
-        
+
         {/* Content */}
-        <motion.div 
+        <motion.div
           style={{ scale, opacity }}
-          className="relative h-full flex flex-col items-center justify-center px-6"
+          className="relative h-full flex flex-col items-center justify-center px-6 pt-20"
         >
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-white/60 text-sm md:text-base tracking-[0.3em] uppercase mb-8"
+            className="text-white/60 text-[12px] md:text-base tracking-[0.3em] uppercase mb-8"
           >
             Formación Profesional experta
           </motion.p>
-          
-          <motion.h1 
-            style={{ y: titleY }}
-            className="text-center"
-          >
+
+          <motion.h1 style={{ y: titleY }} className="text-center">
             <motion.span
               initial={{ opacity: 0, y: 60 }}
               animate={{ opacity: 1, y: 0 }}
@@ -64,22 +65,22 @@ export const HeroSection: React.FC = () => {
               TU FUTURO
             </motion.span>
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
             className="mt-8 md:mt-12 text-white/70 text-base md:text-xl font-light text-center max-w-2xl leading-relaxed"
           >
-            Formación especializada que impulsa tu carrera profesional 
+            Formación especializada que impulsa tu carrera profesional
             <span className="text-white font-normal"> al siguiente nivel</span>
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 mt-12"
+            className="flex flex-col sm:flex-row gap-4 my-12"
           >
             <motion.a
               href="/programas"
@@ -88,7 +89,10 @@ export const HeroSection: React.FC = () => {
               whileTap={{ scale: 0.98 }}
             >
               Explorar Másters
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight
+                size={18}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </motion.a>
             <motion.a
               href="/programas"
