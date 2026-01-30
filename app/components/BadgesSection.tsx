@@ -114,7 +114,6 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({ badges: badgesProp
                           src={cell.badge.imageUrl}
                           alt={cell.badge.name}
                           fill
-                          unoptimized={cell.badge.imageUrl.includes('localhost')}
                           className="object-contain p-2"
                           sizes="(max-width: 768px) 20vw, (max-width: 1200px) 13vw, 10vw"
                         />
