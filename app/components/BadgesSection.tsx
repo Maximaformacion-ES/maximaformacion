@@ -18,20 +18,14 @@ const ROW_ORDERS = [
   [3, 4, 2, 1, 3, 0, 0]
 ];
 
-// Colored cell positions clustered at center.
-const COLORED_SET = new Set(["1-2", "1-3", "2-2", "2-3", "2-4", "3-3"]);
-
 function buildRows(badges: Badge[]) {
-  const rows: { badge: Badge; colored: boolean }[][] = [];
+  const rows: Badge[][] = [];
 
   for (let r = 0; r < ROWS; r++) {
-    const row: { badge: Badge; colored: boolean }[] = [];
+    const row: Badge[] = [];
     for (let c = 0; c < COLS; c++) {
       const badgeIdx = ROW_ORDERS[r][c] % badges.length;
-      const badge = badges[badgeIdx];
-      const key = `${r}-${c}`;
-      const colored = COLORED_SET.has(key);
-      row.push({ badge, colored });
+      row.push(badges[badgeIdx]);
     }
     rows.push(row);
   }
@@ -82,18 +76,14 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                           : undefined
                       }
                     >
-                      {row.map((cell, c) => (
+                      {row.map((badge, c) => (
                         <div
                           key={`${r}-${c}`}
-                          className={`relative flex-shrink-0 aspect-square rounded-xl overflow-hidden transition-all duration-500 ${
-                            cell.colored
-                              ? "opacity-100 w-[16%] -m-[0%] z-10"
-                              : "opacity-30 grayscale w-[13%]"
-                          }`}
+                          className="relative flex-shrink-0 aspect-square rounded-xl overflow-hidden w-[16%] opacity-40 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.2] transition-all duration-500"
                         >
                           <Image
-                            src={cell.badge.imageUrl}
-                            alt={cell.badge.name}
+                            src={badge.imageUrl}
+                            alt={badge.name}
                             fill
                             unoptimized
                             className="object-contain p-2"
