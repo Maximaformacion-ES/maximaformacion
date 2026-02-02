@@ -2,30 +2,79 @@
 
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import type { Badge } from "@/lib/strapi/types";
+import type { Badge, BadgeImportance } from "@/lib/strapi/types";
 import Image from "next/image";
 
 const COLS = 7;
 const ROWS = 5;
 
+const IMPORTANCE_ORDER: Record<BadgeImportance, number> = {
+  Highest: 0,
+  Medium: 1,
+  Low: 2,
+};
+
 /**
- * Build a ROWS × COLS grid by cycling through badges with a seeded shuffle
- * per row so badges are interleaved, not simply repeated in order.
+ * Build a ROWS × COLS grid ensuring every badge appears at least once.
+ * Badges are sorted by importance so Highest end up in the most central
+ * cells and Low on the edges. Remaining cells are filled cycling.
  */
 function buildRows(badges: Badge[]): Badge[][] {
   const n = badges.length;
-  const rows: Badge[][] = [];
+  const total = ROWS * COLS;
 
-  for (let r = 0; r < ROWS; r++) {
-    // Create a shuffled index order for this row using a simple deterministic shuffle
-    const indices = Array.from({ length: COLS }, (_, c) => {
-      // Mix row and column to spread badges across the grid
-      return ((r * 3 + c * 7 + r * c) % n + n) % n;
-    });
-    rows.push(indices.map((idx) => badges[idx]));
+  // Sort badges by importance: Highest first → they get the central cells
+  const sorted = [...badges].sort(
+    (a, b) => IMPORTANCE_ORDER[a.importance] - IMPORTANCE_ORDER[b.importance]
+  );
+
+  // All cells sorted by distance to grid center (central cells first)
+  const cx = (COLS - 1) / 2;
+  const cy = (ROWS - 1) / 2;
+  const cells = Array.from({ length: total }, (_, i) => ({
+    r: Math.floor(i / COLS),
+    c: i % COLS,
+  })).sort((a, b) => {
+    const da = ((a.c - cx) / cx) ** 2 + ((a.r - cy) / cy) ** 2;
+    const db = ((b.c - cx) / cx) ** 2 + ((b.r - cy) / cy) ** 2;
+    return da - db;
+  });
+
+  const grid: number[][] = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+
+  // Place each unique badge once: Highest → most central cell
+  for (let i = 0; i < Math.min(n, total); i++) {
+    grid[cells[i].r][cells[i].c] = i;
   }
 
-  return rows;
+  // Fill remaining cells picking the badge whose nearest copy is farthest away
+  for (let i = n; i < total; i++) {
+    const { r, c } = cells[i];
+    let bestIdx = 0;
+    let bestMinDist = -1;
+
+    for (let b = 0; b < n; b++) {
+      // Find the closest existing copy of badge b
+      let minDist = Infinity;
+      for (let rr = 0; rr < ROWS; rr++) {
+        for (let cc = 0; cc < COLS; cc++) {
+          if (grid[rr][cc] === b && !(rr === r && cc === c)) {
+            const d = (rr - r) ** 2 + (cc - c) ** 2;
+            if (d < minDist) minDist = d;
+          }
+        }
+      }
+      // Pick the badge whose nearest copy is the farthest
+      if (minDist > bestMinDist) {
+        bestMinDist = minDist;
+        bestIdx = b;
+      }
+    }
+
+    grid[r][c] = bestIdx;
+  }
+
+  return grid.map((row) => row.map((idx) => sorted[idx]));
 }
 
 interface BadgesSectionProps {

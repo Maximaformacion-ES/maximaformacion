@@ -241,17 +241,21 @@ export interface Logo {
 
 // ============ Badge Types ============
 
+export type BadgeImportance = 'Low' | 'Medium' | 'Highest';
+
 export interface StrapiBadge {
   id: number;
   documentId: string;
   name: string;
   badge: StrapiMedia | null;
+  importance: BadgeImportance | null;
 }
 
 export interface Badge {
   id: number;
   name: string;
   imageUrl: string;
+  importance: BadgeImportance;
 }
 
 // Query options
