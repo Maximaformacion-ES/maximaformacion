@@ -1,34 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import type { Badge } from "@/lib/strapi/types";
 import Image from "next/image";
 
-// 7 columns × 4 rows. Each row is offset by half a cell to create a brick pattern.
 const COLS = 7;
 const ROWS = 5;
 
-// Each row shuffled independently so badges are interleaved.
-const ROW_ORDERS = [
-  [3, 0, 4, 1, 2, 3, 1],
-  [1, 4, 2, 5, 3, 2, 4],
-  [4, 2, 3, 1, 4, 0, 2],
-  [0, 3, 1, 0, 2, 1, 3],
-  [3, 4, 2, 1, 3, 0, 0]
-];
-
-function buildRows(badges: Badge[]) {
+/**
+ * Build a ROWS × COLS grid by cycling through badges with a seeded shuffle
+ * per row so badges are interleaved, not simply repeated in order.
+ */
+function buildRows(badges: Badge[]): Badge[][] {
+  const n = badges.length;
   const rows: Badge[][] = [];
 
   for (let r = 0; r < ROWS; r++) {
-    const row: Badge[] = [];
-    for (let c = 0; c < COLS; c++) {
-      const badgeIdx = ROW_ORDERS[r][c] % badges.length;
-      row.push(badges[badgeIdx]);
-    }
-    rows.push(row);
+    // Create a shuffled index order for this row using a simple deterministic shuffle
+    const indices = Array.from({ length: COLS }, (_, c) => {
+      // Mix row and column to spread badges across the grid
+      return ((r * 3 + c * 7 + r * c) % n + n) % n;
+    });
+    rows.push(indices.map((idx) => badges[idx]));
   }
+
   return rows;
 }
 
@@ -39,7 +35,12 @@ interface BadgesSectionProps {
 export const BadgesSection: React.FC<BadgesSectionProps> = ({
   badges = [],
 }) => {
-  const rows = badges.length > 0 ? buildRows(badges) : [];
+  const rows = useMemo(
+    () => (badges.length > 0 ? buildRows(badges) : []),
+    [badges]
+  );
+
+  if (badges.length === 0) return null;
 
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
@@ -72,7 +73,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                       className="flex gap-2 md:gap-3 justify-center"
                       style={
                         r % 2 === 1
-                          ? { paddingLeft: "calc(100% / 7 / 2)" }
+                          ? { paddingLeft: `calc(100% / ${COLS} / 2)` }
                           : undefined
                       }
                     >
