@@ -28,7 +28,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({ programs }) => {
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-20 text-neutral-500"
             >
-              <Search size={48} className="mb-4 opacity-20" />
+              <Search size={48} className="mb-4 opacity-60 text-amber-500" />
               <p className="text-lg">No se encontraron programas con esos criterios.</p>
             </motion.div>
           )}
