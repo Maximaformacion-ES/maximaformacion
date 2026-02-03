@@ -62,7 +62,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
       </TabsList>
 
       {/* Descripción */}
-      <TabsContent value="descripcion" className="pt-8">
+      <TabsContent value="descripcion" className="pt-10 md:pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -75,7 +75,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
       </TabsContent>
 
       {/* Temario */}
-      <TabsContent value="temario" className="pt-8">
+      <TabsContent value="temario" className="pt-10 md:pt-12">
         <div className="mb-4 text-neutral-400 text-sm">
           {program.modules.length} módulos especializados
         </div>
@@ -148,7 +148,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
       </TabsContent>
 
       {/* Objetivos */}
-      <TabsContent value="objetivos" className="pt-8">
+      <TabsContent value="objetivos" className="pt-10 md:pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -169,7 +169,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
       </TabsContent>
 
       {/* A quién va dirigido */}
-      <TabsContent value="audiencia" className="pt-8">
+      <TabsContent value="audiencia" className="pt-10 md:pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -190,7 +190,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
       </TabsContent>
 
       {/* Salidas profesionales */}
-      <TabsContent value="salidas" className="pt-8">
+      <TabsContent value="salidas" className="pt-10 md:pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
