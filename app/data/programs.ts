@@ -5,6 +5,12 @@ export interface ProgramModule {
   topics: string[];
 }
 
+export interface Topic {
+  id: number;
+  documentId: string;
+  name: string;
+}
+
 export interface Program {
   id: number;
   type: 'Master' | 'Curso';
@@ -13,7 +19,7 @@ export interface Program {
   slug: string;
   ects: string;
   tags: string[];
-  topic: string;
+  topics: Topic[];
   featured: boolean;
   description: string;
   longDescription: string;
@@ -25,9 +31,9 @@ export interface Program {
   price: number;
   originalPrice?: number;
   modules: ProgramModule[];
-  audience: string[];
-  careers: string[];
-  objectives: string[];
+  audience: string;
+  careers: string;
+  objectives: string;
   isPro: boolean; // Whether this program requires Pro subscription
 }
 
@@ -76,25 +82,20 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
         topics: ['Diseño de solución', 'Implementación', 'Despliegue', 'Presentación']
       }
     ],
-    audience: [
-      'Ingenieros de software con experiencia en programación',
-      'Profesionales de datos que quieren especializarse en IA',
-      'Directivos tecnológicos que necesitan entender IA',
-      'Emprendedores en el sector tech'
-    ],
-    careers: [
-      'AI Engineer',
-      'Machine Learning Engineer',
-      'Data Scientist especializado en IA',
-      'AI Product Manager',
-      'Investigador en IA'
-    ],
-    objectives: [
-      'Dominar los algoritmos de machine learning más utilizados en la industria',
-      'Implementar soluciones de deep learning con frameworks modernos',
-      'Desplegar modelos de IA en producción',
-      'Entender las implicaciones éticas y legales de la IA'
-    ]
+    topics: [{ id: 1, documentId: 'local-1', name: 'Inteligencia Artificial' }],
+    audience: `- Ingenieros de software con experiencia en programación
+- Profesionales de datos que quieren especializarse en IA
+- Directivos tecnológicos que necesitan entender IA
+- Emprendedores en el sector tech`,
+    careers: `- AI Engineer
+- Machine Learning Engineer
+- Data Scientist especializado en IA
+- AI Product Manager
+- Investigador en IA`,
+    objectives: `- Dominar los algoritmos de machine learning más utilizados en la industria
+- Implementar soluciones de deep learning con frameworks modernos
+- Desplegar modelos de IA en producción
+- Entender las implicaciones éticas y legales de la IA`
   },
   { 
     id: 2, 
@@ -128,25 +129,20 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
         topics: ['Risk Management', 'Compliance', 'Incident Response', 'Business Continuity']
       }
     ],
-    audience: [
-      'IT Managers y CTOs',
-      'Profesionales de seguridad con experiencia técnica',
-      'Auditores de seguridad',
-      'Consultores en ciberseguridad'
-    ],
-    careers: [
-      'CISO (Chief Information Security Officer)',
-      'Security Manager',
-      'Cybersecurity Consultant',
-      'Risk Manager',
-      'Compliance Officer'
-    ],
-    objectives: [
-      'Diseñar estrategias de ciberseguridad corporativas',
-      'Gestionar equipos de seguridad',
-      'Implementar frameworks de compliance',
-      'Responder a incidentes de seguridad'
-    ]
+    topics: [{ id: 2, documentId: 'local-2', name: 'Ciberseguridad' }],
+    audience: `- IT Managers y CTOs
+- Profesionales de seguridad con experiencia técnica
+- Auditores de seguridad
+- Consultores en ciberseguridad`,
+    careers: `- CISO (Chief Information Security Officer)
+- Security Manager
+- Cybersecurity Consultant
+- Risk Manager
+- Compliance Officer`,
+    objectives: `- Diseñar estrategias de ciberseguridad corporativas
+- Gestionar equipos de seguridad
+- Implementar frameworks de compliance
+- Responder a incidentes de seguridad`
   },
   { 
     id: 3, 
@@ -179,23 +175,18 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
         topics: ['Spark Core', 'Spark SQL', 'Streaming', 'MLlib']
       }
     ],
-    audience: [
-      'Analistas de datos',
-      'Desarrolladores que quieren especializarse en big data',
-      'Profesionales de business intelligence'
-    ],
-    careers: [
-      'Big Data Engineer',
-      'Data Analyst',
-      'Business Intelligence Analyst',
-      'Data Architect'
-    ],
-    objectives: [
-      'Dominar tecnologías de big data',
-      'Procesar grandes volúmenes de datos',
-      'Crear pipelines de datos',
-      'Visualizar insights de negocio'
-    ]
+    topics: [{ id: 3, documentId: 'local-3', name: 'Big Data' }],
+    audience: `- Analistas de datos
+- Desarrolladores que quieren especializarse en big data
+- Profesionales de business intelligence`,
+    careers: `- Big Data Engineer
+- Data Analyst
+- Business Intelligence Analyst
+- Data Architect`,
+    objectives: `- Dominar tecnologías de big data
+- Procesar grandes volúmenes de datos
+- Crear pipelines de datos
+- Visualizar insights de negocio`
   },
   { 
     id: 4, 
@@ -301,9 +292,10 @@ const getDefaultProgramData = (base: Partial<Program>): Program => ({
       topics: ['Tema 1', 'Tema 2', 'Tema 3']
     }
   ],
-  audience: base.audience || ['Profesionales del sector', 'Recién graduados', 'Personas en transición profesional'],
-  careers: base.careers || ['Especialista', 'Consultor', 'Manager'],
-  objectives: base.objectives || ['Adquirir conocimientos especializados', 'Desarrollar habilidades prácticas', 'Aplicar en proyectos reales']
+  topics: base.topics || [],
+  audience: base.audience || '',
+  careers: base.careers || '',
+  objectives: base.objectives || ''
 } as Program);
 
 // Complete remaining programs with default data

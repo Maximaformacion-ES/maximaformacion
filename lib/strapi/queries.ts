@@ -49,7 +49,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     duration: strapi.duration,
     ects: strapi.ects,
     tags: strapi.tags || [],
-    topic: strapi.topic?.name || '',
+    topics: (strapi.topics || []).map((t) => ({ id: t.id, documentId: t.documentId, name: t.name })),
     featured: strapi.featured,
     description: strapi.description,
     longDescription: strapi.longDescription || strapi.description,
@@ -61,9 +61,15 @@ function transformProgram(strapi: StrapiProgram): Program {
     price: strapi.price || 1499,
     originalPrice: strapi.originalPrice || undefined,
     modules: modules.length > 0 ? modules : [{ title: 'Módulo 1', description: 'Contenido del módulo', hours: 100, topics: ['Tema 1', 'Tema 2', 'Tema 3'] }],
-    audience: strapi.audience || ['Profesionales del sector', 'Recién graduados', 'Personas en transición profesional'],
-    careers: strapi.careers || ['Especialista', 'Consultor', 'Manager'],
-    objectives: strapi.objectives || ['Adquirir conocimientos especializados', 'Desarrollar habilidades prácticas', 'Aplicar en proyectos reales'],
+    audience: strapi.audience || `- Profesionales del sector que buscan especialización
+- Recién graduados que quieren impulsar su carrera
+- Personas en transición profesional`,
+    careers: strapi.careers || `- Especialista en el área
+- Consultor independiente
+- Manager de equipos`,
+    objectives: strapi.objectives || `- Adquirir conocimientos especializados y actualizados
+- Desarrollar habilidades prácticas aplicables
+- Aplicar lo aprendido en proyectos reales`,
     isPro: strapi.isPro,
   };
 }
@@ -118,7 +124,8 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
   // Populate relations
   params.set('populate[image]', 'true');
   params.set('populate[modules]', 'true');
-  params.set('populate[topic][fields][0]', 'name');
+  params.set('populate[topics][fields][0]', 'name');
+  params.set('populate[topics][fields][1]', 'documentId');
 
   // Filters
   const filters: string[] = [];
@@ -222,7 +229,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[modules]=true&populate[topic][fields][0]=name`,
+      `/api/programs/${id}?populate[image]=true&populate[modules]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -247,7 +254,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[modules]=true&populate[topic][fields][0]=name`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[modules]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

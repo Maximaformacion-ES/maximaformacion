@@ -118,7 +118,7 @@ export interface StrapiProgram {
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
   startDate: string | null;
-  topic: StrapiTopic | null;
+  topics: StrapiTopic[] | null;
   certification: string | null;
   price: number | null;
   originalPrice: number | null;
@@ -126,9 +126,9 @@ export interface StrapiProgram {
   moduleRelations?: StrapiModule[] | null;
   stripeProductId: string | null;
   stripePriceId: string | null;
-  audience: string[] | null;
-  careers: string[] | null;
-  objectives: string[] | null;
+  audience: string | null;
+  careers: string | null;
+  objectives: string | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -181,7 +181,7 @@ export interface Program {
   duration: string;
   ects: string;
   tags: string[];
-  topic: string;
+  topics: Topic[];
   featured: boolean;
   description: string;
   longDescription: string;
@@ -193,9 +193,9 @@ export interface Program {
   price: number;
   originalPrice?: number;
   modules: ProgramModule[];
-  audience: string[];
-  careers: string[];
-  objectives: string[];
+  audience: string;
+  careers: string;
+  objectives: string;
   isPro: boolean;
 }
 

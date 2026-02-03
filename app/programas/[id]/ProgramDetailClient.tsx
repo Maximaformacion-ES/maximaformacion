@@ -58,17 +58,17 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
-        <ProgramHeroSection program={program} />
+        <ProgramHeroSection 
+          program={program}
+          sidebar={<ProgramSidebar program={program} />}
+          tabs={<ProgramTabs program={program} />}
+        />
 
         <ProGateWrapper program={program}>
-          <section className="py-16 px-6 md:px-12 bg-[#0a0a0a]">
-            <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <div className="lg:col-span-2">
-                <ProgramTabs program={program} />
-              </div>
-              <div className="lg:col-span-1">
-                <ProgramSidebar program={program} />
-              </div>
+          {/* Sidebar on mobile — hidden on desktop since it's in the hero */}
+          <section className="pb-16 px-6 md:px-12 bg-[#0a0a0a] lg:hidden">
+            <div className="max-w-[1400px] mx-auto">
+              <ProgramSidebar program={program} />
             </div>
           </section>
           <ProgramCTASection program={program} />

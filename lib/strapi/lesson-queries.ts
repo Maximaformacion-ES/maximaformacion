@@ -99,10 +99,16 @@ function transformProgramWithLessons(strapi: StrapiProgram): ProgramWithLessons 
     price: strapi.price || 0,
     originalPrice: strapi.originalPrice || undefined,
     modules: legacyModules.length > 0 ? legacyModules : [],
-    audience: strapi.audience || [],
-    careers: strapi.careers || [],
-    objectives: strapi.objectives || [],
-    topic: strapi.topic?.name || '',
+    audience: strapi.audience || `- Profesionales del sector que buscan especialización
+- Recién graduados que quieren impulsar su carrera
+- Personas en transición profesional`,
+    careers: strapi.careers || `- Especialista en el área
+- Consultor independiente
+- Manager de equipos`,
+    objectives: strapi.objectives || `- Adquirir conocimientos especializados y actualizados
+- Desarrollar habilidades prácticas aplicables
+- Aplicar lo aprendido en proyectos reales`,
+    topics: (strapi.topics || []).map((t) => ({ id: t.id, documentId: t.documentId, name: t.name })),
     isPro: strapi.isPro,
     moduleRelations,
     totalLessons,
@@ -124,6 +130,9 @@ export async function getProgramWithLessons(
     const populate = {
       image: true,
       modules: true,
+      topics: {
+        fields: ['name', 'documentId'],
+      },
       moduleRelations: {
         populate: {
           lessons: {

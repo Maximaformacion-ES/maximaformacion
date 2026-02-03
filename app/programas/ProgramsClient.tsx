@@ -32,7 +32,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
 
     // Apply Topic Filter
     if (selectedTopics.length > 0) {
-      result = result.filter(p => selectedTopics.includes(p.topic));
+      result = result.filter(p => p.topics?.some(t => selectedTopics.includes(t.name)));
     }
 
     // Apply Search
@@ -41,7 +41,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
       result = result.filter(p =>
         p.title.toLowerCase().includes(q) ||
         p.tags.some(t => t.toLowerCase().includes(q)) ||
-        p.topic.toLowerCase().includes(q)
+        p.topics?.some(t => t.name.toLowerCase().includes(q))
       );
     }
 

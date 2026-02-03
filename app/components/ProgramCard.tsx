@@ -73,7 +73,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
           </div>
 
           {/* Badges */}
-          <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-2 flex-wrap">
             <span className={`px-3 py-1.5 backdrop-blur-md text-xs font-semibold rounded-full ${
               isMaster
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
@@ -81,10 +81,17 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
             }`}>
               {program.type}
             </span>
-            {program.topic && (
-              <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white/70 text-xs font-medium rounded-full">
-                {program.topic}
-              </span>
+            {program.topics && program.topics.length > 0 && (
+              <>
+                <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white/70 text-xs font-medium rounded-full">
+                  {program.topics[0].name}
+                </span>
+                {program.topics.length > 1 && (
+                  <span className="px-2 py-1.5 bg-white/10 backdrop-blur-md text-white/50 text-xs font-medium rounded-full">
+                    +{program.topics.length - 1}
+                  </span>
+                )}
+              </>
             )}
           </div>
 

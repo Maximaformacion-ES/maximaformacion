@@ -20,14 +20,11 @@ function generateSlug(title: string): string {
 
 function extractTopicsFromPrograms(programs: Program[]): Topic[] {
   const unique = new Map<string, Topic>();
-  let syntheticId = 1;
   for (const p of programs) {
-    if (p.topic && !unique.has(p.topic)) {
-      unique.set(p.topic, {
-        id: syntheticId++,
-        documentId: `local-${syntheticId}`,
-        name: p.topic,
-      });
+    for (const topic of (p.topics || [])) {
+      if (!unique.has(topic.name)) {
+        unique.set(topic.name, topic);
+      }
     }
   }
   return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
