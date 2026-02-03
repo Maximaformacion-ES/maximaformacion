@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { FontStyles } from "./components/FontStyles";
 import { Header } from "./components/Header";
 import { HeroSection } from "./components/HeroSection";
@@ -12,6 +13,11 @@ import { Footer } from "./components/Footer";
 import type { Program, Badge, HomeData } from "@/lib/strapi/types";
 import { LogoMarquee } from "./components/LogoMarquee";
 import { BadgesSection } from "./components/BadgesSection";
+
+const FAQSection = dynamic(
+  () => import("./components/FAQSection").then((mod) => ({ default: mod.FAQSection })),
+  { ssr: false }
+);
 
 interface HomeClientProps {
   programs: Program[];
@@ -59,6 +65,11 @@ export default function HomeClient({ programs, badges, homeData }: HomeClientPro
         overline={homeData.badgesSection.badgesOverline}
         title={homeData.badgesSection.badgesTitle}
         description={homeData.badgesSection.badgesDescription}
+      />
+      <FAQSection
+        overline={homeData.faqSection.faqOverline}
+        title={homeData.faqSection.faqTitle}
+        faqs={homeData.faqSection.faqs}
       />
       <CTASection
         overline={homeData.ctaSection.ctaOverline}

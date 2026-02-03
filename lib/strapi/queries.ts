@@ -639,6 +639,15 @@ function transformHome(strapi: StrapiHome): HomeData {
       badgesTitle: strapi.badgesSection?.badgesTitle || '',
       badgesDescription: strapi.badgesSection?.badgesDescription || '',
     },
+    faqSection: {
+      faqOverline: strapi.faqSection?.faqOverline || '',
+      faqTitle: strapi.faqSection?.faqTitle || '',
+      faqDescription: strapi.faqSection?.faqDescription || '',
+      faqs: (strapi.faqSection?.faq || []).map((f) => ({
+        question: f.question,
+        answer: f.answer,
+      })),
+    },
     ctaSection: {
       ctaOverline: strapi.ctaSection?.ctaOverline || '',
       ctaTitle: strapi.ctaSection?.ctaTitle || '',
@@ -650,7 +659,7 @@ function transformHome(strapi: StrapiHome): HomeData {
 export async function getHomeData(): Promise<HomeData | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiHome>>(
-      '/api/home?populate[numericSection]=*&populate[programsSection]=*&populate[partnersSection][populate]=partnersLogos&populate[testimonialsSection][populate]=testimonial&populate[badgesSection]=*&populate[ctaSection]=*',
+      '/api/home?populate[numericSection]=*&populate[programsSection]=*&populate[partnersSection][populate]=partnersLogos&populate[testimonialsSection][populate]=testimonial&populate[badgesSection]=*&populate[faqSection][populate]=faq&populate[ctaSection]=*',
       {
         revalidate: 60,
         tags: ['home'],

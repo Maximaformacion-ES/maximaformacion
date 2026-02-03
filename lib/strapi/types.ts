@@ -392,6 +392,20 @@ export interface StrapiBadgesSection {
   badgesDescription: string | null;
 }
 
+export interface StrapiFAQ {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+export interface StrapiFaqSection {
+  id: number;
+  faqOverline: string | null;
+  faqTitle: string;
+  faqDescription: string | null;
+  faq: StrapiFAQ[];
+}
+
 export interface StrapiCtaSection {
   id: number;
   ctaOverline: string | null;
@@ -410,6 +424,7 @@ export interface StrapiHome {
   partnersSection: StrapiPartnersSection;
   testimonialsSection: StrapiTestimonialsSection;
   badgesSection: StrapiBadgesSection;
+  faqSection: StrapiFaqSection;
   ctaSection: StrapiCtaSection;
 }
 
@@ -442,6 +457,12 @@ export interface HomeData {
     badgesOverline: string;
     badgesTitle: string;
     badgesDescription: string;
+  };
+  faqSection: {
+    faqOverline: string;
+    faqTitle: string;
+    faqDescription: string;
+    faqs: { question: string; answer: string }[];
   };
   ctaSection: {
     ctaOverline: string;
