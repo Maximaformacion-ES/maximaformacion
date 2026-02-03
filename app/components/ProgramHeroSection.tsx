@@ -40,7 +40,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program 
           </span>
           {program.isPro && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full">
-              <Crown size={10} /> PRO
+              <Crown size={10} /> PR
             </span>
           )}
           {program.featured && (
