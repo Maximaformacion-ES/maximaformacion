@@ -1,9 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Globe, Monitor, Award } from 'lucide-react';
-import { Program } from '../data/programs';
+import type { Program } from '@/lib/strapi/types';
+import { markdownToHtml } from '@/lib/markdown';
+
+// Component to render markdown content with consistent styling
+function MarkdownContent({ content, className = '' }: { content: string; className?: string }) {
+  const [html, setHtml] = useState<string>('');
+
+  useEffect(() => {
+    if (content) {
+      markdownToHtml(content).then(setHtml);
+    }
+  }, [content]);
+
+  if (!html) return null;
+
+  return (
+    <div
+      className={`markdown-content ${className}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
 
 interface ProgramOverviewProps {
   program: Program;
@@ -64,7 +85,7 @@ export const ProgramOverview: React.FC<ProgramOverviewProps> = ({ program }) => 
         </div>
 
         {/* Objectives */}
-        {program.objectives && program.objectives.length > 0 && (
+        {program.objectives && (
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -73,21 +94,10 @@ export const ProgramOverview: React.FC<ProgramOverviewProps> = ({ program }) => 
             className="mt-16 pt-16 border-t border-white/10"
           >
             <h3 className="text-2xl font-bold mb-8">Objetivos del Programa</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {program.objectives.map((objective, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-start gap-4 text-neutral-300"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
-                  <span className="font-light">{objective}</span>
-                </motion.div>
-              ))}
-            </div>
+            <MarkdownContent
+              content={program.objectives}
+              className="text-neutral-300 font-light [&_ul]:grid [&_ul]:md:grid-cols-2 [&_ul]:gap-4 [&_li]:flex [&_li]:items-start [&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-2 [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0"
+            />
           </motion.div>
         )}
       </div>

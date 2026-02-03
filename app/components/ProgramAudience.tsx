@@ -1,9 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Briefcase } from 'lucide-react';
-import { Program } from '../data/programs';
+import type { Program } from '@/lib/strapi/types';
+import { markdownToHtml } from '@/lib/markdown';
+
+// Component to render markdown content with consistent styling
+function MarkdownContent({ content, className = '' }: { content: string; className?: string }) {
+  const [html, setHtml] = useState<string>('');
+
+  useEffect(() => {
+    if (content) {
+      markdownToHtml(content).then(setHtml);
+    }
+  }, [content]);
+
+  if (!html) return null;
+
+  return (
+    <div
+      className={`markdown-content ${className}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
 
 interface ProgramAudienceProps {
   program: Program;
@@ -27,21 +48,10 @@ export const ProgramAudience: React.FC<ProgramAudienceProps> = ({ program }) => 
                 ¿PARA QUIÉN ES <span className="text-stroke">ESTE PROGRAMA?</span>
               </h2>
             </div>
-            <ul className="space-y-4">
-              {program.audience.map((item, i) => (
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-start gap-4 text-neutral-300"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
-                  <span className="font-light">{item}</span>
-                </motion.li>
-              ))}
-            </ul>
+            <MarkdownContent
+              content={program.audience}
+              className="text-neutral-300 font-light [&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-2 [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0"
+            />
           </motion.div>
 
           {/* Career Outcomes */}
@@ -57,21 +67,10 @@ export const ProgramAudience: React.FC<ProgramAudienceProps> = ({ program }) => 
                 SALIDAS <span className="text-stroke">PROFESIONALES</span>
               </h2>
             </div>
-            <ul className="space-y-4">
-              {program.careers.map((career, i) => (
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-start gap-4 text-neutral-300"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
-                  <span className="font-light">{career}</span>
-                </motion.li>
-              ))}
-            </ul>
+            <MarkdownContent
+              content={program.careers}
+              className="text-neutral-300 font-light [&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-2 [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0"
+            />
           </motion.div>
         </div>
       </div>
