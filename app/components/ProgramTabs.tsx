@@ -66,20 +66,27 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
   return (
     <div>
       {/* Tab bar */}
-      <div className="relative flex border-b border-white/10 lg:gap-12 w-full">
+      <div className="relative flex border-b border-white/10 gap-1 sm:gap-6 lg:gap-8 w-full overflow-x-auto scrollbar-hide -mx-2 px-2">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`relative px-2 py-3 text-sm font-medium transition-colors ${
+            className={`relative px-2 sm:px-3 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeTab === tab.value
                 ? 'text-amber-500'
                 : 'text-white/50 hover:text-amber-400'
             }`}
           >
-            <span className="flex items-center gap-2">
-              {tab.icon && <tab.icon className="size-4 hidden sm:inline-block" />}
-              {tab.label}
+            <span className="flex items-center gap-1 sm:gap-2">
+              {tab.icon && <tab.icon className="size-3.5 sm:size-4" />}
+              <span className="sm:hidden">
+                {tab.value === 'descripcion' && 'Info'}
+                {tab.value === 'temario' && 'Temario'}
+                {tab.value === 'objetivos' && 'Objetivos'}
+                {tab.value === 'audiencia' && 'Audiencia'}
+                {tab.value === 'salidas' && 'Salidas'}
+              </span>
+              <span className="hidden sm:inline">{tab.label}</span>
             </span>
             {activeTab === tab.value && (
               <motion.div
@@ -104,7 +111,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <p className="text-lg text-neutral-400 font-light leading-relaxed">
+              <p className="text-sm sm:text-lg text-neutral-400 font-light leading-relaxed">
                 {program.longDescription}
               </p>
             </motion.div>
@@ -200,7 +207,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.objectives}
-                className="text-neutral-300 font-light [&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-2 [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-4"
+                className="text-sm sm:text-base text-neutral-300 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
               />
             </motion.div>
           )}
@@ -215,7 +222,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.audience}
-                className="text-neutral-300 font-light [&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-2 [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-4"
+                className="text-sm sm:text-base text-neutral-300 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
               />
             </motion.div>
           )}
@@ -230,7 +237,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.careers}
-                className="text-neutral-300 font-light [&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-2 [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-4"
+                className="text-sm sm:text-base text-neutral-300 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-amber-500 [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
               />
             </motion.div>
           )}
