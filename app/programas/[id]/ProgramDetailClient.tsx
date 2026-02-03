@@ -6,9 +6,8 @@ import { FontStyles } from '../../components/FontStyles';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { ProgramHeroSection } from '../../components/ProgramHeroSection';
-import { ProgramOverview } from '../../components/ProgramOverview';
-import { ProgramCurriculum } from '../../components/ProgramCurriculum';
-import { ProgramAudience } from '../../components/ProgramAudience';
+import { ProgramTabs } from '../../components/ProgramTabs';
+import { ProgramSidebar } from '../../components/ProgramSidebar';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import ProGateWrapper from './ProGateWrapper';
 import type { Program } from '@/lib/strapi/types';
@@ -62,9 +61,16 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
         <ProgramHeroSection program={program} />
 
         <ProGateWrapper program={program}>
-          <ProgramOverview program={program} />
-          <ProgramCurriculum program={program} />
-          <ProgramAudience program={program} />
+          <section className="py-16 px-6 md:px-12 bg-[#0a0a0a]">
+            <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <div className="lg:col-span-2">
+                <ProgramTabs program={program} />
+              </div>
+              <div className="lg:col-span-1">
+                <ProgramSidebar program={program} />
+              </div>
+            </div>
+          </section>
           <ProgramCTASection program={program} />
         </ProGateWrapper>
       </main>

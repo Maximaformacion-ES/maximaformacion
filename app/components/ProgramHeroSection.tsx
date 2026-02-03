@@ -29,7 +29,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program 
         <img 
           src={program.image} 
           alt={program.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-70"
         />
       </motion.div>
       
