@@ -48,8 +48,8 @@ export async function strapiRequest<T>(
   const response = await fetch(url.toString(), fetchOptions);
 
   if (!response.ok) {
-    // Only log as warning for common issues (Strapi down/no auth)
-    if (response.status === 401 || response.status === 503) {
+    // Only log as warning for common issues (Strapi down/no auth/missing content type)
+    if (response.status === 400 || response.status === 401 || response.status === 404 || response.status === 503) {
       console.warn(`Strapi unavailable (${response.status}) - using fallback data if available`);
     } else {
       console.error(`Strapi API error: ${response.status} ${response.statusText}`);

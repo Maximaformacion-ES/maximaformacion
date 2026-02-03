@@ -1,9 +1,10 @@
 import { draftMode } from 'next/headers';
-import { getPrograms, getLogos, getBadges } from '@/lib/strapi/queries';
+import { getPrograms, getBadges, getHomeData } from '@/lib/strapi/queries';
 import { isStrapiConfigured } from '@/lib/strapi/client';
 import { COMPLETE_PROGRAMS } from './data/programs';
+import { HOME_FALLBACK } from './data/home-fallback';
 import HomeClient from './HomeClient';
-import type { Program, Logo, Badge } from '@/lib/strapi/types';
+import type { Program, Badge, HomeData } from '@/lib/strapi/types';
 
 export const revalidate = 60;
 
@@ -22,18 +23,23 @@ export default async function Home() {
   const { isEnabled: isDraft } = await draftMode();
 
   let programs: Program[];
-  let logos: Logo[] = [];
   let badges: Badge[] = [];
+  let homeData: HomeData = HOME_FALLBACK;
 
   if (isStrapiConfigured()) {
     try {
-      const [{ programs: strapiPrograms }, strapiLogos, strapiBadges] = await Promise.all([
+      const [{ programs: strapiPrograms }, strapiBadges, strapiHomeData] = await Promise.all([
         getPrograms({ draft: isDraft }),
-        getLogos(),
         getBadges(),
+        getHomeData(),
       ]);
-      logos = strapiLogos;
       badges = strapiBadges;
+      if (strapiHomeData) {
+        homeData = strapiHomeData;
+        console.log('[Home] Datos cargados desde Strapi CMS');
+      } else {
+        console.log('[Home] Strapi no devolvió datos de Home, usando fallback');
+      }
       if (strapiPrograms.length > 0) {
         programs = strapiPrograms;
       } else {
@@ -60,5 +66,5 @@ export default async function Home() {
     }));
   }
 
-  return <HomeClient programs={programs} logos={logos} badges={badges} />;
+  return <HomeClient programs={programs} badges={badges} homeData={homeData} />;
 }

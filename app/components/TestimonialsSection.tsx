@@ -3,43 +3,58 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Quote } from 'lucide-react';
+import { renderStyledTitle } from './StyledTitle';
 
-const testimonials = [
+interface Testimonial {
+  text: string;
+  name: string;
+  role: string;
+}
+
+const DEFAULT_TESTIMONIALS: Testimonial[] = [
   {
-    quote: "El máster en Marketing Digital transformó completamente mi carrera. En 6 meses pasé de junior a liderar el equipo de growth de una startup.",
-    author: "María García",
+    text: "El máster en Marketing Digital transformó completamente mi carrera. En 6 meses pasé de junior a liderar el equipo de growth de una startup.",
+    name: "María García",
     role: "Head of Growth @ TechStartup",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
   },
   {
-    quote: "La metodología práctica y los profesores en activo hacen que cada clase sea aplicable directamente a tu trabajo del día a día.",
-    author: "Carlos Rodríguez",
+    text: "La metodología práctica y los profesores en activo hacen que cada clase sea aplicable directamente a tu trabajo del día a día.",
+    name: "Carlos Rodríguez",
     role: "Data Scientist @ FinTech Corp",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
   },
   {
-    quote: "Después del bootcamp de desarrollo, conseguí trabajo en menos de un mes. La bolsa de empleo de Maxima es increíble.",
-    author: "Laura Martínez",
+    text: "Después del bootcamp de desarrollo, conseguí trabajo en menos de un mes. La bolsa de empleo de Maxima es increíble.",
+    name: "Laura Martínez",
     role: "Full Stack Developer @ AgencyX",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
   },
 ];
 
-export const TestimonialsSection: React.FC = () => {
+interface TestimonialsSectionProps {
+  overline?: string;
+  title?: string;
+  testimonials?: Testimonial[];
+}
+
+export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
+  overline = 'Lo que dicen nuestros alumnos',
+  title = 'HISTORIAS {DE ÉXITO}',
+  testimonials = DEFAULT_TESTIMONIALS,
+}) => {
   const [current, setCurrent] = useState(0);
-  
+  const displayTestimonials = testimonials.length > 0 ? testimonials : DEFAULT_TESTIMONIALS;
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % testimonials.length);
+      setCurrent((prev) => (prev + 1) % displayTestimonials.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
-  
+  }, [displayTestimonials.length]);
+
   return (
     <section id="opiniones" className="relative py-24 md:py-32 bg-[#111]">
       {/* Background accent */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-500/5 to-transparent" />
-      
+
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 relative">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left side - Header */}
@@ -50,7 +65,7 @@ export const TestimonialsSection: React.FC = () => {
               viewport={{ once: true }}
               className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-4"
             >
-              Lo que dicen nuestros alumnos
+              {overline}
             </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 40 }}
@@ -58,13 +73,12 @@ export const TestimonialsSection: React.FC = () => {
               viewport={{ once: true }}
               className="text-white text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
-              HISTORIAS<br />
-              <span className="text-stroke">DE ÉXITO</span>
+              {renderStyledTitle(title)}
             </motion.h2>
-            
+
             {/* Navigation dots */}
             <div className="flex gap-3">
-              {testimonials.map((_, i) => (
+              {displayTestimonials.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrent(i)}
@@ -75,7 +89,7 @@ export const TestimonialsSection: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           {/* Right side - Testimonial */}
           <div className="relative min-h-[400px]">
             <AnimatePresence mode="wait">
@@ -88,20 +102,18 @@ export const TestimonialsSection: React.FC = () => {
                 className="bg-[#1a1a1a] rounded-3xl p-8 md:p-12"
               >
                 <Quote size={48} className="text-amber-400/30 mb-6" />
-                
+
                 <p className="text-white text-xl md:text-2xl font-light leading-relaxed mb-8">
-                  "{testimonials[current].quote}"
+                  &ldquo;{displayTestimonials[current].text}&rdquo;
                 </p>
-                
+
                 <div className="flex items-center gap-4">
-                  <img
-                    src={testimonials[current].image}
-                    alt={testimonials[current].author}
-                    className="w-14 h-14 rounded-full object-cover"
-                  />
+                  <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-xl font-bold">
+                    {displayTestimonials[current].name.charAt(0)}
+                  </div>
                   <div>
-                    <div className="text-white font-bold">{testimonials[current].author}</div>
-                    <div className="text-white/50 text-sm">{testimonials[current].role}</div>
+                    <div className="text-white font-bold">{displayTestimonials[current].name}</div>
+                    <div className="text-white/50 text-sm">{displayTestimonials[current].role}</div>
                   </div>
                 </div>
               </motion.div>

@@ -3,15 +3,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { renderStyledTitle } from './StyledTitle';
 
-export const CTASection: React.FC = () => {
+interface CTASectionProps {
+  overline?: string;
+  title?: string;
+  description?: string;
+}
+
+export const CTASection: React.FC<CTASectionProps> = ({
+  overline = '¿Listo para empezar?',
+  title = 'TU PRÓXIMO {CAPÍTULO} EMPIEZA HOY',
+  description = 'Habla con nuestro equipo de asesores académicos y encuentra el programa perfecto para tus objetivos profesionales.',
+}) => {
   return (
     <section className="relative py-32 md:py-48 bg-[#0a0a0a] overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/10 rounded-full blur-[200px]" />
       </div>
-      
+
       <div className="max-w-[1200px] mx-auto px-6 md:px-12 relative text-center">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -19,20 +30,18 @@ export const CTASection: React.FC = () => {
           viewport={{ once: true }}
           className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-6"
         >
-          ¿Listo para empezar?
+          {overline}
         </motion.p>
-        
+
         <motion.h2
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-white text-4xl md:text-6xl lg:text-8xl font-black tracking-tight mb-8"
         >
-          TU PRÓXIMO<br />
-          <span className="text-stroke">CAPÍTULO</span><br />
-          EMPIEZA HOY
+          {renderStyledTitle(title)}
         </motion.h2>
-        
+
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -40,10 +49,9 @@ export const CTASection: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="text-white/60 text-lg md:text-xl font-light max-w-2xl mx-auto mb-12"
         >
-          Habla con nuestro equipo de asesores académicos y encuentra 
-          el programa perfecto para tus objetivos profesionales.
+          {description}
         </motion.p>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

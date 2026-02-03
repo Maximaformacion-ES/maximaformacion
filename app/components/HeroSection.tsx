@@ -3,9 +3,19 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ChevronDown, ArrowRight } from "lucide-react";
-import { LogoMarquee } from "./LogoMarquee";
+import { renderStyledTitle } from "./StyledTitle";
 
-export const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  overline?: string;
+  title?: string;
+  description?: string;
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({
+  overline = 'Formación Profesional experta',
+  title = 'TRANSFORMA {TU FUTURO}',
+  description = 'Formación especializada que impulsa tu carrera profesional al siguiente nivel',
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -44,26 +54,17 @@ export const HeroSection: React.FC = () => {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="text-white/60 text-[12px] md:text-base tracking-[0.3em] uppercase mb-8"
           >
-            Formación Profesional experta
+            {overline}
           </motion.p>
 
-          <motion.h1 style={{ y: titleY }} className="text-center">
-            <motion.span
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="block text-white text-[12vw] md:text-[10vw] lg:text-[8vw] font-black leading-[0.85] tracking-tighter"
-            >
-              TRANSFORMA
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="block text-white text-stroke text-[12vw] md:text-[10vw] lg:text-[8vw] font-black leading-[0.85] tracking-tighter"
-            >
-              TU FUTURO
-            </motion.span>
+          <motion.h1
+            style={{ y: titleY }}
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-center text-white text-[12vw] md:text-[10vw] lg:text-[8vw] font-black leading-[0.85] tracking-tighter"
+          >
+            {renderStyledTitle(title)}
           </motion.h1>
 
           <motion.p
@@ -72,8 +73,7 @@ export const HeroSection: React.FC = () => {
             transition={{ delay: 0.8, duration: 1 }}
             className="mt-8 md:mt-12 text-white/70 text-base md:text-xl font-light text-center max-w-2xl leading-relaxed"
           >
-            Formación especializada que impulsa tu carrera profesional
-            <span className="text-white font-normal"> al siguiente nivel</span>
+            {description}
           </motion.p>
 
           <motion.div
@@ -103,7 +103,7 @@ export const HeroSection: React.FC = () => {
               Ver Cursos
             </motion.a>
           </motion.div>
-          
+
           {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }}

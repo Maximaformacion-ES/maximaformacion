@@ -3,13 +3,20 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import type { Logo } from '@/lib/strapi/types';
 
-interface LogoMarqueeProps {
-  logos?: Logo[];
+interface PartnerLogo {
+  url: string;
+  alt: string;
 }
 
-function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Logo[] }) {
+interface LogoMarqueeProps {
+  partnerLogos?: PartnerLogo[];
+  overline?: string;
+  title?: string;
+  description?: string;
+}
+
+function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: PartnerLogo[] }) {
   const ordered = direction === 'left' ? logos : [...logos].reverse();
   const items = [...ordered, ...ordered, ...ordered, ...ordered];
   const from = direction === 'left' ? 0 : -25;
@@ -26,12 +33,12 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Log
       >
         {items.map((logo, i) => (
           <div
-            key={`${logo.id}-${i}`}
+            key={`${logo.alt}-${i}`}
             className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
           >
             <Image
-              src={logo.imageUrl}
-              alt={logo.companyName}
+              src={logo.url}
+              alt={logo.alt}
               fill
               className="object-contain"
               sizes="128px"
@@ -43,9 +50,12 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Log
   );
 }
 
-export const LogoMarquee: React.FC<LogoMarqueeProps> = ({ logos = [] }) => {
-  const displayLogos = logos;
-
+export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
+  partnerLogos = [],
+  overline = 'Partners',
+  title = 'Confían en nosotros',
+  description = 'Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
+}) => {
   return (
     <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full]">
       {/* Header */}
@@ -58,29 +68,31 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({ logos = [] }) => {
           className="text-center"
         >
           <p className="text-amber-500 text-sm tracking-[0.5em] uppercase mb-4">
-            Partners
+            {overline}
           </p>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-6">
-            Confían en nosotros
+            {title}
           </h2>
           <div className="w-16 h-px bg-amber-500 mx-auto mb-6" />
           <p className="text-neutral-400 text-base md:text-lg font-light max-w-xl mx-auto">
-            Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos
+            {description}
           </p>
         </motion.div>
       </div>
 
       {/* Logo rows */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1, delay: 0.3 }}
-        className="flex flex-col gap-8 max-w-[1400px] mx-auto"
-      >
-        <LogoRow direction="right" logos={displayLogos} />
-        <LogoRow direction="left" logos={displayLogos} />
-      </motion.div>
+      {partnerLogos.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="flex flex-col gap-8 max-w-[1400px] mx-auto"
+        >
+          <LogoRow direction="right" logos={partnerLogos} />
+          <LogoRow direction="left" logos={partnerLogos} />
+        </motion.div>
+      )}
     </section>
   );
 };

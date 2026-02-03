@@ -9,17 +9,17 @@ import { CoursesSection } from "./components/CoursesSection";
 import { TestimonialsSection } from "./components/TestimonialsSection";
 import { CTASection } from "./components/CTASection";
 import { Footer } from "./components/Footer";
-import type { Program, Logo, Badge } from "@/lib/strapi/types";
+import type { Program, Badge, HomeData } from "@/lib/strapi/types";
 import { LogoMarquee } from "./components/LogoMarquee";
 import { BadgesSection } from "./components/BadgesSection";
 
 interface HomeClientProps {
   programs: Program[];
-  logos: Logo[];
   badges: Badge[];
+  homeData: HomeData;
 }
 
-export default function HomeClient({ programs, logos, badges }: HomeClientProps) {
+export default function HomeClient({ programs, badges, homeData }: HomeClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -27,13 +27,44 @@ export default function HomeClient({ programs, logos, badges }: HomeClientProps)
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-      <HeroSection />
-      <StatsSection />
-      <CoursesSection programs={programs} />
-      <LogoMarquee logos={logos} />
-      <TestimonialsSection />
-      <BadgesSection badges={badges} />
-      <CTASection />
+      <HeroSection
+        overline={homeData.heroOverline}
+        title={homeData.heroTitle}
+        description={homeData.heroDescription}
+      />
+      <StatsSection
+        students={homeData.numericSection.students}
+        bussiness={homeData.numericSection.bussiness}
+        activePrograms={homeData.numericSection.activePrograms}
+        mediaRating={homeData.numericSection.mediaRating}
+      />
+      <CoursesSection
+        programs={programs}
+        overline={homeData.programsSection.programsOverline}
+        title={homeData.programsSection.programsTitle}
+      />
+      <LogoMarquee
+        partnerLogos={homeData.partnersSection.partnersLogos}
+        overline={homeData.partnersSection.partnersOverline}
+        title={homeData.partnersSection.partnersTitle}
+        description={homeData.partnersSection.partnersDescription}
+      />
+      <TestimonialsSection
+        overline={homeData.testimonialsSection.testimonialsOverline}
+        title={homeData.testimonialsSection.testimonialsTitle}
+        testimonials={homeData.testimonialsSection.testimonials}
+      />
+      <BadgesSection
+        badges={badges}
+        overline={homeData.badgesSection.badgesOverline}
+        title={homeData.badgesSection.badgesTitle}
+        description={homeData.badgesSection.badgesDescription}
+      />
+      <CTASection
+        overline={homeData.ctaSection.ctaOverline}
+        title={homeData.ctaSection.ctaTitle}
+        description={homeData.ctaSection.ctaDescription}
+      />
       <Footer />
     </div>
   );

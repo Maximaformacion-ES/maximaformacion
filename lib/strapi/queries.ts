@@ -9,6 +9,7 @@ import type {
   StrapiSiteMetadata,
   StrapiLogo,
   StrapiBadge,
+  StrapiHome,
   Program,
   Topic,
   BlogPost,
@@ -16,6 +17,7 @@ import type {
   SiteMetadata,
   Logo,
   Badge,
+  HomeData,
   ProgramQueryOptions,
   BlogQueryOptions,
   ProgramModule,
@@ -594,5 +596,75 @@ export async function getBadges(): Promise<Badge[]> {
   } catch (error) {
     console.error('[getBadges] Error:', error);
     return [];
+  }
+}
+
+// ============ Home Single Type Query ============
+
+function transformHome(strapi: StrapiHome): HomeData {
+  return {
+    heroOverline: strapi.heroOverline || '',
+    heroTitle: strapi.heroTitle,
+    heroDescription: strapi.heroDescription || '',
+    numericSection: {
+      students: strapi.numericSection?.students || '',
+      bussiness: strapi.numericSection?.bussiness || '',
+      activePrograms: strapi.numericSection?.activePrograms || '',
+      mediaRating: strapi.numericSection?.mediaRating || '',
+    },
+    programsSection: {
+      programsOverline: strapi.programsSection?.programsOverline || '',
+      programsTitle: strapi.programsSection?.programsTitle || '',
+    },
+    partnersSection: {
+      partnersOverline: strapi.partnersSection?.partnersOverline || '',
+      partnersTitle: strapi.partnersSection?.partnersTitle || '',
+      partnersLogos: (strapi.partnersSection?.partnersLogos || []).map((media) => ({
+        url: getStrapiMediaUrl(media),
+        alt: media.alternativeText || media.name || '',
+      })),
+      partnersDescription: strapi.partnersSection?.partnersDescription || '',
+    },
+    testimonialsSection: {
+      testimonialsOverline: strapi.testimonialsSection?.testimonialsOverline || '',
+      testimonialsTitle: strapi.testimonialsSection?.testimonialsTitle || '',
+      testimonials: (strapi.testimonialsSection?.testimonial || []).map((t) => ({
+        text: t.text,
+        name: t.name,
+        role: t.role || '',
+      })),
+    },
+    badgesSection: {
+      badgesOverline: strapi.badgesSection?.badgesOverline || '',
+      badgesTitle: strapi.badgesSection?.badgesTitle || '',
+      badgesDescription: strapi.badgesSection?.badgesDescription || '',
+    },
+    ctaSection: {
+      ctaOverline: strapi.ctaSection?.ctaOverline || '',
+      ctaTitle: strapi.ctaSection?.ctaTitle || '',
+      ctaDescription: strapi.ctaSection?.ctaDescription || '',
+    },
+  };
+}
+
+export async function getHomeData(): Promise<HomeData | null> {
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiHome>>(
+      '/api/home?populate[numericSection]=*&populate[programsSection]=*&populate[partnersSection][populate]=partnersLogos&populate[testimonialsSection][populate]=testimonial&populate[badgesSection]=*&populate[ctaSection]=*',
+      {
+        revalidate: 60,
+        tags: ['home'],
+      }
+    );
+
+    if (!response.data) {
+      return null;
+    }
+
+    return transformHome(response.data);
+  } catch (error) {
+    // Expected when Home single type is not yet created in Strapi
+    console.error('Error fetching home data:', error); 
+    return null;
   }
 }

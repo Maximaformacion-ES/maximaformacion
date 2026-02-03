@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import type { Badge, BadgeImportance } from "@/lib/strapi/types";
 import Image from "next/image";
+import { renderStyledTitle } from "./StyledTitle";
 
 const COLS = 7;
 const ROWS = 5;
@@ -79,10 +80,16 @@ function buildRows(badges: Badge[]): Badge[][] {
 
 interface BadgesSectionProps {
   badges?: Badge[];
+  overline?: string;
+  title?: string;
+  description?: string;
 }
 
 export const BadgesSection: React.FC<BadgesSectionProps> = ({
   badges = [],
+  overline = 'Certificaciones y reconocimientos',
+  title = 'CALIDAD {ACREDITADA}',
+  description = 'Contamos con certificaciones ISO 9001, ISO 14001 e ISO 27001, el sello Cum Laude de Emagister desde 2018 y una valoración de 5.0 en Google con más de 120 reseñas.',
 }) => {
   const rows = useMemo(
     () => (badges.length > 0 ? buildRows(badges) : []),
@@ -156,7 +163,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               viewport={{ once: true }}
               className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-4"
             >
-              Certificaciones y reconocimientos
+              {overline}
             </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 40 }}
@@ -164,9 +171,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               viewport={{ once: true }}
               className="text-white text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
-              CALIDAD
-              <br />
-              <span className="text-stroke">ACREDITADA</span>
+              {renderStyledTitle(title)}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -175,9 +180,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               transition={{ delay: 0.2 }}
               className="text-neutral-400 text-base md:text-lg font-light max-w-md leading-relaxed"
             >
-              Contamos con certificaciones ISO 9001, ISO 14001 e ISO 27001, el
-              sello Cum Laude de Emagister desde 2018 y una valoración de 5.0 en
-              Google con más de 120 reseñas.
+              {description}
             </motion.p>
           </div>
         </div>

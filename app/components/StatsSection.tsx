@@ -4,14 +4,26 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Award, BookOpen, Star } from 'lucide-react';
 
-export const StatsSection: React.FC = () => {
+interface StatsSectionProps {
+  students?: string;
+  bussiness?: string;
+  activePrograms?: string;
+  mediaRating?: string;
+}
+
+export const StatsSection: React.FC<StatsSectionProps> = ({
+  students = '15K+',
+  bussiness = '50+',
+  activePrograms = '150+',
+  mediaRating = '4.9',
+}) => {
   const stats = [
-    { value: '15K+', label: 'Estudiantes formados', icon: Users },
-    { value: '50+', label: 'Empresas confían en nosotros', icon: Award },
-    { value: '150+', label: 'Programas activos', icon: BookOpen },
-    { value: '4.9', label: 'Valoración media', icon: Star },
+    { value: students, label: 'Estudiantes formados', icon: Users },
+    { value: bussiness, label: 'Empresas confían en nosotros', icon: Award },
+    { value: activePrograms, label: 'Programas activos', icon: BookOpen },
+    { value: mediaRating, label: 'Valoración media', icon: Star },
   ];
-  
+
   return (
     <section className="relative -mt-20 pt-0 pb-12 md:pb-12 bg-[#0a0a0a]">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">

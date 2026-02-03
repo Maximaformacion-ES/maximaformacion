@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProgramCard } from './ProgramCard';
+import { renderStyledTitle } from './StyledTitle';
 import type { Program } from '@/lib/strapi/types';
 
 // Generate a consistent rating between 4 and 5 based on program id
@@ -21,9 +22,15 @@ function generateStudents(id: number): string {
 
 interface CoursesSectionProps {
   programs: Program[];
+  overline?: string;
+  title?: string;
 }
 
-export const CoursesSection: React.FC<CoursesSectionProps> = ({ programs }) => {
+export const CoursesSection: React.FC<CoursesSectionProps> = ({
+  programs,
+  overline = 'Programas Destacados',
+  title = 'MÁSTERS & {ESPECIALIZACIONES}',
+}) => {
   // Sort by rating (highest first) and take top 6
   const sortedPrograms = [...programs]
     .map(p => ({ program: p, rating: generateRating(p.id) }))
@@ -42,7 +49,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ programs }) => {
               viewport={{ once: true }}
               className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-4"
             >
-              Programas Destacados
+              {overline}
             </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 40 }}
@@ -50,8 +57,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ programs }) => {
               viewport={{ once: true }}
               className="text-white text-4xl md:text-6xl lg:text-7xl font-black tracking-tight"
             >
-              MÁSTERS &<br />
-              <span className="text-stroke">ESPECIALIZACIONES</span>
+              {renderStyledTitle(title)}
             </motion.h2>
           </div>
 

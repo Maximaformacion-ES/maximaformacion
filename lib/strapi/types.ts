@@ -347,6 +347,109 @@ export interface UserCourseData {
   accessType: 'pro' | 'purchased' | 'none';
 }
 
+// ============ Home Single Type ============
+
+export interface StrapiTestimonial {
+  id: number;
+  text: string;
+  name: string;
+  role: string | null;
+}
+
+export interface StrapiNumericSection {
+  id: number;
+  students: string;
+  bussiness: string;
+  activePrograms: string;
+  mediaRating: string;
+}
+
+export interface StrapiProgramsSection {
+  id: number;
+  programsOverline: string | null;
+  programsTitle: string | null;
+}
+
+export interface StrapiPartnersSection {
+  id: number;
+  partnersOverline: string | null;
+  partnersTitle: string;
+  partnersLogos: StrapiMedia[];
+  partnersDescription: string | null;
+}
+
+export interface StrapiTestimonialsSection {
+  id: number;
+  testimonialsOverline: string | null;
+  testimonialsTitle: string;
+  testimonial: StrapiTestimonial[];
+}
+
+export interface StrapiBadgesSection {
+  id: number;
+  badgesOverline: string | null;
+  badgesTitle: string | null;
+  badgesDescription: string | null;
+}
+
+export interface StrapiCtaSection {
+  id: number;
+  ctaOverline: string | null;
+  ctaTitle: string;
+  ctaDescription: string | null;
+}
+
+export interface StrapiHome {
+  id: number;
+  documentId: string;
+  heroOverline: string | null;
+  heroTitle: string;
+  heroDescription: string | null;
+  numericSection: StrapiNumericSection;
+  programsSection: StrapiProgramsSection;
+  partnersSection: StrapiPartnersSection;
+  testimonialsSection: StrapiTestimonialsSection;
+  badgesSection: StrapiBadgesSection;
+  ctaSection: StrapiCtaSection;
+}
+
+export interface HomeData {
+  heroOverline: string;
+  heroTitle: string;
+  heroDescription: string;
+  numericSection: {
+    students: string;
+    bussiness: string;
+    activePrograms: string;
+    mediaRating: string;
+  };
+  programsSection: {
+    programsOverline: string;
+    programsTitle: string;
+  };
+  partnersSection: {
+    partnersOverline: string;
+    partnersTitle: string;
+    partnersLogos: { url: string; alt: string }[];
+    partnersDescription: string;
+  };
+  testimonialsSection: {
+    testimonialsOverline: string;
+    testimonialsTitle: string;
+    testimonials: { text: string; name: string; role: string }[];
+  };
+  badgesSection: {
+    badgesOverline: string;
+    badgesTitle: string;
+    badgesDescription: string;
+  };
+  ctaSection: {
+    ctaOverline: string;
+    ctaTitle: string;
+    ctaDescription: string;
+  };
+}
+
 // Extended Program type with Stripe fields
 export interface ProgramWithStripe extends Program {
   stripeProductId: string | null;
