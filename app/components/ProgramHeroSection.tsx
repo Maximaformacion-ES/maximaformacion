@@ -103,11 +103,11 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
             >
               <div className="flex items-center gap-2 text-white">
                 <Clock size={16} className="text-amber-500" />
-                <span className="text-sm font-medium">{program.duration}</span>
+                <span className="text-sm font-medium">{program.duration} horas</span>
               </div>
               <div className="flex items-center gap-2 text-white">
                 <BookOpen size={16} className="text-amber-500" />
-                <span className="text-sm font-medium">{program.ects}</span>
+                <span className="text-sm font-medium">{program.ects} créditos</span>
               </div>
               <div className="flex items-center gap-2 text-white">
                 <Award size={16} className="text-amber-500" />
