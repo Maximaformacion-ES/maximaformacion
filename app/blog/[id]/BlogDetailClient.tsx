@@ -52,7 +52,7 @@ export default function BlogDetailClient({ post, relatedPosts }: BlogDetailClien
   }
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-clip">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />

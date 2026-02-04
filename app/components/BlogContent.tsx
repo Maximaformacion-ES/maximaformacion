@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { BlogPost } from '@/lib/strapi/types';
+import { BlogTableOfContents } from './BlogTableOfContents';
 
 interface BlogContentProps {
   post: BlogPost;
@@ -16,6 +17,14 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           color: rgb(212, 212, 212);
           font-size: 1.125rem;
           line-height: 1.75rem;
+        }
+
+        /* Heading scroll offset for TOC navigation */
+        .blog-html-content h1,
+        .blog-html-content h2,
+        .blog-html-content h3,
+        .blog-html-content h4 {
+          scroll-margin-top: 7rem;
         }
 
         /* Headings */
@@ -199,14 +208,14 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           }
         }
       `}</style>
-      <section className="py-24 md:py-32 px-6 md:px-12 bg-[#0a0a0a]">
-        <div className="max-w-4xl mx-auto">
+      <section id="blog-content-section" className="py-24 md:py-32 px-6 md:px-12 bg-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto">
           {/* Tags */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-wrap gap-3 mb-12"
+            className="flex flex-wrap gap-3 mb-12 max-w-4xl"
           >
             {post.tags.map(tag => (
               <span
@@ -218,18 +227,26 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
             ))}
           </motion.div>
 
-          {/* Article Content */}
-          <motion.article
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div
-              dangerouslySetInnerHTML={{ __html: post.content }}
-              className="blog-html-content"
-            />
-          </motion.article>
+          <div className="flex items-start gap-12 justify-between">
+            {/* Article Content */}
+            <motion.article
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="max-w-4xl flex-1 min-w-0"
+            >
+              <div
+                dangerouslySetInnerHTML={{ __html: post.content }}
+                className="blog-html-content"
+              />
+            </motion.article>
+
+            {/* Table of Contents */}
+            <aside className="hidden xl:block w-64 flex-shrink-0 sticky top-28">
+              <BlogTableOfContents contentHtml={post.content} />
+            </aside>
+          </div>
         </div>
       </section>
     </>
