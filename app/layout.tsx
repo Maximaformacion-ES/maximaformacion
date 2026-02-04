@@ -60,6 +60,13 @@ export default function RootLayout({
   return (
     <ClerkProvider localization={esES}>
       <html lang="es">
+        <head>
+          <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
+          <link rel="preload" href="/fonts/ZTNature-Regular.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+          <link rel="preload" href="/fonts/ZTNature-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+          <link rel="preload" href="/fonts/ZTNature-Light.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >

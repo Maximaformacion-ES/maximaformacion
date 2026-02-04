@@ -56,7 +56,7 @@ const nextConfig: NextConfig = {
     return [
       {
         // Caché largo para assets estáticos
-        source: '/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2)',
+        source: '/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2|otf|ttf)',
         headers: [
           {
             key: 'Cache-Control',

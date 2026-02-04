@@ -36,7 +36,6 @@ export default async function Home() {
       badges = strapiBadges;
       if (strapiHomeData) {
         homeData = strapiHomeData;
-        console.log('[Home] Datos cargados desde Strapi CMS');
       } else {
         console.log('[Home] Strapi no devolvió datos de Home, usando fallback');
       }
