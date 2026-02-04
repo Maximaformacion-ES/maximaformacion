@@ -5,6 +5,9 @@ import { COMPLETE_PROGRAMS } from '@/app/data/programs';
 import LessonPlayerClient from './LessonPlayerClient';
 import type { ProgramWithLessons, Lesson, ModuleWithLessons } from '@/lib/strapi/types';
 
+// ISR: Revalidar cada hora
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ programId: string; lessonId: string }>;
 }

@@ -162,7 +162,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                           expandedModule === index ? null : index,
                         )
                       }
-                      className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-white/5 duration-300 transition-colors group "
+                      className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-white/5 duration-200 transition-colors group "
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
