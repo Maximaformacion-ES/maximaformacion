@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import "../styles/markdown.css";
 import {
   ChevronDown,
   Clock,

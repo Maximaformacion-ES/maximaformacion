@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Briefcase } from 'lucide-react';
+import '../styles/markdown.css';
 import type { Program } from '@/lib/strapi/types';
 import { markdownToHtml } from '@/lib/markdown';
 
