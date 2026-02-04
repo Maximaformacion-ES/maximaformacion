@@ -83,7 +83,38 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
   return (
     <div className="sticky top-24">
-      <div className="border border-white/10 bg-[#111] p-6 space-y-6">
+      <div className="border border-white/10 bg-[#111] overflow-hidden rounded-lg shadow-lg shadow-black/30">
+        
+        {/* Program Image */}
+        {program.image && (
+          <div className="relative aspect-video w-full">
+            <img
+              src={program.image}
+              alt={program.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
+        <div className="p-6 space-y-6">
+        {/* Info */}
+        <div className="grid grid-cols-2 gap-4">
+          {infoItems.map((item) => (
+            <div key={item.label} className="flex items-start gap-2">
+              <item.icon size={14} className="text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <div className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                  {item.label}
+                </div>
+                <div className="text-white text-sm font-medium">{item.value} {item.label === 'Duración' ? 'horas' : ''}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-white/10" />
+
         {/* Pricing */}
         <div>
           <div className="flex items-baseline gap-3">
@@ -160,24 +191,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           )}
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-white/10" />
-
-        {/* Info */}
-        <div className="space-y-4">
-          {infoItems.map((item) => (
-            <div key={item.label} className="flex items-center gap-3">
-              <item.icon size={16} className="text-amber-500 shrink-0" />
-              <div>
-                <div className="text-[10px] text-neutral-500 uppercase tracking-widest">
-                  {item.label}
-                </div>
-                <div className="text-white text-sm font-medium">{item.value}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
+         {/* Divider */}
         {/* Divider */}
         <div className="border-t border-white/10" />
 
@@ -200,6 +214,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             <Phone size={14} />
             +34 635 65 93 91
           </a>
+        </div>
         </div>
       </div>
     </div>

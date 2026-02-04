@@ -1,15 +1,29 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Clock, Users, Briefcase, Target, BookOpen, ListOrdered } from 'lucide-react';
-import type { Program } from '@/lib/strapi/types';
-import type { LucideIcon } from 'lucide-react';
-import { markdownToHtml } from '@/lib/markdown';
+import React, { useState, useMemo, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ChevronDown,
+  Clock,
+  Users,
+  Briefcase,
+  Target,
+  BookOpen,
+  ListOrdered,
+} from "lucide-react";
+import type { Program } from "@/lib/strapi/types";
+import type { LucideIcon } from "lucide-react";
+import { markdownToHtml } from "@/lib/markdown";
 
 // Component to render markdown content with consistent styling
-function MarkdownContent({ content, className = '' }: { content: string; className?: string }) {
-  const [html, setHtml] = useState<string>('');
+function MarkdownContent({
+  content,
+  className = "",
+}: {
+  content: string;
+  className?: string;
+}) {
+  const [html, setHtml] = useState<string>("");
 
   useEffect(() => {
     if (content) {
@@ -39,11 +53,11 @@ interface TabDef {
 
 export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
   const [expandedModule, setExpandedModule] = useState<number | null>(0);
-  const [activeTab, setActiveTab] = useState('descripcion');
+  const [activeTab, setActiveTab] = useState("descripcion");
 
   // Debug: log program data to see what's coming from Strapi
   useEffect(() => {
-    console.log('ProgramTabs - program data:', {
+    console.log("ProgramTabs - program data:", {
       title: program.title,
       topics: program.topics,
       audience: program.audience,
@@ -54,12 +68,19 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
 
   const tabs = useMemo<TabDef[]>(() => {
     const t: TabDef[] = [
-      { value: 'descripcion', label: 'Descripción', icon: BookOpen },
-      { value: 'temario', label: 'Temario', icon: ListOrdered },
+      { value: "descripcion", label: "Descripción", icon: BookOpen },
+      { value: "temario", label: "Temario", icon: ListOrdered },
     ];
-    if (program.objectives) t.push({ value: 'objetivos', label: 'Objetivos', icon: Target });
-    if (program.audience) t.push({ value: 'audiencia', label: 'A quién va dirigido', icon: Users });
-    if (program.careers) t.push({ value: 'salidas', label: 'Salidas profesionales', icon: Briefcase });
+    if (program.objectives)
+      t.push({ value: "objetivos", label: "Objetivos", icon: Target });
+    if (program.audience)
+      t.push({ value: "audiencia", label: "A quién va dirigido", icon: Users });
+    if (program.careers)
+      t.push({
+        value: "salidas",
+        label: "Salidas profesionales",
+        icon: Briefcase,
+      });
     return t;
   }, [program.objectives, program.audience, program.careers]);
 
@@ -73,18 +94,18 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             onClick={() => setActiveTab(tab.value)}
             className={`relative px-2 sm:px-3 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeTab === tab.value
-                ? 'text-amber-500'
-                : 'text-white/50 hover:text-amber-400'
+                ? "text-amber-500"
+                : "text-white/50 hover:text-amber-400"
             }`}
           >
             <span className="flex items-center gap-1 sm:gap-2">
               {tab.icon && <tab.icon className="size-3.5 sm:size-4" />}
               <span className="sm:hidden">
-                {tab.value === 'descripcion' && 'Info'}
-                {tab.value === 'temario' && 'Temario'}
-                {tab.value === 'objetivos' && 'Objetivos'}
-                {tab.value === 'audiencia' && 'Audiencia'}
-                {tab.value === 'salidas' && 'Salidas'}
+                {tab.value === "descripcion" && "Info"}
+                {tab.value === "temario" && "Temario"}
+                {tab.value === "objetivos" && "Objetivos"}
+                {tab.value === "audiencia" && "Audiencia"}
+                {tab.value === "salidas" && "Salidas"}
               </span>
               <span className="hidden sm:inline">{tab.label}</span>
             </span>
@@ -92,7 +113,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
               <motion.div
                 layoutId="tab-underline"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500"
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
           </button>
@@ -101,9 +122,9 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
 
       {/* Descripción */}
       {/* Tab content */}
-      <div className="pt-10 md:pt-12">
+      <div className="pt-10 md:pt-4">
         <AnimatePresence mode="wait">
-          {activeTab === 'descripcion' && (
+          {activeTab === "descripcion" && (
             <motion.div
               key="descripcion"
               initial={{ opacity: 0, y: 12 }}
@@ -111,13 +132,14 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <p className="text-sm sm:text-lg text-neutral-400 font-light leading-relaxed">
-                {program.longDescription}
-              </p>
+              <MarkdownContent
+                content={program.longDescription}
+                className="text-sm sm:text-lg text-neutral-400 font-light leading-relaxed"
+              />
             </motion.div>
           )}
 
-          {activeTab === 'temario' && (
+          {activeTab === "temario" && (
             <motion.div
               key="temario"
               initial={{ opacity: 0, y: 12 }}
@@ -132,24 +154,32 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                 {program.modules.map((module, index) => (
                   <div
                     key={index}
-                    className="bg-[#111] border border-white/10 overflow-hidden"
+                    className="bg-[#111] border border-white/10 overflow-hidden rounded-lg"
                   >
                     <button
-                      onClick={() => setExpandedModule(expandedModule === index ? null : index)}
-                      className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-white/5 transition-colors group"
+                      onClick={() =>
+                        setExpandedModule(
+                          expandedModule === index ? null : index,
+                        )
+                      }
+                      className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-white/5 duration-300 transition-colors group "
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <span className="text-amber-500 text-xs font-bold">Módulo {index + 1}</span>
+                          <span className="text-amber-500 text-xs font-bold">
+                            Módulo {index + 1}
+                          </span>
                           <span className="flex items-center gap-1.5 text-neutral-500 text-xs">
                             <Clock size={12} />
                             {module.hours}h
                           </span>
                         </div>
-                        <h3 className="text-base md:text-lg font-bold text-white group-hover:text-amber-500 transition-colors">
+                        <h3 className="text-base md:text-lg font-bold text-white group-hover:text-amber-500 transition-colors duration-300">
                           {module.title}
                         </h3>
-                        <p className="text-neutral-400 mt-1 text-sm font-light">{module.description}</p>
+                        <p className="text-neutral-400 mt-1 text-sm font-light">
+                          {module.description}
+                        </p>
                       </div>
                       <motion.div
                         animate={{ rotate: expandedModule === index ? 180 : 0 }}
@@ -164,26 +194,28 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                       {expandedModule === index && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
+                          animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
                           <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-white/10">
                             <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">
-                              Temas del Módulo
+                              Unidades del Módulo
                             </h4>
-                            <div className="grid md:grid-cols-2 gap-2">
-                              {module.topics.map((topic, topicIndex) => (
+                            <div className="grid md:grid-cols-1">
+                              {module.units?.map((unit, unitIndex) => (
                                 <motion.div
-                                  key={topicIndex}
+                                  key={unitIndex}
                                   initial={{ opacity: 0, x: -10 }}
                                   animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: topicIndex * 0.05 }}
-                                  className="flex items-start gap-3 text-neutral-300"
+                                  transition={{ delay: unitIndex * 0.05 }}
+                                  className="flex items-start gap-3 text-neutral-300 py-4 border-b last:border-0 border-white/10"
                                 >
                                   <div className="w-1 h-1 rounded-full bg-amber-500 mt-2 shrink-0" />
-                                  <span className="font-light text-sm">{topic}</span>
+                                  <span className="font-light text-sm">
+                                    {unit.title}
+                                  </span>
                                 </motion.div>
                               ))}
                             </div>
@@ -197,7 +229,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             </motion.div>
           )}
 
-          {activeTab === 'objetivos' && (
+          {activeTab === "objetivos" && (
             <motion.div
               key="objetivos"
               initial={{ opacity: 0, y: 12 }}
@@ -212,7 +244,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             </motion.div>
           )}
 
-          {activeTab === 'audiencia' && (
+          {activeTab === "audiencia" && (
             <motion.div
               key="audiencia"
               initial={{ opacity: 0, y: 12 }}
@@ -227,7 +259,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             </motion.div>
           )}
 
-          {activeTab === 'salidas' && (
+          {activeTab === "salidas" && (
             <motion.div
               key="salidas"
               initial={{ opacity: 0, y: 12 }}

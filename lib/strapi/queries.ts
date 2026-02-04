@@ -37,7 +37,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     title: m.title,
     description: m.description,
     hours: m.hours,
-    topics: m.topics || [],
+    units: (m.units || []).map((u) => ({ title: u.title })),
   }));
 
   return {
@@ -60,7 +60,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     certification: strapi.certification || (strapi.type === 'Master' ? 'Título Propio Universidad' : 'Certificado de Experto'),
     price: strapi.price || 1499,
     originalPrice: strapi.originalPrice || undefined,
-    modules: modules.length > 0 ? modules : [{ title: 'Módulo 1', description: 'Contenido del módulo', hours: 100, topics: ['Tema 1', 'Tema 2', 'Tema 3'] }],
+    modules: modules.length > 0 ? modules : [{ title: 'Módulo 1', description: 'Contenido del módulo', hours: 100, units: [{ title: 'Tema 1' }, { title: 'Tema 2' }, { title: 'Tema 3' }] }],
     audience: strapi.audience || `- Profesionales del sector que buscan especialización
 - Recién graduados que quieren impulsar su carrera
 - Personas en transición profesional`,
@@ -123,7 +123,7 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
 
   // Populate relations
   params.set('populate[image]', 'true');
-  params.set('populate[modules]', 'true');
+  params.set('populate[modules][populate][units]', 'true');
   params.set('populate[topics][fields][0]', 'name');
   params.set('populate[topics][fields][1]', 'documentId');
 
@@ -229,7 +229,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[modules]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -254,7 +254,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[modules]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

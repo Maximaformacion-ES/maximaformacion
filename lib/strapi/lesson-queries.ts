@@ -74,7 +74,7 @@ function transformProgramWithLessons(strapi: StrapiProgram): ProgramWithLessons 
     title: m.title,
     description: m.description,
     hours: m.hours,
-    topics: m.topics || [],
+    units: (m.units || []).map((u) => ({ title: u.title })),
   }));
 
   return {
@@ -129,7 +129,11 @@ export async function getProgramWithLessons(
     // Deep populate to get modules with lessons
     const populate = {
       image: true,
-      modules: true,
+      modules: {
+        populate: {
+          units: true,
+        },
+      },
       topics: {
         fields: ['name', 'documentId'],
       },

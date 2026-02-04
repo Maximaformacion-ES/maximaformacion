@@ -52,9 +52,10 @@ export const ProgramOverview: React.FC<ProgramOverviewProps> = ({ program }) => 
             <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
               SOBRE EL <span className="text-stroke">PROGRAMA</span>
             </h2>
-            <p className="text-lg text-neutral-400 font-light leading-relaxed mb-6">
-              {program.longDescription}
-            </p>
+            <MarkdownContent
+              content={program.longDescription}
+              className="text-lg text-neutral-400 font-light leading-relaxed mb-6"
+            />
           </motion.div>
 
           {/* Features Grid */}

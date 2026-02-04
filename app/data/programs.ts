@@ -1,8 +1,12 @@
+export interface ProgramUnit {
+  title: string;
+}
+
 export interface ProgramModule {
   title: string;
   description: string;
   hours: number;
-  topics: string[];
+  units?: ProgramUnit[];
 }
 
 export interface Topic {
@@ -61,25 +65,25 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
         title: 'Fundamentos de Inteligencia Artificial',
         description: 'Introducción a los conceptos básicos de IA y sus aplicaciones',
         hours: 150,
-        topics: ['Historia de la IA', 'Tipos de aprendizaje', 'Ética en IA', 'Casos de uso empresariales']
+        units: [{ title: 'Historia de la IA' }, { title: 'Tipos de aprendizaje' }, { title: 'Ética en IA' }, { title: 'Casos de uso empresariales' }]
       },
       {
         title: 'Machine Learning Avanzado',
         description: 'Algoritmos supervisados y no supervisados, ensemble methods',
         hours: 200,
-        topics: ['Regresión y clasificación', 'Random Forest', 'Gradient Boosting', 'Clustering']
+        units: [{ title: 'Regresión y clasificación' }, { title: 'Random Forest' }, { title: 'Gradient Boosting' }, { title: 'Clustering' }]
       },
       {
         title: 'Deep Learning y Redes Neuronales',
         description: 'Arquitecturas profundas y frameworks modernos',
         hours: 250,
-        topics: ['TensorFlow y PyTorch', 'CNNs', 'RNNs y LSTM', 'Transformers']
+        units: [{ title: 'TensorFlow y PyTorch' }, { title: 'CNNs' }, { title: 'RNNs y LSTM' }, { title: 'Transformers' }]
       },
       {
         title: 'Proyecto Final',
         description: 'Desarrollo de un proyecto completo de IA aplicada',
         hours: 300,
-        topics: ['Diseño de solución', 'Implementación', 'Despliegue', 'Presentación']
+        units: [{ title: 'Diseño de solución' }, { title: 'Implementación' }, { title: 'Despliegue' }, { title: 'Presentación' }]
       }
     ],
     topics: [{ id: 1, documentId: 'local-1', name: 'Inteligencia Artificial' }],
@@ -120,13 +124,13 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
         title: 'Fundamentos de Ciberseguridad',
         description: 'Principios básicos y amenazas actuales',
         hours: 150,
-        topics: ['Tipos de amenazas', 'Vulnerabilidades comunes', 'Marco legal', 'Estándares ISO']
+        units: [{ title: 'Tipos de amenazas' }, { title: 'Vulnerabilidades comunes' }, { title: 'Marco legal' }, { title: 'Estándares ISO' }]
       },
       {
         title: 'Gestión de Seguridad',
         description: 'Diseño e implementación de políticas de seguridad',
         hours: 200,
-        topics: ['Risk Management', 'Compliance', 'Incident Response', 'Business Continuity']
+        units: [{ title: 'Risk Management' }, { title: 'Compliance' }, { title: 'Incident Response' }, { title: 'Business Continuity' }]
       }
     ],
     topics: [{ id: 2, documentId: 'local-2', name: 'Ciberseguridad' }],
@@ -166,13 +170,13 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
         title: 'Fundamentos de Big Data',
         description: 'Introducción a los sistemas distribuidos y almacenamiento',
         hours: 100,
-        topics: ['Hadoop Ecosystem', 'HDFS', 'MapReduce', 'YARN']
+        units: [{ title: 'Hadoop Ecosystem' }, { title: 'HDFS' }, { title: 'MapReduce' }, { title: 'YARN' }]
       },
       {
         title: 'Procesamiento con Spark',
         description: 'Análisis de datos con Apache Spark',
         hours: 150,
-        topics: ['Spark Core', 'Spark SQL', 'Streaming', 'MLlib']
+        units: [{ title: 'Spark Core' }, { title: 'Spark SQL' }, { title: 'Streaming' }, { title: 'MLlib' }]
       }
     ],
     topics: [{ id: 3, documentId: 'local-3', name: 'Big Data' }],
@@ -289,7 +293,7 @@ const getDefaultProgramData = (base: Partial<Program>): Program => ({
       title: 'Módulo 1',
       description: 'Contenido del módulo',
       hours: 100,
-      topics: ['Tema 1', 'Tema 2', 'Tema 3']
+      units: [{ title: 'Tema 1' }, { title: 'Tema 2' }, { title: 'Tema 3' }]
     }
   ],
   topics: base.topics || [],

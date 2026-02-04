@@ -22,12 +22,12 @@ function getFallbackProgram(id: string): ProgramWithLessons | null {
     title: module.title,
     description: module.description,
     order: moduleIndex + 1,
-    lessons: module.topics.map((topic, lessonIndex) => ({
+    lessons: (module.units || []).map((unit, lessonIndex) => ({
       id: moduleIndex * 100 + lessonIndex + 1,
       documentId: `lesson-${moduleIndex + 1}-${lessonIndex + 1}`,
-      title: topic,
-      slug: topic.toLowerCase().replace(/\s+/g, '-'),
-      description: `Contenido de la lección: ${topic}`,
+      title: unit.title,
+      slug: unit.title.toLowerCase().replace(/\s+/g, '-'),
+      description: `Contenido de la lección: ${unit.title}`,
       cloudflareVideoId: null,
       duration: Math.floor(Math.random() * 1800) + 600,
       order: lessonIndex + 1,
@@ -36,7 +36,7 @@ function getFallbackProgram(id: string): ProgramWithLessons | null {
       moduleId: moduleIndex + 1,
     })),
     totalDuration: module.hours * 60,
-    lessonCount: module.topics.length,
+    lessonCount: (module.units || []).length,
   }));
 
   const totalLessons = moduleRelations.reduce((sum, m) => sum + m.lessonCount, 0);

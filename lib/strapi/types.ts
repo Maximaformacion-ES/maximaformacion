@@ -59,13 +59,19 @@ export interface Topic {
   name: string;
 }
 
+// Unit component (embedded in modules)
+export interface StrapiUnitComponent {
+  id: number;
+  title: string;
+}
+
 // Legacy module component (embedded in programs)
 export interface StrapiModuleComponent {
   id: number;
   title: string;
   description: string;
   hours: number;
-  topics: string[] | null;
+  units?: StrapiUnitComponent[] | null;
 }
 
 // New Module collection type (for lesson system)
@@ -165,11 +171,15 @@ export interface StrapiBlogPost {
 }
 
 // Frontend-compatible types (matching existing interfaces)
+export interface ProgramUnit {
+  title: string;
+}
+
 export interface ProgramModule {
   title: string;
   description: string;
   hours: number;
-  topics: string[];
+  units?: ProgramUnit[];
 }
 
 export interface Program {
