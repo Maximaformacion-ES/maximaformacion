@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Linkedin, Mail } from 'lucide-react';
 
@@ -50,10 +51,12 @@ export const TeamSection: React.FC = () => {
             whileHover={{ y: -10 }}
             className="group relative aspect-[3/4] overflow-hidden bg-neutral-900 border border-white/5"
           >
-            <img 
+            <Image 
               src={member.image} 
               alt={member.name}
-              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0 duration-500"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-cover opacity-80 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0 duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
             <div className="absolute bottom-0 left-0 p-6 w-full">
