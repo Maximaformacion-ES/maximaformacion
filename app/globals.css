@@ -38,14 +38,26 @@
 @theme inline {
   --animate-accordion-down: accordion-down 0.3s ease-out;
   --animate-accordion-up: accordion-up 0.3s ease-out;
+  --font-sans: var(--font-zt-nature), system-ui, sans-serif;
+
+  /* Maxima Formación – Design System Colors */
+  --color-mx-bg: #FFFCF8;
+  --color-mx-text: #1a1a1a;
+  --color-mx-text-muted: #666563;
+  --color-mx-orange: #F7A000;
+  --color-mx-orange-dark: #ab6f00;
+  --color-mx-border: #e5e5e5;
+  --color-mx-card: #ffffff;
+  --color-mx-footer: #1a1a1a;
+  --color-mx-blue: #527BE7;
+
+  /* shadcn/ui tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-orange-foreground: var(--sidebar-orange-foreground);
+  --color-sidebar-orange: var(--sidebar-orange);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -59,8 +71,8 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
+  --color-orange-foreground: var(--orange-foreground);
+  --color-orange: var(--orange);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -82,17 +94,7 @@
 
 /* Film grain overlay effect */
 .grain {
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  right: -50%;
-  bottom: -50%;
-  width: 200%;
-  height: 200%;
-  background: transparent url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E") repeat;
-  opacity: 0.03;
-  pointer-events: none;
-  z-index: 9999;
+  display: none;
 }
 
 /* Noise overlay using pseudo-element */
@@ -111,8 +113,9 @@
 
 /* Text stroke utility */
 .text-stroke {
-  -webkit-text-stroke: 1px currentColor;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 3px var(--stroke-color, var(--color-mx-orange));
+  -webkit-text-fill-color: var(--color-mx-bg);
+  paint-order: stroke fill;
 }
 
 /* Magnetic hover effect */
@@ -134,16 +137,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--color-mx-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--color-mx-border);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #bbb;
 }
 
 /* No scrollbar utility */
@@ -1016,8 +1019,8 @@ a[href*="/billing"],
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --orange: oklch(0.97 0 0);
+  --orange-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -1031,8 +1034,8 @@ a[href*="/billing"],
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-orange: oklch(0.97 0 0);
+  --sidebar-orange-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
@@ -1050,8 +1053,8 @@ a[href*="/billing"],
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --orange: oklch(0.269 0 0);
+  --orange-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -1065,8 +1068,8 @@ a[href*="/billing"],
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-orange: oklch(0.269 0 0);
+  --sidebar-orange-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }

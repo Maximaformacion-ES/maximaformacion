@@ -45,7 +45,7 @@ export default function HomeClient({ programs, badges, homeData }: HomeClientPro
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />

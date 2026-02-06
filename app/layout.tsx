@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import { getSiteMetadata } from "@/lib/strapi/queries";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const ztNature = localFont({
+  src: [
+    { path: "../public/fonts/ZTNature-Thin.otf", weight: "100", style: "normal" },
+    { path: "../public/fonts/ZTNature-ThinItalic.otf", weight: "100", style: "italic" },
+    { path: "../public/fonts/ZTNature-Light.otf", weight: "300", style: "normal" },
+    { path: "../public/fonts/ZTNature-Regular.otf", weight: "400", style: "normal" },
+    { path: "../public/fonts/ZTNature-Medium.otf", weight: "500", style: "normal" },
+    { path: "../public/fonts/ZTNature-Bold.otf", weight: "700", style: "normal" },
+    { path: "../public/fonts/ZTNature-Black.otf", weight: "900", style: "normal" },
+    { path: "../public/fonts/ZTNature-BlackItalic.otf", weight: "900", style: "italic" },
+  ],
+  variable: "--font-zt-nature",
+  display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -63,12 +68,10 @@ export default function RootLayout({
         <head>
           <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
-          <link rel="preload" href="/fonts/ZTNature-Regular.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-          <link rel="preload" href="/fonts/ZTNature-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-          <link rel="preload" href="/fonts/ZTNature-Light.otf" as="font" type="font/otf" crossOrigin="anonymous" />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${ztNature.variable} antialiased`}
+          style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
         >
           {children}
         </body>

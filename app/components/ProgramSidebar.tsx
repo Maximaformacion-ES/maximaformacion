@@ -83,8 +83,8 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
   return (
     <div className="sticky top-24">
-      <div className="border border-white/10 bg-[#111] overflow-hidden rounded-lg shadow-lg shadow-black/30">
-        
+      <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
+
         {/* Program Image */}
         {program.image && (
           <div className="relative aspect-video w-full">
@@ -101,51 +101,51 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
         <div className="grid grid-cols-2 gap-4">
           {infoItems.map((item) => (
             <div key={item.label} className="flex items-start gap-2">
-              <item.icon size={14} className="text-amber-500 shrink-0 mt-0.5" />
+              <item.icon size={14} className="text-mx-orange shrink-0 mt-0.5" />
               <div>
-                <div className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                <div className="text-[10px] text-mx-text-muted uppercase tracking-widest">
                   {item.label}
                 </div>
-                <div className="text-white text-sm font-medium">{item.value} {item.label === 'Duración' ? 'horas' : ''}</div>
+                <div className="text-mx-text text-sm font-medium">{item.value} {item.label === 'Duración' ? 'horas' : ''}</div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Divider */}
-        <div className="border-t border-white/10" />
+        <div className="border-t border-mx-border" />
 
         {/* Pricing */}
         <div>
           <div className="flex items-baseline gap-3">
             {program.originalPrice && (
-              <span className="text-neutral-500 text-lg line-through">
+              <span className="text-mx-text-muted text-lg line-through">
                 {program.originalPrice}€
               </span>
             )}
-            <span className="text-amber-500 text-4xl font-black">
+            <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-4xl font-black`}>
               {program.price}€
             </span>
           </div>
           {program.originalPrice && (
-            <div className="mt-1 text-amber-500 text-xs font-bold">
+            <div className="mt-1 text-mx-orange text-xs font-bold">
               Ahorra {program.originalPrice - program.price}€
             </div>
           )}
-          <p className="text-neutral-500 text-xs mt-1">Pago único • Acceso permanente</p>
+          <p className="text-mx-text-muted text-xs mt-1">Pago único • Acceso permanente</p>
         </div>
 
         {/* Guarantee badge */}
-        <div className="flex items-center gap-3 px-4 py-3 border border-amber-500/20 bg-amber-500/5 rounded-lg">
-          <ShieldCheck size={18} className="text-amber-500 shrink-0" />
-          <span className="text-xs text-white/80 font-light">
-            <span className="font-semibold text-amber-400">14 días de garantía</span> — Devolución del 100%
+        <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
+          <ShieldCheck size={18} className="text-mx-orange shrink-0" />
+          <span className="text-xs text-mx-text-muted font-light">
+            <span className="font-semibold text-mx-orange">14 días de garantía</span> — Devolución del 100%
           </span>
         </div>
 
         {/* Error */}
         {error && (
-          <p className="text-red-400 text-sm">{error}</p>
+          <p className="text-red-500 text-sm">{error}</p>
         )}
 
         {/* CTA Button */}
@@ -153,7 +153,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           {isLoaded && hasAccess ? (
             <Link
               href={`/cursos/${program.documentId || program.id}`}
-              className="group flex items-center justify-center gap-3 w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black px-6 py-4 text-base font-medium rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/30"
+              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-base font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
               Acceder al Curso
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -162,7 +162,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             <motion.button
               onClick={handlePurchaseCourse}
               disabled={isLoading}
-              className="group flex items-center justify-center gap-3 w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black px-6 py-4 text-base font-medium rounded-lg hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-base font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               whileHover={{ scale: isLoading ? 1 : 1.02 }}
               whileTap={{ scale: isLoading ? 1 : 0.98 }}
             >
@@ -183,7 +183,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           {isLoaded && !userHasPro && (
             <Link
               href="/pricing"
-              className="flex items-center justify-center gap-2 w-full border border-amber-500/50 text-amber-500 px-6 py-3 text-sm font-light rounded-lg hover:bg-amber-500/10 transition-colors"
+              className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
             >
               <Crown size={16} />
               O hazte Pro por €18/mes
@@ -191,25 +191,24 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           )}
         </div>
 
-         {/* Divider */}
         {/* Divider */}
-        <div className="border-t border-white/10" />
+        <div className="border-t border-mx-border" />
 
         {/* Contact */}
         <div className="space-y-3">
-          <div className="text-xs text-neutral-500 uppercase tracking-widest font-bold">
+          <div className="text-xs text-mx-text-muted uppercase tracking-widest font-bold">
             Contacto
           </div>
           <a
             href="mailto:cursos@maximaformacion.es"
-            className="flex items-center gap-3 text-neutral-400 text-sm hover:text-white transition-colors"
+            className="flex items-center gap-3 text-mx-text-muted text-sm hover:text-mx-orange transition-colors"
           >
             <Mail size={14} />
             cursos@maximaformacion.es
           </a>
           <a
             href="tel:+34635659391"
-            className="flex items-center gap-3 text-neutral-400 text-sm hover:text-white transition-colors"
+            className="flex items-center gap-3 text-mx-text-muted text-sm hover:text-mx-orange transition-colors"
           >
             <Phone size={14} />
             +34 635 65 93 91

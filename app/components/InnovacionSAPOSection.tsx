@@ -91,7 +91,7 @@ const pricingPlans = [
 
 export const InnovacionSAPOSection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-neutral-950">
+    <section className="py-32 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
         {/* SAPO Hero */}
         <motion.div
@@ -100,13 +100,13 @@ export const InnovacionSAPOSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Te presentamos nuestra APP
           </span>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6">
             Conoce SAPO
           </h2>
-          <p className="text-white/70 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed mb-8">
+          <p className="text-mx-text-muted text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed mb-8">
             Una app que automatiza el análisis estadístico y genera resultados listos para publicar, 
             sin necesidad de programar.
           </p>
@@ -115,11 +115,11 @@ export const InnovacionSAPOSection: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="p-6 border border-white/10 bg-white/5"
+              className="p-6 border border-mx-border bg-mx-card rounded-lg"
             >
-              <h3 className="text-xl font-bold mb-3">Asistencia estadística automatizada</h3>
-              <p className="text-white/60 font-light">
-                La app te guía paso a paso: recopila información clave de tu estudio y te sugiere 
+              <h3 className="text-xl font-bold text-mx-text mb-3">Asistencia estadística automatizada</h3>
+              <p className="text-mx-text-muted font-light">
+                La app te guía paso a paso: recopila información clave de tu estudio y te sugiere
                 automáticamente la metodología estadística más adecuada, sin complicaciones.
               </p>
             </motion.div>
@@ -127,10 +127,10 @@ export const InnovacionSAPOSection: React.FC = () => {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="p-6 border border-white/10 bg-white/5"
+              className="p-6 border border-mx-border bg-mx-card rounded-lg"
             >
-              <h3 className="text-xl font-bold mb-3">Generación automática de resultados</h3>
-              <p className="text-white/60 font-light">
+              <h3 className="text-xl font-bold text-mx-text mb-3">Generación automática de resultados</h3>
+              <p className="text-mx-text-muted font-light">
                 Obtén análisis listos para publicar sin necesidad de programar. Genera descriptivos 
                 avanzados, gráficos y resultados estadísticos con rigor científico.
               </p>
@@ -144,7 +144,7 @@ export const InnovacionSAPOSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl font-bold text-center mb-12"
+            className="text-3xl font-bold text-mx-text text-center mb-12"
           >
             Características principales
           </motion.h3>
@@ -156,11 +156,11 @@ export const InnovacionSAPOSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="p-6 border border-white/10 bg-black/40 hover:border-amber-500/50 transition-all duration-300"
+                className="p-6 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300"
               >
-                <feature.icon className="text-amber-500 mb-4" size={28} />
-                <h4 className="text-lg font-bold mb-2">{feature.title}</h4>
-                <p className="text-white/60 font-light text-sm leading-relaxed">{feature.description}</p>
+                <feature.icon className="text-mx-orange mb-4" size={28} />
+                <h4 className="text-lg font-bold text-mx-text mb-2">{feature.title}</h4>
+                <p className="text-mx-text-muted font-light text-sm leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -173,7 +173,7 @@ export const InnovacionSAPOSection: React.FC = () => {
           viewport={{ once: true }}
           className="mb-12"
         >
-          <h3 className="text-3xl font-bold text-center mb-12">Planes y precios</h3>
+          <h3 className="text-3xl font-bold text-mx-text text-center mb-12">Planes y precios</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pricingPlans.map((plan, idx) => (
               <motion.div
@@ -184,24 +184,24 @@ export const InnovacionSAPOSection: React.FC = () => {
                 transition={{ delay: idx * 0.1 }}
                 className={`relative p-8 border rounded-lg ${
                   plan.popular
-                    ? 'border-amber-500 bg-amber-500/10'
-                    : 'border-white/10 bg-black/40'
+                    ? 'border-mx-orange bg-mx-orange/10'
+                    : 'border-mx-border bg-mx-card'
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-amber-500 text-black text-xs font-bold uppercase tracking-widest">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-mx-orange text-white text-xs font-bold uppercase tracking-widest rounded-full">
                     Popular
                   </div>
                 )}
-                <h4 className="text-2xl font-bold mb-2">{plan.name}</h4>
+                <h4 className="text-2xl font-bold text-mx-text mb-2">{plan.name}</h4>
                 <div className="mb-6">
-                  <span className="text-4xl font-black">{plan.price}€</span>
-                  {plan.period && <span className="text-white/60 text-lg">{plan.period}</span>}
+                  <span className="text-4xl font-black text-mx-text">{plan.price}€</span>
+                  {plan.period && <span className="text-mx-text-muted text-lg">{plan.period}</span>}
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-white/70">
-                      <Check size={16} className="text-amber-500 mt-0.5 shrink-0" />
+                    <li key={i} className="flex items-start gap-3 text-sm text-mx-text-muted">
+                      <Check size={16} className="text-mx-orange mt-0.5 shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -209,8 +209,8 @@ export const InnovacionSAPOSection: React.FC = () => {
                 <button
                   className={`w-full py-3 px-6 rounded-full font-medium transition-colors ${
                     plan.popular
-                      ? 'bg-amber-500 text-black hover:bg-amber-400'
-                      : 'bg-white text-black hover:bg-white/90'
+                      ? 'bg-mx-orange text-white hover:bg-mx-orange-dark'
+                      : 'border border-mx-border text-mx-text hover:bg-mx-orange/10 hover:border-mx-orange/50'
                   }`}
                 >
                   {plan.cta}

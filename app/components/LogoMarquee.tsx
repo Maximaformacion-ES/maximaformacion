@@ -29,12 +29,12 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Par
       <motion.div
         className="flex items-center gap-12 md:gap-16 w-max"
         animate={{ x: [`${from}%`, `${to}%`] }}
-        transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
+        transition={{ duration: 200, ease: 'linear', repeat: Infinity }}
       >
         {items.map((logo, i) => (
           <div
             key={`${logo.alt}-${i}`}
-            className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
+            className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
           >
             <Image
               src={logo.url}
@@ -56,8 +56,10 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
   title = 'Confían en nosotros',
   description = 'Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
 }) => {
+
+  console.log('Rendering LogoMarquee with logos:', partnerLogos);
   return (
-    <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full]">
+    <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full] bg-mx-bg">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-24">
         <motion.div
@@ -67,14 +69,14 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <p className="text-amber-500 text-sm tracking-[0.5em] uppercase mb-4">
+          <p className="text-mx-orange text-sm tracking-[0.5em] uppercase mb-4">
             {overline}
           </p>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-6">
+          <h2 className="text-mx-blue text-3xl md:text-5xl font-black tracking-tight mb-6">
             {title}
           </h2>
-          <div className="w-16 h-px bg-amber-500 mx-auto mb-6" />
-          <p className="text-neutral-400 text-base md:text-lg font-light max-w-xl mx-auto">
+          <div className="w-16 h-px bg-mx-orange mx-auto mb-6" />
+          <p className="text-mx-text-muted text-base md:text-lg font-light max-w-xl mx-auto">
             {description}
           </p>
         </motion.div>

@@ -45,7 +45,7 @@ const services: Service[] = [
 
 export const ServicesGridSection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-black">
+    <section className="py-32 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -53,13 +53,13 @@ export const ServicesGridSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Así podemos ayudarte
           </span>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6 text-balance">
             Resolvemos los desafíos estadísticos de tu empresa
           </h2>
-          <p className="text-white/60 text-lg font-light max-w-2xl mx-auto">
+          <p className="text-mx-text-muted text-lg font-light max-w-2xl mx-auto">
             Para que extraigas el máximo valor de los datos generados en tu negocio
           </p>
         </motion.div>
@@ -72,11 +72,11 @@ export const ServicesGridSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="p-8 border border-white/10 bg-white/5 hover:border-amber-500/50 hover:bg-white/10 transition-all duration-300 group"
+              className="p-8 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300 group"
             >
-              <service.icon className="text-amber-500 mb-6" size={32} />
-              <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
-              <p className="text-white/60 font-light leading-relaxed">{service.description}</p>
+              <service.icon className="text-mx-orange mb-6" size={32} />
+              <h3 className="text-xl font-bold text-mx-text mb-4">{service.title}</h3>
+              <p className="text-mx-text-muted font-light leading-relaxed">{service.description}</p>
             </motion.div>
           ))}
         </div>

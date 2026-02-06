@@ -30,14 +30,14 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           className="absolute inset-0 z-10"
           style={{
             background:
-              "radial-gradient(ellipse 90% 60% at center, transparent 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 80%, black 100%)",
+              "radial-gradient(ellipse 90% 60% at center, transparent 0%, rgba(255,252,248,0.3) 50%, rgba(255,252,248,0.8) 80%, var(--color-mx-bg) 100%)",
           }}
         />
         {/* Top fade */}
-        <div className="absolute inset-x-0 top-0 h-[50%] bg-gradient-to-b from-black via-black/90 via-10% to-transparent z-10" />
+        <div className="absolute inset-x-0 top-0 h-[50%] bg-gradient-to-b from-mx-bg via-mx-bg/90 via-10% to-transparent z-10" />
         {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black via-black/90 via-54% to-transparent z-10" />
-        {/* Image with noise and amber tint */}
+        <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-mx-bg via-mx-bg/90 via-54% to-transparent z-10" />
+        {/* Image with noise and blue tint */}
         <div className="noise w-full h-full relative">
           <img
             src={heroImage}
@@ -47,11 +47,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           {/* Color tint overlay */}
           <div
             className="absolute inset-0 mix-blend-color"
-            style={{ backgroundColor: "#000" }}
-          />
-          <div
-            className="absolute inset-0 mix-blend-color"
-            style={{ backgroundColor: "#ff9b06", opacity: 0.5 }}
+            style={{ backgroundColor: "var(--color-mx-blue)" }}
           />
         </div>
       </motion.div>
@@ -60,7 +56,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-6"
+          className="inline-block text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-6"
         >
           {heroOverline}
         </motion.span>
@@ -68,7 +64,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-[0.9]"
+          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-[0.9] text-mx-blue"
         >
           {heroTitle}
         </motion.h1>
@@ -76,7 +72,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-white/80 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto"
+          className="text-mx-text-muted text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto"
         >
           {heroDescription}
         </motion.p>
@@ -85,7 +81,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="group inline-flex items-center justify-center gap-3 bg-white text-black px-8 py-4 text-base font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300"
+          className="group inline-flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-base font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
         >
           Descubre más
           <ArrowRight

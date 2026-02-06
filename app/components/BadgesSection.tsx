@@ -99,10 +99,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
   if (badges.length === 0) return null;
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
-      {/* Background accent – mirrored from testimonials */}
-      <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-amber-500/5 to-transparent" />
-
+    <section className="relative py-24 md:py-32 overflow-hidden bg-mx-bg">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 relative">
         <div className="flex flex-col-reverse md:flex-row gap-12 items-center">
           {/* Left side (desktop) / Bottom (mobile) – Badge mosaic */}
@@ -161,7 +158,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </motion.p>
@@ -169,7 +166,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-white text-4xl md:text-6xl font-black tracking-tight mb-8"
+              className="text-mx-blue text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
               {renderStyledTitle(title)}
             </motion.h2>
@@ -178,7 +175,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-neutral-400 text-base md:text-lg font-light max-w-md leading-relaxed"
+              className="text-mx-text-muted text-base md:text-lg font-light max-w-md leading-relaxed"
             >
               {description}
             </motion.p>

@@ -20,7 +20,7 @@ export default function ConsultoriaClient({ heroData }: ConsultoriaClientProps) 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+    <div className="bg-mx-bg min-h-screen text-mx-text selection:bg-mx-orange/30 overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />

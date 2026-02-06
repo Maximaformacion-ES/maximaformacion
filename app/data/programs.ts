@@ -19,9 +19,9 @@ export interface Program {
   id: number;
   type: 'Master' | 'Curso';
   title: string;
-  duration: string;
+  duration: number;
   slug: string;
-  ects: string;
+  ects: number;
   tags: string[];
   topics: Topic[];
   featured: boolean;
@@ -46,8 +46,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 1, 
     type: 'Master', 
     title: 'Máster en Inteligencia Artificial Aplicada', 
-    duration: '1500h', 
-    ects: '60 ECTS', 
+    duration: 1500, 
+    ects: 60, 
     tags: ['Tecnología', 'Innovación'], 
     featured: true,
     isPro: true, // Pro-only program
@@ -105,8 +105,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 2, 
     type: 'Master', 
     title: 'Máster en Dirección de Ciberseguridad', 
-    duration: '1500h', 
-    ects: '60 ECTS', 
+    duration: 1500, 
+    ects: 60, 
     tags: ['Seguridad', 'Gestión'], 
     featured: true,
     isPro: true, // Pro-only program
@@ -152,8 +152,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 3, 
     type: 'Curso', 
     title: 'Experto en Big Data & Analytics', 
-    duration: '750h', 
-    ects: '30 ECTS', 
+    duration: 200, 
+    ects: 30, 
     tags: ['Data', 'Analítica'], 
     featured: false,
     description: 'Especialízate en el análisis de grandes volúmenes de datos con herramientas empresariales.',
@@ -196,8 +196,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 4, 
     type: 'Master', 
     title: 'MBA en Transformación Digital', 
-    duration: '1500h', 
-    ects: '60 ECTS', 
+    duration: 1500, 
+    ects: 60, 
     tags: ['Negocios', 'Digital'], 
     featured: false 
   },
@@ -205,8 +205,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 5, 
     type: 'Curso', 
     title: 'Especialización en Cloud Computing', 
-    duration: '500h', 
-    ects: '20 ECTS', 
+    duration: 500, 
+    ects: 20, 
     tags: ['Tecnología', 'Cloud'], 
     featured: false 
   },
@@ -214,8 +214,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 6, 
     type: 'Master', 
     title: 'Máster en Marketing Digital Avanzado', 
-    duration: '1500h', 
-    ects: '60 ECTS', 
+    duration: 1500, 
+    ects: 60, 
     tags: ['Marketing', 'Digital'], 
     featured: true 
   },
@@ -223,8 +223,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 7, 
     type: 'Curso', 
     title: 'Python para Data Science', 
-    duration: '200h', 
-    ects: '8 ECTS', 
+    duration: 200, 
+    ects: 8, 
     tags: ['Programación', 'Data'], 
     featured: false 
   },
@@ -232,8 +232,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 8, 
     type: 'Master', 
     title: 'Máster en Gestión de Proyectos Ágiles', 
-    duration: '1500h', 
-    ects: '60 ECTS', 
+    duration: 1500, 
+    ects: 60, 
     tags: ['Gestión', 'Agile'], 
     featured: false 
   },
@@ -241,8 +241,8 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
     id: 9, 
     type: 'Curso', 
     title: 'UX/UI Design Fundamentals', 
-    duration: '400h', 
-    ects: '16 ECTS', 
+    duration: 400, 
+    ects: 16, 
     tags: ['Diseño', 'Producto'], 
     featured: false 
   },

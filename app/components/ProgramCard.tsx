@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Star, ArrowUpRight, Crown } from 'lucide-react';
-import Link from 'next/link';
-import { Program } from '@/lib/strapi/types';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Star, ArrowUpRight, Crown } from "lucide-react";
+import Link from "next/link";
+import { Program } from "@/lib/strapi/types";
 
 // Generate a consistent rating between 4 and 5 based on program id
 function generateRating(id: number): number {
   const seed = (id * 7919) % 100;
-  return 4 + (seed / 100);
+  return 4 + seed / 100;
 }
 
 // Generate consistent student count
 function generateStudents(id: number): string {
-  const seed = (id * 3571) % 30 + 10;
+  const seed = ((id * 3571) % 30) + 10;
   return `${(seed / 10).toFixed(1)}K`;
 }
 
@@ -25,14 +25,18 @@ interface ProgramCardProps {
   index?: number;
 }
 
-export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, students, index = 0 }) => {
+export const ProgramCard: React.FC<ProgramCardProps> = ({
+  program,
+  rating,
+  students,
+  index = 0,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Use provided rating/students or generate them
   const displayRating = rating ?? generateRating(program.id);
   const displayStudents = students ?? generateStudents(program.id);
 
-  const isMaster = program.type === 'Master';
+  const isMaster = program.type === "Master";
 
   return (
     <motion.div
@@ -44,116 +48,129 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program, rating, stude
       exit={{ opacity: 0, scale: 0.9 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-[#111] rounded-2xl overflow-hidden cursor-pointer"
+      className="group relative bg-mx-bg rounded-lg overflow-hidden cursor-pointer border border-[#ddd] hover:border-mx-orange/50 transition-all duration-300"
     >
-      <Link href={`/programas/${program.slug}`} className="flex flex-col h-full">
-        {/* Image with hero-style effects */}
-        <div className="relative h-56 md:h-64 overflow-hidden">
-          {/* Vignette overlay */}
+      <Link
+        href={`/programas/${program.slug}`}
+        className="flex flex-col h-full"
+      >
+        {/* Image area */}
+        <div className="relative h-[299px] p-6 flex flex-col justify-between overflow-hidden">
+          {/* Background image */}
+          <motion.img
+            src={program.image}
+            alt={program.title}
+            className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+            animate={{ scale: isHovered ? 1.05 : 1 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          />
+          {/* Gradient overlay fading to bg */}
           <div
-            className="absolute inset-0 z-10 pointer-events-none"
+            className="absolute inset-0 z-10 pointer-events-none rounded-t-lg"
             style={{
-              background: 'radial-gradient(ellipse 95% 80% at center, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.8) 100%)'
+              background:
+                "linear-gradient(to bottom, rgba(255,252,248,0.2) 0%, rgba(255,253,251,0.62) 64%, #fffcf8 95%)",
             }}
           />
-          {/* Image with noise and tint */}
-          <div className="noise w-full h-full relative">
-            <motion.img
-              src={program.image}
-              alt={program.title}
-              className="w-full h-full object-cover opacity-80"
-              animate={{ scale: isHovered ? 1.1 : 1 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            />
-            {/* Amber tint overlay */}
-            <div
-              className="absolute inset-0 mix-blend-color pointer-events-none"
-              style={{ backgroundColor: '#ff9b06', opacity: 0.3 }}
-            />
-          </div>
 
-          {/* Badges */}
-          <div className="absolute top-4 left-4 z-20 flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1.5 backdrop-blur-md text-xs font-semibold rounded-full ${
-              isMaster
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                : 'bg-white/10 text-white border border-white/10'
-            }`}>
+          {/* Type badge - top left */}
+          <div className="relative z-20 flex items-center gap-2 justify-between">
+            <span
+              className={`px-4 py-2 backdrop-blur-sm text-xs font-medium rounded-full ${
+                isMaster
+                  ? "bg-mx-blue text-white"
+                  : "bg-mx-orange border border-mx-orange text-white"
+              }`}
+            >
               {program.type}
             </span>
-            {program.topics && program.topics.length > 0 && (
-              <>
-                <span className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white/70 text-xs font-medium rounded-full">
-                  {program.topics[0].name}
-                </span>
-                {program.topics.length > 1 && (
-                  <span className="px-2 py-1.5 bg-white/10 backdrop-blur-md text-white/50 text-xs font-medium rounded-full">
-                    +{program.topics.length - 1}
-                  </span>
-                )}
-              </>
+            {program.isPro && (
+              <span className="flex items-center gap-1 px-3 py-2 text-[10px] font-black tracking-wider uppercase text-white rounded-full bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] shadow-lg shadow-[#f7a000]/30">
+                <Crown size={10} /> PRO
+              </span>
             )}
           </div>
 
-          {/* Pro badge */}
-          {program.isPro && (
-            <div className="absolute top-4 right-4 z-20">
-              <span className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-full shadow-lg shadow-amber-500/25">
-                <Crown size={10} /> PRO
-              </span>
+          {/* Category tags - bottom of image */}
+          {program.topics && program.topics.length > 0 && (
+            <div className="relative z-20 flex gap-4 items-start">
+              {program.topics.slice(0, 2).map((topic) => (
+                <span
+                  key={topic.name}
+                  className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.5)] text-white text-xs font-medium rounded-full"
+                >
+                  {topic.name}
+                </span>
+              ))}
+              {program.topics.length > 2 && (
+                <span className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.4)] text-white text-xs font-medium rounded-full">
+                  +{program.topics.length - 2}
+                </span>
+              )}
             </div>
           )}
-
-          {/* Hover action button */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
-            className="absolute inset-0 z-20 flex items-center justify-center"
-          >
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
-              <ArrowUpRight size={24} className="text-white ml-1" />
-            </div>
-          </motion.div>
         </div>
 
         {/* Content */}
-        <div className="p-6 flex flex-col flex-grow">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="bg-mx-bg px-6 py-3 flex flex-col flex-grow rounded-b-lg">
+          {/* Rating */}
+          <div className="flex items-center gap-2.5 mb-4">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  size={12}
-                  className={i < Math.floor(displayRating) ? "text-amber-400" : "text-white/20"}
-                  fill={i < Math.floor(displayRating) ? "#f59e0b" : "transparent"}
+                  size={16}
+                  className={
+                    i < Math.floor(displayRating)
+                      ? "text-mx-orange"
+                      : "text-[#ddd]"
+                  }
+                  fill={
+                    i < Math.floor(displayRating)
+                      ? "var(--color-mx-orange)"
+                      : "transparent"
+                  }
                 />
               ))}
             </div>
-            <span className="text-white/50 text-sm">{displayRating.toFixed(1)}</span>
-            <span className="text-white/30 text-sm">({displayStudents} estudiantes)</span>
+            <span className="text-mx-text-muted text-sm">
+              {displayRating.toFixed(1)}
+            </span>
+            <span className="text-mx-text-muted text-sm">
+              ({displayStudents} estudiantes)
+            </span>
           </div>
 
-          <h3 className="text-white text-xl font-bold mb-2 line-clamp-2 group-hover:text-amber-400 transition-colors">
-            {program.title}
-          </h3>
+          {/* Title & Description */}
+          <div className="flex flex-col gap-2 mb-4">
+            <h3 className="text-mx-text-muted text-xl font-medium line-clamp-2">
+              {program.title}
+            </h3>
+            <p className="text-mx-text-muted text-sm font-light line-clamp-3 leading-normal">
+              {program.description}
+            </p>
+          </div>
 
-          <p className="text-white/50 text-sm font-light line-clamp-2 mb-6">
-            {program.description}
-          </p>
-
-          <div className="flex items-center justify-between pt-4 mt-auto border-t border-white/10">
-            <div>
+          {/* Price section */}
+          <div className="flex items-center justify-between pt-4 mt-auto border-t border-[#ddd]">
+            <div className="flex items-center gap-2">
               {program.originalPrice && (
-                <span className="text-white/40 text-sm line-through mr-2">{program.originalPrice}€</span>
+                <span className="text-mx-text-muted text-sm font-light line-through">
+                  {program.originalPrice}€
+                </span>
               )}
-              <span className="text-white text-xl font-bold">{program.price}€</span>
+              <span
+                className={`${program.originalPrice ? "text-mx-orange" : "text-mx-text"} text-xl font-medium`}
+              >
+                {program.price}€
+              </span>
             </div>
 
             <motion.div
               animate={{ x: isHovered ? 4 : 0 }}
-              className="text-amber-400"
+              className="text-mx-text-muted"
             >
-              <ArrowUpRight size={20} />
+              <ArrowUpRight size={24} />
             </motion.div>
           </div>
         </div>

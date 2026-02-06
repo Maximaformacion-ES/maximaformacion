@@ -38,7 +38,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
     .slice(0, 6);
 
   return (
-    <section id="masters" className="relative py-24 md:py-32 bg-[#0a0a0a]">
+    <section id="masters" className="relative py-24 md:py-32 bg-mx-bg">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
@@ -47,7 +47,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </motion.p>
@@ -55,9 +55,9 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-white text-4xl md:text-6xl lg:text-7xl font-black tracking-tight"
+              className="text-mx-blue text-4xl md:text-6xl lg:text-7xl font-black tracking-tight"
             >
-              {renderStyledTitle(title)}
+              {renderStyledTitle(title, "blue")}
             </motion.h2>
           </div>
 
@@ -68,7 +68,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
           >
             <Link
               href="/programas"
-              className="mt-8 md:mt-0 flex items-center gap-2 text-white/60 hover:text-white transition-colors group"
+              className="mt-8 md:mt-0 flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors group"
             >
               Ver todos los programas
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

@@ -112,8 +112,8 @@ export interface StrapiProgram {
   title: string;
   slug: string;
   type: 'Master' | 'Curso';
-  duration: string;
-  ects: string;
+  duration: number;
+  ects: number;
   tags: string[] | null;
   featured: boolean;
   isPro: boolean;
@@ -188,8 +188,8 @@ export interface Program {
   type: 'Master' | 'Curso';
   title: string;
   slug: string;
-  duration: string;
-  ects: string;
+  duration: number;
+  ects: number;
   tags: string[];
   topics: Topic[];
   featured: boolean;

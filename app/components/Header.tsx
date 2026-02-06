@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-white/10"
+        className="fixed top-0 left-0 right-0 z-50 bg-mx-bg border-b border-mx-border"
       >
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-6">
           <div className="flex items-center justify-between">
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
               whileHover={{ scale: 1.02 }}
             >
               <Image 
-                src="/logo.png" 
+                src="/newLogo.png" 
                 alt="Maxima Formación" 
                 width={200} 
                 height={80}
@@ -91,10 +91,10 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 <Link
                   key={item.name}
                   href={item.path}
-                  className="text-white text-sm font-light tracking-wide relative group hover:text-amber-500 transition-colors duration-300"
+                  className="text-mx-text text-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300"
                 >
                   {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-amber-500 group-hover:w-full transition-all duration-300" />
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-mx-orange group-hover:w-full transition-all duration-300" />
                 </Link>
               ))}
             </div>
@@ -105,8 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 <div className="hidden md:flex items-center gap-3">
                   <Link href="/sign-in">
                     <motion.button
-                      className="flex items-center gap-2 border border-white/30 text-white px-4 py-2 text-sm font-medium rounded-full hover:border-amber-500 hover:text-amber-500 hover:bg-white/5 transition-all duration-300"
-                      whileHover={{ scale: 1.05 }}
+                      className="flex items-center gap-2 border border-mx-blue text-mx-blue px-4 py-2 text-sm font-medium rounded-full hover:bg-mx-blue hover:text-white transition-all duration-300 hover:cursor-pointer"
                       whileTap={{ scale: 0.98 }}
                     >
                       <User size={16} />
@@ -115,8 +114,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   </Link>
                   <Link href="/sign-up">
                     <motion.button
-                      className="flex items-center gap-2 bg-amber-500 text-black px-4 py-2 text-sm font-medium rounded-full hover:bg-amber-400 transition-colors duration-300"
-                      whileHover={{ scale: 1.05 }}
+                      className="flex items-center gap-2 bg-mx-blue text-white px-4 py-2 text-sm font-medium rounded-full hover:bg-mx-blue/90 transition-colors duration-300 hover:cursor-pointer"
                       whileTap={{ scale: 0.98 }}
                     >
                       Registrarse
@@ -129,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 <div className="hidden md:flex items-center gap-3">
                   {/* Pro Status / Upgrade CTA */}
                   {userHasPro ? (
-                    <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 px-4 py-2 text-sm font-bold rounded-full">
+                    <div className="flex items-center gap-2 bg-mx-orange/10 border border-mx-orange/30 text-mx-orange px-4 py-2 text-sm font-bold rounded-full">
                       <Crown size={14} />
                       Pro
                       <Check size={14} />
@@ -137,8 +135,8 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   ) : (
                     <Link href="/pricing">
                       <motion.button
-                        className="flex items-center gap-2 bg-linear-to-r from-amber-500 to-amber-600 text-black px-4 py-2 text-sm font-bold rounded-full hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20"
-                        whileHover={{ scale: 1.05 }}
+                        className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 text-sm font-bold rounded-full hover:bg-mx-orange-dark transition-all duration-300 shadow-lg shadow-mx-orange/20"
+                        
                         whileTap={{ scale: 0.98 }}
                       >
                         <Crown size={14} />
@@ -213,8 +211,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
               <div className="hidden md:block relative" ref={dropdownRef}>
                 <motion.button
                   onClick={() => setIsCampusDropdownOpen(!isCampusDropdownOpen)}
-                  className="flex items-center gap-2 bg-white text-black px-5 py-2.5 text-sm font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300"
-                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 text-sm font-medium rounded-full hover:bg-mx-orange/90 transition-colors duration-300"
                   whileTap={{ scale: 0.98 }}
                 >
                   Campus
@@ -231,7 +228,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 bg-black border border-white/10 rounded-lg overflow-hidden shadow-xl"
+                      className="absolute right-0 mt-2 w-48 bg-mx-card border border-mx-border rounded-lg overflow-hidden shadow-xl"
                     >
                       {CAMPUS_OPTIONS.map((option, index) => (
                         <motion.a
@@ -242,7 +239,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="block px-4 py-3 text-white text-sm font-light hover:bg-white/10 hover:text-amber-500 transition-colors duration-200 border-b border-white/5 last:border-b-0"
+                          className="block px-4 py-3 text-mx-text text-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 border-b border-mx-border last:border-b-0"
                           onClick={() => setIsCampusDropdownOpen(false)}
                         >
                           <div className="flex items-center justify-between">
@@ -258,7 +255,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
               
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="lg:hidden text-white p-2"
+                className="lg:hidden text-mx-text p-2"
                 whileTap={{ scale: 0.9 }}
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -275,7 +272,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-black pt-24 px-6"
+            className="fixed inset-0 z-40 bg-mx-bg pt-24 px-6"
           >
             <div className="flex flex-col gap-6">
               {NAV_ITEMS.map((item, i) => (
@@ -283,7 +280,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   key={item.name}
                   href={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-white text-3xl font-light"
+                  className="text-mx-text text-3xl font-light"
                 >
                   <motion.span
                     initial={{ opacity: 0, x: -20 }}
@@ -301,14 +298,14 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 transition={{ delay: 0.6 }}
                 className="mt-8 flex flex-col gap-3"
               >
-                <span className="text-white/60 text-sm mb-2">Mi cuenta:</span>
+                <span className="text-mx-text-muted text-sm mb-2">Mi cuenta:</span>
                 <SignedOut>
                   <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.65 }}
-                      className="flex items-center justify-between gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 text-base font-light rounded-full transition-colors"
+                      className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-base font-light rounded-full transition-colors"
                     >
                       <span>Iniciar sesión</span>
                       <User size={18} />
@@ -319,7 +316,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.7 }}
-                      className="flex items-center justify-between gap-2 bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 text-base font-medium rounded-full transition-colors"
+                      className="flex items-center justify-between gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-3 text-base font-medium rounded-full transition-colors"
                     >
                       <span>Registrarse</span>
                       <ArrowUpRight size={18} />
@@ -330,7 +327,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   <Link 
                     href="/perfil" 
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-4 px-6 py-3 bg-white/10 hover:bg-amber-500/10 rounded-full transition-colors"
+                    className="flex items-center gap-4 px-6 py-3 bg-mx-border/50 hover:bg-mx-orange/10 rounded-full transition-colors"
                   >
                     <UserButton 
                       afterSignOutUrl="/"
@@ -383,7 +380,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                         }
                       }}
                     />
-                    <span className="text-white font-light">Mi perfil</span>
+                    <span className="text-mx-text font-light">Mi perfil</span>
                   </Link>
                 </SignedIn>
               </motion.div>
@@ -395,7 +392,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 transition={{ delay: 0.8 }}
                 className="mt-6 flex flex-col gap-3"
               >
-                <span className="text-white/60 text-sm mb-2">Acceder al Campus:</span>
+                <span className="text-mx-text-muted text-sm mb-2">Acceder al Campus:</span>
                 {CAMPUS_OPTIONS.map((option, index) => (
                   <motion.a
                     key={option.name}
@@ -405,7 +402,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.8 + index * 0.1 }}
-                    className="flex items-center justify-between gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 text-base font-light rounded-full transition-colors"
+                    className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-base font-light rounded-full transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <span>{option.name}</span>

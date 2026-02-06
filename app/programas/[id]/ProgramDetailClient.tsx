@@ -21,7 +21,7 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
 
   if (!program) {
     return (
-      <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+      <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
         <FontStyles />
 
         <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -34,12 +34,12 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Programa no encontrado
             </h2>
-            <p className="text-neutral-400 mb-8 font-light">
+            <p className="text-mx-text-muted mb-8 font-light">
               El programa que buscas no existe o ha sido eliminado.
             </p>
             <Link
               href="/programas"
-              className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-base font-medium rounded-full hover:bg-amber-500 hover:text-white transition-colors duration-300"
+              className="inline-flex items-center gap-3 bg-mx-orange text-white px-8 py-4 text-base font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
             >
               Ver todos los programas
             </Link>
@@ -52,7 +52,7 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
   }
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -66,7 +66,7 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
 
         <ProGateWrapper program={program}>
           {/* Sidebar on mobile — hidden on desktop since it's in the hero */}
-          <section className="pb-16 px-6 md:px-12 bg-[#0a0a0a] lg:hidden">
+          <section className="pb-16 px-6 md:px-12 bg-mx-bg lg:hidden">
             <div className="max-w-[1400px] mx-auto">
               <ProgramSidebar program={program} />
             </div>

@@ -51,10 +51,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   }, [displayTestimonials.length]);
 
   return (
-    <section id="opiniones" className="relative py-24 md:py-32 bg-[#111]">
-      {/* Background accent */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-500/5 to-transparent" />
-
+    <section id="opiniones" className="relative py-24 md:py-32 bg-gradient-to-l from-mx-blue/20 to-mx-bg">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 relative">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left side - Header */}
@@ -63,7 +60,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </motion.p>
@@ -71,7 +68,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-white text-4xl md:text-6xl font-black tracking-tight mb-8"
+              className="text-mx-blue text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
               {renderStyledTitle(title)}
             </motion.h2>
@@ -83,7 +80,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                   key={i}
                   onClick={() => setCurrent(i)}
                   className={`w-12 h-1 rounded-full transition-all duration-300 ${
-                    i === current ? 'bg-amber-400' : 'bg-white/20 hover:bg-white/40'
+                    i === current ? 'bg-mx-orange' : 'bg-mx-border hover:bg-[#ddd]'
                   }`}
                 />
               ))}
@@ -99,21 +96,21 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.5 }}
-                className="bg-[#1a1a1a] rounded-3xl p-8 md:p-12"
+                className="bg-mx-card rounded-3xl p-8 md:p-12 border border-mx-border shadow-sm"
               >
-                <Quote size={48} className="text-amber-400/30 mb-6" />
+                <Quote size={48} className="text-mx-orange/30 mb-6" />
 
-                <p className="text-white text-xl md:text-2xl font-light leading-relaxed mb-8">
+                <p className="text-mx-text text-xl md:text-2xl font-light leading-relaxed mb-8">
                   &ldquo;{displayTestimonials[current].text}&rdquo;
                 </p>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-xl font-bold">
+                  <div className="w-14 h-14 rounded-full bg-mx-orange/10 flex items-center justify-center text-mx-orange text-xl font-bold">
                     {displayTestimonials[current].name.charAt(0)}
                   </div>
                   <div>
-                    <div className="text-white font-bold">{displayTestimonials[current].name}</div>
-                    <div className="text-white/50 text-sm">{displayTestimonials[current].role}</div>
+                    <div className="text-mx-text font-bold">{displayTestimonials[current].name}</div>
+                    <div className="text-mx-text-muted text-sm">{displayTestimonials[current].role}</div>
                   </div>
                 </div>
               </motion.div>

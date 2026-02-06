@@ -62,13 +62,13 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   const displayFaqs = faqs.length > 0 ? faqs : DEFAULT_FAQS;
 
   return (
-    <section className="relative py-32 bg-[#0a0a0a] overflow-hidden">
+    <section className="relative py-32 bg-mx-bg overflow-hidden">
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-amber-400 text-sm tracking-[0.3em] uppercase mb-6 text-center"
+          className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-6 text-center"
         >
           {overline}
         </motion.p>
@@ -77,9 +77,9 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-white text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-16 text-center"
+          className="text-mx-blue text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-16 text-center"
         >
-          {renderStyledTitle(title)}
+          {renderStyledTitle(title, "blue")}
         </motion.h2>
 
         <motion.div

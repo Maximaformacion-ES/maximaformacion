@@ -20,16 +20,16 @@ export const TopicFilterTrigger: React.FC<TopicFilterTriggerProps> = ({
     onClick={toggle}
     className={`flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
       selectedCount > 0
-        ? 'bg-amber-500/20 text-amber-400 border-amber-500/50'
+        ? 'bg-mx-orange/20 text-mx-orange border-mx-orange/50'
         : isOpen
-          ? 'bg-neutral-900 text-neutral-300 border-white/40'
-          : 'bg-neutral-900 text-neutral-400 border-white/10 hover:bg-neutral-800'
+          ? 'bg-mx-card text-mx-text border-mx-border'
+          : 'bg-mx-card text-mx-text-muted border-mx-border hover:border-mx-orange/50'
     }`}
   >
     <Filter size={12} className="md:w-[14px] md:h-[14px]" />
     <span>Tema</span>
     {selectedCount > 0 && (
-      <span className="bg-amber-500 text-white text-[10px] md:text-xs w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center">
+      <span className="bg-mx-orange text-white text-[10px] md:text-xs w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center">
         {selectedCount}
       </span>
     )}
@@ -71,8 +71,8 @@ export const TopicBadgesRow: React.FC<TopicBadgesRowProps> = ({
                 onClick={() => onToggle(topic.name)}
                 className={`px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
                   isSelected
-                    ? 'bg-amber-500 text-white border-amber-500'
-                    : 'bg-neutral-900 text-neutral-400 border-white/10 hover:border-amber-500/50 hover:text-neutral-200'
+                    ? 'bg-mx-orange text-white border-mx-orange'
+                    : 'bg-mx-card text-mx-text-muted border-mx-border hover:border-mx-orange/50 hover:text-mx-text'
                 }`}
               >
                 {topic.name}

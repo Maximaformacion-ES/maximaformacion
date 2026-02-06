@@ -14,7 +14,7 @@ const clients = [
 
 export const ClientsSection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-neutral-950 border-y border-white/10">
+    <section className="py-32 px-6 md:px-12 bg-mx-bg border-y border-mx-border">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -22,13 +22,13 @@ export const ClientsSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Confían en nosotros
           </span>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6">
             Empresas e instituciones líderes
           </h2>
-          <p className="text-white/60 text-lg font-light max-w-2xl mx-auto">
+          <p className="text-mx-text-muted text-lg font-light max-w-2xl mx-auto">
             Más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación
           </p>
         </motion.div>
@@ -41,9 +41,9 @@ export const ClientsSection: React.FC = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="flex items-center justify-center p-6 border border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10 transition-all duration-300 grayscale hover:grayscale-0"
+              className="flex items-center justify-center p-6 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300 grayscale hover:grayscale-0"
             >
-              <div className="text-white/60 hover:text-white text-xl font-bold transition-colors">
+              <div className="text-mx-text-muted hover:text-mx-text text-xl font-bold transition-colors">
                 {client.name}
               </div>
             </motion.div>
@@ -57,9 +57,9 @@ export const ClientsSection: React.FC = () => {
           transition={{ delay: 0.6 }}
           className="mt-16 text-center"
         >
-          <div className="inline-block p-8 border border-white/10 bg-black/40">
-            <h3 className="text-2xl font-bold mb-4">Máximo rigor científico</h3>
-            <p className="text-white/60 font-light max-w-2xl">
+          <div className="inline-block p-8 border border-mx-border bg-mx-card rounded-lg">
+            <h3 className="text-2xl font-bold text-mx-text mb-4">Máximo rigor científico</h3>
+            <p className="text-mx-text-muted font-light max-w-2xl">
               Máxima Consultoría está integrada por un equipo multidisciplinar de expertos en Ciencia de Datos con más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación.
             </p>
           </div>

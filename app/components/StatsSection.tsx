@@ -25,7 +25,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
   ];
 
   return (
-    <section className="relative -mt-20 pt-0 pb-12 md:pb-12 bg-[#0a0a0a]">
+    <section className="relative -mt-20 pt-0 pb-12 md:pb-12 bg-mx-bg">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, i) => (
@@ -37,9 +37,9 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               transition={{ delay: i * 0.1, duration: 0.8 }}
               className="text-center"
             >
-              <stat.icon size={28} className="text-amber-400 mx-auto mb-4" strokeWidth={1.5} />
-              <div className="text-white text-4xl md:text-6xl font-black tracking-tight">{stat.value}</div>
-              <div className="text-white/50 text-sm md:text-base font-light mt-2">{stat.label}</div>
+              <stat.icon size={28} className="text-mx-orange mx-auto mb-4" strokeWidth={1.5} />
+              <div className="text-mx-orange text-4xl md:text-6xl font-black tracking-tight">{stat.value}</div>
+              <div className="text-mx-orange-dark text-sm md:text-base font-light mt-2">{stat.label}</div>
             </motion.div>
           ))}
         </div>

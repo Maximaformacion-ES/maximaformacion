@@ -13,7 +13,7 @@ import React from 'react';
  *  → "CAPÍTULO" (text-stroke, new line)
  *  → "EMPIEZA HOY" (normal, new line)
  */
-export function renderStyledTitle(text: string): React.ReactNode[] {
+export function renderStyledTitle(text: string, color: string = "orange"): React.ReactNode[] {
   // Split by {content} keeping the delimiters
   const segments = text.split(/(\{[^}]+\})/);
   const result: React.ReactNode[] = [];
@@ -30,7 +30,10 @@ export function renderStyledTitle(text: string): React.ReactNode[] {
       <React.Fragment key={lineIndex}>
         {lineIndex > 0 && <br />}
         {isStroke ? (
-          <span className="text-stroke">{content}</span>
+          <span
+            className="text-stroke"
+            style={{ '--stroke-color': color === "blue" ? 'var(--color-mx-blue)' : 'var(--color-mx-orange)' } as React.CSSProperties}
+          >{content}</span>
         ) : (
           content
         )}

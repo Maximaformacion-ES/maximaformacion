@@ -49,7 +49,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
   }, [initialPrograms, activeFilter, searchQuery, selectedTopics]);
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />

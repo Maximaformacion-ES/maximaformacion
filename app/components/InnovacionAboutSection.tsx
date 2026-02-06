@@ -24,7 +24,7 @@ export const InnovacionAboutSection: React.FC = () => {
   ];
 
   return (
-    <section id="sobre-nosotros" className="py-32 px-6 md:px-12 bg-[#0a0a0a]">
+    <section id="sobre-nosotros" className="py-32 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -32,13 +32,13 @@ export const InnovacionAboutSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Sobre Biomáxima
           </span>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6">
             Biomáxima Innovación®
           </h2>
-          <p className="text-white/70 text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed">
+          <p className="text-mx-text-muted text-lg md:text-xl font-light max-w-3xl mx-auto leading-relaxed">
             Empresa altamente especializada en el desarrollo de soluciones tecnológicas avanzadas, 
             enfocándose principalmente en los campos de la ciencia, la salud y la medicina.
           </p>
@@ -51,8 +51,8 @@ export const InnovacionAboutSection: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="mb-16 max-w-4xl mx-auto text-center"
         >
-          <h3 className="text-2xl font-bold mb-4">Nos define la innovación</h3>
-          <p className="text-white/60 font-light leading-relaxed text-lg">
+          <h3 className="text-2xl font-bold text-mx-text mb-4">Nos define la innovación</h3>
+          <p className="text-mx-text-muted font-light leading-relaxed text-lg">
             Nuestro compromiso es innovar y crear herramientas que no solo optimicen procesos, 
             sino que también mejoren la calidad de vida de las personas. A través de un equipo 
             multidisciplinario de expertos en tecnología, biomedicina y análisis de datos, 
@@ -68,11 +68,11 @@ export const InnovacionAboutSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="p-8 border border-white/10 bg-white/5 hover:border-amber-500/50 hover:bg-white/10 transition-all duration-300"
+              className="p-8 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300"
             >
-              <item.icon className="text-amber-500 mb-6" size={32} />
-              <h3 className="text-xl font-bold mb-4">{item.title}</h3>
-              <p className="text-white/60 font-light leading-relaxed">{item.description}</p>
+              <item.icon className="text-mx-orange mb-6" size={32} />
+              <h3 className="text-xl font-bold text-mx-text mb-4">{item.title}</h3>
+              <p className="text-mx-text-muted font-light leading-relaxed">{item.description}</p>
             </motion.div>
           ))}
         </div>
@@ -81,13 +81,13 @@ export const InnovacionAboutSection: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto text-center p-10 border border-white/10 bg-black/40"
+          className="max-w-4xl mx-auto text-center p-10 border border-mx-border bg-mx-card rounded-lg"
         >
-          <h3 className="text-2xl font-bold mb-4">Nuestra visión de futuro</h3>
-          <p className="text-white/70 font-light leading-relaxed">
-            Biomáxima se proyecta como un <strong className="text-white">referente nacional e internacional 
-            en asesoría y soluciones biotecnológicas y biosanitarias</strong>. Su visión consiste en 
-            <strong className="text-white"> impulsar la innovación científica y tecnológica</strong> para 
+          <h3 className="text-2xl font-bold text-mx-text mb-4">Nuestra visión de futuro</h3>
+          <p className="text-mx-text-muted font-light leading-relaxed">
+            Biomáxima se proyecta como un <strong className="text-mx-text">referente nacional e internacional
+            en asesoría y soluciones biotecnológicas y biosanitarias</strong>. Su visión consiste en
+            <strong className="text-mx-text"> impulsar la innovación científica y tecnológica</strong> para 
             mejorar la eficiencia, precisión y aplicabilidad de la investigación en salud y biotecnología.
           </p>
         </motion.div>
