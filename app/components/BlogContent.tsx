@@ -14,9 +14,11 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
     <>
       <style jsx global>{`
         .blog-html-content {
-          color: rgb(212, 212, 212);
+          color: var(--color-mx-text-muted);
           font-size: 1.125rem;
           line-height: 1.75rem;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
 
         /* Heading scroll offset for TOC navigation */
@@ -33,7 +35,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           font-weight: 900;
           line-height: 1.1;
           letter-spacing: -0.02em;
-          color: rgb(255, 255, 255);
+          color: var(--color-mx-blue);
           margin-top: 2.5rem;
           margin-bottom: 1.5rem;
         }
@@ -43,7 +45,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           font-weight: 900;
           line-height: 1.2;
           letter-spacing: -0.01em;
-          color: rgb(255, 255, 255);
+          color: var(--color-mx-blue);
           margin-top: 3rem;
           margin-bottom: 1.5rem;
         }
@@ -52,7 +54,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           font-size: 1.5rem;
           font-weight: 800;
           line-height: 1.3;
-          color: rgb(255, 255, 255);
+          color: var(--color-mx-text);
           margin-top: 2rem;
           margin-bottom: 1rem;
         }
@@ -61,14 +63,14 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           font-size: 1.25rem;
           font-weight: 700;
           line-height: 1.4;
-          color: rgb(255, 255, 255);
+          color: var(--color-mx-text);
           margin-top: 1.5rem;
           margin-bottom: 0.75rem;
         }
 
         /* Paragraphs */
         .blog-html-content p {
-          color: rgb(212, 212, 212);
+          color: var(--color-mx-text-muted);
           font-weight: 300;
           line-height: 1.75;
           margin-bottom: 1.5rem;
@@ -77,7 +79,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
         /* Lists */
         .blog-html-content ul,
         .blog-html-content ol {
-          color: rgb(212, 212, 212);
+          color: var(--color-mx-text-muted);
           margin-top: 1.5rem;
           margin-bottom: 1.5rem;
           padding-left: 1.5rem;
@@ -98,50 +100,50 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
 
         /* Strong and Emphasis */
         .blog-html-content strong {
-          color: rgb(255, 255, 255);
+          color: var(--color-mx-text);
           font-weight: 700;
         }
 
         .blog-html-content em {
           font-style: italic;
-          color: rgb(229, 229, 229);
         }
 
         /* Links */
         .blog-html-content a {
-          color: rgb(245, 158, 11);
+          color: var(--color-mx-orange);
           text-decoration: none;
           transition: all 0.2s ease;
         }
 
         .blog-html-content a:hover {
-          color: rgb(251, 191, 36);
+          color: var(--color-mx-blue);
           text-decoration: underline;
         }
 
         /* Blockquotes */
         .blog-html-content blockquote {
-          border-left: 4px solid rgb(245, 158, 11);
+          border-left: 4px solid var(--color-mx-orange);
           padding-left: 1.5rem;
           margin: 2rem 0;
-          color: rgb(163, 163, 163);
+          color: var(--color-mx-text-muted);
           font-style: italic;
         }
 
         /* Code */
         .blog-html-content code {
-          background-color: rgb(17, 17, 17);
-          color: rgb(245, 158, 11);
+          background-color: var(--color-mx-card);
+          color: var(--color-mx-orange);
           padding: 0.25rem 0.5rem;
           border-radius: 0.25rem;
           font-size: 0.9em;
           font-family: 'Courier New', monospace;
+          border: 1px solid var(--color-mx-border);
         }
 
         .blog-html-content pre {
-          background-color: rgb(17, 17, 17);
-          border: 1px solid rgb(38, 38, 38);
-          border-radius: 0.5rem;
+          background-color: var(--color-mx-card);
+          border: 1px solid var(--color-mx-border);
+          border-radius: 0.75rem;
           padding: 1.5rem;
           overflow-x: auto;
           margin: 2rem 0;
@@ -150,41 +152,44 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
         .blog-html-content pre code {
           background-color: transparent;
           padding: 0;
-          color: rgb(212, 212, 212);
+          color: var(--color-mx-text);
+          border: none;
         }
 
         /* Images */
         .blog-html-content img {
           max-width: 100%;
           height: auto;
-          border-radius: 0.5rem;
+          border-radius: 0.75rem;
           margin: 2rem 0;
         }
 
-        /* Tables */
+        /* Tables - wrap in scrollable container */
         .blog-html-content table {
           width: 100%;
           border-collapse: collapse;
           margin: 2rem 0;
+          display: block;
+          overflow-x: auto;
         }
 
         .blog-html-content th,
         .blog-html-content td {
-          border: 1px solid rgb(38, 38, 38);
+          border: 1px solid var(--color-mx-border);
           padding: 0.75rem;
           text-align: left;
         }
 
         .blog-html-content th {
-          background-color: rgb(17, 17, 17);
-          color: rgb(255, 255, 255);
+          background-color: var(--color-mx-card);
+          color: var(--color-mx-text);
           font-weight: 700;
         }
 
         /* Horizontal Rule */
         .blog-html-content hr {
           border: none;
-          border-top: 1px solid rgb(38, 38, 38);
+          border-top: 1px solid var(--color-mx-border);
           margin: 3rem 0;
         }
 
@@ -197,18 +202,25 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
-          .blog-html-content h1 {
-            font-size: 2rem;
+          .blog-html-content {
+            font-size: 1rem;
+            line-height: 1.625rem;
           }
-          .blog-html-content h2 {
+          .blog-html-content h1 {
             font-size: 1.75rem;
           }
+          .blog-html-content h2 {
+            font-size: 1.5rem;
+          }
           .blog-html-content h3 {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
+          }
+          .blog-html-content h4 {
+            font-size: 1.05rem;
           }
         }
       `}</style>
-      <section id="blog-content-section" className="py-24 md:py-32 px-6 md:px-12 bg-[#0a0a0a]">
+      <section id="blog-content-section" className="py-16 md:py-24 px-6 md:px-12 bg-mx-bg">
         <div className="max-w-7xl mx-auto">
           {/* Tags */}
           <motion.div
@@ -220,7 +232,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
             {post.tags.map(tag => (
               <span
                 key={tag}
-                className="px-4 py-2 bg-white/5 border border-white/10 text-sm text-neutral-400 hover:border-amber-500/50 hover:text-amber-500 transition-colors"
+                className="px-4 py-2 bg-mx-card border border-mx-border text-sm text-mx-text-muted rounded-full hover:border-mx-orange/50 hover:text-mx-orange transition-colors"
               >
                 {tag}
               </span>
@@ -238,7 +250,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
             >
               <div
                 dangerouslySetInnerHTML={{ __html: post.content }}
-                className="blog-html-content"
+                className="blog-html-content overflow-x-hidden"
               />
             </motion.article>
 

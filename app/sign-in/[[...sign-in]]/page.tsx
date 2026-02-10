@@ -9,17 +9,18 @@ import { Header } from '@/app/components/Header';
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-amber-500/30 overflow-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-hidden">
       <FontStyles />
 
-      {/* Background Pattern */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(245,158,11,0.08),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(245,158,11,0.05),transparent_50%)]" />
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
+      {/* Decorative Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(247,160,0,0.06),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(82,123,231,0.06),transparent_50%)]" />
+        <div
+          className="absolute inset-0 opacity-[0.4]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `radial-gradient(circle, #e5e5e5 1px, transparent 1px)`,
+            backgroundSize: '32px 32px',
           }}
         />
       </div>
@@ -28,7 +29,7 @@ export default function SignInPage() {
       <Header isMenuOpen={false} setIsMenuOpen={() => {}} />
 
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-24 pb-12">
+      <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-32 pb-16">
         <div className="w-full max-w-md">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -36,13 +37,13 @@ export default function SignInPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center mb-10"
           >
-            <span className="text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4 block">
+            <span className="text-mx-orange text-sm font-medium tracking-[0.3em] uppercase mb-4 block">
               Bienvenido de nuevo
             </span>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+            <h1 className="text-4xl md:text-5xl font-black text-mx-blue mb-4">
               Inicia Sesión
             </h1>
-            <p className="text-white/60 font-light">
+            <p className="text-mx-text-muted font-light">
               Accede a tu cuenta para continuar tu formación
             </p>
           </motion.div>
@@ -56,45 +57,45 @@ export default function SignInPage() {
             <SignIn
               appearance={{
                 variables: {
-                  colorPrimary: '#f59e0b',
-                  colorBackground: '#141414',
-                  colorText: '#ffffff',
-                  colorTextSecondary: '#a3a3a3',
-                  colorInputBackground: '#1a1a1a',
-                  colorInputText: '#ffffff',
-                  colorNeutral: '#ffffff',
+                  colorPrimary: '#F7A000',
+                  colorBackground: '#ffffff',
+                  colorText: '#1a1a1a',
+                  colorTextSecondary: '#666563',
+                  colorInputBackground: '#FFFEFC',
+                  colorInputText: '#1a1a1a',
+                  colorNeutral: '#1a1a1a',
                   borderRadius: '0.75rem',
                 },
                 elements: {
                   rootBox: 'w-full max-w-md',
-                  card: 'bg-[#141414] border border-amber-500/20 shadow-2xl shadow-amber-500/10 rounded-xl',
+                  card: 'bg-mx-card border border-mx-border shadow-xl rounded-xl',
                   headerTitle: 'hidden',
                   headerSubtitle: 'hidden',
-                  socialButtonsBlockButton: 
-                    'bg-[#1a1a1a] border-2 border-white/20 text-white hover:bg-amber-500/10 hover:border-amber-500 transition-all duration-300 rounded-lg',
-                  socialButtonsBlockButtonText: 'text-white font-medium',
+                  socialButtonsBlockButton:
+                    'bg-mx-bg border-2 border-mx-border text-mx-text hover:bg-mx-orange/5 hover:border-mx-orange transition-all duration-300 rounded-lg',
+                  socialButtonsBlockButtonText: 'text-mx-text font-medium',
                   socialButtonsProviderIcon: 'w-5 h-5',
-                  dividerLine: 'bg-white/20',
-                  dividerText: 'text-white/50 bg-[#141414] px-3',
-                  formFieldLabel: 'text-white font-medium mb-2',
+                  dividerLine: 'bg-mx-border',
+                  dividerText: 'text-mx-text-muted bg-mx-card px-3',
+                  formFieldLabel: 'text-mx-text font-medium mb-2',
                   formFieldLabelRow: 'mb-2',
-                  formFieldInput: 
-                    'bg-[#1a1a1a] border-2 border-white/20 text-white placeholder:text-white/40 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 transition-all duration-300 rounded-lg h-12',
-                  formFieldInputShowPasswordButton: 'text-white/60 hover:text-amber-500',
-                  formButtonPrimary: 
-                    'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold transition-all duration-300 shadow-lg shadow-amber-500/30 rounded-lg h-12 text-base',
+                  formFieldInput:
+                    'bg-mx-bg border-2 border-mx-border text-mx-text placeholder:text-mx-text-muted/50 focus:border-mx-orange focus:ring-2 focus:ring-mx-orange/20 transition-all duration-300 rounded-lg h-12',
+                  formFieldInputShowPasswordButton: 'text-mx-text-muted hover:text-mx-orange',
+                  formButtonPrimary:
+                    'bg-mx-orange hover:bg-mx-orange-dark text-white font-bold transition-all duration-300 rounded-lg h-12 text-base',
                   footerAction: 'mt-6',
-                  footerActionText: 'text-white/60',
-                  footerActionLink: 'text-amber-500 hover:text-amber-400 font-medium',
-                  identityPreview: 'bg-[#1a1a1a] border border-white/20 rounded-lg',
-                  identityPreviewText: 'text-white',
-                  identityPreviewEditButton: 'text-amber-500 hover:text-amber-400',
-                  formFieldAction: 'text-amber-500 hover:text-amber-400',
-                  otpCodeFieldInput: 'bg-[#1a1a1a] border-2 border-white/20 text-white focus:border-amber-500 rounded-lg',
-                  formResendCodeLink: 'text-amber-500 hover:text-amber-400 font-medium',
-                  alert: 'bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg',
-                  alertText: 'text-red-400',
-                  formFieldErrorText: 'text-red-400 text-sm mt-1',
+                  footerActionText: 'text-mx-text-muted',
+                  footerActionLink: 'text-mx-orange hover:text-mx-orange-dark font-medium',
+                  identityPreview: 'bg-mx-bg border border-mx-border rounded-lg',
+                  identityPreviewText: 'text-mx-text',
+                  identityPreviewEditButton: 'text-mx-orange hover:text-mx-orange-dark',
+                  formFieldAction: 'text-mx-orange hover:text-mx-orange-dark',
+                  otpCodeFieldInput: 'bg-mx-bg border-2 border-mx-border text-mx-text focus:border-mx-orange rounded-lg',
+                  formResendCodeLink: 'text-mx-orange hover:text-mx-orange-dark font-medium',
+                  alert: 'bg-red-50 border border-red-200 text-red-600 rounded-lg',
+                  alertText: 'text-red-600',
+                  formFieldErrorText: 'text-red-500 text-sm mt-1',
                   footer: 'hidden',
                 }
               }}
@@ -108,14 +109,14 @@ export default function SignInPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-center text-white/40 text-sm mt-8"
+            className="text-center text-mx-text-muted text-sm mt-8"
           >
             Al iniciar sesión, aceptas nuestros{' '}
-            <Link href="/terminos" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/terminos" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
               Términos de Servicio
             </Link>{' '}
             y{' '}
-            <Link href="/privacidad" className="text-amber-500 hover:text-amber-400 transition-colors">
+            <Link href="/privacidad" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
               Política de Privacidad
             </Link>
           </motion.p>
@@ -123,14 +124,14 @@ export default function SignInPage() {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-20 py-4 px-6 bg-black/80 backdrop-blur-md border-t border-white/5">
-        <div className="max-w-[1800px] mx-auto flex items-center justify-between text-white/40 text-xs">
-          <span>© 2025 Máxima Formación. Todos los derechos reservados.</span>
+      <footer className="fixed bottom-0 left-0 right-0 z-20 py-4 px-6 bg-mx-bg/80 backdrop-blur-md border-t border-mx-border">
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between text-mx-text-muted text-xs">
+          <span>&copy; 2025 Máxima Formación. Todos los derechos reservados.</span>
           <div className="flex items-center gap-4">
-            <Link href="/contacto" className="hover:text-amber-500 transition-colors">
+            <Link href="/contacto" className="hover:text-mx-orange transition-colors">
               Contacto
             </Link>
-            <Link href="/ayuda" className="hover:text-amber-500 transition-colors">
+            <Link href="/ayuda" className="hover:text-mx-orange transition-colors">
               Ayuda
             </Link>
           </div>

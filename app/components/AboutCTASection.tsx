@@ -6,7 +6,7 @@ import { ArrowUpRight } from 'lucide-react';
 export const AboutCTASection: React.FC = () => {
   return (
     <section className="py-32 px-6 flex flex-col items-center justify-center text-center bg-mx-orange">
-      <h2 className="text-white text-5xl md:text-7xl font-black tracking-tighter mb-8 max-w-4xl">
+      <h2 className="text-white text-5xl md:text-7xl font-black  mb-8 max-w-4xl">
         ¿LISTO PARA COMENZAR TU TRANSFORMACIÓN?
       </h2>
       <a

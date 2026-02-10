@@ -42,7 +42,7 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
             <Crown size={16} />
             Contenido Exclusivo Pro
           </span>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-6">
+          <h2 className="text-3xl md:text-5xl font-black  mb-6">
             Este programa requiere{' '}
             <span className="text-amber-500">Pro</span>
           </h2>

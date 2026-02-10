@@ -25,7 +25,7 @@ export default function InnovacionClient({ heroData }: InnovacionClientProps) {
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
-      <main className="relative z-10">
+      <main className="relative z-10 flex flex-col gap-16 md:gap-24">
         <InnovacionHeroSection data={heroData || undefined} />
         <InnovacionAboutSection />
         <InnovacionServicesSection />

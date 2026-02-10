@@ -20,7 +20,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
   const heroDescription = data?.heroDescription || INNOVACION_HERO_FALLBACK.heroDescription;
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative h-dvh flex items-center justify-center overflow-hidden">
       <motion.div
         style={{ y: yRange }}
         className="absolute inset-0 z-0 h-[120%]"
@@ -34,20 +34,20 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           }}
         />
         {/* Top fade */}
-        <div className="absolute inset-x-0 top-0 h-[50%] bg-gradient-to-b from-mx-bg via-mx-bg/90 via-10% to-transparent z-10" />
+        <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-mx-bg via-mx-bg/40 via-50% to-transparent z-10" />
         {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-mx-bg via-mx-bg/90 via-54% to-transparent z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-mx-bg via-mx-bg/40 via-50% to-transparent z-10" />
         {/* Image with noise and blue tint */}
         <div className="noise w-full h-full relative">
           <img
             src={heroImage}
-            className="w-full h-full object-cover object-[center_25%] rotate-y-180 opacity-70"
+            className="w-full h-full object-cover object-[center_25%] rotate-y-180 opacity-100"
             alt="Máxima Formación"
           />
           {/* Color tint overlay */}
           <div
             className="absolute inset-0 mix-blend-color"
-            style={{ backgroundColor: "var(--color-mx-blue)" }}
+            style={{ backgroundColor: "#016157", opacity: 0.9 }}
           />
         </div>
       </motion.div>
@@ -64,7 +64,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-[0.9] text-mx-blue"
+          className="text-4xl md:text-7xl lg:text-8xl font-black mb-6 text-[#016157]"
         >
           {heroTitle}
         </motion.h1>

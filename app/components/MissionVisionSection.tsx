@@ -2,43 +2,90 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Target, Users, ShieldCheck } from 'lucide-react';
+import { Target, Eye, ShieldCheck } from 'lucide-react';
 
 export const MissionVisionSection: React.FC = () => {
-  const items = [
-    {
-      icon: Target,
-      title: "Misión",
-      desc: "Ofrecer formación online rigurosa y práctica que transforme la vida profesional de nuestros alumnos."
-    },
-    {
-      icon: Users,
-      title: "Visión",
-      desc: "Ser el referente en formación especializada de habla hispana, liderando la innovación pedagógica."
-    },
-    {
-      icon: ShieldCheck,
-      title: "Valores",
-      desc: "Cercanía, rigor académico, innovación constante y compromiso con el éxito del alumno."
-    },
-  ];
-
   return (
-    <section className="bg-mx-bg py-32 px-6 md:px-12">
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-        {items.map((item, idx) => (
+    <section className="pb-52 bg-mx-bg px-6 md:px-12">
+      <div className="max-w-4xl mx-auto">
+        {/* Section header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-20"
+        >
+          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            Lo que nos define
+          </span>
+        </motion.div>
+
+        <div className="space-y-16">
+          {/* Misión */}
           <motion.div
-            key={idx}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="p-10 border border-mx-border bg-mx-card hover:border-mx-orange/30 transition-colors rounded-lg"
+            className="text-center"
           >
-            <item.icon className="text-mx-orange mb-6" size={32} />
-            <h3 className="text-mx-text text-2xl font-bold mb-4">{item.title}</h3>
-            <p className="text-mx-text-muted font-light">{item.desc}</p>
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <Target className="text-mx-orange" size={22} />
+              <h3 className="text-2xl font-black text-mx-text uppercase tracking-wide">Misión</h3>
+            </div>
+            <p className="text-base text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
+              Ofrecer formación online rigurosa y práctica que{' '}
+              <span className="text-mx-text font-medium">transforme la vida profesional</span>{' '}
+              de nuestros alumnos, proporcionándoles herramientas y conocimientos que generen un impacto real en sus carreras.
+            </p>
           </motion.div>
-        ))}
+
+          <div className="w-16 h-px bg-mx-border mx-auto" />
+
+          {/* Visión */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <Eye className="text-mx-orange" size={22} />
+              <h3 className="text-2xl font-black text-mx-text uppercase tracking-wide">Visión</h3>
+            </div>
+            <p className="text-base text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
+              Ser el{' '}
+              <span className="text-mx-text font-medium">referente en formación especializada de habla hispana</span>,
+              liderando la innovación pedagógica y estableciendo nuevos estándares de calidad educativa online.
+            </p>
+          </motion.div>
+
+          <div className="w-16 h-px bg-mx-border mx-auto" />
+
+          {/* Valores */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <ShieldCheck className="text-mx-orange" size={22} />
+              <h3 className="text-2xl font-black text-mx-text uppercase tracking-wide">Valores</h3>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              {['Cercanía', 'Rigor académico', 'Innovación constante', 'Compromiso con el alumno'].map(
+                (valor) => (
+                  <span
+                    key={valor}
+                    className="px-5 py-2.5 border border-mx-border rounded-full text-mx-text text-sm font-medium hover:border-mx-orange/50 hover:bg-mx-orange/5 transition-all duration-300"
+                  >
+                    {valor}
+                  </span>
+                )
+              )}
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

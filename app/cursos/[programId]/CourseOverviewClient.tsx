@@ -137,7 +137,7 @@ export default function CourseOverviewClient({
                 <span className="text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4 block">
                   {program.type}
                 </span>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-6">
+                <h1 className="text-4xl md:text-5xl font-black  mb-6">
                   {program.title}
                 </h1>
                 <p className="text-white/60 font-light text-lg mb-8">

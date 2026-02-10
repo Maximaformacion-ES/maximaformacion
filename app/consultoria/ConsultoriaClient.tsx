@@ -25,7 +25,7 @@ export default function ConsultoriaClient({ heroData }: ConsultoriaClientProps) 
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
-      <main className="relative z-10">
+      <main className="relative z-10 flex flex-col gap-16 md:gap-24">
         <ConsultoriaHeroSection data={heroData || undefined} />
         <ServicesGridSection />
         <FeaturesSection />

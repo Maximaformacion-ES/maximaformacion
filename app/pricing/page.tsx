@@ -74,7 +74,7 @@ function SuccessMessage() {
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-green-500/20 border border-green-500/50 text-green-400 px-6 py-4 rounded-xl flex items-center gap-3"
+      className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl flex items-center gap-3"
     >
       <Check size={20} />
       <span>¡Suscripción completada con éxito!</span>
@@ -133,7 +133,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+    <div className="bg-mx-bg min-h-screen text-mx-text overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -152,26 +152,26 @@ export default function PricingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-flex items-center gap-2 text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-6">
+              <span className="inline-flex items-center gap-2 text-mx-orange text-sm font-medium tracking-[0.3em] uppercase mb-6">
                 <Sparkles size={16} />
                 Planes y Precios
               </span>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter mb-6">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-mx-blue mb-6">
                 Invierte en tu{' '}
-                <span className="text-amber-500">futuro</span>
+                <span className="text-mx-orange">futuro</span>
               </h1>
-              <p className="text-white/60 font-light text-lg md:text-xl max-w-2xl mx-auto mb-10">
+              <p className="text-mx-text-muted font-light text-lg md:text-xl max-w-2xl mx-auto mb-10">
                 Elige el plan que mejor se adapte a tus necesidades y comienza tu camino hacia la excelencia profesional
               </p>
 
               {/* Billing Period Toggle */}
-              <div className="inline-flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-full">
+              <div className="inline-flex items-center gap-1 p-1 bg-mx-card border border-mx-border rounded-full">
                 <button
                   onClick={() => setBillingPeriod('monthly')}
                   className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                     billingPeriod === 'monthly'
-                      ? 'bg-amber-500 text-black'
-                      : 'text-white/60 hover:text-white'
+                      ? 'bg-mx-orange text-white'
+                      : 'text-mx-text-muted hover:text-mx-text'
                   }`}
                 >
                   Mensual
@@ -180,13 +180,13 @@ export default function PricingPage() {
                   onClick={() => setBillingPeriod('yearly')}
                   className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                     billingPeriod === 'yearly'
-                      ? 'bg-amber-500 text-black'
-                      : 'text-white/60 hover:text-white'
+                      ? 'bg-mx-orange text-white'
+                      : 'text-mx-text-muted hover:text-mx-text'
                   }`}
                 >
                   Anual
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    billingPeriod === 'yearly' ? 'bg-black/20' : 'bg-green-500/20 text-green-400'
+                    billingPeriod === 'yearly' ? 'bg-white/20' : 'bg-green-50 text-green-600'
                   }`}>
                     Ahorra 20%
                   </span>
@@ -208,14 +208,14 @@ export default function PricingPage() {
                   transition={{ duration: 0.8, delay: idx * 0.2 }}
                   className={`relative p-8 md:p-10 rounded-2xl border transition-all duration-300 ${
                     plan.highlighted
-                      ? 'bg-gradient-to-b from-amber-500/10 to-[#141414] border-amber-500/50 shadow-2xl shadow-amber-500/10'
-                      : 'bg-[#141414] border-white/10 hover:border-white/20'
+                      ? 'bg-mx-orange/5 border-mx-orange/30 shadow-xl shadow-mx-orange/5'
+                      : 'bg-mx-card border-mx-border hover:border-mx-orange/20'
                   }`}
                 >
                   {/* Badge */}
                   {plan.badge && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <span className="inline-flex items-center gap-2 bg-amber-500 text-black px-4 py-1.5 rounded-full text-sm font-bold">
+                      <span className="inline-flex items-center gap-2 bg-mx-orange text-white px-4 py-1.5 rounded-full text-sm font-bold">
                         <Zap size={14} />
                         {plan.badge}
                       </span>
@@ -225,37 +225,37 @@ export default function PricingPage() {
                   {/* Plan Header */}
                   <div className="flex items-center gap-3 mb-6">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      plan.highlighted ? 'bg-amber-500/20' : 'bg-white/10'
+                      plan.highlighted ? 'bg-mx-orange/15' : 'bg-mx-border'
                     }`}>
-                      <plan.icon className={plan.highlighted ? 'text-amber-500' : 'text-white/60'} size={24} />
+                      <plan.icon className={plan.highlighted ? 'text-mx-orange' : 'text-mx-text-muted'} size={24} />
                     </div>
-                    <h3 className="text-2xl font-bold">{plan.name}</h3>
+                    <h3 className="text-2xl font-bold text-mx-text">{plan.name}</h3>
                   </div>
 
                   {/* Price */}
                   <div className="mb-6">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl md:text-6xl font-black">
+                      <span className="text-5xl md:text-6xl font-black text-mx-text">
                         €{billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly}
                       </span>
-                      <span className="text-white/60 font-light">
+                      <span className="text-mx-text-muted font-light">
                         {plan.price.monthly === 0 ? '' : billingPeriod === 'yearly' ? '/año' : '/mes'}
                       </span>
                     </div>
                     {billingPeriod === 'yearly' && plan.price.monthly > 0 && (
-                      <p className="text-amber-500 text-sm mt-2">
+                      <p className="text-mx-orange text-sm mt-2">
                         Equivalente a €{Math.round(plan.price.yearly / 12)}/mes
                       </p>
                     )}
-                    <p className="text-white/60 font-light mt-2">{plan.description}</p>
+                    <p className="text-mx-text-muted font-light mt-2">{plan.description}</p>
                   </div>
 
                   {/* Features */}
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-3">
-                        <Check className={plan.highlighted ? 'text-amber-500' : 'text-white/40'} size={18} />
-                        <span className="text-white/80 font-light">{feature}</span>
+                        <Check className={plan.highlighted ? 'text-mx-orange' : 'text-mx-text-muted'} size={18} />
+                        <span className="text-mx-text font-light">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -265,7 +265,7 @@ export default function PricingPage() {
                     userHasPro ? (
                       <button
                         disabled
-                        className="w-full bg-green-500/20 text-green-400 border border-green-500/30 px-8 py-4 rounded-full font-bold cursor-default flex items-center justify-center gap-2"
+                        className="w-full bg-green-50 text-green-600 border border-green-200 px-8 py-4 rounded-full font-bold cursor-default flex items-center justify-center gap-2"
                       >
                         <Check size={18} />
                         Plan Activo
@@ -274,7 +274,7 @@ export default function PricingPage() {
                       <button
                         onClick={() => handleSubscribe(plan.id)}
                         disabled={loadingPlan === plan.id}
-                        className="w-full group flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-8 py-4 rounded-full font-bold transition-all duration-300 disabled:opacity-70 disabled:cursor-wait"
+                        className="w-full group flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-8 py-4 rounded-full font-bold transition-all duration-300 disabled:opacity-70 disabled:cursor-wait"
                       >
                         {loadingPlan === plan.id ? (
                           <>
@@ -292,7 +292,7 @@ export default function PricingPage() {
                   ) : (
                     <button
                       disabled
-                      className="w-full bg-white/10 text-white/60 px-8 py-4 rounded-full font-medium cursor-not-allowed"
+                      className="w-full bg-mx-border text-mx-text-muted px-8 py-4 rounded-full font-medium cursor-not-allowed"
                     >
                       {plan.cta}
                     </button>
@@ -312,10 +312,10 @@ export default function PricingPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-4">
+              <h2 className="text-3xl md:text-4xl font-black text-mx-blue mb-4">
                 Comparativa de planes
               </h2>
-              <p className="text-white/60 font-light">
+              <p className="text-mx-text-muted font-light">
                 Descubre todas las ventajas de cada plan
               </p>
             </motion.div>
@@ -324,17 +324,17 @@ export default function PricingPage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="border border-white/10 rounded-2xl overflow-hidden"
+              className="border border-mx-border rounded-2xl overflow-hidden"
             >
               {/* Table Header */}
-              <div className="grid grid-cols-3 bg-white/5 border-b border-white/10">
-                <div className="p-4 md:p-6 font-medium text-white/60">
+              <div className="grid grid-cols-3 bg-mx-bg border-b border-mx-border">
+                <div className="p-4 md:p-6 font-medium text-mx-text-muted">
                   Características
                 </div>
-                <div className="p-4 md:p-6 text-center font-bold border-l border-white/10">
+                <div className="p-4 md:p-6 text-center font-bold border-l border-mx-border text-mx-text">
                   Free
                 </div>
-                <div className="p-4 md:p-6 text-center font-bold border-l border-white/10 bg-amber-500/10 text-amber-500">
+                <div className="p-4 md:p-6 text-center font-bold border-l border-mx-border bg-mx-orange/5 text-mx-orange">
                   Pro
                 </div>
               </div>
@@ -344,24 +344,24 @@ export default function PricingPage() {
                 <div
                   key={idx}
                   className={`grid grid-cols-3 ${
-                    idx !== PLAN_FEATURES.length - 1 ? 'border-b border-white/10' : ''
+                    idx !== PLAN_FEATURES.length - 1 ? 'border-b border-mx-border' : ''
                   }`}
                 >
-                  <div className="p-4 md:p-6 text-white/80 font-light">
+                  <div className="p-4 md:p-6 text-mx-text font-light">
                     {item.feature}
                   </div>
-                  <div className="p-4 md:p-6 flex items-center justify-center border-l border-white/10">
+                  <div className="p-4 md:p-6 flex items-center justify-center border-l border-mx-border">
                     {item.free ? (
                       <Check className="text-green-500" size={20} />
                     ) : (
-                      <X className="text-white/20" size={20} />
+                      <X className="text-mx-border" size={20} />
                     )}
                   </div>
-                  <div className="p-4 md:p-6 flex items-center justify-center border-l border-white/10 bg-amber-500/5">
+                  <div className="p-4 md:p-6 flex items-center justify-center border-l border-mx-border bg-mx-orange/3">
                     {item.pro ? (
-                      <Check className="text-amber-500" size={20} />
+                      <Check className="text-mx-orange" size={20} />
                     ) : (
-                      <X className="text-white/20" size={20} />
+                      <X className="text-mx-border" size={20} />
                     )}
                   </div>
                 </div>
@@ -379,7 +379,7 @@ export default function PricingPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-4">
+              <h2 className="text-3xl md:text-4xl font-black text-mx-blue mb-4">
                 Preguntas frecuentes
               </h2>
             </motion.div>
@@ -409,10 +409,10 @@ export default function PricingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="p-6 bg-white/5 border border-white/10 rounded-xl hover:border-amber-500/30 transition-colors"
+                  className="p-6 bg-mx-card border border-mx-border rounded-xl hover:border-mx-orange/30 transition-colors"
                 >
-                  <h3 className="text-lg font-bold mb-2">{faq.q}</h3>
-                  <p className="text-white/60 font-light">{faq.a}</p>
+                  <h3 className="text-lg font-bold text-mx-text mb-2">{faq.q}</h3>
+                  <p className="text-mx-text-muted font-light">{faq.a}</p>
                 </motion.div>
               ))}
             </div>
@@ -425,18 +425,18 @@ export default function PricingPage() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center p-12 md:p-16 bg-gradient-to-b from-amber-500/10 to-transparent border border-amber-500/30 rounded-3xl"
+            className="max-w-4xl mx-auto text-center p-12 md:p-16 bg-mx-orange/5 border border-mx-orange/20 rounded-3xl"
           >
-            <Crown className="text-amber-500 mx-auto mb-6" size={48} />
-            <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-4">
+            <Crown className="text-mx-orange mx-auto mb-6" size={48} />
+            <h2 className="text-3xl md:text-4xl font-black text-mx-blue mb-4">
               ¿Listo para dar el siguiente paso?
             </h2>
-            <p className="text-white/60 font-light text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-mx-text-muted font-light text-lg mb-8 max-w-xl mx-auto">
               Únete a miles de profesionales que ya están impulsando sus carreras con Máxima Formación Pro
             </p>
             <Link
               href={isSignedIn ? '#' : '/sign-up'}
-              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-10 py-4 rounded-full font-bold transition-all duration-300"
+              className="inline-flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-10 py-4 rounded-full font-bold transition-all duration-300"
             >
               Comenzar con Pro
               <ArrowRight size={18} />

@@ -4,10 +4,10 @@ import React from 'react';
 
 export const StorySection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+    <section className="py-48 px-6 md:px-12 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
       <div>
         <span className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4 block">NUESTRA HISTORIA</span>
-        <h2 className="text-mx-text text-4xl md:text-5xl font-bold mb-8 leading-tight">
+        <h2 className="text-mx-blue text-4xl md:text-5xl font-bold mb-8 leading-tight">
           "No se trata de llegar alto, se trata de llegar lejos."
         </h2>
       </div>

@@ -71,7 +71,7 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-mx-blue text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter"
+          className="text-mx-blue text-6xl md:text-8xl lg:text-9xl font-black "
         >
           {heroTitle}
         </motion.h1>

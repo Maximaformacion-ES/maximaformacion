@@ -68,8 +68,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           <div
             className="absolute inset-0 z-10 pointer-events-none rounded-t-lg"
             style={{
-              background:
-                "linear-gradient(to bottom, rgba(255,252,248,0.2) 0%, rgba(255,253,251,0.62) 64%, #fffcf8 95%)",
+              
             }}
           />
 

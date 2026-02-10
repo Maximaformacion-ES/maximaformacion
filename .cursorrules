@@ -60,7 +60,7 @@ app/
 
 ### Typography
 - **Font Family**: ZTNature (custom), system fallbacks
-- **Headings**: font-black, tracking-tighter
+- **Headings**: font-black, 
   - H1: text-5xl to text-9xl (responsive)
   - H2: text-4xl to text-6xl
   - H3: text-2xl to text-3xl
@@ -149,7 +149,7 @@ export const SectionName: React.FC = () => {
           <span className="text-amber-500 text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Section Label
           </span>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
+          <h2 className="text-4xl md:text-6xl font-black  mb-6">
             Section Title
           </h2>
           <p className="text-white/60 text-lg font-light max-w-2xl mx-auto">

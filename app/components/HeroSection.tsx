@@ -119,7 +119,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center text-mx-blue text-[12vw] md:text-[10vw] lg:text-[8vw] font-black leading-[0.85] tracking-tighter"
+            className="text-center text-mx-blue text-[12vw] md:text-[10vw] lg:text-[8vw] font-black leading-[0.85] "
           >
             {renderStyledTitle(title)}
           </motion.h1>

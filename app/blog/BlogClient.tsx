@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -40,23 +41,35 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
   }, [initialPosts, activeFilter, searchQuery]);
 
   return (
-    <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
-      <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10">
+      <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10 overflow-x-hidden">
         <BlogHeader />
 
-        <BlogFilterBar
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          resultsCount={filteredPosts.length}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <BlogFilterBar
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            resultsCount={filteredPosts.length}
+          />
+        </motion.div>
 
-        <BlogGrid posts={filteredPosts} />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+        >
+          <BlogGrid posts={filteredPosts} />
+        </motion.div>
       </main>
 
       <Footer />

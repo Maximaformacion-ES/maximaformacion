@@ -17,7 +17,7 @@ export default function NotFound() {
 
       <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
         <div className="text-center max-w-2xl">
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6">
+          <h1 className="text-6xl md:text-8xl font-black  mb-6">
             404
           </h1>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">

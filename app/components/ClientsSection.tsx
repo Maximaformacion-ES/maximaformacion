@@ -14,56 +14,67 @@ const clients = [
 
 export const ClientsSection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-mx-bg border-y border-mx-border">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
-            Confían en nosotros
-          </span>
-          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6">
-            Empresas e instituciones líderes
-          </h2>
-          <p className="text-mx-text-muted text-lg font-light max-w-2xl mx-auto">
-            Más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-          {clients.map((client, idx) => (
-            <motion.div
-              key={client.name}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="flex items-center justify-center p-6 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300 grayscale hover:grayscale-0"
+    <section className="py-20 md:py-0 md:h-[70dvh] flex flex-col justify-center px-6 md:px-12 bg-mx-bg">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 lg:items-stretch">
+          {/* Left: testimonial card */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:w-1/2"
+          >
+            <div
+              className="h-full relative overflow-hidden p-10 md:p-14 rounded-2xl text-white flex flex-col justify-center"
+              style={{ backgroundColor: 'var(--color-mx-blue)' }}
             >
-              <div className="text-mx-text-muted hover:text-mx-text text-xl font-bold transition-colors">
-                {client.name}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              <span className="text-white/40 text-sm font-medium tracking-[0.5em] uppercase mb-10 block">
+                Confían en nosotros
+              </span>
+              <p className="text-white/90 text-xl md:text-2xl font-light leading-relaxed italic mb-8">
+                &ldquo;Gracias al equipo de Máxima Consultoría, optimizamos nuestros procesos de análisis de datos reduciendo significativamente los tiempos de decisión.&rdquo;
+              </p>
+              <div className="w-8 h-0.5 bg-white/20 mb-4" />
+              <span className="text-white/50 text-sm font-medium uppercase tracking-wider">
+                Director de Análisis — Centro de investigación
+              </span>
+            </div>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="mt-16 text-center"
-        >
-          <div className="inline-block p-8 border border-mx-border bg-mx-card rounded-lg">
-            <h3 className="text-2xl font-bold text-mx-text mb-4">Máximo rigor científico</h3>
-            <p className="text-mx-text-muted font-light max-w-2xl">
-              Máxima Consultoría está integrada por un equipo multidisciplinar de expertos en Ciencia de Datos con más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación.
-            </p>
+          {/* Right: header + client logos */}
+          <div className="lg:w-1/2 flex flex-col justify-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-10"
+            >
+              <h2 className="text-mx-blue text-3xl md:text-5xl font-black mb-4 text-balance">
+                Empresas e instituciones líderes
+              </h2>
+              <p className="text-mx-text-muted font-light leading-relaxed">
+                Más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {clients.map((client, idx) => (
+                <motion.div
+                  key={client.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.06 }}
+                  className="group flex items-center justify-center p-6 border border-mx-border bg-mx-card rounded-xl hover:border-mx-orange/30 hover:-translate-y-0.5 transition-all duration-400"
+                >
+                  <span className="text-mx-text-muted group-hover:text-mx-blue text-lg font-bold tracking-wide transition-colors duration-300">
+                    {client.name}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

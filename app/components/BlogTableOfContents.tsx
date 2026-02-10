@@ -23,26 +23,6 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-function extractHeadings(html: string): TocItem[] {
-  const regex = /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/gi;
-  const headings: TocItem[] = [];
-  let match;
-
-  while ((match = regex.exec(html)) !== null) {
-    const level = parseInt(match[1], 10);
-    const text = match[2].replace(/<[^>]*>/g, '').trim();
-    if (text) {
-      headings.push({
-        id: slugify(text),
-        text,
-        level,
-      });
-    }
-  }
-
-  return headings;
-}
-
 export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ contentHtml }) => {
   const [activeId, setActiveId] = useState<string>('');
   const [isVisible, setIsVisible] = useState(false);
@@ -133,8 +113,8 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
       style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
     >
       <div className="flex items-center gap-2 mb-4">
-        <List className="w-4 h-4 text-amber-500" />
-        <span className="text-amber-500 text-xs tracking-[0.3em] uppercase font-medium">
+        <List className="w-4 h-4 text-mx-orange" />
+        <span className="text-mx-orange text-xs tracking-[0.3em] uppercase font-medium">
           Índice
         </span>
       </div>
@@ -150,8 +130,8 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
                 ${heading.level === 3 ? 'pl-6' : 'pl-4'}
                 ${
                   activeId === heading.id
-                    ? 'border-amber-500 text-amber-500 font-medium'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-300 hover:border-white/20'
+                    ? 'border-mx-orange text-mx-orange font-medium'
+                    : 'border-transparent text-mx-text-muted hover:text-mx-text hover:border-mx-border'
                 }
               `}
             >

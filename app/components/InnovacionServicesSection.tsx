@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FlaskConical, Heart, BarChart3, Lightbulb, Shield, Users } from 'lucide-react';
 
 interface Service {
   icon: React.ElementType;
   title: string;
+  tagline: string;
   description: string;
 }
 
@@ -14,85 +15,174 @@ const services: Service[] = [
   {
     icon: FlaskConical,
     title: 'Ciencia',
-    description: 'Impulsamos el desarrollo científico aplicando tecnología y diseño para transformar ideas en soluciones funcionales. Desde la investigación hasta la creación de prototipos, conectamos la ciencia con la innovación en salud.'
+    tagline: 'Investigación y prototipos',
+    description:
+      'Impulsamos el desarrollo científico aplicando tecnología y diseño para transformar ideas en soluciones funcionales. Desde la investigación hasta la creación de prototipos, conectamos la ciencia con la innovación en salud.',
   },
   {
     icon: Heart,
     title: 'Salud',
-    description: 'Desarrollamos herramientas tecnológicas que mejoran la gestión, el acceso y el análisis de datos en entornos sanitarios, promoviendo soluciones centradas en el bienestar.'
+    tagline: 'Gestión sanitaria digital',
+    description:
+      'Desarrollamos herramientas tecnológicas que mejoran la gestión, el acceso y el análisis de datos en entornos sanitarios, promoviendo soluciones centradas en el bienestar.',
   },
   {
     icon: BarChart3,
     title: 'Estadística',
-    description: 'Ofrecemos asesoría experta para el análisis de datos científicos y clínicos, aplicando metodologías estadísticas avanzadas para tomar decisiones basadas en evidencia.'
+    tagline: 'Análisis basado en evidencia',
+    description:
+      'Ofrecemos asesoría experta para el análisis de datos científicos y clínicos, aplicando metodologías estadísticas avanzadas para tomar decisiones basadas en evidencia.',
   },
   {
     icon: Lightbulb,
     title: 'Innovación aplicada',
-    description: 'Diseñamos soluciones funcionales con potencial patentable para el sector científico y sanitario, transformando ideas en productos y servicios innovadores.'
+    tagline: 'Soluciones patentables',
+    description:
+      'Diseñamos soluciones funcionales con potencial patentable para el sector científico y sanitario, transformando ideas en productos y servicios innovadores.',
   },
   {
     icon: Shield,
     title: 'Rigor científico',
-    description: 'Garantizamos metodologías fiables y resultados de alta calidad mediante procesos rigurosos y validados científicamente.'
+    tagline: 'Metodologías validadas',
+    description:
+      'Garantizamos metodologías fiables y resultados de alta calidad mediante procesos rigurosos y validados científicamente.',
   },
   {
     icon: Users,
     title: 'Colaboración',
-    description: 'Trabajamos con equipos multidisciplinarios de expertos en tecnología, biomedicina y análisis de datos para abordar desafíos complejos.'
-  }
+    tagline: 'Equipos multidisciplinarios',
+    description:
+      'Trabajamos con equipos multidisciplinarios de expertos en tecnología, biomedicina y análisis de datos para abordar desafíos complejos.',
+  },
 ];
 
 export const InnovacionServicesSection: React.FC = () => {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  const row1 = services.slice(0, 3);
+  const row2 = services.slice(3, 6);
+
   return (
-    <section className="py-32 px-6 md:px-12 bg-mx-bg">
+    <section className="py-20 md:py-0 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
+        {/* Right-aligned title block */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="flex md:justify-end mb-12 md:mb-20"
         >
-          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
-            Ofrecemos varios servicios
-          </span>
-          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6">
-            Todo lo que debes saber
-          </h2>
-          <p className="text-mx-text-muted text-lg font-light max-w-2xl mx-auto">
-            Desarrollamos aplicaciones inteligentes, brindamos asesoría estadística especializada 
-            y diseñamos soluciones funcionales con potencial patentable para el sector científico y sanitario.
-          </p>
+          <div className="max-w-lg md:text-right">
+            <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+              Nuestros servicios
+            </span>
+            <h2 className="text-[#016157] text-3xl md:text-6xl font-black mb-6">
+              Todo lo que debes saber
+            </h2>
+            <p className="text-mx-text-muted text-lg font-light">
+              Desarrollamos aplicaciones inteligentes, brindamos asesoría estadística especializada
+              y diseñamos soluciones funcionales con potencial patentable.
+            </p>
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, idx) => (
-            <motion.div
+        {/* Staggered honeycomb grid — 7 cols so row 2 offsets by half without overflow */}
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+          {/* Row 1: cols 2-3, 4-5, 6-7 (col 1 empty — pushed right) */}
+          {row1.map((service, idx) => {
+            const colStartClass = ['md:[grid-column-start:2]', 'md:[grid-column-start:4]', 'md:[grid-column-start:6]'][idx];
+            return (
+              <div
+                key={service.title}
+                className={`md:col-span-2 ${colStartClass}`}
+              >
+                <ServiceCell
+                  service={service}
+                  idx={idx}
+                  isHovered={hoveredIdx === idx}
+                  onHover={() => setHoveredIdx(idx)}
+                  onLeave={() => setHoveredIdx(null)}
+                  bgVariant={idx % 2 === 0 ? 'card' : 'tint'}
+                />
+              </div>
+            );
+          })}
+
+          {/* Row 2: cols 1-2, 3-4, 5-6 (col 7 empty — pushed left) */}
+          {row2.map((service, idx) => (
+            <div
               key={service.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="p-8 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300 group"
+              className="md:col-span-2"
             >
-              <service.icon className="text-mx-orange mb-6" size={32} />
-              <h3 className="text-xl font-bold text-mx-text mb-4">{service.title}</h3>
-              <p className="text-mx-text-muted font-light leading-relaxed">{service.description}</p>
-            </motion.div>
+              <ServiceCell
+                service={service}
+                idx={idx + 3}
+                isHovered={hoveredIdx === idx + 3}
+                onHover={() => setHoveredIdx(idx + 3)}
+                onLeave={() => setHoveredIdx(null)}
+                bgVariant={idx % 2 === 0 ? 'tint' : 'card'}
+              />
+            </div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-20 text-center"
-        >
-          <p className="text-2xl md:text-3xl font-light text-mx-text-muted italic max-w-3xl mx-auto">
-            Donde la ciencia se encuentra con la tecnología, nace la innovación que transforma la salud.
-          </p>
-        </motion.div>
       </div>
     </section>
   );
 };
+
+function ServiceCell({
+  service,
+  idx,
+  isHovered,
+  onHover,
+  onLeave,
+  bgVariant,
+}: {
+  service: Service;
+  idx: number;
+  isHovered: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  bgVariant: 'card' | 'tint';
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: idx * 0.08 }}
+      className={`relative overflow-hidden rounded-lg border border-mx-border p-6 md:p-8 md:min-h-[200px] cursor-default transition-all duration-300 ${
+        bgVariant === 'card' ? 'bg-mx-card' : 'bg-[#016157]/5'
+      } ${isHovered ? 'border-mx-orange/50' : ''}`}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+    >
+      {/* Default visible content - always shown on mobile, fades on desktop hover */}
+      <div
+        className={`transition-all duration-300 ${
+          isHovered ? 'md:opacity-0 md:-translate-y-4' : 'opacity-100 translate-y-0'
+        }`}
+      >
+        <service.icon className="text-mx-orange mb-5" size={40} />
+        <h3 className="text-xl font-bold text-mx-text mb-2">{service.title}</h3>
+        <p className="text-sm text-mx-text-muted font-light">{service.tagline}</p>
+        {/* Description always visible on mobile */}
+        <p className="md:hidden text-sm text-mx-text-muted font-light leading-relaxed mt-3">
+          {service.description}
+        </p>
+      </div>
+
+      {/* Hover-reveal overlay - desktop only */}
+      <div
+        className={`hidden md:flex absolute inset-0 p-8 flex-col justify-center transition-all duration-300 ${
+          isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <h3 className="text-lg font-bold text-mx-text mb-3">{service.title}</h3>
+        <p className="text-sm text-mx-text-muted font-light leading-relaxed">
+          {service.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}

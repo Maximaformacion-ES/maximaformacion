@@ -135,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   ) : (
                     <Link href="/pricing">
                       <motion.button
-                        className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 text-sm font-bold rounded-full hover:bg-mx-orange-dark transition-all duration-300 shadow-lg shadow-mx-orange/20"
+                        className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 text-sm font-bold rounded-full hover:bg-mx-orange-dark transition-all duration-300 shadow-lg shadow-mx-orange/20 whitespace-nowrap"
                         
                         whileTap={{ scale: 0.98 }}
                       >

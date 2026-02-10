@@ -10,7 +10,7 @@ export const CatalogHeader: React.FC = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter mb-6 text-mx-blue"
+        className="text-5xl md:text-7xl lg:text-9xl font-black  mb-6 text-mx-blue"
       >
         NUESTROS <span className="text-stroke text-mx-orange">PROGRAMAS</span>
       </motion.h1>

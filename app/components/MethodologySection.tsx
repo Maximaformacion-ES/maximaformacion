@@ -45,42 +45,61 @@ const methodologyPoints: MethodologyPoint[] = [
 
 export const MethodologySection: React.FC = () => {
   return (
-    <section className="py-32 px-6 md:px-12 bg-mx-bg">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
-            Metodología
-          </span>
-          <h2 className="text-mx-blue text-4xl md:text-6xl font-black tracking-tighter mb-6">
-            Formación que marca la diferencia
-          </h2>
-          <p className="text-mx-text-muted text-lg font-light max-w-2xl mx-auto">
-            Nuestra metodología está diseñada para garantizar tu éxito profesional
-          </p>
-        </motion.div>
+    <section className="py-20 md:py-0 flex flex-col justify-center px-6 md:px-12 bg-mx-bg">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
+          {/* Left: title block */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="lg:w-2/5 flex flex-col justify-center"
+          >
+            <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+              Metodología
+            </span>
+            <h2 className="text-mx-blue text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-balance">
+              Formación que marca la diferencia
+            </h2>
+            <p className="text-mx-text-muted text-lg font-light leading-relaxed text-balance">
+              Nuestra metodología está diseñada para garantizar tu éxito profesional
+            </p>
+          </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {methodologyPoints.map((point, idx) => (
-            <motion.div
-              key={point.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="p-8 border border-mx-border bg-mx-card rounded-lg hover:border-mx-orange/50 transition-all duration-300 text-center"
-            >
-              <div className="w-16 h-16 rounded-full bg-mx-orange/10 flex items-center justify-center mx-auto mb-6">
-                <point.icon className="text-mx-orange" size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-mx-text mb-3">{point.title}</h3>
-              <p className="text-mx-text-muted font-light">{point.description}</p>
-            </motion.div>
-          ))}
+          {/* Right: numbered list */}
+          <div className="lg:w-3/5">
+            {methodologyPoints.map((point, idx) => (
+              <motion.div
+                key={point.title}
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.07, duration: 0.5 }}
+                className="group flex items-center gap-5 py-5 border-b border-mx-border last:border-b-0"
+              >
+                {/* Number */}
+                <span className="text-mx-orange text-sm font-bold tabular-nums shrink-0 w-6">
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-bold text-mx-text group-hover:text-mx-blue transition-colors duration-300">
+                    {point.title}
+                  </h3>
+                  <p className="text-mx-text-muted text-sm font-light mt-0.5">
+                    {point.description}
+                  </p>
+                </div>
+
+                {/* Icon - decorative, right side */}
+                <point.icon
+                  className="text-mx-border group-hover:text-mx-orange transition-colors duration-400 shrink-0"
+                  size={18}
+                />
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

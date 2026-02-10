@@ -109,7 +109,7 @@ export default function CourseAccessGate({
             <Crown size={16} />
             Contenido Premium
           </span>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-6">
+          <h2 className="text-3xl md:text-5xl font-black  mb-6">
             Accede a &quot;{program.title}&quot;
           </h2>
           <p className="text-white/60 font-light text-lg mb-10 max-w-2xl mx-auto">
