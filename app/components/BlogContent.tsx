@@ -15,8 +15,8 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
       <style jsx global>{`
         .blog-html-content {
           color: var(--color-mx-text-muted);
-          font-size: 1.125rem;
-          line-height: 1.75rem;
+          font-size: 1rem;
+          line-height: 1.7;
           overflow-wrap: break-word;
           word-break: break-word;
         }

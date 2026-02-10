@@ -1,6 +1,6 @@
 /* Markdown content styles */
 .markdown-content {
-  font-size: 0.875rem; /* text-sm */
+  font-size: 1rem; /* 16px */
 }
 
 .markdown-content h1 {
@@ -8,7 +8,7 @@
   font-weight: 700;
   margin-top: 1.25rem;
   margin-bottom: 0.75rem;
-  color: white;
+  color: var(--color-mx-text);
 }
 
 .markdown-content h2 {
@@ -16,7 +16,7 @@
   font-weight: 600;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  color: white;
+  color: var(--color-mx-text);
 }
 
 .markdown-content h3 {
@@ -24,7 +24,7 @@
   font-weight: 600;
   margin-top: 0.75rem;
   margin-bottom: 0.5rem;
-  color: white;
+  color: var(--color-mx-text);
 }
 
 .markdown-content h4 {
@@ -32,7 +32,7 @@
   font-weight: 600;
   margin-top: 0.75rem;
   margin-bottom: 0.375rem;
-  color: white;
+  color: var(--color-mx-text);
 }
 
 .markdown-content p {
@@ -57,7 +57,7 @@
 
 .markdown-content strong {
   font-weight: 600;
-  color: white;
+  color: var(--color-mx-text);
 }
 
 .markdown-content em {
@@ -65,33 +65,35 @@
 }
 
 .markdown-content a {
-  color: #f59e0b;
+  color: var(--color-mx-orange);
   text-decoration: underline;
   transition: color 0.2s;
 }
 
 .markdown-content a:hover {
-  color: #fbbf24;
+  color: var(--color-mx-orange-dark);
 }
 
 .markdown-content blockquote {
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--color-mx-orange);
   padding-left: 1rem;
   margin: 1rem 0;
   font-style: italic;
-  color: #a3a3a3;
+  color: var(--color-mx-text-muted);
 }
 
 .markdown-content code {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--color-mx-bg);
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-family: monospace;
   font-size: 0.875em;
+  border: 1px solid var(--color-mx-border);
 }
 
 .markdown-content pre {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--color-mx-bg);
+  border: 1px solid var(--color-mx-border);
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
@@ -101,11 +103,12 @@
 .markdown-content pre code {
   background-color: transparent;
   padding: 0;
+  border: none;
 }
 
 .markdown-content hr {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--color-mx-border);
   margin: 2rem 0;
 }
 
@@ -117,13 +120,13 @@
 
 .markdown-content th,
 .markdown-content td {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-mx-border);
   padding: 0.5rem 0.75rem;
   text-align: left;
 }
 
 .markdown-content th {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--color-mx-bg);
   font-weight: 600;
-  color: white;
+  color: var(--color-mx-text);
 }
