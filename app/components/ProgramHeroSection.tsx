@@ -16,12 +16,12 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
     <section className="relative pt-28 pb-12 md:pt-32 md:pb-16 overflow-visible">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.78)] to-[rgba(255,252,248,0.45)] z-10" />
-        <div className="absolute inset-0 bg-linear-to-t from-mx-bg via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.82)] to-[rgba(255,252,248,0.55)] z-10" />
+        <div className="absolute inset-0 bg-linear-to-t from-mx-bg via-[rgba(255,252,248,0.2)] to-transparent z-10" />
         <img
           src={program.image}
           alt={program.title}
-          className="w-full h-full object-cover brightness-95 saturate-[0.85]"
+          className="w-full h-full object-cover opacity-70"
         />
       </div>
 
