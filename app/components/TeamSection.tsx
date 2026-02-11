@@ -3,72 +3,73 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import type { TeamMember } from '@/lib/strapi/types';
 
-interface TeamMember {
-  name: string;
-  role?: string;
-  image: string;
-  linkedin?: string;
-}
-
-interface Department {
-  label: string;
-  members: TeamMember[];
-}
-
-const ceo: TeamMember = {
-  name: 'Alfonso Lara',
-  role: 'CEO de Máxima Formación',
-  image:
-    'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/32575bc7-df2f-45e7-99e1-c14d10c8b704.webp',
-  linkedin: '#',
-};
-
-const departments: Department[] = [
+// Fallback data when Strapi is unavailable
+const FALLBACK_MEMBERS: TeamMember[] = [
   {
-    label: 'Docencia',
-    members: [
-      {
-        name: 'Rosana Ferrero',
-        image:
-          'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/295ba03d-c8b5-46cd-8b73-11e3a4a37b14.webp',
-        linkedin: '#',
-      },
-      {
-        name: 'Juan Luis López',
-        image:
-          'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/6c438ef0-cd28-4a16-8280-ccee3c18ae6e.webp',
-        linkedin: '#',
-      },
-      {
-        name: 'Ignacio García',
-        image: '/ignacio-garcia.jpg.webp',
-        linkedin: '#',
-      },
-      {
-        name: 'Marcos Rodríguez',
-        image: '/marcos-rodriguez.jpeg',
-        linkedin: '#',
-      },
-      {
-        name: 'José Ant. Lorente',
-        image: '/jose-antonio-lorente.png',
-        linkedin: '#',
-      },
-    ],
+    id: 1,
+    name: 'Alfonso Lara',
+    role: 'CEO',
+    avatar:
+      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/32575bc7-df2f-45e7-99e1-c14d10c8b704.webp',
+    linkedin: '#',
+    email: '',
   },
   {
-    label: 'Comunicación',
-    members: [
-      {
-        name: 'Joana Gorosito',
-        image:
-          'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/8d8d9167-df39-4729-8560-88ef9e1d156d.webp',
-        linkedin: '#',
-      },
-    ],
+    id: 2,
+    name: 'Rosana Ferrero',
+    role: 'Docencia',
+    avatar:
+      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/295ba03d-c8b5-46cd-8b73-11e3a4a37b14.webp',
+    linkedin: '#',
+    email: '',
+  },
+  {
+    id: 3,
+    name: 'Juan Luis López',
+    role: 'Docencia',
+    avatar:
+      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/6c438ef0-cd28-4a16-8280-ccee3c18ae6e.webp',
+    linkedin: '#',
+    email: '',
+  },
+  {
+    id: 4,
+    name: 'Ignacio García',
+    role: 'Docencia',
+    avatar: '/ignacio-garcia.jpg.webp',
+    linkedin: '#',
+    email: '',
+  },
+  {
+    id: 5,
+    name: 'Marcos Rodríguez',
+    role: 'Docencia',
+    avatar: '/marcos-rodriguez.jpeg',
+    linkedin: '#',
+    email: '',
+  },
+  {
+    id: 6,
+    name: 'José Ant. Lorente',
+    role: 'Docencia',
+    avatar: '/jose-antonio-lorente.png',
+    linkedin: '#',
+    email: '',
+  },
+  {
+    id: 7,
+    name: 'Joana Gorosito',
+    role: 'Comunicación',
+    avatar:
+      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/8d8d9167-df39-4729-8560-88ef9e1d156d.webp',
+    linkedin: '#',
+    email: '',
   },
 ];
+
+const ROLE_ORDER: TeamMember['role'][] = ['CEO', 'Docencia', 'Comunicación'];
 
 function LinkedInBadge() {
   return (
@@ -93,21 +94,36 @@ function MemberAvatar({ member, size = 'md' }: { member: TeamMember; size?: 'lg'
       >
         <div className={`${sizeClasses} rounded-full overflow-hidden border-3 border-white/20 group-hover:border-white/50 transition-colors`}>
           <Image
-            src={member.image}
+            src={member.avatar}
             alt={member.name}
             fill
             sizes={size === 'lg' ? '160px' : '112px'}
             className="object-cover rounded-lg"
           />
         </div>
-        <LinkedInBadge />
+        {member.linkedin && <LinkedInBadge />}
       </a>
       <span className="text-white text-sm font-medium text-center">{member.name}</span>
     </div>
   );
 }
 
-export const TeamSection: React.FC = () => {
+interface TeamSectionProps {
+  members?: TeamMember[];
+}
+
+export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
+  const allMembers = members && members.length > 0 ? members : FALLBACK_MEMBERS;
+
+  const ceo = allMembers.find((m) => m.role === 'CEO');
+  const departments = ROLE_ORDER
+    .filter((role) => role !== 'CEO')
+    .map((role) => ({
+      label: role,
+      members: allMembers.filter((m) => m.role === role),
+    }))
+    .filter((dept) => dept.members.length > 0);
+
   return (
     <section className="py-32 px-6 md:px-12 bg-mx-blue">
       <div className="max-w-[1200px] mx-auto">
@@ -122,21 +138,23 @@ export const TeamSection: React.FC = () => {
         </motion.h2>
 
         {/* CEO featured */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col md:flex-row items-center justify-center gap-8 mb-20"
-        >
-          <MemberAvatar member={ceo} size="lg" />
-          <div className="text-center md:text-left">
-            <h3 className="text-white text-2xl md:text-3xl font-bold">{ceo.name}</h3>
-            <p className="text-white/60 text-sm font-light mb-3">{ceo.role}</p>
-            <p className="text-white/80 text-lg italic">
-              &laquo;Más que un equipo, una gran familia.&raquo;
-            </p>
-          </div>
-        </motion.div>
+        {ceo && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-col md:flex-row items-center justify-center gap-8 mb-20"
+          >
+            <MemberAvatar member={ceo} size="lg" />
+            <div className="text-center md:text-left">
+              <h3 className="text-white text-2xl md:text-3xl font-bold">{ceo.name}</h3>
+              <p className="text-white/60 text-sm font-light mb-3">CEO de Máxima Formación</p>
+              <p className="text-white/80 text-lg italic">
+                &laquo;Más que un equipo, una gran familia.&raquo;
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Departments */}
         <div className="space-y-16">
@@ -147,7 +165,6 @@ export const TeamSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              {/* Department row with line */}
               <div className="flex items-center gap-6 mb-10">
                 <span className="text-white/50 text-sm font-medium tracking-widest uppercase shrink-0">
                   {dept.label}
@@ -155,10 +172,9 @@ export const TeamSection: React.FC = () => {
                 <div className="flex-1 h-px bg-white/10" />
               </div>
 
-              {/* Members grid */}
               <div className="flex flex-wrap justify-center gap-10 md:gap-14">
                 {dept.members.map((member) => (
-                  <MemberAvatar key={member.name} member={member} />
+                  <MemberAvatar key={member.id} member={member} />
                 ))}
               </div>
             </motion.div>

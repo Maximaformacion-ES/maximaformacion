@@ -39,6 +39,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.r2.cloudflarestorage.com',
       },
+      // Cloudflare R2 public bucket
+      {
+        protocol: 'https',
+        hostname: '*.r2.dev',
+      },
       // Unsplash (used in existing data)
       {
         protocol: 'https',

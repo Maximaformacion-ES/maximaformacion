@@ -20,6 +20,8 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 9;
 
   const filteredPrograms = useMemo(() => {
     let result = initialPrograms;
@@ -48,6 +50,17 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
     return result;
   }, [initialPrograms, activeFilter, searchQuery, selectedTopics]);
 
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter, searchQuery, selectedTopics]);
+
+  const totalPages = Math.ceil(filteredPrograms.length / ITEMS_PER_PAGE);
+  const paginatedPrograms = filteredPrograms.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
@@ -71,6 +84,9 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
             availableTopics={availableTopics}
             selectedTopics={selectedTopics}
             setSelectedTopics={setSelectedTopics}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
         </motion.div>
 
@@ -79,7 +95,12 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
         >
-          <CatalogGrid programs={filteredPrograms} />
+          <CatalogGrid
+            programs={paginatedPrograms}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </motion.div>
       </main>
 

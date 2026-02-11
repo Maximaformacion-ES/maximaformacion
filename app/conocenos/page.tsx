@@ -1,11 +1,14 @@
-import { getConocenosSection } from '@/lib/strapi/queries';
+import { getConocenosSection, getTeamMembers } from '@/lib/strapi/queries';
 import ConocenosClient from './ConocenosClient';
 
 // ISR: Revalidar cada hora
 export const revalidate = 3600;
 
 export default async function ConocenosPage() {
-  const heroData = await getConocenosSection();
+  const [heroData, teamMembers] = await Promise.all([
+    getConocenosSection(),
+    getTeamMembers(),
+  ]);
 
-  return <ConocenosClient heroData={heroData} />;
+  return <ConocenosClient heroData={heroData} teamMembers={teamMembers} />;
 }

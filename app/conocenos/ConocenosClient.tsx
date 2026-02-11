@@ -9,13 +9,14 @@ import { StorySection } from '../components/StorySection';
 import { MissionVisionSection } from '../components/MissionVisionSection';
 import { TeamSection } from '../components/TeamSection';
 import { AboutCTASection } from '../components/AboutCTASection';
-import type { HeroSection } from '@/lib/strapi/types';
+import type { HeroSection, TeamMember } from '@/lib/strapi/types';
 
 interface ConocenosClientProps {
   heroData?: HeroSection | null;
+  teamMembers?: TeamMember[];
 }
 
-export default function ConocenosClient({ heroData }: ConocenosClientProps) {
+export default function ConocenosClient({ heroData, teamMembers }: ConocenosClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -28,7 +29,7 @@ export default function ConocenosClient({ heroData }: ConocenosClientProps) {
         <AboutHeroSection data={heroData || undefined} />
         <StorySection />
         <MissionVisionSection />
-        <TeamSection />
+        <TeamSection members={teamMembers} />
         <AboutCTASection />
       </main>
 

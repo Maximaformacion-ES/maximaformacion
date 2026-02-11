@@ -10,6 +10,7 @@ import type {
   StrapiLogo,
   StrapiBadge,
   StrapiHome,
+  StrapiTeamMember,
   Program,
   Topic,
   BlogPost,
@@ -18,6 +19,7 @@ import type {
   Logo,
   Badge,
   HomeData,
+  TeamMember,
   ProgramQueryOptions,
   BlogQueryOptions,
   ProgramModule,
@@ -661,6 +663,34 @@ function transformHome(strapi: StrapiHome): HomeData {
       ctaDescription: strapi.ctaSection?.ctaDescription || '',
     },
   };
+}
+
+// ============ Team Member Queries ============
+
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiTeamMember[]>>(
+      '/api/team-members?populate[avatar]=true&pagination[pageSize]=100&sort=name:asc',
+      {
+        revalidate: 3600,
+        tags: ['team-members'],
+      }
+    );
+
+    return response.data
+      .filter((m) => m.avatar)
+      .map((m) => ({
+        id: m.id,
+        name: m.name,
+        avatar: getStrapiMediaUrl(m.avatar!),
+        linkedin: m.linkedin || '',
+        email: m.email || '',
+        role: m.role || 'Docencia',
+      }));
+  } catch (error) {
+    console.error('Error fetching team members:', error);
+    return [];
+  }
 }
 
 export async function getHomeData(): Promise<HomeData | null> {

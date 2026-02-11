@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
 import { TopicFilterTrigger, TopicBadgesRow } from './TopicFilter';
 import type { Topic } from '@/lib/strapi/types';
 
@@ -14,6 +14,9 @@ interface CatalogFilterBarProps {
   availableTopics: Topic[];
   selectedTopics: string[];
   setSelectedTopics: (topics: string[]) => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
@@ -25,6 +28,9 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
   availableTopics,
   selectedTopics,
   setSelectedTopics,
+  currentPage,
+  totalPages,
+  onPageChange,
 }) => {
   const categories = ['Todos', 'Master', 'Curso'];
   const [topicsOpen, setTopicsOpen] = useState(false);
@@ -68,15 +74,54 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
           )}
         </div>
 
-        <div className="relative w-full md:w-80 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-mx-text-muted group-focus-within:text-mx-orange transition-colors" size={18} />
-          <input
-            type="text"
-            placeholder="Buscar programa..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-mx-card border border-mx-border rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-mx-orange transition-colors text-mx-text placeholder:text-mx-text-muted/50"
-          />
+        <div className="flex items-center gap-4">
+          {/* Pagination inline - desktop only */}
+          {totalPages > 1 && (
+            <div className="hidden md:flex items-center gap-1">
+              <button
+                onClick={() => onPageChange(1)}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ChevronsLeft size={14} />
+              </button>
+              <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <span className="text-xs text-mx-text-muted px-2 whitespace-nowrap">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ChevronRight size={14} />
+              </button>
+              <button
+                onClick={() => onPageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              >
+                <ChevronsRight size={14} />
+              </button>
+            </div>
+          )}
+
+          <div className="relative w-full md:w-80 group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-mx-text-muted group-focus-within:text-mx-orange transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Buscar programa..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-mx-card border border-mx-border rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-mx-orange transition-colors text-mx-text placeholder:text-mx-text-muted/50"
+            />
+          </div>
         </div>
       </div>
 
@@ -90,9 +135,48 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
         />
       )}
 
-      {/* Results Count */}
-      <div className="mt-4 text-xs text-mx-text-muted">
-        MOSTRANDO {resultsCount} RESULTADOS
+      {/* Results Count + Mobile Pagination */}
+      <div className="mt-4 flex items-center justify-between">
+        <span className="text-xs text-mx-text-muted">
+          MOSTRANDO {resultsCount} RESULTADOS
+        </span>
+
+        {/* Pagination - mobile only */}
+        {totalPages > 1 && (
+          <div className="flex md:hidden items-center gap-1">
+            <button
+              onClick={() => onPageChange(1)}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronsLeft size={14} />
+            </button>
+            <button
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <span className="text-xs text-mx-text-muted px-2 whitespace-nowrap">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronRight size={14} />
+            </button>
+            <button
+              onClick={() => onPageChange(totalPages)}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-full border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronsRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

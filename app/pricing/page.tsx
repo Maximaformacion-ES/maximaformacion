@@ -6,9 +6,11 @@ import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Check, X, Crown, Sparkles, ArrowRight, Zap, Star, Loader2 } from 'lucide-react';
+import { FAQSection } from '../components/FAQSection';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { renderStyledTitle } from '../components/StyledTitle';
 
 // Plan features comparison (for the comparison table below)
 const PLAN_FEATURES = [
@@ -157,8 +159,7 @@ export default function PricingPage() {
                 Planes y Precios
               </span>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-mx-blue mb-6">
-                Invierte en tu{' '}
-                <span className="text-mx-orange">futuro</span>
+                {renderStyledTitle('INVIERTE EN TU {FUTURO}', "blue")}
               </h1>
               <p className="text-mx-text-muted font-light text-lg md:text-xl max-w-2xl mx-auto mb-10">
                 Elige el plan que mejor se adapte a tus necesidades y comienza tu camino hacia la excelencia profesional
@@ -235,7 +236,7 @@ export default function PricingPage() {
                   {/* Price */}
                   <div className="mb-6">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl md:text-6xl font-black text-mx-text">
+                      <span className="text-5xl md:text-5xl font-black text-mx-text">
                         €{billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly}
                       </span>
                       <span className="text-mx-text-muted font-light">
@@ -371,77 +372,53 @@ export default function PricingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="px-6 md:px-12 py-20">
-          <div className="max-w-3xl mx-auto">
+        <FAQSection
+          overline="Resolvemos tus dudas"
+          title="PREGUNTAS {FRECUENTES}"
+          faqs={[
+            {
+              question: '¿Puedo cancelar mi suscripción en cualquier momento?',
+              answer: 'Sí, puedes cancelar tu suscripción Pro en cualquier momento desde tu perfil. Seguirás teniendo acceso hasta el final del período de facturación.',
+            },
+            {
+              question: '¿Qué métodos de pago aceptan?',
+              answer: 'Aceptamos todas las tarjetas de crédito y débito principales (Visa, Mastercard, American Express) a través de nuestra pasarela de pago segura.',
+            },
+            {
+              question: '¿Hay garantía de devolución?',
+              answer: 'Sí, ofrecemos una garantía de devolución de 14 días. Si no estás satisfecho con el plan Pro, te devolvemos el dinero sin preguntas.',
+            },
+            {
+              question: '¿Puedo cambiar de plan más adelante?',
+              answer: 'Por supuesto. Puedes actualizar de Free a Pro o cambiar entre facturación mensual y anual en cualquier momento.',
+            },
+          ]}
+        />
+
+        {/* CTA Section */}
+        <section className="py-20 md:py-32 px-6 md:px-12 bg-mx-blue">
+          <div className="max-w-5xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-black text-mx-blue mb-4">
-                Preguntas frecuentes
+              <h2 className="text-white text-3xl md:text-6xl lg:text-7xl font-black mb-8">
+                ¿Listo para dar el siguiente paso?
               </h2>
+              <p className="text-white/70 text-lg md:text-2xl font-light mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed">
+                Únete a miles de profesionales que ya están impulsando sus carreras con Máxima Formación Pro
+              </p>
+
+              <Link
+                href={isSignedIn ? '#' : '/sign-up'}
+                className="group inline-flex items-center gap-3 bg-mx-orange text-white px-10 py-5 rounded-full text-base font-bold tracking-wide hover:bg-mx-orange-dark transition-all duration-300"
+              >
+                Comenzar con Pro
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
             </motion.div>
-
-            <div className="space-y-4">
-              {[
-                {
-                  q: '¿Puedo cancelar mi suscripción en cualquier momento?',
-                  a: 'Sí, puedes cancelar tu suscripción Pro en cualquier momento desde tu perfil. Seguirás teniendo acceso hasta el final del período de facturación.',
-                },
-                {
-                  q: '¿Qué métodos de pago aceptan?',
-                  a: 'Aceptamos todas las tarjetas de crédito y débito principales (Visa, Mastercard, American Express) a través de nuestra pasarela de pago segura.',
-                },
-                {
-                  q: '¿Hay garantía de devolución?',
-                  a: 'Sí, ofrecemos una garantía de devolución de 14 días. Si no estás satisfecho con el plan Pro, te devolvemos el dinero sin preguntas.',
-                },
-                {
-                  q: '¿Puedo cambiar de plan más adelante?',
-                  a: 'Por supuesto. Puedes actualizar de Free a Pro o cambiar entre facturación mensual y anual en cualquier momento.',
-                },
-              ].map((faq, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="p-6 bg-mx-card border border-mx-border rounded-xl hover:border-mx-orange/30 transition-colors"
-                >
-                  <h3 className="text-lg font-bold text-mx-text mb-2">{faq.q}</h3>
-                  <p className="text-mx-text-muted font-light">{faq.a}</p>
-                </motion.div>
-              ))}
-            </div>
           </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="px-6 md:px-12 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center p-12 md:p-16 bg-mx-orange/5 border border-mx-orange/20 rounded-3xl"
-          >
-            <Crown className="text-mx-orange mx-auto mb-6" size={48} />
-            <h2 className="text-3xl md:text-4xl font-black text-mx-blue mb-4">
-              ¿Listo para dar el siguiente paso?
-            </h2>
-            <p className="text-mx-text-muted font-light text-lg mb-8 max-w-xl mx-auto">
-              Únete a miles de profesionales que ya están impulsando sus carreras con Máxima Formación Pro
-            </p>
-            <Link
-              href={isSignedIn ? '#' : '/sign-up'}
-              className="inline-flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-10 py-4 rounded-full font-bold transition-all duration-300"
-            >
-              Comenzar con Pro
-              <ArrowRight size={18} />
-            </Link>
-          </motion.div>
         </section>
       </main>
 

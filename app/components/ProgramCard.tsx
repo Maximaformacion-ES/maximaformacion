@@ -55,7 +55,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         className="flex flex-col h-full"
       >
         {/* Image area */}
-        <div className="relative h-[299px] p-6 flex flex-col justify-between overflow-hidden">
+        <div className="relative h-[220px] xl:h-[240px] 2xl:h-[299px] p-4 xl:p-5 2xl:p-6 flex flex-col justify-between overflow-hidden">
           {/* Background image */}
           <motion.img
             src={program.image}
@@ -111,7 +111,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="bg-mx-bg px-6 py-3 flex flex-col flex-grow rounded-b-lg">
+        <div className="bg-mx-bg px-4 xl:px-5 2xl:px-6 py-3 flex flex-col flex-grow rounded-b-lg">
           {/* Rating */}
           <div className="flex items-center gap-2.5 mb-4">
             <div className="flex items-center gap-1">
@@ -145,7 +145,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
             <h3 className="text-mx-text-muted text-xl font-medium line-clamp-2">
               {program.title}
             </h3>
-            <p className="text-mx-text-muted text-sm font-light line-clamp-3 leading-normal">
+            <p className="text-mx-text-muted text-sm 2xl:text-base font-light line-clamp-3 leading-normal">
               {program.description}
             </p>
           </div>

@@ -268,6 +268,29 @@ export interface Badge {
   importance: BadgeImportance;
 }
 
+// ============ Team Member Types ============
+
+export type TeamRole = 'CEO' | 'Docencia' | 'Comunicación';
+
+export interface StrapiTeamMember {
+  id: number;
+  documentId: string;
+  name: string;
+  avatar: StrapiMedia | null;
+  linkedin: string | null;
+  email: string | null;
+  role: TeamRole | null;
+}
+
+export interface TeamMember {
+  id: number;
+  name: string;
+  avatar: string;
+  linkedin: string;
+  email: string;
+  role: TeamRole;
+}
+
 // Query options
 export interface ProgramQueryOptions {
   type?: 'Master' | 'Curso';

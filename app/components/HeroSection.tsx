@@ -37,11 +37,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <motion.div style={{ y }} className="absolute inset-0 bg-mx-bg" />
 
         {/* Decorative chevrons */}
-        <div className="absolute left-[2%] top-1/2 -translate-y-1/2 hidden lg:block pointer-events-none">
+        <div className="absolute left-[2%] top-1/2 -translate-y-1/2 hidden lg:block pointer-events-none w-32 xl:w-48 2xl:w-[266px]">
           <svg
-            width="266"
-            height="273"
             viewBox="0 0 266 273"
+            className="w-full h-auto"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -68,11 +67,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </defs>
           </svg>
         </div>
-        <div className="absolute right-[2%] top-1/2 -translate-y-1/2 hidden lg:block pointer-events-none">
+        <div className="absolute right-[2%] top-1/2 -translate-y-1/2 hidden lg:block pointer-events-none w-32 xl:w-48 2xl:w-[266px]">
           <svg
-            width="266"
-            height="273"
             viewBox="0 0 266 273"
+            className="w-full h-auto"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
