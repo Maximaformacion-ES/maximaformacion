@@ -496,16 +496,7 @@
   color: #F7A000 !important;
 }
 
-/* User Profile Container */
-.user-profile-container .cl-rootBox {
-  width: 100% !important;
-}
-
-.user-profile-container .cl-card {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e5e5 !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05) !important;
-}
+/* User Profile Container (custom layout, no Clerk UserProfile component) */
 
 /* Hide Clerk's built-in billing (we use Stripe directly) */
 .cl-billingPage,
