@@ -698,7 +698,7 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
 export async function getHomeData(): Promise<HomeData | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiHome>>(
-      '/api/home?populate[numericSection]=*&populate[programsSection]=*&populate[partnersSection][populate]=partnersLogos&populate[testimonialsSection][populate]=testimonial&populate[badgesSection]=*&populate[faqSection][populate]=faq&populate[ctaSection]=*',
+      '/api/home?populate[numericSection]=*&populate[programsSection]=*&populate[partnersSection][populate]=partnersLogos&populate[testimonialsSection][populate]=testimonial&populate[badgesSection]=*&populate[faqSection][populate]=faq&populate[ctaSection][populate]=logoMaxymia',
       {
         revalidate: 60,
         tags: ['home'],
