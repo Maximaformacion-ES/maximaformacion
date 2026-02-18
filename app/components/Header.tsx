@@ -15,6 +15,7 @@ import {
 interface HeaderProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (value: boolean) => void;
+  variant?: 'default' | 'maxymia';
 }
 
 interface NavItem {
@@ -29,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Innovación', path: '/innovacion' },
   { name: 'Blog', path: '/blog' },
   { name: 'Contacto', path: '/contacto' },
+  { name: 'Maxymia', path: '/maxymia' },
 ];
 
 const CAMPUS_OPTIONS = [
@@ -37,7 +39,8 @@ const CAMPUS_OPTIONS = [
   { name: 'Maxymia', url: 'https://maxymia.com/' },
 ];
 
-export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => {
+export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, variant = 'default' }) => {
+  const isDark = variant === 'maxymia';
   const [isCampusDropdownOpen, setIsCampusDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { isSignedIn, user } = useUser();
@@ -63,40 +66,54 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
   }, [isCampusDropdownOpen]);
   return (
     <>
-      <motion.nav 
+      <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 bg-mx-bg border-b border-mx-border"
+        className={`fixed left-0 right-0 z-50 ${isDark ? 'top-8 bg-[#060918] border-b border-white/10' : 'top-0 bg-mx-bg border-b border-mx-border'}`}
       >
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-6">
           <div className="flex items-center justify-between">
-            <motion.a 
-              href="/" 
+            <motion.a
+              href={isDark ? "/maxymia" : "/"}
               className="flex items-center"
               whileHover={{ scale: 1.02 }}
             >
-              <Image 
-                src="/newLogo.png" 
-                alt="Maxima Formación" 
-                width={200} 
-                height={80}
-                className="h-12 md:h-14 w-auto"
-                priority
-              />
+              {isDark ? (
+                <Image
+                  src="/logo-completo.webp"
+                  alt="Maxymia"
+                  width={200}
+                  height={80}
+                  className="h-10 md:h-12 w-auto"
+                  priority
+                />
+              ) : (
+                <Image
+                  src="/newLogo.png"
+                  alt="Maxima Formación"
+                  width={200}
+                  height={80}
+                  className="h-12 md:h-14 w-auto"
+                  priority
+                />
+              )}
             </motion.a>
             
             <div className="hidden lg:flex items-center gap-8">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.path}
-                  className="text-mx-text text-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300"
-                >
-                  {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-mx-orange group-hover:w-full transition-all duration-300" />
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                const isActive = isDark && item.path === '/maxymia';
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.path}
+                    className={`text-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white' : 'text-white/80') : 'text-mx-text'}`}
+                  >
+                    {item.name}
+                    <span className={`absolute -bottom-1 left-0 h-px bg-mx-orange transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                  </Link>
+                );
+              })}
             </div>
             
             <div className="flex items-center gap-4">
@@ -105,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                 <div className="hidden md:flex items-center gap-3">
                   <Link href="/sign-in">
                     <motion.button
-                      className="flex items-center gap-2 border border-mx-blue text-mx-blue px-4 py-2 text-sm font-medium rounded-full hover:bg-mx-blue hover:text-white transition-all duration-300 hover:cursor-pointer"
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 hover:cursor-pointer ${isDark ? 'border border-white/30 text-white hover:bg-white/10' : 'border border-mx-blue text-mx-blue hover:bg-mx-blue hover:text-white'}`}
                       whileTap={{ scale: 0.98 }}
                     >
                       <User size={16} />
@@ -114,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   </Link>
                   <Link href="/sign-up">
                     <motion.button
-                      className="flex items-center gap-2 bg-mx-blue text-white px-4 py-2 text-sm font-medium rounded-full hover:bg-mx-blue/90 transition-colors duration-300 hover:cursor-pointer"
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-300 hover:cursor-pointer ${isDark ? 'bg-mx-orange text-white hover:bg-mx-orange-dark' : 'bg-mx-blue text-white hover:bg-mx-blue/90'}`}
                       whileTap={{ scale: 0.98 }}
                     >
                       Registrarse
@@ -228,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 bg-mx-card border border-mx-border rounded-lg overflow-hidden shadow-xl"
+                      className={`absolute right-0 mt-2 w-48 rounded-lg overflow-hidden shadow-xl ${isDark ? 'bg-[#0d1025] border border-white/10' : 'bg-mx-card border border-mx-border'}`}
                     >
                       {CAMPUS_OPTIONS.map((option, index) => (
                         <motion.a
@@ -239,7 +256,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="block px-4 py-3 text-mx-text text-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 border-b border-mx-border last:border-b-0"
+                          className={`block px-4 py-3 text-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 last:border-b-0 ${isDark ? 'text-white/80 border-b border-white/10' : 'text-mx-text border-b border-mx-border'}`}
                           onClick={() => setIsCampusDropdownOpen(false)}
                         >
                           <div className="flex items-center justify-between">
@@ -255,7 +272,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
               
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="lg:hidden text-mx-text p-2"
+                className={`lg:hidden p-2 ${isDark ? 'text-white' : 'text-mx-text'}`}
                 whileTap={{ scale: 0.9 }}
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -272,7 +289,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-mx-bg pt-24 px-6"
+            className={`fixed inset-0 z-40 pt-24 px-6 ${isDark ? 'bg-[#060918]' : 'bg-mx-bg'}`}
           >
             <div className="flex flex-col gap-6">
               {NAV_ITEMS.map((item, i) => (
@@ -280,7 +297,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen }) => 
                   key={item.name}
                   href={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-mx-text text-3xl font-light"
+                  className={`text-3xl font-light ${isDark ? 'text-white' : 'text-mx-text'}`}
                 >
                   <motion.span
                     initial={{ opacity: 0, x: -20 }}
