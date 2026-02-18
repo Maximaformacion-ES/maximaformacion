@@ -16,7 +16,7 @@ const CLOUDFLARE_STREAM_API_TOKEN = process.env.CLOUDFLARE_STREAM_API_TOKEN;
 const CLOUDFLARE_STREAM_SIGNING_KEY_ID = process.env.CLOUDFLARE_STREAM_SIGNING_KEY_ID;
 const CLOUDFLARE_STREAM_SIGNING_KEY_JWK = process.env.CLOUDFLARE_STREAM_SIGNING_KEY_JWK;
 
-export interface CloudflareVideoDetails {
+interface CloudflareVideoDetails {
   uid: string;
   thumbnail: string;
   playback: {
@@ -112,7 +112,7 @@ export function getVideoThumbnail(
 /**
  * Get animated GIF preview from video
  */
-export function getVideoPreviewGif(
+function getVideoPreviewGif(
   videoId: string,
   options?: {
     start?: string;
@@ -139,7 +139,7 @@ export function getVideoPreviewGif(
 /**
  * Get video details from Cloudflare Stream API
  */
-export async function getVideoDetails(videoId: string): Promise<CloudflareVideoDetails | null> {
+async function getVideoDetails(videoId: string): Promise<CloudflareVideoDetails | null> {
   if (!CLOUDFLARE_ACCOUNT_ID || !CLOUDFLARE_STREAM_API_TOKEN) {
     console.warn('Cloudflare Stream API not configured');
     return null;

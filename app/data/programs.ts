@@ -1,21 +1,21 @@
-export interface ProgramUnit {
+interface ProgramUnit {
   title: string;
 }
 
-export interface ProgramModule {
+interface ProgramModule {
   title: string;
   description: string;
   hours: number;
   units?: ProgramUnit[];
 }
 
-export interface Topic {
+interface Topic {
   id: number;
   documentId: string;
   name: string;
 }
 
-export interface Program {
+interface Program {
   id: number;
   type: 'Master' | 'Curso';
   title: string;
@@ -41,7 +41,7 @@ export interface Program {
   isPro: boolean; // Whether this program requires Pro subscription
 }
 
-export const ALL_PROGRAMS: Partial<Program>[] = [
+const ALL_PROGRAMS: Partial<Program>[] = [
   { 
     id: 1, 
     type: 'Master', 
@@ -248,10 +248,10 @@ export const ALL_PROGRAMS: Partial<Program>[] = [
   },
 ];
 
-export const CATEGORIES = ['Todos', 'Master', 'Curso'] as const;
+const CATEGORIES = ['Todos', 'Master', 'Curso'] as const;
 
 // Helper function to get program by ID
-export const getProgramById = (id: number): Program | undefined => {
+const getProgramById = (id: number): Program | undefined => {
   return COMPLETE_PROGRAMS.find(p => p.id === id);
 };
 

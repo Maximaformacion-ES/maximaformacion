@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Star, ArrowUpRight, Crown } from "lucide-react";
 import Link from "next/link";
 import { Program } from "@/lib/strapi/types";
@@ -39,7 +39,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   const isMaster = program.type === "Master";
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         {/* Image area */}
         <div className="relative h-[220px] xl:h-[240px] 2xl:h-[299px] p-4 xl:p-5 2xl:p-6 flex flex-col justify-between overflow-hidden">
           {/* Background image */}
-          <motion.img
+          <m.img
             src={program.image}
             alt={program.title}
             className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
@@ -115,17 +115,17 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Rating */}
           <div className="flex items-center gap-2.5 mb-4">
             <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
+              {[1, 2, 3, 4, 5].map((star) => (
                 <Star
-                  key={i}
+                  key={star}
                   size={16}
                   className={
-                    i < Math.floor(displayRating)
+                    star <= Math.floor(displayRating)
                       ? "text-mx-orange"
                       : "text-[#ddd]"
                   }
                   fill={
-                    i < Math.floor(displayRating)
+                    star <= Math.floor(displayRating)
                       ? "var(--color-mx-orange)"
                       : "transparent"
                   }
@@ -165,15 +165,15 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               </span>
             </div>
 
-            <motion.div
+            <m.div
               animate={{ x: isHovered ? 4 : 0 }}
               className="text-mx-text-muted"
             >
               <ArrowUpRight size={24} />
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </Link>
-    </motion.div>
+    </m.div>
   );
 };

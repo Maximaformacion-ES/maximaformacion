@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import type { BlogPost } from '@/lib/strapi/types';
@@ -18,7 +19,7 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
   return (
     <section className="py-20 md:py-28 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -30,11 +31,11 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
           <h2 className="text-mx-blue text-3xl md:text-5xl font-black">
             Artículos relacionados
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {posts.map((post, idx) => (
-            <motion.article
+            <m.article
               key={post.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -44,10 +45,13 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
             >
               {/* Featured Image */}
               <div className="relative h-48 overflow-hidden rounded-t-xl">
-                <img
+                <Image
                   src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-mx-blue text-white text-xs font-medium rounded-full">
@@ -71,7 +75,7 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
                   <ArrowUpRight size={16} className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                 </Link>
               </div>
-            </motion.article>
+            </m.article>
           ))}
         </div>
       </div>

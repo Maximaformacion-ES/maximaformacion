@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Users, Award, BookOpen, Star } from 'lucide-react';
 
 interface StatsSectionProps {
@@ -29,7 +29,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, i) => (
-            <motion.div
+            <m.div
               key={stat.label}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -40,7 +40,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               <stat.icon size={28} className="text-mx-orange mx-auto mb-4" strokeWidth={1.5} />
               <div className="text-mx-orange text-4xl md:text-6xl font-black tracking-tight">{stat.value}</div>
               <div className="text-mx-orange-dark text-sm md:text-base font-light mt-2">{stat.label}</div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>

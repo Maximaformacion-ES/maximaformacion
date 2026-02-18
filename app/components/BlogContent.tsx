@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { BlogPost } from '@/lib/strapi/types';
 import { BlogTableOfContents } from './BlogTableOfContents';
 
@@ -12,7 +12,7 @@ interface BlogContentProps {
 export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
   return (
     <>
-      <style jsx global>{`
+      <style>{`
         .blog-html-content {
           color: var(--color-mx-text-muted);
           font-size: 1rem;
@@ -223,7 +223,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
       <section id="blog-content-section" className="py-16 md:py-24 px-6 md:px-12 bg-mx-bg">
         <div className="max-w-7xl mx-auto">
           {/* Tags */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -237,11 +237,11 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
                 {tag}
               </span>
             ))}
-          </motion.div>
+          </m.div>
 
           <div className="flex items-start gap-12 justify-between">
             {/* Article Content */}
-            <motion.article
+            <m.article
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -252,7 +252,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
                 dangerouslySetInnerHTML={{ __html: post.content }}
                 className="blog-html-content overflow-x-hidden"
               />
-            </motion.article>
+            </m.article>
 
             {/* Table of Contents */}
             <aside className="hidden xl:block w-64 flex-shrink-0 sticky top-28">

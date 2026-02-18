@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import { Mail, Linkedin } from 'lucide-react';
 import type { BlogPost } from '@/lib/strapi/types';
 
@@ -26,17 +27,20 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
   return (
     <section className="py-12 md:py-16 px-6 md:px-12 bg-mx-bg border-y border-mx-border">
       <div className="max-w-4xl mx-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="flex flex-col md:flex-row items-center md:items-start gap-8 p-8 bg-mx-card border border-mx-border rounded-2xl"
         >
           {post.author.avatar ? (
-            <img
+            <Image
               src={post.author.avatar}
               alt={post.author.name}
               className="w-24 h-24 rounded-full border-2 border-mx-orange/30 object-cover"
+              width={96}
+              height={96}
+              unoptimized
             />
           ) : (
             <div className="w-24 h-24 rounded-full bg-mx-orange/10 border-2 border-mx-orange/30 flex items-center justify-center">
@@ -82,7 +86,7 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
               </div>
             )}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

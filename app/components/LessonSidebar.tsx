@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown,
   ChevronUp,
@@ -60,7 +60,7 @@ export default function LessonSidebar({
       {/* Overlay for mobile */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -71,7 +71,7 @@ export default function LessonSidebar({
       </AnimatePresence>
 
       {/* Sidebar */}
-      <motion.aside
+      <m.aside
         initial={{ x: '100%' }}
         animate={{ x: isOpen ? 0 : '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
@@ -97,7 +97,7 @@ export default function LessonSidebar({
             </span>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <motion.div
+            <m.div
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
@@ -154,7 +154,7 @@ export default function LessonSidebar({
                 {/* Lessons */}
                 <AnimatePresence>
                   {isExpanded && (
-                    <motion.div
+                    <m.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
@@ -209,7 +209,7 @@ export default function LessonSidebar({
                           </Link>
                         );
                       })}
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>
@@ -227,7 +227,7 @@ export default function LessonSidebar({
             Ver resumen del curso
           </Link>
         </div>
-      </motion.aside>
+      </m.aside>
     </>
   );
 }

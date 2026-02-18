@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import {
   ShoppingCart,
   Loader2,
@@ -88,10 +89,13 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
         {/* Program Image */}
         {program.image && (
           <div className="relative aspect-video w-full">
-            <img
+            <Image
               src={program.image}
               alt={program.title}
               className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 350px"
+              unoptimized
             />
           </div>
         )}
@@ -159,7 +163,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           ) : (
-            <motion.button
+            <m.button
               onClick={handlePurchaseCourse}
               disabled={isLoading}
               className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-base font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -177,7 +181,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                   {isSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
                 </>
               )}
-            </motion.button>
+            </m.button>
           )}
 
           {isLoaded && !userHasPro && (

@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getBlogPosts } from '@/lib/strapi/queries';
 import type { BlogPost } from '@/lib/strapi/types';
 import BlogClient from './BlogClient';
+
+export const metadata: Metadata = {
+  title: 'Blog | Máxima Formación',
+  description: 'Artículos, guías y recursos sobre estadística, ciencia de datos, formación profesional e innovación. Mantente al día con las últimas tendencias del sector.',
+};
 
 export const revalidate = 60;
 

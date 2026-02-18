@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import { Smartphone, Zap, BarChart3, Globe, Link as LinkIcon, BookOpen, Check, X, ArrowUpRight } from 'lucide-react';
 
 const SAPO_TEAL = '#016157';
@@ -76,7 +77,7 @@ export const InnovacionSAPOSection: React.FC = () => {
         {/* Sub-zone A: Product hero with image */}
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-16 md:mb-32">
           {/* Left: Text content + cards */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -130,21 +131,23 @@ export const InnovacionSAPOSection: React.FC = () => {
                 className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
               />
             </a>
-          </motion.div>
+          </m.div>
 
           {/* Right: App image */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="lg:w-1/2 flex justify-center"
           >
-            <img
+            <Image
               src="/sapo.png"
               alt="SAPO Statistical Assistant - App móvil"
               className="w-full max-w-md drop-shadow-2xl"
+              width={448}
+              height={800}
             />
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Sub-zone B: Features - 2 columns, no cards */}
@@ -156,18 +159,18 @@ export const InnovacionSAPOSection: React.FC = () => {
             <div className="absolute inset-8 md:inset-16 rounded-full border" style={{ borderColor: `${SAPO_TEAL}05` }} />
           </div>
 
-          <motion.h3
+          <m.h3
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-3xl font-bold text-mx-text text-center mb-16 relative"
           >
             Características principales
-          </motion.h3>
+          </m.h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10 max-w-4xl mx-auto relative">
             {sapoFeatures.map((feature, idx) => (
-              <motion.div
+              <m.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -182,13 +185,13 @@ export const InnovacionSAPOSection: React.FC = () => {
                     {feature.description}
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
 
         {/* Sub-zone C: Pricing comparison table */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -291,7 +294,7 @@ export const InnovacionSAPOSection: React.FC = () => {
               </tfoot>
             </table>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

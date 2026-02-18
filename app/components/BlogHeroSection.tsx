@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
+import { m, useScroll, useTransform } from 'framer-motion';
 import { Clock, Calendar, Award } from 'lucide-react';
 import type { BlogPost } from '@/lib/strapi/types';
 
@@ -26,7 +27,7 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
 
   return (
     <section ref={containerRef} className="relative h-dvh flex items-center justify-center overflow-hidden">
-      <motion.div
+      <m.div
         style={{ y }}
         className="absolute inset-0 z-0 h-[120%]"
       >
@@ -43,10 +44,13 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
         <div className="absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-mx-bg via-mx-bg/40 via-50% to-transparent z-10" />
         {/* Image with noise and tint */}
         <div className="noise w-full h-full relative">
-          <img
+          <Image
             src={post.image}
             alt={post.title}
             className="w-full h-full object-cover opacity-20"
+            fill
+            sizes="100vw"
+            unoptimized
           />
           {/* Color tint overlay */}
           <div
@@ -54,13 +58,13 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
             style={{ backgroundColor: 'var(--color-mx-blue)', opacity: 0.15 }}
           />
         </div>
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         style={{ opacity }}
         className="relative z-20 text-center px-6 max-w-5xl mx-auto"
       >
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -74,27 +78,27 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
               <Award size={12} /> Destacado
             </span>
           )}
-        </motion.div>
+        </m.div>
 
-        <motion.h1
+        <m.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-2xl md:text-5xl lg:text-7xl font-black text-mx-blue mb-6 md:mb-8 leading-tight"
         >
           {post.title}
-        </motion.h1>
+        </m.h1>
 
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-base md:text-xl text-mx-text-muted font-light mb-8 md:mb-12 max-w-3xl mx-auto"
         >
           {post.excerpt}
-        </motion.p>
+        </m.p>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.8 }}
@@ -114,8 +118,8 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
               <div className="text-base font-bold">{post.readTime}</div>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </section>
   );
 };

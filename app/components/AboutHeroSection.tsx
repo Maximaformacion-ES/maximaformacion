@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
+import { m, useScroll, useTransform } from "framer-motion";
 import type { HeroSection } from "@/lib/strapi/types";
 import { CONOCENOS_HERO_FALLBACK } from "@/app/data/hero-sections";
 
@@ -19,7 +20,7 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      <motion.div
+      <m.div
         style={{ y: yRange }}
         className="absolute inset-0 z-0 h-[120%] flex items-center justify-center"
       >
@@ -47,34 +48,37 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
         />
         {/* Image with blue tint */}
         <div className="w-full h-full relative">
-          <img
+          <Image
             src={heroImage}
             className="w-full h-full object-cover object-[center_25%] opacity-50"
             alt="Máxima Formación"
+            fill
+            sizes="100vw"
+            unoptimized
           />
           <div
             className="absolute inset-0 mix-blend-color"
             style={{ backgroundColor: "var(--color-mx-blue)", opacity: 0.5 }}
           />
         </div>
-      </motion.div>
+      </m.div>
 
       <div className="relative z-20 text-center px-6 mt-[-10vh]">
-        <motion.span
+        <m.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="inline-block text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-6"
         >
           {heroOverline}
-        </motion.span>
-        <motion.h1
+        </m.span>
+        <m.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="text-mx-blue text-6xl md:text-8xl lg:text-9xl font-black "
         >
           {heroTitle}
-        </motion.h1>
+        </m.h1>
       </div>
     </section>
   );

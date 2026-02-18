@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FlaskConical, Microscope, Network } from 'lucide-react';
-import { renderStyledTitle } from './StyledTitle';
+import { StyledTitle } from './StyledTitle';
 
 const differentiators = [
   {
@@ -31,7 +31,7 @@ export const InnovacionAboutSection: React.FC = () => {
     <section id="sobre-nosotros" className="py-20 md:py-32 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
         {/* Left-aligned editorial header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -41,7 +41,7 @@ export const InnovacionAboutSection: React.FC = () => {
             Sobre Biomáxima
           </span>
           <h2 className="text-[#016157] text-3xl md:text-6xl font-black mb-6">
-            {renderStyledTitle(`BIOMÁXIMA {INNOVACION®}`)}
+            <StyledTitle text="BIOMÁXIMA {INNOVACION®}" />
           </h2>
           <p className="text-mx-text-muted text-lg md:text-xl font-light leading-relaxed">
             Empresa altamente especializada en el desarrollo de soluciones tecnológicas avanzadas,
@@ -53,7 +53,7 @@ export const InnovacionAboutSection: React.FC = () => {
             multidisciplinario de expertos en tecnología, biomedicina y análisis de datos,
             trabajamos para diseñar aplicaciones y sistemas que aborden desafíos complejos en estos sectores.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Vertical timeline with alternating sides */}
         <div className="relative">
@@ -69,7 +69,7 @@ export const InnovacionAboutSection: React.FC = () => {
               const isLeft = sides[idx] === 'left';
 
               return (
-                <motion.div
+                <m.div
                   key={item.title}
                   initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -104,14 +104,14 @@ export const InnovacionAboutSection: React.FC = () => {
                       {item.description}
                     </p>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>
         </div>
 
         {/* Vision pull-quote */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -137,7 +137,7 @@ export const InnovacionAboutSection: React.FC = () => {
               — Visión de Biomáxima Innovación
             </footer>
           </blockquote>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

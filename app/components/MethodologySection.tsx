@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Monitor, Users, Target, TrendingUp, BookOpen, MessageSquare } from 'lucide-react';
 
 interface MethodologyPoint {
@@ -49,7 +49,7 @@ export const MethodologySection: React.FC = () => {
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
           {/* Left: title block */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -64,12 +64,12 @@ export const MethodologySection: React.FC = () => {
             <p className="text-mx-text-muted text-lg font-light leading-relaxed text-balance">
               Nuestra metodología está diseñada para garantizar tu éxito profesional
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Right: numbered list */}
           <div className="lg:w-3/5">
             {methodologyPoints.map((point, idx) => (
-              <motion.div
+              <m.div
                 key={point.title}
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -97,7 +97,7 @@ export const MethodologySection: React.FC = () => {
                   className="text-mx-border group-hover:text-mx-orange transition-colors duration-400 shrink-0"
                   size={18}
                 />
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

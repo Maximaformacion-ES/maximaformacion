@@ -11,6 +11,7 @@ import type {
   StrapiBadge,
   StrapiHome,
   StrapiTeamMember,
+  StrapiMaxymiaHome,
   Program,
   Topic,
   BlogPost,
@@ -19,6 +20,7 @@ import type {
   Logo,
   Badge,
   HomeData,
+  MaxymiaHomeData,
   TeamMember,
   ProgramQueryOptions,
   BlogQueryOptions,
@@ -332,7 +334,7 @@ export async function getBlogPosts(
   };
 }
 
-export async function getBlogPostById(
+async function getBlogPostById(
   id: number | string,
   draft = false
 ): Promise<BlogPost | null> {
@@ -559,7 +561,7 @@ export async function getSiteMetadata(): Promise<SiteMetadata | null> {
 
 // ============ Logo Queries ============
 
-export async function getLogos(): Promise<Logo[]> {
+async function getLogos(): Promise<Logo[]> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiLogo[]>>(
       '/api/logos?populate[image]=true&pagination[pageSize]=100&sort=companyName:asc',
@@ -710,7 +712,67 @@ export async function getHomeData(): Promise<HomeData | null> {
     return transformHome(response.data);
   } catch (error) {
     // Expected when Home single type is not yet created in Strapi
-    console.error('Error fetching home data:', error); 
+    console.error('Error fetching home data:', error);
+    return null;
+  }
+}
+
+// ============ Maxymia Home Query (Single Type) ============
+
+function transformMaxymiaHome(strapi: StrapiMaxymiaHome): MaxymiaHomeData {
+  const transformCards = (cards: StrapiMaxymiaHome['whatIsSection']) => {
+    if (!cards) return { overline: '', title: '', description: '', cards: [] };
+    return {
+      overline: cards.overline || '',
+      title: cards.title,
+      description: cards.description || '',
+      cards: (cards.card || []).map((c) => ({
+        title: c.title || '',
+        description: c.description || '',
+        image: c.image ? getStrapiMediaUrl(c.image) : '',
+      })),
+    };
+  };
+
+  return {
+    hero: {
+      overline: strapi.hero?.overline || '',
+      title: strapi.hero?.title || '',
+      description: strapi.hero?.description || '',
+    },
+    whatIsSection: transformCards(strapi.whatIsSection),
+    coursesSection: {
+      overline: strapi.Courses?.programsOverline || '',
+      title: strapi.Courses?.programsTitle || '',
+      description: strapi.Courses?.programsDescription || '',
+    },
+    whyMaxymia: transformCards(strapi.whyMaxymia),
+    ctaSection: {
+      overline: strapi.ctaSection?.ctaOverline || '',
+      title: strapi.ctaSection?.ctaTitle || '',
+      description: strapi.ctaSection?.ctaDescription || '',
+      logo: strapi.ctaSection?.logoMaxymia ? getStrapiMediaUrl(strapi.ctaSection.logoMaxymia) : '',
+    },
+  };
+}
+
+export async function getMaxymiaHome(): Promise<MaxymiaHomeData | null> {
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiMaxymiaHome>>(
+      '/api/maxymia-home?populate[hero]=*&populate[whatIsSection][populate][card][populate]=*&populate[Courses]=*&populate[whyMaxymia][populate][card][populate]=*&populate[ctaSection][populate]=*&status=published',
+      {
+        revalidate: 60,
+        tags: ['maxymia-home'],
+      }
+    );
+
+    if (!response.data) {
+      return null;
+    }
+
+    return transformMaxymiaHome(response.data);
+  } catch (error) {
+    console.error('Error fetching maxymia home data:', error);
     return null;
   }
 }

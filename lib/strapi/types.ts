@@ -18,7 +18,7 @@ export interface StrapiSingleResponse<T> {
   meta: Record<string, unknown>;
 }
 
-export interface StrapiMediaFormat {
+interface StrapiMediaFormat {
   url: string;
   width: number;
   height: number;
@@ -60,7 +60,7 @@ export interface Topic {
 }
 
 // Unit component (embedded in modules)
-export interface StrapiUnitComponent {
+interface StrapiUnitComponent {
   id: number;
   title: string;
 }
@@ -382,7 +382,7 @@ export interface UserCourseData {
 
 // ============ Home Single Type ============
 
-export interface StrapiTestimonial {
+interface StrapiTestimonial {
   id: number;
   text: string;
   name: string;
@@ -425,7 +425,7 @@ export interface StrapiBadgesSection {
   badgesDescription: string | null;
 }
 
-export interface StrapiFAQ {
+interface StrapiFAQ {
   id: number;
   question: string;
   answer: string;
@@ -504,10 +504,88 @@ export interface HomeData {
   };
 }
 
-// Extended Program type with Stripe fields
-export interface ProgramWithStripe extends Program {
-  stripeProductId: string | null;
-  stripePriceId: string | null;
+// ============ Maxymia Home Types (Single Type) ============
+
+export interface StrapiMaxymiaHero {
+  id: number;
+  overline: string | null;
+  title: string | null;
+  description: string | null;
+}
+
+interface StrapiMaxymiaCard {
+  id: number;
+  title: string | null;
+  description: string | null;
+  image: StrapiMedia | null;
+}
+
+export interface StrapiMaxymiaCardSection {
+  id: number;
+  overline: string | null;
+  title: string;
+  description: string | null;
+  card: StrapiMaxymiaCard[];
+}
+
+export interface StrapiMaxymiaMasterSection {
+  id: number;
+  programsOverline: string | null;
+  programsTitle: string | null;
+  programsDescription: string | null;
+}
+
+export interface StrapiMaxymiaCtaSection {
+  id: number;
+  ctaOverline: string | null;
+  ctaTitle: string;
+  ctaDescription: string | null;
+  logoMaxymia: StrapiMedia | null;
+}
+
+export interface StrapiMaxymiaHome {
+  id: number;
+  documentId: string;
+  hero: StrapiMaxymiaHero | null;
+  whatIsSection: StrapiMaxymiaCardSection | null;
+  Courses: StrapiMaxymiaMasterSection | null;
+  whyMaxymia: StrapiMaxymiaCardSection | null;
+  ctaSection: StrapiMaxymiaCtaSection | null;
+}
+
+// Frontend types for Maxymia
+export interface MaxymiaCard {
+  title: string;
+  description: string;
+  image: string;
+}
+
+export interface MaxymiaCardSection {
+  overline: string;
+  title: string;
+  description: string;
+  cards: MaxymiaCard[];
+}
+
+export interface MaxymiaHomeData {
+  hero: {
+    overline: string;
+    title: string;
+    description: string;
+  };
+  whatIsSection: MaxymiaCardSection;
+  coursesSection: {
+    overline: string;
+    title: string;
+    description: string;
+  };
+  whyMaxymia: MaxymiaCardSection;
+  ctaSection: {
+    overline: string;
+    title: string;
+    description: string;
+    logo: string;
+  };
 }
 
 // ============ Hero Section Types (Single Types) ============

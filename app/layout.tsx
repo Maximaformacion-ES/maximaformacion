@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import { getSiteMetadata } from "@/lib/strapi/queries";
+import { MotionProvider } from "./components/MotionProvider";
 import "./globals.css";
 
 const ztNature = localFont({
@@ -73,7 +74,7 @@ export default function RootLayout({
           className={`${ztNature.variable} antialiased`}
           style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
         >
-          {children}
+          <MotionProvider>{children}</MotionProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { List } from 'lucide-react';
 
 interface TocItem {
@@ -105,7 +105,7 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
   };
 
   return (
-    <motion.nav
+    <m.nav
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 20 }}
       transition={{ duration: 0.4 }}
@@ -140,6 +140,6 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
           </li>
         ))}
       </ul>
-    </motion.nav>
+    </m.nav>
   );
 };

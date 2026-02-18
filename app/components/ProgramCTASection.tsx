@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Phone, Mail } from 'lucide-react';
 import type { Program } from '@/lib/strapi/types';
 
@@ -13,7 +13,7 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
   return (
     <section className="py-24 md:py-32 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-[1200px] mx-auto text-center">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -25,10 +25,10 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
           <p className="text-xl text-mx-text-muted font-light mb-12 max-w-2xl mx-auto">
             Únete a cientos de profesionales que ya están transformando su carrera con este programa.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Contact Info */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -43,7 +43,7 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
             <Phone size={18} />
             +34 635 65 93 91
           </a>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

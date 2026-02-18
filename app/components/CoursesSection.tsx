@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ProgramCard } from './ProgramCard';
-import { renderStyledTitle } from './StyledTitle';
+import { StyledTitle } from './StyledTitle';
 import type { Program } from '@/lib/strapi/types';
 
 // Generate a consistent rating between 4 and 5 based on program id
@@ -43,25 +43,25 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
           <div>
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
-            </motion.p>
-            <motion.h2
+            </m.p>
+            <m.h2
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-mx-blue text-4xl md:text-6xl lg:text-7xl font-black tracking-tight"
             >
-              {renderStyledTitle(title, "blue")}
-            </motion.h2>
+              <StyledTitle text={title} color="blue" />
+            </m.h2>
           </div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -73,7 +73,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               Ver todos los programas
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Course Grid */}

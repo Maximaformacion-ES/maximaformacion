@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { renderStyledTitle } from './StyledTitle';
+import { StyledTitle } from './StyledTitle';
 
 interface CTASectionProps {
   overline?: string;
@@ -24,25 +24,25 @@ export const CTASection: React.FC<CTASectionProps> = ({
       </div>
 
       <div className="max-w-[1200px] mx-auto px-6 md:px-12 relative text-center">
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-6"
         >
           {overline}
-        </motion.p>
+        </m.p>
 
-        <motion.h2
+        <m.h2
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-mx-blue text-4xl md:text-6xl lg:text-8xl font-black tracking-tight mb-8"
         >
-          {renderStyledTitle(title)}
-        </motion.h2>
+          <StyledTitle text={title} />
+        </m.h2>
 
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -50,16 +50,16 @@ export const CTASection: React.FC<CTASectionProps> = ({
           className="text-mx-text-muted text-lg md:text-xl font-light max-w-2xl mx-auto mb-12"
         >
           {description}
-        </motion.p>
+        </m.p>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <motion.a
+          <m.a
             href="/contacto"
             className="group flex items-center justify-center gap-3 bg-mx-orange text-white px-10 py-5 text-lg font-medium rounded-full hover:bg-mx-orange/90 transition duration-300"
             
@@ -67,16 +67,16 @@ export const CTASection: React.FC<CTASectionProps> = ({
           >
             Solicitar Información
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-          </motion.a>
-          <motion.a
+          </m.a>
+          <m.a
             href="tel:+34635659391"
             className="flex items-center justify-center gap-3 border border-mx-orange text-mx-orange px-10 py-5 text-lg font-light rounded-full hover:bg-mx-orange/10 hover:border-mx-orange transition duration-300"
             
             whileTap={{ scale: 0.98 }}
           >
             Agendar Llamada
-          </motion.a>
-        </motion.div>
+          </m.a>
+        </m.div>
       </div>
     </section>
   );

@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Play, CheckCircle, Crown, ShoppingBag, Clock } from 'lucide-react';
 import type { UserCourseData } from '@/lib/strapi/types';
 import { formatTotalDuration } from '@/lib/cloudflare/stream';
@@ -30,7 +31,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
   }`;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -38,10 +39,13 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
     >
       {/* Course Image */}
       <div className="relative aspect-video">
-        <img
+        <Image
           src={program.image}
           alt={program.title}
           className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
@@ -98,7 +102,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
               <span className="text-amber-500 text-xs font-medium">{progressPercent}%</span>
             </div>
             <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <motion.div
+              <m.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 className={`h-full rounded-full ${
@@ -147,6 +151,6 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
           </p>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import { Clock, BookOpen, Award, Crown } from 'lucide-react';
 import type { Program } from '@/lib/strapi/types';
 
@@ -18,10 +19,13 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.82)] to-[rgba(255,252,248,0.55)] z-10" />
         <div className="absolute inset-0 bg-linear-to-t from-mx-bg via-[rgba(255,252,248,0.2)] to-transparent z-10" />
-        <img
+        <Image
           src={program.image}
           alt={program.title}
           className="w-full h-full object-cover opacity-70"
+          fill
+          sizes="100vw"
+          unoptimized
         />
       </div>
 
@@ -30,7 +34,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
             {/* Badges row */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -53,21 +57,21 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
                   <Award size={10} /> Destacado
                 </span>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Title */}
-            <motion.h1
+            <m.h1
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
               className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
             >
               {program.title}
-            </motion.h1>
+            </m.h1>
 
             {/* Topics badges */}
             {program.topics && program.topics.length > 0 && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15, duration: 0.5 }}
@@ -81,21 +85,21 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
                     {topic.name}
                   </span>
                 ))}
-              </motion.div>
+              </m.div>
             )}
 
             {/* Description */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-base md:text-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {program.description}
-            </motion.p>
+            </m.p>
 
             {/* Info pills */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
@@ -113,17 +117,17 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
                 <Award size={16} className="text-mx-orange" />
                 <span className="text-sm font-medium">{program.modules.length} módulos</span>
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Tabs below hero text */}
             {tabs && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
               >
                 {tabs}
-              </motion.div>
+              </m.div>
             )}
           </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { BlogCard } from './BlogCard';
 import type { BlogPost } from '@/lib/strapi/types';
@@ -23,14 +23,14 @@ export const BlogGrid: React.FC<BlogGridProps> = ({ posts }) => {
               ))}
             </div>
           ) : (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-20 text-mx-text-muted"
             >
               <Search size={48} className="mb-4 opacity-20" />
               <p className="text-lg">No se encontraron artículos con esos criterios.</p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

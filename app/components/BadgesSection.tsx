@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import type { Badge, BadgeImportance } from "@/lib/strapi/types";
 import Image from "next/image";
-import { renderStyledTitle } from "./StyledTitle";
+import { StyledTitle } from "./StyledTitle";
 
 const COLS = 7;
 const ROWS = 5;
@@ -78,6 +78,8 @@ function buildRows(badges: Badge[]): Badge[][] {
   return grid.map((row) => row.map((idx) => sorted[idx]));
 }
 
+const DEFAULT_BADGES: Badge[] = [];
+
 interface BadgesSectionProps {
   badges?: Badge[];
   overline?: string;
@@ -86,7 +88,7 @@ interface BadgesSectionProps {
 }
 
 export const BadgesSection: React.FC<BadgesSectionProps> = ({
-  badges = [],
+  badges = DEFAULT_BADGES,
   overline = 'Certificaciones y reconocimientos',
   title = 'CALIDAD {ACREDITADA}',
   description = 'Contamos con certificaciones ISO 9001, ISO 14001 e ISO 27001, el sello Cum Laude de Emagister desde 2018 y una valoración de 5.0 en Google con más de 120 reseñas.',
@@ -117,7 +119,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                 {rows.map((row, r) => {
                   const slideFrom = r % 2 === 0 ? -40 : 40;
                   return (
-                    <motion.div
+                    <m.div
                       key={r}
                       initial={{ opacity: 0, x: slideFrom }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -145,7 +147,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                           />
                         </div>
                       ))}
-                    </motion.div>
+                    </m.div>
                   );
                 })}
               </div>
@@ -154,23 +156,23 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
 
           {/* Right side (desktop) / Top (mobile) – Text */}
           <div className="md:w-2/5 w-full text-center md:text-left">
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
-            </motion.p>
-            <motion.h2
+            </m.p>
+            <m.h2
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-mx-blue text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
-              {renderStyledTitle(title)}
-            </motion.h2>
-            <motion.p
+              <StyledTitle text={title} />
+            </m.h2>
+            <m.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -178,7 +180,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               className="text-mx-text-muted text-base md:text-lg font-light max-w-md leading-relaxed"
             >
               {description}
-            </motion.p>
+            </m.p>
           </div>
         </div>
       </div>

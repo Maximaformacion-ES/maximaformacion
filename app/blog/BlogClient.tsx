@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -49,7 +49,7 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
       <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10 overflow-x-hidden">
         <BlogHeader />
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -61,15 +61,15 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
             setSearchQuery={setSearchQuery}
             resultsCount={filteredPosts.length}
           />
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
         >
           <BlogGrid posts={filteredPosts} />
-        </motion.div>
+        </m.div>
       </main>
 
       <Footer />

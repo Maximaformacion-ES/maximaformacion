@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getBlogPostBySlug, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
 import { markdownToHtml } from '@/lib/markdown';
@@ -9,6 +10,27 @@ interface BlogPageProps {
   params: Promise<{
     id: string;
   }>;
+}
+
+// Dynamic metadata based on blog post
+export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.id;
+
+  let title = 'Blog | Máxima Formación';
+  let description = 'Lee este artículo en el blog de Máxima Formación. Contenido especializado en estadística, ciencia de datos y formación profesional.';
+
+  try {
+    const post = await getBlogPostBySlug(slug, false);
+    if (post) {
+      title = `${post.title} | Blog | Máxima Formación`;
+      description = post.excerpt || description;
+    }
+  } catch {
+    // Strapi unavailable
+  }
+
+  return { title, description };
 }
 
 // Generate static params for SSG

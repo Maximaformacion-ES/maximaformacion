@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Crown, Lock, Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import type { Program, PurchasedCourse } from '@/lib/strapi/types';
@@ -26,7 +26,7 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
   return (
     <section className="py-20 md:py-32 px-6 md:px-12 bg-gradient-to-b from-[#0a0a0a] to-black">
       <div className="max-w-4xl mx-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -54,8 +54,8 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 gap-4 mb-10 text-left">
             {proFeatures.map((feature, idx) => (
-              <motion.div
-                key={idx}
+              <m.div
+                key={feature}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * idx }}
@@ -63,7 +63,7 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
               >
                 <Check className="text-amber-500 flex-shrink-0" size={18} />
                 <span className="text-white/80">{feature}</span>
-              </motion.div>
+              </m.div>
             ))}
           </div>
 
@@ -97,7 +97,7 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
           >
             ← Volver al catálogo de programas
           </Link>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

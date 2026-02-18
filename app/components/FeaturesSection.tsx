@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ClipboardCheck, Code, Sparkles, GraduationCap } from 'lucide-react';
 
 interface Feature {
@@ -39,7 +39,7 @@ export const FeaturesSection: React.FC = () => {
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex flex-col lg:flex-row-reverse gap-12 lg:gap-16 lg:items-center">
           {/* Right side: title block */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -54,12 +54,12 @@ export const FeaturesSection: React.FC = () => {
             <p className="text-mx-text-muted text-lg font-light leading-relaxed text-balance">
               Herramientas, metodología y experiencia para transformar datos en decisiones
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Left side: 2x2 grid */}
           <div className="lg:w-3/5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {features.map((feature, idx) => (
-              <motion.div
+              <m.div
                 key={feature.title}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -83,7 +83,7 @@ export const FeaturesSection: React.FC = () => {
                     {feature.description}
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

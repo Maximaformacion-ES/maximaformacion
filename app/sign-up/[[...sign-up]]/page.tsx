@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { SignUp } from '@clerk/nextjs';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Link from 'next/link';
 import { FontStyles } from '../../components/FontStyles';
 import { Header } from '@/app/components/Header';
@@ -31,7 +31,7 @@ export default function SignUpPage() {
       {/* Main Content */}
       <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-32 pb-16">
         <div className="w-full max-w-xl">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -46,9 +46,9 @@ export default function SignUpPage() {
             <p className="text-mx-text-muted font-light">
               Comienza tu camino hacia la excelencia profesional
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -104,9 +104,9 @@ export default function SignUpPage() {
               path="/sign-up"
               signInUrl="/sign-in"
             />
-          </motion.div>
+          </m.div>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
@@ -120,7 +120,7 @@ export default function SignUpPage() {
             <Link href="/privacidad" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
               Política de Privacidad
             </Link>
-          </motion.p>
+          </m.p>
         </div>
       </main>
 

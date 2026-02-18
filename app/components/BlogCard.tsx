@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { m } from "framer-motion";
 import { Clock, Calendar, ArrowUpRight, Award } from "lucide-react";
 import Link from "next/link";
 import type { BlogPost } from "@/lib/strapi/types";
@@ -30,7 +31,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
   };
 
   return (
-    <motion.article
+    <m.article
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -39,10 +40,13 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
     >
       {/* Featured Image */}
       <div className="relative h-56 overflow-hidden">
-        <img
+        <Image
           src={post.image}
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized
         />
         {/* Light gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -99,10 +103,13 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
             {post.author.name && (
               <>
                 {post.author.avatar ? (
-                  <img
+                  <Image
                     src={post.author.avatar}
                     alt={post.author.name}
                     className="w-8 h-8 rounded-full border border-mx-border object-cover"
+                    width={32}
+                    height={32}
+                    unoptimized
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-mx-orange/10 border border-mx-orange/30 flex items-center justify-center">
@@ -135,6 +142,6 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
           </Link>
         </div>
       </div>
-    </motion.article>
+    </m.article>
   );
 };

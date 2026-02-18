@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FlaskConical, Heart, BarChart3, Lightbulb, Shield, Users } from 'lucide-react';
 
 interface Service {
@@ -66,7 +66,7 @@ export const InnovacionServicesSection: React.FC = () => {
     <section className="py-20 md:py-0 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
         {/* Right-aligned title block */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -84,7 +84,7 @@ export const InnovacionServicesSection: React.FC = () => {
               y diseñamos soluciones funcionales con potencial patentable.
             </p>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Staggered honeycomb grid — 7 cols so row 2 offsets by half without overflow */}
         <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
@@ -109,21 +109,24 @@ export const InnovacionServicesSection: React.FC = () => {
           })}
 
           {/* Row 2: cols 1-2, 3-4, 5-6 (col 7 empty — pushed left) */}
-          {row2.map((service, idx) => (
-            <div
-              key={service.title}
-              className="md:col-span-2"
-            >
-              <ServiceCell
-                service={service}
-                idx={idx + 3}
-                isHovered={hoveredIdx === idx + 3}
-                onHover={() => setHoveredIdx(idx + 3)}
-                onLeave={() => setHoveredIdx(null)}
-                bgVariant={idx % 2 === 0 ? 'tint' : 'card'}
-              />
-            </div>
-          ))}
+          {row2.map((service, idx) => {
+            const globalIdx = idx + 3;
+            return (
+              <div
+                key={service.title}
+                className="md:col-span-2"
+              >
+                <ServiceCell
+                  service={service}
+                  idx={globalIdx}
+                  isHovered={hoveredIdx === globalIdx}
+                  onHover={() => setHoveredIdx(globalIdx)}
+                  onLeave={() => setHoveredIdx(null)}
+                  bgVariant={idx % 2 === 0 ? 'tint' : 'card'}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -146,7 +149,7 @@ function ServiceCell({
   bgVariant: 'card' | 'tint';
 }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -183,6 +186,6 @@ function ServiceCell({
           {service.description}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

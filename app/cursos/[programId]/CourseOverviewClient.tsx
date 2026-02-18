@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Play,
   Clock,
@@ -20,9 +21,293 @@ import { useUser } from '@clerk/nextjs';
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 import { FontStyles } from '@/app/components/FontStyles';
-import type { ProgramWithLessons, PurchasedCourse, CourseProgress } from '@/lib/strapi/types';
+import type { ProgramWithLessons, PurchasedCourse, CourseProgress, Lesson, ModuleWithLessons } from '@/lib/strapi/types';
 import { formatTotalDuration, formatDuration } from '@/lib/cloudflare/stream';
 import CourseAccessGate from '@/app/components/CourseAccessGate';
+
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+interface CourseHeroProps {
+  program: ProgramWithLessons;
+  progress: CourseProgress | undefined;
+  progressPercent: number;
+  currentLessonId: string | null;
+  completedLessons: Set<string>;
+}
+
+function CourseHero({
+  program,
+  progress,
+  progressPercent,
+  currentLessonId,
+}: CourseHeroProps) {
+  return (
+    <section className="pt-32 pb-16 px-6 md:px-12 bg-gradient-to-b from-[#0a0a0a] to-black">
+      <div className="max-w-7xl mx-auto">
+        <m.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="grid lg:grid-cols-2 gap-12 items-start"
+        >
+          {/* Course Info */}
+          <div>
+            <span className="text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4 block">
+              {program.type}
+            </span>
+            <h1 className="text-4xl md:text-5xl font-black  mb-6">
+              {program.title}
+            </h1>
+            <p className="text-white/60 font-light text-lg mb-8">
+              {program.description}
+            </p>
+
+            {/* Course Stats */}
+            <div className="flex flex-wrap gap-6 mb-8">
+              <div className="flex items-center gap-2">
+                <BookOpen className="text-amber-500" size={20} />
+                <span className="text-white/80">{program.totalLessons} lecciones</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="text-amber-500" size={20} />
+                <span className="text-white/80">{formatTotalDuration(program.totalDuration)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FileText className="text-amber-500" size={20} />
+                <span className="text-white/80">{program.moduleRelations.length} módulos</span>
+              </div>
+            </div>
+
+            {/* Progress Bar (if has progress) */}
+            {progress && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white/60 text-sm">Tu progreso</span>
+                  <span className="text-amber-500 font-medium">{progressPercent}%</span>
+                </div>
+                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <m.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 0.8 }}
+                    className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* CTA Button */}
+            {currentLessonId && (
+              <Link
+                href={`/cursos/${program.documentId}/lesson/${currentLessonId}`}
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-8 py-4 rounded-full font-bold transition-all duration-300 shadow-lg shadow-amber-500/30"
+              >
+                <Play size={20} fill="currentColor" />
+                {progress ? 'Continuar donde lo dejaste' : 'Comenzar curso'}
+                <ArrowRight size={20} />
+              </Link>
+            )}
+          </div>
+
+          {/* Course Image */}
+          <div className="relative aspect-video rounded-2xl overflow-hidden">
+            <Image
+              src={program.image}
+              alt={program.title}
+              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+        </m.div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface LessonRowProps {
+  lesson: Lesson;
+  programDocumentId: string;
+  isCompleted: boolean;
+  canAccess: boolean;
+  hasAccess: boolean;
+}
+
+function LessonRow({
+  lesson,
+  programDocumentId,
+  isCompleted,
+  canAccess,
+  hasAccess,
+}: LessonRowProps) {
+  const isFree = lesson.isFree;
+
+  return (
+    <Link
+      href={
+        canAccess
+          ? `/cursos/${programDocumentId}/lesson/${lesson.documentId}`
+          : '#'
+      }
+      className={`block p-4 pl-20 flex items-center justify-between border-b border-white/5 last:border-0 transition-colors ${
+        canAccess
+          ? 'hover:bg-white/5 cursor-pointer'
+          : 'opacity-50 cursor-not-allowed'
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+            isCompleted
+              ? 'bg-green-500/20 text-green-500'
+              : canAccess
+                ? 'bg-white/10 text-white/60'
+                : 'bg-white/5 text-white/30'
+          }`}
+        >
+          {isCompleted ? (
+            <CheckCircle size={16} />
+          ) : canAccess ? (
+            <Video size={16} />
+          ) : (
+            <Lock size={14} />
+          )}
+        </div>
+        <div>
+          <p className="text-white/80 font-medium">
+            {lesson.title}
+            {isFree && !hasAccess && (
+              <span className="ml-2 text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full">
+                Vista previa
+              </span>
+            )}
+          </p>
+          <p className="text-white/40 text-sm">
+            {formatDuration(lesson.duration)}
+          </p>
+        </div>
+      </div>
+      {canAccess && !isCompleted && (
+        <Play className="text-white/30" size={16} />
+      )}
+    </Link>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ModuleAccordionProps {
+  module: ModuleWithLessons;
+  moduleIndex: number;
+  isExpanded: boolean;
+  onToggle: (index: number) => void;
+  completedLessons: Set<string>;
+  hasAccess: boolean;
+  programDocumentId: string;
+  showProgress: boolean;
+}
+
+function ModuleAccordion({
+  module,
+  moduleIndex,
+  isExpanded,
+  onToggle,
+  completedLessons,
+  hasAccess,
+  programDocumentId,
+  showProgress,
+}: ModuleAccordionProps) {
+  const moduleCompleted = module.lessons.every((l) =>
+    completedLessons.has(l.documentId)
+  );
+  const moduleProgress = module.lessons.filter((l) =>
+    completedLessons.has(l.documentId)
+  ).length;
+
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: moduleIndex * 0.1 }}
+      className="border border-white/10 rounded-xl overflow-hidden"
+    >
+      {/* Module Header */}
+      <button
+        onClick={() => onToggle(moduleIndex)}
+        className="w-full p-6 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors"
+      >
+        <div className="flex items-center gap-4">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              moduleCompleted
+                ? 'bg-green-500/20 text-green-500'
+                : 'bg-amber-500/20 text-amber-500'
+            }`}
+          >
+            {moduleCompleted ? (
+              <CheckCircle size={20} />
+            ) : (
+              <span className="font-bold">{moduleIndex + 1}</span>
+            )}
+          </div>
+          <div className="text-left">
+            <h3 className="font-semibold text-white">{module.title}</h3>
+            <p className="text-white/40 text-sm">
+              {module.lessonCount} lecciones • {formatTotalDuration(module.totalDuration)}
+              {showProgress && (
+                <span className="ml-2 text-amber-500">
+                  ({moduleProgress}/{module.lessonCount} completadas)
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+        {isExpanded ? (
+          <ChevronUp className="text-white/40" size={24} />
+        ) : (
+          <ChevronDown className="text-white/40" size={24} />
+        )}
+      </button>
+
+      {/* Lessons List */}
+      <AnimatePresence>
+        {isExpanded && (
+          <m.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-white/10">
+              {module.lessons.map((lesson) => {
+                const isCompleted = completedLessons.has(lesson.documentId);
+                const canAccess = hasAccess || lesson.isFree;
+
+                return (
+                  <LessonRow
+                    key={lesson.id}
+                    lesson={lesson}
+                    programDocumentId={programDocumentId}
+                    isCompleted={isCompleted}
+                    canAccess={canAccess}
+                    hasAccess={hasAccess}
+                  />
+                );
+              })}
+            </div>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </m.div>
+  );
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
 
 interface CourseOverviewClientProps {
   program: ProgramWithLessons;
@@ -38,7 +323,8 @@ export default function CourseOverviewClient({
   const { isSignedIn, user, isLoaded } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set([0]));
-  const [showSuccess, setShowSuccess] = useState(showSuccessMessage);
+  const [successDismissed, setSuccessDismissed] = useState(false);
+  const showSuccess = showSuccessMessage && !successDismissed;
 
   // Get user access and progress
   const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
@@ -55,11 +341,11 @@ export default function CourseOverviewClient({
 
   // Hide success message after 5 seconds
   useEffect(() => {
-    if (showSuccess) {
-      const timer = setTimeout(() => setShowSuccess(false), 5000);
+    if (showSuccessMessage && !successDismissed) {
+      const timer = setTimeout(() => setSuccessDismissed(true), 5000);
       return () => clearTimeout(timer);
     }
-  }, [showSuccess]);
+  }, [showSuccessMessage, successDismissed]);
 
   // Toggle module expansion
   const toggleModule = (index: number) => {
@@ -111,7 +397,7 @@ export default function CourseOverviewClient({
         {/* Success Message */}
         <AnimatePresence>
           {showSuccess && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
@@ -119,90 +405,18 @@ export default function CourseOverviewClient({
             >
               <PartyPopper size={24} />
               <span className="font-medium">¡Compra completada! Ya tienes acceso al curso.</span>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Hero Section */}
-        <section className="pt-32 pb-16 px-6 md:px-12 bg-gradient-to-b from-[#0a0a0a] to-black">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="grid lg:grid-cols-2 gap-12 items-start"
-            >
-              {/* Course Info */}
-              <div>
-                <span className="text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4 block">
-                  {program.type}
-                </span>
-                <h1 className="text-4xl md:text-5xl font-black  mb-6">
-                  {program.title}
-                </h1>
-                <p className="text-white/60 font-light text-lg mb-8">
-                  {program.description}
-                </p>
-
-                {/* Course Stats */}
-                <div className="flex flex-wrap gap-6 mb-8">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="text-amber-500" size={20} />
-                    <span className="text-white/80">{program.totalLessons} lecciones</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="text-amber-500" size={20} />
-                    <span className="text-white/80">{formatTotalDuration(program.totalDuration)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FileText className="text-amber-500" size={20} />
-                    <span className="text-white/80">{program.moduleRelations.length} módulos</span>
-                  </div>
-                </div>
-
-                {/* Progress Bar (if has progress) */}
-                {progress && (
-                  <div className="mb-8">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-white/60 text-sm">Tu progreso</span>
-                      <span className="text-amber-500 font-medium">{progressPercent}%</span>
-                    </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progressPercent}%` }}
-                        transition={{ duration: 0.8 }}
-                        className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* CTA Button */}
-                {currentLessonId && (
-                  <Link
-                    href={`/cursos/${program.documentId}/lesson/${currentLessonId}`}
-                    className="inline-flex items-center gap-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-8 py-4 rounded-full font-bold transition-all duration-300 shadow-lg shadow-amber-500/30"
-                  >
-                    <Play size={20} fill="currentColor" />
-                    {progress ? 'Continuar donde lo dejaste' : 'Comenzar curso'}
-                    <ArrowRight size={20} />
-                  </Link>
-                )}
-              </div>
-
-              {/* Course Image */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden">
-                <img
-                  src={program.image}
-                  alt={program.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              </div>
-            </motion.div>
-          </div>
-        </section>
+        <CourseHero
+          program={program}
+          progress={progress}
+          progressPercent={progressPercent}
+          currentLessonId={currentLessonId}
+          completedLessons={completedLessons}
+        />
 
         {/* Module List */}
         <section className="py-16 px-6 md:px-12">
@@ -210,136 +424,19 @@ export default function CourseOverviewClient({
             <h2 className="text-2xl font-bold mb-8">Contenido del curso</h2>
 
             <div className="space-y-4">
-              {program.moduleRelations.map((module, moduleIndex) => {
-                const isExpanded = expandedModules.has(moduleIndex);
-                const moduleCompleted = module.lessons.every((l) =>
-                  completedLessons.has(l.documentId)
-                );
-                const moduleProgress = module.lessons.filter((l) =>
-                  completedLessons.has(l.documentId)
-                ).length;
-
-                return (
-                  <motion.div
-                    key={module.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: moduleIndex * 0.1 }}
-                    className="border border-white/10 rounded-xl overflow-hidden"
-                  >
-                    {/* Module Header */}
-                    <button
-                      onClick={() => toggleModule(moduleIndex)}
-                      className="w-full p-6 flex items-center justify-between bg-white/5 hover:bg-white/10 transition-colors"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            moduleCompleted
-                              ? 'bg-green-500/20 text-green-500'
-                              : 'bg-amber-500/20 text-amber-500'
-                          }`}
-                        >
-                          {moduleCompleted ? (
-                            <CheckCircle size={20} />
-                          ) : (
-                            <span className="font-bold">{moduleIndex + 1}</span>
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <h3 className="font-semibold text-white">{module.title}</h3>
-                          <p className="text-white/40 text-sm">
-                            {module.lessonCount} lecciones • {formatTotalDuration(module.totalDuration)}
-                            {progress && (
-                              <span className="ml-2 text-amber-500">
-                                ({moduleProgress}/{module.lessonCount} completadas)
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="text-white/40" size={24} />
-                      ) : (
-                        <ChevronDown className="text-white/40" size={24} />
-                      )}
-                    </button>
-
-                    {/* Lessons List */}
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="border-t border-white/10">
-                            {module.lessons.map((lesson, lessonIndex) => {
-                              const isCompleted = completedLessons.has(lesson.documentId);
-                              const isFree = lesson.isFree;
-                              const canAccess = hasAccess || isFree;
-
-                              return (
-                                <Link
-                                  key={lesson.id}
-                                  href={
-                                    canAccess
-                                      ? `/cursos/${program.documentId}/lesson/${lesson.documentId}`
-                                      : '#'
-                                  }
-                                  className={`block p-4 pl-20 flex items-center justify-between border-b border-white/5 last:border-0 transition-colors ${
-                                    canAccess
-                                      ? 'hover:bg-white/5 cursor-pointer'
-                                      : 'opacity-50 cursor-not-allowed'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-4">
-                                    <div
-                                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                        isCompleted
-                                          ? 'bg-green-500/20 text-green-500'
-                                          : canAccess
-                                            ? 'bg-white/10 text-white/60'
-                                            : 'bg-white/5 text-white/30'
-                                      }`}
-                                    >
-                                      {isCompleted ? (
-                                        <CheckCircle size={16} />
-                                      ) : canAccess ? (
-                                        <Video size={16} />
-                                      ) : (
-                                        <Lock size={14} />
-                                      )}
-                                    </div>
-                                    <div>
-                                      <p className="text-white/80 font-medium">
-                                        {lesson.title}
-                                        {isFree && !hasAccess && (
-                                          <span className="ml-2 text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full">
-                                            Vista previa
-                                          </span>
-                                        )}
-                                      </p>
-                                      <p className="text-white/40 text-sm">
-                                        {formatDuration(lesson.duration)}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  {canAccess && !isCompleted && (
-                                    <Play className="text-white/30" size={16} />
-                                  )}
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                );
-              })}
+              {program.moduleRelations.map((module, moduleIndex) => (
+                <ModuleAccordion
+                  key={module.id}
+                  module={module}
+                  moduleIndex={moduleIndex}
+                  isExpanded={expandedModules.has(moduleIndex)}
+                  onToggle={toggleModule}
+                  completedLessons={completedLessons}
+                  hasAccess={hasAccess}
+                  programDocumentId={program.documentId}
+                  showProgress={!!progress}
+                />
+              ))}
             </div>
           </div>
         </section>

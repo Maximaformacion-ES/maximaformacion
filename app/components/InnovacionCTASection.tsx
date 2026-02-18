@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,7 +9,7 @@ export const InnovacionCTASection: React.FC = () => {
   return (
     <section className="py-20 md:py-32 px-6 md:px-12" style={{ backgroundColor: '#016157' }}>
       <div className="max-w-5xl mx-auto text-center">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -46,7 +46,7 @@ export const InnovacionCTASection: React.FC = () => {
               />
             </a>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

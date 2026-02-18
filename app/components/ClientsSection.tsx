@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const clients = [
   { name: 'CSIC', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=CSIC' },
@@ -18,7 +18,7 @@ export const ClientsSection: React.FC = () => {
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 lg:items-stretch">
           {/* Left: testimonial card */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -39,11 +39,11 @@ export const ClientsSection: React.FC = () => {
                 Director de Análisis — Centro de investigación
               </span>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Right: header + client logos */}
           <div className="lg:w-1/2 flex flex-col justify-center">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -55,11 +55,11 @@ export const ClientsSection: React.FC = () => {
               <p className="text-mx-text-muted font-light leading-relaxed">
                 Más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación
               </p>
-            </motion.div>
+            </m.div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {clients.map((client, idx) => (
-                <motion.div
+                <m.div
                   key={client.name}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -70,7 +70,7 @@ export const ClientsSection: React.FC = () => {
                   <span className="text-mx-text-muted group-hover:text-mx-blue text-lg font-bold tracking-wide transition-colors duration-300">
                     {client.name}
                   </span>
-                </motion.div>
+                </m.div>
               ))}
             </div>
           </div>

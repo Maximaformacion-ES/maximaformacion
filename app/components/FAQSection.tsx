@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { renderStyledTitle } from './StyledTitle';
+import { m } from 'framer-motion';
+import { StyledTitle } from './StyledTitle';
 import {
   Accordion,
   AccordionItem,
@@ -64,25 +64,25 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   return (
     <section className="relative py-32 bg-mx-bg overflow-hidden">
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-6 text-center"
         >
           {overline}
-        </motion.p>
+        </m.p>
 
-        <motion.h2
+        <m.h2
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-mx-blue text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-16 text-center"
         >
-          {renderStyledTitle(title, "blue")}
-        </motion.h2>
+          <StyledTitle text={title} color="blue" />
+        </m.h2>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -90,13 +90,13 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
         >
           <Accordion type="single" collapsible className="w-full">
             {displayFaqs.map((faq, index) => (
-              <AccordionItem key={index} value={`faq-${index}`}>
+              <AccordionItem key={faq.question} value={`faq-${index}`}>
                 <AccordionTrigger>{faq.question}</AccordionTrigger>
                 <AccordionContent>{faq.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

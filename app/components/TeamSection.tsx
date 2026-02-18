@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { TeamMember } from '@/lib/strapi/types';
 
 // Fallback data when Strapi is unavailable
@@ -128,18 +128,18 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
     <section className="py-32 px-6 md:px-12 bg-mx-blue">
       <div className="max-w-[1200px] mx-auto">
         {/* Title */}
-        <motion.h2
+        <m.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-white text-4xl md:text-6xl font-black text-center mb-20 uppercase"
         >
           Nuestro Equipo
-        </motion.h2>
+        </m.h2>
 
         {/* CEO featured */}
         {ceo && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -153,13 +153,13 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
                 &laquo;Más que un equipo, una gran familia.&raquo;
               </p>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Departments */}
         <div className="space-y-16">
           {departments.map((dept) => (
-            <motion.div
+            <m.div
               key={dept.label}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -177,7 +177,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
                   <MemberAvatar key={member.id} member={member} />
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>

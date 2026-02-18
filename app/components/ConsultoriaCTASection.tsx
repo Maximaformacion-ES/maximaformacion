@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,7 +9,7 @@ export const ConsultoriaCTASection: React.FC = () => {
   return (
     <section className="py-32 px-6 md:px-12 bg-mx-blue">
       <div className="max-w-5xl mx-auto text-center">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -37,7 +37,7 @@ export const ConsultoriaCTASection: React.FC = () => {
                 <ArrowUpRight size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </Link>
             </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

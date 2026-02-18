@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
+import { m, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { HeroSection } from "@/lib/strapi/types";
 import { INNOVACION_HERO_FALLBACK } from "@/app/data/hero-sections";
@@ -21,7 +22,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
 
   return (
     <section className="relative h-dvh flex items-center justify-center overflow-hidden">
-      <motion.div
+      <m.div
         style={{ y: yRange }}
         className="absolute inset-0 z-0 h-[120%]"
       >
@@ -39,10 +40,13 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
         <div className="absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-mx-bg via-mx-bg/40 via-50% to-transparent z-10" />
         {/* Image with noise and blue tint */}
         <div className="noise w-full h-full relative">
-          <img
+          <Image
             src={heroImage}
             className="w-full h-full object-cover object-[center_25%] rotate-y-180 opacity-100"
             alt="Máxima Formación"
+            fill
+            sizes="100vw"
+            unoptimized
           />
           {/* Color tint overlay */}
           <div
@@ -50,33 +54,33 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
             style={{ backgroundColor: "#016157", opacity: 0.9 }}
           />
         </div>
-      </motion.div>
+      </m.div>
 
       <div className="relative z-20 text-center px-6 max-w-5xl mx-auto">
-        <motion.span
+        <m.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="inline-block text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-6"
         >
           {heroOverline}
-        </motion.span>
-        <motion.h1
+        </m.span>
+        <m.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="text-4xl md:text-7xl lg:text-8xl font-black mb-6 text-[#016157]"
         >
           {heroTitle}
-        </motion.h1>
-        <motion.p
+        </m.h1>
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="text-mx-text-muted text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto"
         >
           {heroDescription}
-        </motion.p>
-        <motion.a
+        </m.p>
+        <m.a
           href="#sobre-nosotros"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -88,7 +92,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
             size={18}
             className="group-hover:translate-x-1 transition-transform"
           />
-        </motion.a>
+        </m.a>
       </div>
     </section>
   );

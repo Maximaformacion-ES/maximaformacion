@@ -201,7 +201,7 @@ export async function getLessonById(
 /**
  * Get a lesson by slug
  */
-export async function getLessonBySlug(
+async function getLessonBySlug(
   slug: string,
   draft = false
 ): Promise<Lesson | null> {
@@ -229,7 +229,7 @@ export async function getLessonBySlug(
 /**
  * Get all lessons for a module
  */
-export async function getLessonsByModule(
+async function getLessonsByModule(
   moduleId: number | string,
   draft = false
 ): Promise<Lesson[]> {

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useReducer, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { Loader2, Play, AlertCircle } from 'lucide-react';
 import { getVideoThumbnail } from '@/lib/cloudflare/stream';
 
@@ -15,6 +16,39 @@ interface VideoPlayerProps {
   className?: string;
 }
 
+// ─── Video state reducer ────────────────────────────────────────────
+interface VideoState {
+  embedUrl: string | null;
+  isLoading: boolean;
+  error: string | null;
+  userClickedPlay: boolean;
+}
+
+type VideoAction =
+  | { type: 'FETCH_SUCCESS'; embedUrl: string }
+  | { type: 'FETCH_ERROR'; error: string }
+  | { type: 'USER_CLICKED_PLAY' };
+
+const initialVideoState: VideoState = {
+  embedUrl: null,
+  isLoading: true,
+  error: null,
+  userClickedPlay: false,
+};
+
+function videoReducer(state: VideoState, action: VideoAction): VideoState {
+  switch (action.type) {
+    case 'FETCH_SUCCESS':
+      return { ...state, embedUrl: action.embedUrl, isLoading: false, error: null };
+    case 'FETCH_ERROR':
+      return { ...state, error: action.error, isLoading: false };
+    case 'USER_CLICKED_PLAY':
+      return { ...state, userClickedPlay: true };
+    default:
+      return state;
+  }
+}
+
 export default function VideoPlayer({
   videoId,
   title,
@@ -25,19 +59,19 @@ export default function VideoPlayer({
   startTime = 0,
   className = '',
 }: VideoPlayerProps) {
-  const [embedUrl, setEmbedUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [hasStarted, setHasStarted] = useState(autoPlay);
+  const [state, dispatch] = useReducer(videoReducer, initialVideoState);
+  const { embedUrl, isLoading, error, userClickedPlay } = state;
+  const hasStarted = autoPlay || userClickedPlay;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const progressRef = useRef<Set<number>>(new Set());
 
   // Fetch signed URL
   useEffect(() => {
+    const abortController = new AbortController();
+
     async function fetchSignedUrl() {
       if (!videoId) {
-        setError('No video ID provided');
-        setIsLoading(false);
+        dispatch({ type: 'FETCH_ERROR', error: 'No video ID provided' });
         return;
       }
 
@@ -48,6 +82,7 @@ export default function VideoPlayer({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ videoId }),
+          signal: abortController.signal,
         });
 
         if (!response.ok) {
@@ -64,15 +99,16 @@ export default function VideoPlayer({
         params.set('poster', getVideoThumbnail(videoId, { time: '1s', width: 1280 }));
 
         const url = data.embedUrl + (data.embedUrl.includes('?') ? '&' : '?') + params.toString();
-        setEmbedUrl(url);
+        dispatch({ type: 'FETCH_SUCCESS', embedUrl: url });
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error loading video');
-      } finally {
-        setIsLoading(false);
+        if (abortController.signal.aborted) return;
+        dispatch({ type: 'FETCH_ERROR', error: err instanceof Error ? err.message : 'Error loading video' });
       }
     }
 
     fetchSignedUrl();
+
+    return () => { abortController.abort(); };
   }, [videoId, autoPlay, startTime]);
 
   // Handle messages from iframe (Cloudflare Stream Player API)
@@ -122,7 +158,7 @@ export default function VideoPlayer({
 
   // Handle play button click
   const handlePlay = () => {
-    setHasStarted(true);
+    dispatch({ type: 'USER_CLICKED_PLAY' });
   };
 
   if (error) {
@@ -156,12 +192,18 @@ export default function VideoPlayer({
       <div
         className={`aspect-video bg-black/50 rounded-xl relative overflow-hidden cursor-pointer group ${className}`}
         onClick={handlePlay}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handlePlay(); } }}
+        role="button"
+        tabIndex={0}
       >
         {/* Thumbnail */}
-        <img
+        <Image
           src={getVideoThumbnail(videoId, { time: '1s', width: 1280 })}
           alt={title || 'Video thumbnail'}
           className="absolute inset-0 w-full h-full object-cover"
+          fill
+          sizes="100vw"
+          unoptimized
         />
 
         {/* Overlay */}

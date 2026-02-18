@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 
 const footerLinks = {
@@ -35,9 +37,9 @@ export const MaxymiaFooter: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
           {/* Brand */}
           <div>
-            <a href="/maxymia" className="inline-block mb-5">
-              <img src="/logo-completo.webp" alt="Maxymia" className="h-10 w-auto" />
-            </a>
+            <Link href="/maxymia" className="inline-block mb-5">
+              <Image src="/logo-completo.webp" alt="Maxymia" className="h-10 w-auto" width={200} height={40} />
+            </Link>
             <p className="text-white/50 text-sm font-light leading-relaxed max-w-[268px]">
               El campus virtual de IA aplicada a ciencias de Máxima Formación. Formación especializada para investigadores y profesionales.
             </p>
@@ -109,9 +111,9 @@ export const MaxymiaFooter: React.FC = () => {
           </p>
           <div className="flex gap-5">
             {['Política de Privacidad', 'Aviso Legal', 'Cookies'].map((text) => (
-              <a key={text} href="#" className="text-white/30 hover:text-white/60 text-xs transition-colors">
+              <button key={text} type="button" className="text-white/30 hover:text-white/60 text-xs transition-colors">
                 {text}
-              </a>
+              </button>
             ))}
           </div>
         </div>

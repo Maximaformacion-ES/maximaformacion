@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 interface Project {
@@ -33,7 +34,7 @@ export const InnovacionProjectsSection: React.FC = () => {
     <section className="py-20 md:py-0 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto">
         {/* Small left-aligned header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -49,12 +50,12 @@ export const InnovacionProjectsSection: React.FC = () => {
             Cada proyecto refleja nuestro compromiso con la innovación funcional y el impacto real
             en el sector científico-sanitario.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Two 50/50 image cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((project, idx) => (
-            <motion.a
+            <m.a
               key={project.title}
               href={project.url}
               target="_blank"
@@ -66,10 +67,12 @@ export const InnovacionProjectsSection: React.FC = () => {
               className="group relative block aspect-video rounded-xl overflow-hidden cursor-pointer"
             >
               {/* Background image with saturate + scale on hover */}
-              <img
+              <Image
                 src={project.image}
                 alt={project.title}
                 className="absolute inset-0 w-full h-full object-cover saturate-[0.4] group-hover:saturate-100 group-hover:scale-110 transition-all duration-700 ease-out"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
 
               {/* Dark gradient overlay from bottom */}
@@ -89,7 +92,7 @@ export const InnovacionProjectsSection: React.FC = () => {
               <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <ArrowUpRight size={24} className="text-white" />
               </div>
-            </motion.a>
+            </m.a>
           ))}
         </div>
       </div>

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Quote } from 'lucide-react';
-import { renderStyledTitle } from './StyledTitle';
+import { StyledTitle } from './StyledTitle';
 
 interface Testimonial {
   text: string;
@@ -56,28 +56,28 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left side - Header */}
           <div>
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
-            </motion.p>
-            <motion.h2
+            </m.p>
+            <m.h2
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-mx-blue text-4xl md:text-6xl font-black tracking-tight mb-8"
             >
-              {renderStyledTitle(title)}
-            </motion.h2>
+              <StyledTitle text={title} />
+            </m.h2>
 
             {/* Navigation dots */}
             <div className="flex gap-3">
-              {displayTestimonials.map((_, i) => (
+              {displayTestimonials.map((testimonial, i) => (
                 <button
-                  key={i}
+                  key={testimonial.name}
                   onClick={() => setCurrent(i)}
                   className={`w-12 h-1 rounded-full transition-all duration-300 ${
                     i === current ? 'bg-mx-orange' : 'bg-mx-border hover:bg-[#ddd]'
@@ -90,7 +90,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
           {/* Right side - Testimonial */}
           <div className="relative min-h-[400px]">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={current}
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -113,7 +113,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                     <div className="text-mx-text-muted text-sm">{displayTestimonials[current].role}</div>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
         </div>

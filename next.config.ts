@@ -54,6 +54,20 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
       },
+      // Clerk user avatars
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+      },
+      // Cloudflare Stream thumbnails
+      {
+        protocol: 'https',
+        hostname: '*.cloudflarestream.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'videodelivery.net',
+      },
     ],
   },
   // Headers para mejorar caché

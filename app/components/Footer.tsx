@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-
+import Link from "next/link";
 import Image from "next/image";
 
 export const Footer: React.FC = () => {
@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-12 mb-16">
           {/* Brand */}
           <div className="lg:flex-1">
-            <a href="/" className="inline-block">
+            <Link href="/" className="inline-block">
               <Image
                 src="/newLogo.png"
                 alt="Maxima Formación"
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
                 height={66}
                 className="h-10 md:h-12 w-auto "
               />
-            </a>
+            </Link>
             <p className="text-mx-text-muted text-sm font-light mt-4 max-w-xs leading-relaxed">
               Formación profesional experta para impulsar tu carrera al
               siguiente nivel.

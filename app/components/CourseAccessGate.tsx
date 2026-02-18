@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Crown,
   Lock,
@@ -93,7 +93,7 @@ export default function CourseAccessGate({
   return (
     <section className="py-20 md:py-32 px-6 md:px-12 bg-gradient-to-b from-[#0a0a0a] to-black">
       <div className="max-w-6xl mx-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -115,12 +115,12 @@ export default function CourseAccessGate({
           <p className="text-white/60 font-light text-lg mb-10 max-w-2xl mx-auto">
             Este programa es exclusivo. Elige la opción que mejor se adapte a ti.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Two Options Grid */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Option 1: Buy Course */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -147,8 +147,8 @@ export default function CourseAccessGate({
 
             {/* Course Features */}
             <div className="space-y-3 mb-8">
-              {courseFeatures.map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-3">
+              {courseFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-3">
                   <Check className="text-green-500 flex-shrink-0" size={16} />
                   <span className="text-white/70 text-sm">{feature}</span>
                 </div>
@@ -176,10 +176,10 @@ export default function CourseAccessGate({
                 </>
               )}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Option 2: Pro Subscription */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -205,8 +205,8 @@ export default function CourseAccessGate({
 
             {/* Pro Features */}
             <div className="space-y-3 mb-8">
-              {proFeatures.map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-3">
+              {proFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-3">
                   <Sparkles className="text-amber-500 flex-shrink-0" size={16} />
                   <span className="text-white/70 text-sm">{feature}</span>
                 </div>
@@ -225,11 +225,11 @@ export default function CourseAccessGate({
             <p className="text-center text-white/40 text-xs mt-4">
               Acceso a +50 cursos y masters
             </p>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Back Link */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -241,7 +241,7 @@ export default function CourseAccessGate({
           >
             ← Volver al catálogo de programas
           </Link>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

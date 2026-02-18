@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Filter, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import type { Topic } from '@/lib/strapi/types';
 
 interface TopicFilterTriggerProps {
@@ -55,7 +55,7 @@ export const TopicBadgesRow: React.FC<TopicBadgesRowProps> = ({
 }) => (
   <AnimatePresence>
     {isOpen && (
-      <motion.div
+      <m.div
         initial={{ height: 0, opacity: 0 }}
         animate={{ height: 'auto', opacity: 1 }}
         exit={{ height: 0, opacity: 0 }}
@@ -80,7 +80,7 @@ export const TopicBadgesRow: React.FC<TopicBadgesRowProps> = ({
             );
           })}
         </div>
-      </motion.div>
+      </m.div>
     )}
   </AnimatePresence>
 );

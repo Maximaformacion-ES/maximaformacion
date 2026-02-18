@@ -1,13 +1,15 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 
 interface PartnerLogo {
   url: string;
   alt: string;
 }
+
+const DEFAULT_PARTNER_LOGOS: PartnerLogo[] = [];
 
 interface LogoMarqueeProps {
   partnerLogos?: PartnerLogo[];
@@ -18,7 +20,7 @@ interface LogoMarqueeProps {
 
 function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: PartnerLogo[] }) {
   const ordered = direction === 'left' ? logos : [...logos].reverse();
-  const items = [...ordered, ...ordered, ...ordered, ...ordered];
+  const copies = [0, 1, 2, 3] as const;
   const from = direction === 'left' ? 0 : -25;
   const to = direction === 'left' ? -25 : 0;
 
@@ -26,32 +28,34 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Par
     <div className="overflow-hidden relative"
       style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
     >
-      <motion.div
+      <m.div
         className="flex items-center gap-12 md:gap-16 w-max"
         animate={{ x: [`${from}%`, `${to}%`] }}
         transition={{ duration: 200, ease: 'linear', repeat: Infinity }}
       >
-        {items.map((logo, i) => (
-          <div
-            key={`${logo.alt}-${i}`}
-            className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
-          >
-            <Image
-              src={logo.url}
-              alt={logo.alt}
-              fill
-              className="object-contain"
-              sizes="128px"
-            />
-          </div>
-        ))}
-      </motion.div>
+        {copies.map((copyIndex) =>
+          ordered.map((logo, logoIndex) => (
+            <div
+              key={`${logo.alt}-${logoIndex}-copy${copyIndex}`}
+              className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
+            >
+              <Image
+                src={logo.url}
+                alt={logo.alt}
+                fill
+                className="object-contain"
+                sizes="128px"
+              />
+            </div>
+          ))
+        )}
+      </m.div>
     </div>
   );
 }
 
 export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
-  partnerLogos = [],
+  partnerLogos = DEFAULT_PARTNER_LOGOS,
   overline = 'Partners',
   title = 'Confían en nosotros',
   description = 'Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
@@ -62,7 +66,7 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
     <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full] bg-mx-bg">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-24">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -79,12 +83,12 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
           <p className="text-mx-text-muted text-base md:text-lg font-light max-w-xl mx-auto">
             {description}
           </p>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Logo rows */}
       {partnerLogos.length > 0 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -93,7 +97,7 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
         >
           <LogoRow direction="right" logos={partnerLogos} />
           <LogoRow direction="left" logos={partnerLogos} />
-        </motion.div>
+        </m.div>
       )}
     </section>
   );

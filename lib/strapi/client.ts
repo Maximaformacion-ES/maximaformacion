@@ -6,7 +6,7 @@ export function isStrapiConfigured(): boolean {
   return Boolean(STRAPI_API_TOKEN && STRAPI_URL);
 }
 
-export interface FetchOptions {
+interface FetchOptions {
   cache?: RequestCache;
   revalidate?: number;
   tags?: string[];
@@ -74,4 +74,3 @@ export function getStrapiMediaUrl(media: { url: string } | null | undefined): st
   return `${STRAPI_URL}${media.url}`;
 }
 
-export { STRAPI_URL };

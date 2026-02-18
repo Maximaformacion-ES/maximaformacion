@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { m } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Globe } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
@@ -32,7 +33,7 @@ const ContactPage = () => {
         {/* Hero Section */}
         <section className="relative pt-40 pb-20 px-6 md:px-12 overflow-hidden">
           <div className="max-w-7xl mx-auto">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -44,16 +45,16 @@ const ContactPage = () => {
                 ¿EN QUÉ PODEMOS <br />
                 <span className="text-stroke text-mx-orange">AYUDARTE?</span>
               </h1>
-            </motion.div>
+            </m.div>
 
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 1 }}
               className="max-w-2xl text-mx-text-muted text-lg md:text-xl font-light leading-relaxed"
             >
               Creemos en ti, llegarás hasta donde tú quieras llegar. En Máxima Formación te proporcionamos los conocimientos y las herramientas para que puedas lograrlo.
-            </motion.p>
+            </m.p>
           </div>
         </section>
 
@@ -61,7 +62,7 @@ const ContactPage = () => {
         <section className="py-20 px-6 md:px-12 bg-mx-card border-y border-mx-border">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20">
             {/* Form Side */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -70,8 +71,9 @@ const ContactPage = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Nombre Completo</label>
+                    <label htmlFor="contact-name" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Nombre Completo</label>
                     <input
+                      id="contact-name"
                       type="text"
                       required
                       className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50"
@@ -81,8 +83,9 @@ const ContactPage = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Email Corporativo</label>
+                    <label htmlFor="contact-email" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Email Corporativo</label>
                     <input
+                      id="contact-email"
                       type="email"
                       required
                       className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50"
@@ -94,8 +97,9 @@ const ContactPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Teléfono</label>
+                  <label htmlFor="contact-phone" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Teléfono</label>
                   <input
+                    id="contact-phone"
                     type="tel"
                     className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50"
                     placeholder="+34 600 000 000"
@@ -105,8 +109,9 @@ const ContactPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Mensaje</label>
+                  <label htmlFor="contact-message" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Mensaje</label>
                   <textarea
+                    id="contact-message"
                     rows={5}
                     required
                     className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-mx-text focus:outline-none focus:border-mx-orange transition-colors resize-none placeholder:text-mx-text-muted/50"
@@ -124,10 +129,10 @@ const ContactPage = () => {
                   <Send size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </form>
-            </motion.div>
+            </m.div>
 
             {/* Info Side */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -168,8 +173,8 @@ const ContactPage = () => {
                     "Quieres ampliar información sobre convocatorias.",
                     "Te ha surgido alguna duda durante el proceso.",
                     "Estás organizando un congreso o evento."
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-4 text-sm text-mx-text-muted">
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-4 text-sm text-mx-text-muted">
                       <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-mx-orange shrink-0" />
                       {item}
                     </li>
@@ -179,9 +184,9 @@ const ContactPage = () => {
 
               <div className="flex items-center gap-6 pt-4">
                 <div className="flex -space-x-4">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-12 h-12 rounded-full border-2 border-mx-card bg-mx-border overflow-hidden">
-                      <img src={`https://i.pravatar.cc/150?u=${i+10}`} alt="Support" className="w-full h-full object-cover" />
+                  {[1,2,3,4].map(avatarId => (
+                    <div key={`avatar-${avatarId}`} className="w-12 h-12 rounded-full border-2 border-mx-card bg-mx-border overflow-hidden">
+                      <Image src={`https://i.pravatar.cc/150?u=${avatarId+10}`} alt="Support" className="w-full h-full object-cover" width={48} height={48} unoptimized />
                     </div>
                   ))}
                 </div>
@@ -190,7 +195,7 @@ const ContactPage = () => {
                   <p className="text-xs text-mx-text-muted">Respuesta media en menos de 24h</p>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </section>
 
@@ -221,10 +226,13 @@ const ContactPage = () => {
                 </div>
               </div>
               <div className="lg:col-span-2 aspect-video bg-mx-card rounded-2xl overflow-hidden border border-mx-border relative group">
-                <img
+                <Image
                   src="https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/bde01d02-151f-488e-8abd-30af12bc9ef0/assets/931e7cfc-3c9f-4db2-a8aa-48a2f9ee891d.png"
                   alt="Location Map"
                   className="w-full h-full object-cover opacity-80 saturate-[0.3] group-hover:saturate-100 group-hover:opacity-100 transition-all duration-700"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  unoptimized
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 rounded-full bg-mx-orange flex items-center justify-center animate-pulse">

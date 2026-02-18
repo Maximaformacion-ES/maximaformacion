@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Search, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
 import { ProgramCard } from './ProgramCard';
 import { Program } from '@/lib/strapi/types';
@@ -26,7 +26,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
 
   // Generate page numbers to display
   const getPageNumbers = () => {
-    const pages: (number | 'ellipsis')[] = [];
+    const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
 
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -35,14 +35,14 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
 
     pages.push(1);
 
-    if (currentPage > 3) pages.push('ellipsis');
+    if (currentPage > 3) pages.push('ellipsis-start');
 
     const start = Math.max(2, currentPage - 1);
     const end = Math.min(totalPages - 1, currentPage + 1);
 
     for (let i = start; i <= end; i++) pages.push(i);
 
-    if (currentPage < totalPages - 2) pages.push('ellipsis');
+    if (currentPage < totalPages - 2) pages.push('ellipsis-end');
 
     pages.push(totalPages);
 
@@ -61,14 +61,14 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
               ))}
             </div>
           ) : (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-20 text-mx-text-muted"
             >
               <Search size={48} className="mb-4 opacity-60 text-mx-orange" />
               <p className="text-lg">No se encontraron programas con esos criterios.</p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -91,9 +91,9 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
             <ChevronLeft size={18} />
           </button>
 
-          {getPageNumbers().map((page, idx) =>
-            page === 'ellipsis' ? (
-              <span key={`ellipsis-${idx}`} className="px-2 text-mx-text-muted">
+          {getPageNumbers().map((page) =>
+            typeof page === 'string' ? (
+              <span key={page} className="px-2 text-mx-text-muted">
                 ...
               </span>
             ) : (

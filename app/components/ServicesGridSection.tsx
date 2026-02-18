@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { LayoutGrid, Database, PieChart, TrendingUp, Brain, Workflow } from 'lucide-react';
-import { renderStyledTitle } from './StyledTitle';
+import { StyledTitle } from './StyledTitle';
 
 interface Service {
   icon: React.ElementType;
@@ -52,7 +52,7 @@ export const ServicesGridSection: React.FC = () => {
     <section className="py-20 md:py-0 md:h-dvh flex flex-col justify-center px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -64,7 +64,7 @@ export const ServicesGridSection: React.FC = () => {
           <h2 className="text-mx-blue text-3xl md:text-5xl font-black text-balance md:w-2/3">
             Resolvemos los desafíos estadísticos de tu empresa
           </h2>
-        </motion.div>
+        </m.div>
 
         {/* Interactive list + detail panel */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
@@ -73,7 +73,7 @@ export const ServicesGridSection: React.FC = () => {
             {services.map((service, idx) => {
               const isActive = idx === activeIndex;
               return (
-                <motion.button
+                <m.button
                   key={service.title}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -111,7 +111,7 @@ export const ServicesGridSection: React.FC = () => {
                   }`}>
                     {service.title}
                   </span>
-                </motion.button>
+                </m.button>
               );
             })}
           </div>
@@ -119,7 +119,7 @@ export const ServicesGridSection: React.FC = () => {
           {/* Right: detail panel */}
           <div className="lg:w-3/5 relative min-h-0 lg:min-h-[280px] flex items-center lg:ml-8">
             <AnimatePresence mode="wait">
-              <motion.div
+              <m.div
                 key={activeIndex}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -134,13 +134,13 @@ export const ServicesGridSection: React.FC = () => {
 
                 <div className="relative z-10">
                   <h3 className="text-2xl md:text-5xl lg:text-6xl font-black text-mx-blue mb-4 md:mb-6">
-                    {renderStyledTitle('{' + activeService.title.toUpperCase() + '}', 'blue')}
+                    <StyledTitle text={'{' + activeService.title.toUpperCase() + '}'} color="blue" />
                   </h3>
                   <p className="text-mx-text-muted text-base md:text-xl lg:text-2xl font-light leading-relaxed max-w-xl">
                     {activeService.description}
                   </p>
                 </div>
-              </motion.div>
+              </m.div>
             </AnimatePresence>
           </div>
         </div>

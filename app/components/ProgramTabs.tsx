@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import "../styles/markdown.css";
 import {
   ChevronDown,
@@ -27,9 +27,13 @@ function MarkdownContent({
   const [html, setHtml] = useState<string>("");
 
   useEffect(() => {
+    let cancelled = false;
     if (content) {
-      markdownToHtml(content).then(setHtml);
+      markdownToHtml(content).then((result) => {
+        if (!cancelled) setHtml(result);
+      });
     }
+    return () => { cancelled = true; };
   }, [content]);
 
   if (!html) return null;
@@ -110,7 +114,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
               <span className="hidden sm:inline">{tab.label}</span>
             </span>
             {activeTab === tab.value && (
-              <motion.div
+              <m.div
                 layoutId="tab-underline"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-mx-orange"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -124,7 +128,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
       <div className="pt-10 md:pt-4">
         <AnimatePresence mode="wait">
           {activeTab === "descripcion" && (
-            <motion.div
+            <m.div
               key="descripcion"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -135,11 +139,11 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                 content={program.longDescription}
                 className="text-sm sm:text-lg text-mx-text-muted font-light leading-relaxed"
               />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "temario" && (
-            <motion.div
+            <m.div
               key="temario"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -152,7 +156,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
               <div className="space-y-3">
                 {program.modules.map((module, index) => (
                   <div
-                    key={index}
+                    key={module.title}
                     className="bg-mx-card border border-mx-border overflow-hidden rounded-lg"
                   >
                     <button
@@ -180,18 +184,18 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                           {module.description}
                         </p>
                       </div>
-                      <motion.div
+                      <m.div
                         animate={{ rotate: expandedModule === index ? 180 : 0 }}
                         transition={{ duration: 0.3 }}
                         className="ml-4 shrink-0"
                       >
                         <ChevronDown size={20} className="text-mx-text-muted" />
-                      </motion.div>
+                      </m.div>
                     </button>
 
                     <AnimatePresence>
                       {expandedModule === index && (
-                        <motion.div
+                        <m.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
@@ -204,7 +208,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                             </h4>
                             <div className="grid md:grid-cols-1">
                               {module.units?.map((unit, unitIndex) => (
-                                <motion.div
+                                <m.div
                                   key={unitIndex}
                                   initial={{ opacity: 0, x: -10 }}
                                   animate={{ opacity: 1, x: 0 }}
@@ -215,21 +219,21 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                                   <span className="font-light text-sm">
                                     {unit.title}
                                   </span>
-                                </motion.div>
+                                </m.div>
                               ))}
                             </div>
                           </div>
-                        </motion.div>
+                        </m.div>
                       )}
                     </AnimatePresence>
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "objetivos" && (
-            <motion.div
+            <m.div
               key="objetivos"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -240,11 +244,11 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                 content={program.objectives}
                 className="text-sm sm:text-base text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
               />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "audiencia" && (
-            <motion.div
+            <m.div
               key="audiencia"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -255,11 +259,11 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                 content={program.audience}
                 className="text-sm sm:text-base text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
               />
-            </motion.div>
+            </m.div>
           )}
 
           {activeTab === "salidas" && (
-            <motion.div
+            <m.div
               key="salidas"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -270,7 +274,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                 content={program.careers}
                 className="text-sm sm:text-base text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
               />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

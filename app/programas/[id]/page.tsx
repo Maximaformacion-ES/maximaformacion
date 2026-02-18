@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getProgramBySlug, getAllProgramSlugs } from '@/lib/strapi/queries';
 import { isStrapiConfigured } from '@/lib/strapi/client';
@@ -22,6 +23,40 @@ interface ProgramPageProps {
   params: Promise<{
     id: string;
   }>;
+}
+
+// Dynamic metadata based on program
+export async function generateMetadata({ params }: ProgramPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.id;
+
+  let title = 'Programa | Máxima Formación';
+  let description = 'Descubre este programa formativo de Máxima Formación. Formación de calidad en estadística, ciencia de datos e innovación.';
+
+  if (isStrapiConfigured()) {
+    try {
+      const program = await getProgramBySlug(slug, false);
+      if (program) {
+        title = `${program.title} | Máxima Formación`;
+        description = program.description || description;
+      }
+    } catch {
+      // Strapi unavailable, try local fallback
+    }
+  }
+
+  // Fallback to local data if no title was resolved from Strapi
+  if (title === 'Programa | Máxima Formación') {
+    const localProgram = COMPLETE_PROGRAMS.find(
+      (p) => generateSlug(p.title) === slug
+    );
+    if (localProgram) {
+      title = `${localProgram.title} | Máxima Formación`;
+      description = localProgram.description || description;
+    }
+  }
+
+  return { title, description };
 }
 
 // Generate static params for SSG

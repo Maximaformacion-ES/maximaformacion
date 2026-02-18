@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
+import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FontStyles } from '../../components/FontStyles';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
@@ -22,9 +23,12 @@ const UserInfoSection = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const initializedRef = useRef(false);
 
+  // Initialize form fields once when user data first loads
   useEffect(() => {
-    if (user) {
+    if (user && !initializedRef.current) {
+      initializedRef.current = true;
       setFirstName(user.firstName || '');
       setLastName(user.lastName || '');
     }
@@ -59,7 +63,7 @@ const UserInfoSection = () => {
     <>
       {/* Alert: no name registered */}
       {!hasFullName && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -99,17 +103,20 @@ const UserInfoSection = () => {
               </button>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* User Info */}
       <div className="space-y-6">
         {/* Avatar + Name */}
         <div className="flex items-start gap-5">
-          <img
+          <Image
             src={user.imageUrl}
             alt={user.fullName || 'Avatar'}
             className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-mx-orange/30 object-cover shrink-0"
+            width={80}
+            height={80}
+            unoptimized
           />
           <div className="flex-1 min-w-0">
             {isEditing ? (
@@ -183,7 +190,7 @@ const UserInfoSection = () => {
               {user.externalAccounts.map((account) => (
                 <div key={account.id} className="flex items-center gap-3 p-3 bg-mx-bg border border-mx-border rounded-xl">
                   {account.imageUrl ? (
-                    <img src={account.imageUrl} alt={account.provider} className="w-7 h-7 rounded-full" />
+                    <Image src={account.imageUrl} alt={account.provider} className="w-7 h-7 rounded-full" width={28} height={28} unoptimized />
                   ) : (
                     <div className="w-7 h-7 bg-mx-border rounded-full flex items-center justify-center">
                       <Shield size={12} className="text-mx-text-muted" />
@@ -208,28 +215,67 @@ const UserInfoSection = () => {
   );
 };
 
+// ─── Mis Cursos State ───────────────────────────────────────────────
+interface CoursesState {
+  courses: UserCourseData[];
+  isLoading: boolean;
+  error: string | null;
+  hasProAccess: boolean;
+}
+
+type CoursesAction =
+  | { type: 'FETCH_SUCCESS'; courses: UserCourseData[]; hasProAccess: boolean }
+  | { type: 'FETCH_ERROR'; error: string };
+
+const initialCoursesState: CoursesState = {
+  courses: [],
+  isLoading: true,
+  error: null,
+  hasProAccess: false,
+};
+
+function coursesReducer(state: CoursesState, action: CoursesAction): CoursesState {
+  switch (action.type) {
+    case 'FETCH_SUCCESS':
+      return { ...state, courses: action.courses, hasProAccess: action.hasProAccess, isLoading: false, error: null };
+    case 'FETCH_ERROR':
+      return { ...state, error: action.error, isLoading: false };
+    default:
+      return state;
+  }
+}
+
 // ─── Mis Cursos Section ──────────────────────────────────────────────
 const MisCursosSection = () => {
-  const [courses, setCourses] = useState<UserCourseData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [hasProAccess, setHasProAccess] = useState(false);
+  const [state, dispatch] = useReducer(coursesReducer, initialCoursesState);
+  const { courses, isLoading, error, hasProAccess } = state;
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     async function fetchCourses() {
       try {
-        const response = await fetch('/api/user/courses');
+        const response = await fetch('/api/user/courses', {
+          signal: abortController.signal,
+        });
         if (!response.ok) throw new Error('Failed to fetch courses');
         const data = await response.json();
-        setCourses(data.courses || []);
-        setHasProAccess(data.hasProAccess || false);
+        dispatch({
+          type: 'FETCH_SUCCESS',
+          courses: data.courses || [],
+          hasProAccess: data.hasProAccess || false,
+        });
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error loading courses');
-      } finally {
-        setIsLoading(false);
+        if (abortController.signal.aborted) return;
+        dispatch({
+          type: 'FETCH_ERROR',
+          error: err instanceof Error ? err.message : 'Error loading courses',
+        });
       }
     }
     fetchCourses();
+
+    return () => { abortController.abort(); };
   }, []);
 
   const inProgressCourse = courses.find(
@@ -278,10 +324,13 @@ const MisCursosSection = () => {
         <div className="mb-6 p-4 bg-mx-orange/5 border border-mx-orange/20 rounded-xl">
           <p className="text-mx-orange text-sm font-medium mb-3">Continuar donde lo dejaste</p>
           <div className="flex items-center gap-4">
-            <img
+            <Image
               src={inProgressCourse.program.image}
               alt={inProgressCourse.program.title}
               className="w-20 h-14 object-cover rounded-lg"
+              width={80}
+              height={56}
+              unoptimized
             />
             <div className="flex-1 min-w-0">
               <h4 className="text-mx-text font-medium truncate">{inProgressCourse.program.title}</h4>
@@ -421,8 +470,8 @@ const MiPlanSection = () => {
         </div>
 
         <div className="space-y-2 mb-5">
-          {(isPro ? proFeatures : freeFeatures).map((feature, idx) => (
-            <div key={idx} className="flex items-center gap-2">
+          {(isPro ? proFeatures : freeFeatures).map((feature) => (
+            <div key={feature} className="flex items-center gap-2">
               <Check className={isPro ? 'text-mx-orange' : 'text-mx-text-muted'} size={15} />
               <span className="text-mx-text text-sm">{feature}</span>
             </div>
@@ -507,8 +556,8 @@ const MiPlanSection = () => {
                 'Mentoría grupal',
                 'Recursos premium',
                 'Acceso anticipado',
-              ].map((benefit, idx) => (
-                <div key={idx} className="flex items-center gap-2">
+              ].map((benefit) => (
+                <div key={benefit} className="flex items-center gap-2">
                   <Check className="text-mx-orange" size={14} />
                   <span className="text-mx-text-muted text-sm">{benefit}</span>
                 </div>
@@ -566,7 +615,7 @@ const SeguridadSection = () => {
             {user.externalAccounts.map((account) => (
               <div key={account.id} className="flex items-center gap-3 p-3 bg-mx-bg border border-mx-border rounded-xl">
                 {account.imageUrl ? (
-                  <img src={account.imageUrl} alt={account.provider} className="w-6 h-6 rounded-full" />
+                  <Image src={account.imageUrl} alt={account.provider} className="w-6 h-6 rounded-full" width={24} height={24} unoptimized />
                 ) : (
                   <Shield size={16} className="text-mx-text-muted" />
                 )}
@@ -644,7 +693,7 @@ export default function PerfilPage() {
         {/* Profile Layout */}
         <section className="px-6 md:px-12">
           <div className="max-w-5xl mx-auto">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -716,7 +765,7 @@ export default function PerfilPage() {
                   {activeSection === 'certificados' && <CertificadosSection />}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </section>
       </main>
