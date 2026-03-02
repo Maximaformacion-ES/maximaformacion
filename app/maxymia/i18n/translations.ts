@@ -1,0 +1,210 @@
+import type { Locale } from '../types';
+
+const translations: Record<Locale, Record<string, string>> = {
+  es: {
+    // Dashboard
+    'campus.title': 'Campus Maxymia',
+    'campus.subtitle': 'Campus de IA Aplicada a Ciencias',
+    'campus.welcome': 'Bienvenido al Campus Maxymia',
+    'campus.welcomeDesc': 'Explora nuestros cursos de Inteligencia Artificial aplicada a ciencias y comienza tu formación.',
+    'campus.continueLearning': 'Seguir aprendiendo',
+    'campus.continueCourse': 'Continuar curso',
+    'campus.startCourse': 'Comenzar curso',
+    'campus.catalog': 'Catálogo de cursos',
+    'campus.searchPlaceholder': 'Buscar cursos...',
+    'campus.all': 'Todos',
+    'campus.noResults': 'No se encontraron cursos con estos filtros.',
+    'campus.backToCampus': 'Volver al campus',
+
+    // Course
+    'course.lessons': 'lecciones',
+    'course.blocks': 'bloques',
+    'course.exams': 'exámenes',
+    'course.completed': 'completadas',
+    'course.content': 'Contenido del curso',
+    'course.enrolled': 'Inscrito',
+
+    // Lesson
+    'lesson.markComplete': 'Marcar como completada',
+    'lesson.completed': 'Lección completada',
+    'lesson.previous': 'Anterior',
+    'lesson.next': 'Siguiente',
+    'lesson.content': 'Contenido',
+
+    // Exam
+    'exam.submit': 'Enviar examen',
+    'exam.passed': '¡Examen aprobado!',
+    'exam.failed': 'No superado',
+    'exam.correctAnswers': 'respuestas correctas',
+    'exam.minimumRequired': 'Mínimo requerido',
+    'exam.resultSaved': 'Resultado guardado',
+    'exam.tryAgain': 'Intentar de nuevo',
+    'exam.question': 'Pregunta',
+    'exam.selectAll': 'Selecciona todas las respuestas correctas',
+    'exam.orderItems': 'Ordena los elementos usando las flechas',
+    'exam.yourAnswer': 'Tu respuesta...',
+    'exam.writeAnswer': 'Escribe tu respuesta...',
+    'exam.sampleAnswer': 'Respuesta de referencia:',
+    'exam.exam': 'Examen',
+
+    // Levels
+    'level.beginner': 'Principiante',
+    'level.intermediate': 'Intermedio',
+    'level.advanced': 'Avanzado',
+
+    // Certificate
+    'cert.title': 'Certificado de Finalización',
+    'cert.certifies': 'Se certifica que',
+    'cert.completedCourse': 'ha completado satisfactoriamente el curso',
+    'cert.date': 'Fecha',
+    'cert.instructor': 'Instructor',
+    'cert.print': 'Imprimir / Descargar PDF',
+
+    // Home page
+    'campus.bestRated': 'Mejor Valorados',
+    'campus.recommended': 'Recomendados',
+    'campus.continueLearningRow': 'Seguir Cursando',
+    'campus.startLearning': 'Empieza a aprender',
+    'campus.students': 'estudiantes',
+    'campus.newCourse': 'NUEVO',
+    'campus.bestRatedBadge': 'MEJOR VALORADO',
+    'campus.home': 'Inicio',
+    'campus.courses': 'Cursos',
+    'campus.recentlyAdded': 'Añadidos Recientemente',
+
+    // Footer
+    'footer.campus': 'Campus',
+    'footer.specialties': 'Especialidades',
+    'footer.company': 'Maxima Formacion',
+    'footer.allCourses': 'Todos los cursos',
+    'footer.myProgress': 'Mi progreso',
+    'footer.certificates': 'Certificados',
+    'footer.ia': 'Inteligencia Artificial',
+    'footer.dataScience': 'Data Science',
+    'footer.machineLearning': 'Machine Learning',
+    'footer.nlp': 'Procesamiento del Lenguaje',
+    'footer.cv': 'Vision por Computador',
+    'footer.about': 'Sobre nosotros',
+    'footer.contact': 'Contacto',
+    'footer.privacy': 'Politica de privacidad',
+    'footer.terms': 'Terminos y condiciones',
+    'footer.description': 'Campus de IA aplicada a ciencias. Formacion de vanguardia en inteligencia artificial.',
+    'footer.rights': 'Todos los derechos reservados.',
+
+    // Notifications
+    'notifications.title': 'Nuevos cursos',
+    'notifications.empty': 'No hay cursos nuevos',
+    'notifications.daysAgo': 'hace {n} días',
+    'notifications.today': 'Hoy',
+    'notifications.yesterday': 'Ayer',
+
+    // Language
+    'lang.switch': 'Cambiar idioma',
+  },
+  en: {
+    // Dashboard
+    'campus.title': 'Maxymia Campus',
+    'campus.subtitle': 'Applied AI Campus for Sciences',
+    'campus.welcome': 'Welcome to Maxymia Campus',
+    'campus.welcomeDesc': 'Explore our AI courses applied to sciences and start your training.',
+    'campus.continueLearning': 'Continue learning',
+    'campus.continueCourse': 'Continue course',
+    'campus.startCourse': 'Start course',
+    'campus.catalog': 'Course Catalog',
+    'campus.searchPlaceholder': 'Search courses...',
+    'campus.all': 'All',
+    'campus.noResults': 'No courses found with these filters.',
+    'campus.backToCampus': 'Back to campus',
+
+    // Course
+    'course.lessons': 'lessons',
+    'course.blocks': 'blocks',
+    'course.exams': 'exams',
+    'course.completed': 'completed',
+    'course.content': 'Course content',
+    'course.enrolled': 'Enrolled',
+
+    // Lesson
+    'lesson.markComplete': 'Mark as completed',
+    'lesson.completed': 'Lesson completed',
+    'lesson.previous': 'Previous',
+    'lesson.next': 'Next',
+    'lesson.content': 'Content',
+
+    // Exam
+    'exam.submit': 'Submit exam',
+    'exam.passed': 'Exam passed!',
+    'exam.failed': 'Not passed',
+    'exam.correctAnswers': 'correct answers',
+    'exam.minimumRequired': 'Minimum required',
+    'exam.resultSaved': 'Result saved',
+    'exam.tryAgain': 'Try again',
+    'exam.question': 'Question',
+    'exam.selectAll': 'Select all correct answers',
+    'exam.orderItems': 'Order the items using the arrows',
+    'exam.yourAnswer': 'Your answer...',
+    'exam.writeAnswer': 'Write your answer...',
+    'exam.sampleAnswer': 'Sample answer:',
+    'exam.exam': 'Exam',
+
+    // Levels
+    'level.beginner': 'Beginner',
+    'level.intermediate': 'Intermediate',
+    'level.advanced': 'Advanced',
+
+    // Certificate
+    'cert.title': 'Certificate of Completion',
+    'cert.certifies': 'This certifies that',
+    'cert.completedCourse': 'has successfully completed the course',
+    'cert.date': 'Date',
+    'cert.instructor': 'Instructor',
+    'cert.print': 'Print / Download PDF',
+
+    // Home page
+    'campus.bestRated': 'Best Rated',
+    'campus.recommended': 'Recommended',
+    'campus.continueLearningRow': 'Continue Learning',
+    'campus.startLearning': 'Start learning',
+    'campus.students': 'students',
+    'campus.newCourse': 'NEW',
+    'campus.bestRatedBadge': 'BEST RATED',
+    'campus.home': 'Home',
+    'campus.courses': 'Courses',
+    'campus.recentlyAdded': 'Recently Added',
+
+    // Footer
+    'footer.campus': 'Campus',
+    'footer.specialties': 'Specialties',
+    'footer.company': 'Maxima Formacion',
+    'footer.allCourses': 'All courses',
+    'footer.myProgress': 'My progress',
+    'footer.certificates': 'Certificates',
+    'footer.ia': 'Artificial Intelligence',
+    'footer.dataScience': 'Data Science',
+    'footer.machineLearning': 'Machine Learning',
+    'footer.nlp': 'Language Processing',
+    'footer.cv': 'Computer Vision',
+    'footer.about': 'About us',
+    'footer.contact': 'Contact',
+    'footer.privacy': 'Privacy policy',
+    'footer.terms': 'Terms and conditions',
+    'footer.description': 'Applied AI campus for sciences. Cutting-edge artificial intelligence training.',
+    'footer.rights': 'All rights reserved.',
+
+    // Notifications
+    'notifications.title': 'New courses',
+    'notifications.empty': 'No new courses',
+    'notifications.daysAgo': '{n} days ago',
+    'notifications.today': 'Today',
+    'notifications.yesterday': 'Yesterday',
+
+    // Language
+    'lang.switch': 'Switch language',
+  },
+};
+
+export function getTranslation(locale: Locale, key: string): string {
+  return translations[locale]?.[key] ?? key;
+}
+
+export default translations;

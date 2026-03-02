@@ -54,7 +54,7 @@ function transformModuleWithLessons(strapi: StrapiModule): ModuleWithLessons {
 }
 
 // Default values for missing program data
-const DEFAULT_PROGRAM_IMAGE = 'placeholder-image-programs.webp';
+const DEFAULT_PROGRAM_IMAGE = '/placeholder-course.svg';
 
 // Transform Strapi Program with module relations to ProgramWithLessons
 function transformProgramWithLessons(strapi: StrapiProgram): ProgramWithLessons {

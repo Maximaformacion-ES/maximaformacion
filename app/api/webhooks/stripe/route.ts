@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { clerkClient } from '@clerk/nextjs/server';
+import { isDbConfigured } from '@/lib/db/client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
@@ -9,33 +10,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-export async function POST(request: Request) {
-  const body = await request.text();
-  const headersList = await headers();
-  const signature = headersList.get('stripe-signature');
-
-  if (!signature) {
-    return NextResponse.json(
-      { error: 'Missing stripe-signature header' },
-      { status: 400 }
-    );
-  }
-
-  let event: Stripe.Event;
+async function handleWithDb(event: Stripe.Event): Promise<boolean> {
+  if (!isDbConfigured()) return false;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err);
-    return NextResponse.json(
-      { error: 'Webhook signature verification failed' },
-      { status: 400 }
-    );
-  }
+    const {
+      upsertUser,
+      upsertSubscription,
+      updateUserPlan,
+      updateSubscriptionStatus,
+      createEnrollment,
+      getSubscriptionByStripeCustomer,
+    } = await import('@/lib/db/queries');
 
-  const client = await clerkClient();
-
-  try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -45,15 +32,12 @@ export async function POST(request: Request) {
 
         if (!userId) {
           console.error('No userId in session metadata');
-          break;
+          return true;
         }
 
-        // Get current user metadata
-        const user = await client.users.getUser(userId);
-        const currentMetadata = user.publicMetadata || {};
+        await upsertUser(userId, session.customer_email || undefined);
 
         if (paymentType === 'course' && session.mode === 'payment') {
-          // Handle course purchase
           const programId = session.metadata?.programId;
           const documentId = session.metadata?.documentId;
           const programTitle = session.metadata?.programTitle;
@@ -61,190 +45,264 @@ export async function POST(request: Request) {
 
           if (!programId || !documentId) {
             console.error('Missing programId or documentId in session metadata');
-            break;
+            return true;
           }
 
-          // Add to user's purchased courses
-          interface PurchasedCourse {
-            programId: number;
-            documentId: string;
-            purchasedAt: string;
-            stripePaymentId: string;
-            price: number;
-            title?: string;
-          }
+          await createEnrollment({
+            clerkId: userId,
+            programId: Number(programId),
+            programDocumentId: documentId,
+            accessType: 'purchased',
+            stripePaymentId: paymentIntentId,
+            price: (session.amount_total || 0) / 100,
+            title: programTitle,
+          });
 
-          const existingPurchases = (currentMetadata.purchasedCourses as PurchasedCourse[]) || [];
-
-          // Check if already purchased to avoid duplicates
-          const alreadyPurchased = existingPurchases.some(
-            (p) => p.documentId === documentId || p.programId === Number(programId)
-          );
-
-          if (!alreadyPurchased) {
-            const newPurchase: PurchasedCourse = {
-              programId: Number(programId),
-              documentId,
-              purchasedAt: new Date().toISOString(),
-              stripePaymentId: paymentIntentId,
-              price: (session.amount_total || 0) / 100,
-              title: programTitle,
-            };
-
-            await client.users.updateUserMetadata(userId, {
-              publicMetadata: {
-                ...currentMetadata,
-                stripeCustomerId: customerId || currentMetadata.stripeCustomerId,
-                purchasedCourses: [...existingPurchases, newPurchase],
-              },
-              privateMetadata: {
-                ...user.privateMetadata,
-                stripeCustomerId: customerId || (user.privateMetadata as Record<string, unknown>)?.stripeCustomerId,
-              },
+          if (customerId) {
+            await upsertSubscription({
+              clerkId: userId,
+              stripeCustomerId: customerId,
+              stripeSubscriptionId: `cust_${customerId}`,
+              status: 'none',
+              plan: 'free',
             });
-            console.log(`✅ User ${userId} purchased course: ${programTitle} (${documentId})`);
-          } else {
-            console.log(`ℹ️ User ${userId} already owns course ${documentId}`);
           }
+
+          console.log(`User ${userId} purchased course: ${programTitle} (${documentId})`);
         } else {
-          // Handle subscription (existing logic)
           const subscriptionId = session.subscription as string;
 
-          await client.users.updateUserMetadata(userId, {
-            publicMetadata: {
-              ...currentMetadata,
-              plan: 'pro',
-              stripeCustomerId: customerId,
-              stripeSubscriptionId: subscriptionId,
-              subscribedAt: new Date().toISOString(),
-            },
-            privateMetadata: {
-              ...user.privateMetadata,
-              stripeCustomerId: customerId,
-              stripeSubscriptionId: subscriptionId,
-            },
+          await upsertSubscription({
+            clerkId: userId,
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            status: 'active',
+            plan: 'pro',
+            startedAt: new Date(),
           });
-          console.log(`✅ User ${userId} upgraded to Pro`);
+
+          await updateUserPlan(userId, 'pro');
+          console.log(`User ${userId} upgraded to Pro`);
         }
-        break;
+        return true;
       }
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        // Find user by Stripe customer ID
-        const users = await client.users.getUserList({
-          limit: 100,
-        });
-
-        const user = users.data.find(
-          (u) => u.publicMetadata?.stripeCustomerId === customerId
-        );
-
-        if (user) {
+        const sub = await getSubscriptionByStripeCustomer(customerId);
+        if (sub) {
           const isActive = subscription.status === 'active' || subscription.status === 'trialing';
-          
-          await client.users.updateUserMetadata(user.id, {
-            publicMetadata: {
-              ...user.publicMetadata,
-              plan: isActive ? 'pro' : 'free',
-              subscriptionStatus: subscription.status,
-            },
-          });
-          console.log(`✅ User ${user.id} subscription updated: ${subscription.status}`);
+          const plan = isActive ? 'pro' : 'free';
+          await updateSubscriptionStatus(sub.clerkId, subscription.status, plan);
+          await updateUserPlan(sub.clerkId, plan);
+          console.log(`User ${sub.clerkId} subscription updated: ${subscription.status}`);
         }
-        break;
+        return true;
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        // Find user by Stripe customer ID
-        const users = await client.users.getUserList({
-          limit: 100,
-        });
-
-        const user = users.data.find(
-          (u) => u.publicMetadata?.stripeCustomerId === customerId
-        );
-
-        if (user) {
-          await client.users.updateUserMetadata(user.id, {
-            publicMetadata: {
-              ...user.publicMetadata,
-              plan: 'free',
-              subscriptionStatus: 'canceled',
-              canceledAt: new Date().toISOString(),
-            },
-          });
-          console.log(`✅ User ${user.id} subscription canceled`);
+        const sub = await getSubscriptionByStripeCustomer(customerId);
+        if (sub) {
+          await updateSubscriptionStatus(sub.clerkId, 'canceled', 'free', { canceledAt: new Date() });
+          await updateUserPlan(sub.clerkId, 'free');
+          console.log(`User ${sub.clerkId} subscription canceled`);
         }
-        break;
+        return true;
       }
 
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
 
-        // Find user by Stripe customer ID
-        const users = await client.users.getUserList({
-          limit: 100,
-        });
-
-        const user = users.data.find(
-          (u) => u.publicMetadata?.stripeCustomerId === customerId
-        );
-
-        if (user) {
-          await client.users.updateUserMetadata(user.id, {
-            publicMetadata: {
-              ...user.publicMetadata,
-              lastPaymentAt: new Date().toISOString(),
-            },
+        const sub = await getSubscriptionByStripeCustomer(customerId);
+        if (sub) {
+          await updateSubscriptionStatus(sub.clerkId, sub.status, sub.plan, {
+            lastPaymentAt: new Date(),
+            paymentFailed: false,
           });
-          console.log(`✅ User ${user.id} payment succeeded`);
+          console.log(`User ${sub.clerkId} payment succeeded`);
         }
-        break;
+        return true;
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
 
-        // Find user by Stripe customer ID
-        const users = await client.users.getUserList({
-          limit: 100,
-        });
-
-        const user = users.data.find(
-          (u) => u.publicMetadata?.stripeCustomerId === customerId
-        );
-
-        if (user) {
-          await client.users.updateUserMetadata(user.id, {
-            publicMetadata: {
-              ...user.publicMetadata,
-              paymentFailed: true,
-              paymentFailedAt: new Date().toISOString(),
-            },
-          });
-          console.log(`⚠️ User ${user.id} payment failed`);
+        const sub = await getSubscriptionByStripeCustomer(customerId);
+        if (sub) {
+          await updateSubscriptionStatus(sub.clerkId, sub.status, sub.plan, { paymentFailed: true });
+          console.log(`User ${sub.clerkId} payment failed`);
         }
-        break;
+        return true;
       }
 
       default:
         console.log(`Unhandled event type: ${event.type}`);
+        return true;
+    }
+  } catch (dbError) {
+    console.warn('Database unavailable for webhook, falling back to Clerk:', dbError);
+    return false;
+  }
+}
+
+async function handleWithClerk(event: Stripe.Event) {
+  const client = await clerkClient();
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const userId = session.metadata?.userId;
+      const customerId = session.customer as string;
+      const paymentType = session.metadata?.type || 'subscription';
+
+      if (!userId) break;
+
+      const user = await client.users.getUser(userId);
+      const currentMetadata = user.publicMetadata || {};
+
+      if (paymentType === 'course' && session.mode === 'payment') {
+        const programId = session.metadata?.programId;
+        const documentId = session.metadata?.documentId;
+        const programTitle = session.metadata?.programTitle;
+        const paymentIntentId = session.payment_intent as string;
+
+        if (!programId || !documentId) break;
+
+        interface PurchasedCourse {
+          programId: number;
+          documentId: string;
+          purchasedAt: string;
+          stripePaymentId: string;
+          price: number;
+          title?: string;
+        }
+
+        const existingPurchases = (currentMetadata.purchasedCourses as PurchasedCourse[]) || [];
+        const alreadyPurchased = existingPurchases.some(
+          (p) => p.documentId === documentId || p.programId === Number(programId)
+        );
+
+        if (!alreadyPurchased) {
+          await client.users.updateUserMetadata(userId, {
+            publicMetadata: {
+              ...currentMetadata,
+              stripeCustomerId: customerId || currentMetadata.stripeCustomerId,
+              purchasedCourses: [...existingPurchases, {
+                programId: Number(programId),
+                documentId,
+                purchasedAt: new Date().toISOString(),
+                stripePaymentId: paymentIntentId,
+                price: (session.amount_total || 0) / 100,
+                title: programTitle,
+              }],
+            },
+          });
+        }
+      } else {
+        const subscriptionId = session.subscription as string;
+        await client.users.updateUserMetadata(userId, {
+          publicMetadata: {
+            ...currentMetadata,
+            plan: 'pro',
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            subscribedAt: new Date().toISOString(),
+          },
+        });
+      }
+      break;
+    }
+
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+      const users = await client.users.getUserList({ limit: 100 });
+      const user = users.data.find((u) => u.publicMetadata?.stripeCustomerId === customerId);
+      if (user) {
+        const isActive = subscription.status === 'active' || subscription.status === 'trialing';
+        await client.users.updateUserMetadata(user.id, {
+          publicMetadata: { ...user.publicMetadata, plan: isActive ? 'pro' : 'free', subscriptionStatus: subscription.status },
+        });
+      }
+      break;
+    }
+
+    case 'customer.subscription.deleted': {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+      const users = await client.users.getUserList({ limit: 100 });
+      const user = users.data.find((u) => u.publicMetadata?.stripeCustomerId === customerId);
+      if (user) {
+        await client.users.updateUserMetadata(user.id, {
+          publicMetadata: { ...user.publicMetadata, plan: 'free', subscriptionStatus: 'canceled', canceledAt: new Date().toISOString() },
+        });
+      }
+      break;
+    }
+
+    case 'invoice.payment_succeeded': {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = invoice.customer as string;
+      const users = await client.users.getUserList({ limit: 100 });
+      const user = users.data.find((u) => u.publicMetadata?.stripeCustomerId === customerId);
+      if (user) {
+        await client.users.updateUserMetadata(user.id, {
+          publicMetadata: { ...user.publicMetadata, lastPaymentAt: new Date().toISOString() },
+        });
+      }
+      break;
+    }
+
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = invoice.customer as string;
+      const users = await client.users.getUserList({ limit: 100 });
+      const user = users.data.find((u) => u.publicMetadata?.stripeCustomerId === customerId);
+      if (user) {
+        await client.users.updateUserMetadata(user.id, {
+          publicMetadata: { ...user.publicMetadata, paymentFailed: true, paymentFailedAt: new Date().toISOString() },
+        });
+      }
+      break;
+    }
+  }
+}
+
+export async function POST(request: Request) {
+  const body = await request.text();
+  const headersList = await headers();
+  const signature = headersList.get('stripe-signature');
+
+  if (!signature) {
+    return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err);
+    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
+  }
+
+  try {
+    // Try DB first, fall back to Clerk
+    const handled = await handleWithDb(event);
+    if (!handled) {
+      await handleWithClerk(event);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Webhook handler error:', error);
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }

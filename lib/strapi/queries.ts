@@ -29,7 +29,7 @@ import type {
 } from './types';
 
 // Default values for missing program data
-const DEFAULT_PROGRAM_IMAGE = 'placeholder-image-programs.webp';
+const DEFAULT_PROGRAM_IMAGE = '/placeholder-course.svg';
 
 // Transform Strapi Program to frontend Program
 function transformProgram(strapi: StrapiProgram): Program {
@@ -82,7 +82,7 @@ function transformProgram(strapi: StrapiProgram): Program {
 function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
   const imageUrl = strapi.image
     ? getStrapiMediaUrl(strapi.image)
-    : strapi.imageUrl || 'placeholder-image-programs.webp';
+    : strapi.imageUrl || '/placeholder-course.svg';
 
   const author: BlogAuthor = strapi.author
     ? {

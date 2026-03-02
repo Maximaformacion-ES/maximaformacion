@@ -60,6 +60,38 @@ export async function strapiRequest<T>(
   return response.json();
 }
 
+export async function strapiGraphQL<T>(
+  query: string,
+  variables?: Record<string, unknown>,
+  options: { revalidate?: number; tags?: string[] } = {}
+): Promise<T> {
+  const url = `${STRAPI_URL}/graphql`;
+  const fetchOptions: RequestInit & { next?: { revalidate?: number; tags?: string[] } } = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(STRAPI_API_TOKEN && { Authorization: `Bearer ${STRAPI_API_TOKEN}` }),
+    },
+    body: JSON.stringify({ query, variables }),
+  };
+  if (options.revalidate !== undefined || options.tags) {
+    fetchOptions.next = {};
+    if (options.revalidate !== undefined) fetchOptions.next.revalidate = options.revalidate;
+    if (options.tags) fetchOptions.next.tags = options.tags;
+  }
+  const response = await fetch(url, fetchOptions);
+  if (!response.ok) {
+    console.warn(`Strapi GraphQL error (${response.status}) - using fallback data if available`);
+    throw new Error(`GraphQL error: ${response.status}`);
+  }
+  const json = await response.json();
+  if (json.errors) {
+    console.error('GraphQL errors:', json.errors);
+    throw new Error('GraphQL query failed');
+  }
+  return json.data;
+}
+
 export function getStrapiMediaUrl(media: { url: string } | null | undefined): string {
   if (!media?.url) {
     return '';

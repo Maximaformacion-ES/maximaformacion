@@ -61,7 +61,6 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
   description = 'Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
 }) => {
 
-  console.log('Rendering LogoMarquee with logos:', partnerLogos);
   return (
     <section className="pb-24 md:pb-32 2xl:pb-64 2xl:pt-32 overflow-hidden h-[full] bg-mx-bg">
       {/* Header */}

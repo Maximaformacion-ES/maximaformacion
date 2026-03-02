@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { Header } from '@/app/components/Header';
 import { FontStyles } from '@/app/components/FontStyles';
 import VideoPlayer from '@/app/components/VideoPlayer';
@@ -21,8 +22,6 @@ import LessonSidebar from '@/app/components/LessonSidebar';
 import type {
   ProgramWithLessons,
   Lesson,
-  PurchasedCourse,
-  CourseProgress,
 } from '@/lib/strapi/types';
 import type { LessonNavigation } from '@/lib/strapi/lesson-queries';
 import CourseAccessGate from '@/app/components/CourseAccessGate';
@@ -39,24 +38,18 @@ export default function LessonPlayerClient({
   navigation,
 }: LessonPlayerClientProps) {
   const router = useRouter();
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  const { hasPro, hasAccess: checkAccess, courseProgress, isLoading: campusLoading } = useUserCampus();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Get user access
-  const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
-  const purchasedCourses = (user?.publicMetadata?.purchasedCourses as PurchasedCourse[]) || [];
-  const hasPurchased = purchasedCourses.some(
-    (c) => c.programId === program.id || c.documentId === program.documentId
-  );
-  const hasAccess = userHasPro || hasPurchased || lesson.isFree;
+  const userHasPro = isSignedIn && hasPro;
+  const hasAccess = checkAccess(program.documentId) || lesson.isFree;
 
   // Get course progress
-  const courseProgress =
-    (user?.publicMetadata?.courseProgress as Record<string, CourseProgress>) || {};
-  const progress = courseProgress[program.documentId];
-  const completedLessons = new Set(progress?.completedLessons || []);
+  const progressData = courseProgress[program.documentId];
+  const completedLessons = new Set(progressData?.completedLessons || []);
   const isAlreadyCompleted = completedLessons.has(lesson.documentId);
 
   // Handle lesson completion
@@ -105,7 +98,7 @@ export default function LessonPlayerClient({
   };
 
   // If user doesn't have access, show access gate
-  if (isLoaded && !hasAccess) {
+  if (isLoaded && !campusLoading && !hasAccess) {
     return (
       <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
         <FontStyles />

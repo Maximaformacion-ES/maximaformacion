@@ -92,7 +92,7 @@ function MemberAvatar({ member, size = 'md' }: { member: TeamMember; size?: 'lg'
         rel="noopener noreferrer"
         className="relative group"
       >
-        <div className={`${sizeClasses} rounded-full overflow-hidden border-3 border-white/20 group-hover:border-white/50 transition-colors`}>
+        <div className={`${sizeClasses} relative rounded-full overflow-hidden border-3 border-white/20 group-hover:border-white/50 transition-colors`}>
           <Image
             src={member.avatar}
             alt={member.name}

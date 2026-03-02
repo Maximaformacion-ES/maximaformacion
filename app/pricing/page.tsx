@@ -8,6 +8,7 @@ import { Footer } from '../components/Footer';
 import { Check, X, Crown, Sparkles, ArrowRight, Zap, Star, Loader2 } from 'lucide-react';
 import { FAQSection } from '../components/FAQSection';
 import { useUser } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { StyledTitle } from '../components/StyledTitle';
@@ -342,12 +343,12 @@ function PricingContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
+  const { hasPro } = useUserCampus();
   const searchParams = useSearchParams();
   const success = searchParams.get('success');
 
-  // Check if user already has Pro
-  const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
+  const userHasPro = isSignedIn && hasPro;
 
   const handleSubscribe = async (planId: string) => {
     if (!isSignedIn) {

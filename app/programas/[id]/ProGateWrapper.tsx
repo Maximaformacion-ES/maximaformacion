@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { m } from 'framer-motion';
 import { Crown, Lock, Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import type { Program, PurchasedCourse } from '@/lib/strapi/types';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
+import type { Program } from '@/lib/strapi/types';
 import CourseAccessGate from '@/app/components/CourseAccessGate';
 
 interface ProGateWrapperProps {
@@ -104,19 +105,11 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
 };
 
 export default function ProGateWrapper({ program, children }: ProGateWrapperProps) {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
+  const { hasPro, hasAccess: checkAccess } = useUserCampus();
 
-  // Check if user has Pro plan from Clerk metadata
-  const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
-
-  // Check if user has purchased this specific course
-  const purchasedCourses = (user?.publicMetadata?.purchasedCourses as PurchasedCourse[]) || [];
-  const hasPurchased = purchasedCourses.some(
-    (c) => c.programId === program.id || c.documentId === program.documentId
-  );
-
-  // User has access if they have Pro OR have purchased this course
-  const hasAccess = userHasPro || hasPurchased;
+  const userHasPro = isSignedIn && hasPro;
+  const hasAccess = checkAccess(program.documentId);
 
   // Check if program requires payment (Pro or purchase)
   const requiresPayment = program.isPro;

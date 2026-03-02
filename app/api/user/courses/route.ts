@@ -3,20 +3,18 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { getPrograms } from '@/lib/strapi/queries';
 import { getProgramWithLessons } from '@/lib/strapi/lesson-queries';
+import { isDbConfigured } from '@/lib/db/client';
 import type { PurchasedCourse, CourseProgress, UserCourseData } from '@/lib/strapi/types';
 
-// Helper to safely fetch from Strapi
 async function safeFetchPrograms(isPro: boolean) {
   try {
     const { programs } = await getPrograms({ isPro, limit: 100 });
     return programs;
   } catch {
-    // Strapi unavailable - return empty array
     return [];
   }
 }
 
-// Helper to safely get program with lessons
 async function safeGetProgramWithLessons(documentId: string) {
   try {
     return await getProgramWithLessons(documentId);
@@ -36,13 +34,63 @@ export async function GET() {
       );
     }
 
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    const publicMetadata = user.publicMetadata || {};
+    let userHasPro = false;
+    let purchasedList: { programId: number | null; programDocumentId: string; purchasedAt?: string }[] = [];
+    let courseProgressMap: Record<string, { completedLessons: string[]; currentLessonId: string | null; lastAccessedAt: string | null; startedAt: string | null }> = {};
 
-    const userHasPro = publicMetadata.plan === 'pro';
-    const purchasedCourses = (publicMetadata.purchasedCourses as PurchasedCourse[]) || [];
-    const courseProgress = (publicMetadata.courseProgress as Record<string, CourseProgress>) || {};
+    // Try PostgreSQL first
+    if (isDbConfigured()) {
+      try {
+        const { getUserByClerkId, getUserEnrollments, getAllCourseProgress } = await import('@/lib/db/queries');
+
+        const dbUser = await getUserByClerkId(userId);
+        userHasPro = dbUser?.plan === 'pro';
+
+        const dbEnrollments = await getUserEnrollments(userId);
+        purchasedList = dbEnrollments.map((e) => ({
+          programId: e.programId,
+          programDocumentId: e.programDocumentId,
+          purchasedAt: e.purchasedAt?.toISOString(),
+        }));
+
+        courseProgressMap = await getAllCourseProgress(userId);
+      } catch (dbError) {
+        console.warn('Database unavailable for user/courses, falling back to Clerk:', dbError);
+        // Reset and fall through to Clerk
+        userHasPro = false;
+        purchasedList = [];
+        courseProgressMap = {};
+      }
+    }
+
+    // Fallback: read from Clerk metadata if no DB data
+    if (!isDbConfigured() || (purchasedList.length === 0 && !userHasPro)) {
+      try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const publicMetadata = user.publicMetadata || {};
+
+        userHasPro = publicMetadata.plan === 'pro';
+        const clerkPurchased = (publicMetadata.purchasedCourses as PurchasedCourse[]) || [];
+        purchasedList = clerkPurchased.map((c) => ({
+          programId: c.programId,
+          programDocumentId: c.documentId,
+          purchasedAt: c.purchasedAt,
+        }));
+
+        const clerkProgress = (publicMetadata.courseProgress as Record<string, CourseProgress>) || {};
+        for (const [programDocId, progress] of Object.entries(clerkProgress)) {
+          courseProgressMap[programDocId] = {
+            completedLessons: progress.completedLessons || [],
+            currentLessonId: progress.currentLessonId || null,
+            lastAccessedAt: progress.lastAccessedAt || null,
+            startedAt: progress.startedAt || null,
+          };
+        }
+      } catch {
+        // If Clerk also fails, continue with empty data
+      }
+    }
 
     const userCourses: UserCourseData[] = [];
 
@@ -51,9 +99,8 @@ export async function GET() {
       const programs = await safeFetchPrograms(true);
 
       for (const program of programs) {
-        const progress = courseProgress[program.documentId];
+        const progress = courseProgressMap[program.documentId];
 
-        // Calculate progress percentage
         let progressPercent = 0;
         if (progress) {
           const fullProgram = await safeGetProgramWithLessons(program.documentId);
@@ -68,30 +115,33 @@ export async function GET() {
           program,
           purchased: false,
           progress: progress
-            ? { ...progress, progressPercent }
+            ? {
+                startedAt: progress.startedAt || new Date().toISOString(),
+                lastAccessedAt: progress.lastAccessedAt || new Date().toISOString(),
+                completedLessons: progress.completedLessons,
+                currentLessonId: progress.currentLessonId || undefined,
+                progressPercent,
+              }
             : undefined,
           accessType: 'pro',
         });
       }
     }
 
-    // Add purchased courses (even if user is Pro, they keep purchased courses permanently)
-    for (const purchase of purchasedCourses) {
-      // Check if course is already in the list (avoid duplicates if user is Pro)
+    // Add purchased courses
+    for (const purchase of purchasedList) {
       const alreadyInList = userCourses.some(
         (c) =>
           c.program.id === purchase.programId ||
-          c.program.documentId === purchase.documentId
+          c.program.documentId === purchase.programDocumentId
       );
 
       if (!alreadyInList) {
-        // Fetch the program
-        const program = await safeGetProgramWithLessons(purchase.documentId);
+        const program = await safeGetProgramWithLessons(purchase.programDocumentId);
 
         if (program) {
-          const progress = courseProgress[purchase.documentId];
+          const progress = courseProgressMap[purchase.programDocumentId];
 
-          // Calculate progress percentage
           let progressPercent = 0;
           if (progress && program.totalLessons > 0) {
             progressPercent = Math.round(
@@ -104,17 +154,22 @@ export async function GET() {
             purchased: true,
             purchasedAt: purchase.purchasedAt,
             progress: progress
-              ? { ...progress, progressPercent }
+              ? {
+                  startedAt: progress.startedAt || new Date().toISOString(),
+                  lastAccessedAt: progress.lastAccessedAt || new Date().toISOString(),
+                  completedLessons: progress.completedLessons,
+                  currentLessonId: progress.currentLessonId || undefined,
+                  progressPercent,
+                }
               : undefined,
             accessType: 'purchased',
           });
         }
       } else {
-        // Update the existing entry to mark it as also purchased
         const existingIndex = userCourses.findIndex(
           (c) =>
             c.program.id === purchase.programId ||
-            c.program.documentId === purchase.documentId
+            c.program.documentId === purchase.programDocumentId
         );
         if (existingIndex !== -1) {
           userCourses[existingIndex].purchased = true;
@@ -123,7 +178,7 @@ export async function GET() {
       }
     }
 
-    // Sort by last accessed (most recent first), then by purchased date
+    // Sort by last accessed (most recent first)
     userCourses.sort((a, b) => {
       const aDate = a.progress?.lastAccessedAt || a.purchasedAt || '';
       const bDate = b.progress?.lastAccessedAt || b.purchasedAt || '';

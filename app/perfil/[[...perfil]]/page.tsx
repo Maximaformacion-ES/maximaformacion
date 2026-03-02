@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { m } from 'framer-motion';
 import { FontStyles } from '../../components/FontStyles';
 import { Header } from '../../components/Header';
@@ -381,6 +382,93 @@ const MisCursosSection = () => {
 };
 
 // ─── Certificados Section ────────────────────────────────────────────
+// ─── Maxymia Section ─────────────────────────────────────────────────
+const MaxymiaSection = () => {
+  const { courseProgress } = useUserCampus();
+  const maxymiaCoursesModule = React.useMemo(() => {
+    try {
+      // Dynamic import of maxymia courses
+      const { getMaxymiaCourses, getCourseMeta } = require('@/app/maxymia/data/queries');
+      const courses = getMaxymiaCourses() as { id: string; slug: string; title: { es: string }; category: string }[];
+      return courses.map((course) => ({
+        ...course,
+        meta: getCourseMeta(course) as { totalLessons: number; totalMinutes: number },
+      }));
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const coursesWithProgress = maxymiaCoursesModule.filter(
+    (c: { id: string }) => courseProgress[c.id]
+  );
+
+  if (coursesWithProgress.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Sparkles className="text-mx-orange mx-auto mb-3" size={32} />
+        <h3 className="text-mx-text font-medium mb-1">Campus Maxymia</h3>
+        <p className="text-mx-text-muted text-sm mb-4">
+          Explora cursos de IA aplicada a ciencias
+        </p>
+        <Link
+          href="/maxymia/campus"
+          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-mx-orange-dark transition-colors"
+        >
+          Ir al Campus
+          <ArrowRight size={14} />
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {coursesWithProgress.map((course: { id: string; slug: string; title: { es: string }; category: string; meta: { totalLessons: number } }) => {
+        const progress = courseProgress[course.id];
+        const completedCount = progress?.completedLessons.length ?? 0;
+        const pct = course.meta.totalLessons > 0
+          ? Math.round((completedCount / course.meta.totalLessons) * 100)
+          : 0;
+
+        return (
+          <Link
+            key={course.id}
+            href={`/maxymia/campus/${course.slug}`}
+            className="flex items-center gap-4 p-4 rounded-xl border border-mx-border hover:border-mx-orange/30 transition-colors"
+          >
+            <div className="w-12 h-12 bg-mx-orange/10 rounded-xl flex items-center justify-center shrink-0">
+              <Sparkles className="text-mx-orange" size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-mx-text font-medium text-sm truncate">{course.title.es}</h4>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1 h-1.5 bg-mx-border rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-mx-orange rounded-full transition-all"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="text-mx-text-muted text-xs">{pct}%</span>
+              </div>
+            </div>
+            <ArrowRight size={16} className="text-mx-text-muted shrink-0" />
+          </Link>
+        );
+      })}
+
+      <div className="pt-2">
+        <Link
+          href="/maxymia/campus"
+          className="text-mx-orange text-sm hover:underline"
+        >
+          Ver todos los cursos →
+        </Link>
+      </div>
+    </div>
+  );
+};
+
 const CertificadosSection = () => (
   <div className="flex items-center gap-4">
     <div className="w-12 h-12 bg-mx-orange/10 rounded-xl flex items-center justify-center shrink-0">
@@ -395,13 +483,14 @@ const CertificadosSection = () => (
 
 // ─── Mi Plan Section ─────────────────────────────────────────────────
 const MiPlanSection = () => {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
+  const { hasPro, subscription } = useUserCampus();
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
-  const isPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
-  const subscribedAt = user?.publicMetadata?.subscribedAt as string | undefined;
-  const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
-  const stripeCustomerId = user?.publicMetadata?.stripeCustomerId as string | undefined;
+  const isPro = isSignedIn && hasPro;
+  const subscribedAt = subscription?.startedAt;
+  const subscriptionStatus = subscription?.status;
+  const stripeCustomerId = subscription?.stripeCustomerId;
 
   const handleOpenBillingPortal = async () => {
     setIsLoadingPortal(true);
@@ -660,13 +749,14 @@ const SeguridadSection = () => {
 };
 
 // ─── Nav items config ────────────────────────────────────────────────
-type SectionKey = 'perfil' | 'seguridad' | 'plan' | 'cursos' | 'certificados';
+type SectionKey = 'perfil' | 'seguridad' | 'plan' | 'cursos' | 'maxymia' | 'certificados';
 
 const navItems: { key: SectionKey; label: string; icon: React.ReactNode }[] = [
   { key: 'perfil', label: 'Perfil', icon: <User size={18} /> },
   { key: 'seguridad', label: 'Seguridad', icon: <Lock size={18} /> },
   { key: 'plan', label: 'Mi Plan', icon: <Crown size={18} /> },
   { key: 'cursos', label: 'Mis Cursos', icon: <GraduationCap size={18} /> },
+  { key: 'maxymia', label: 'Maxymia', icon: <Sparkles size={18} /> },
   { key: 'certificados', label: 'Certificados', icon: <Award size={18} /> },
 ];
 
@@ -680,6 +770,7 @@ export default function PerfilPage() {
     seguridad: 'Seguridad',
     plan: 'Plan y Facturación',
     cursos: 'Mis Cursos',
+    maxymia: 'Campus Maxymia',
     certificados: 'Mis Certificados',
   };
 
@@ -762,6 +853,7 @@ export default function PerfilPage() {
                   {activeSection === 'seguridad' && <SeguridadSection />}
                   {activeSection === 'plan' && <MiPlanSection />}
                   {activeSection === 'cursos' && <MisCursosSection />}
+                  {activeSection === 'maxymia' && <MaxymiaSection />}
                   {activeSection === 'certificados' && <CertificadosSection />}
                 </div>
               </div>

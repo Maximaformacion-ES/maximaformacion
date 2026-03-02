@@ -26,7 +26,7 @@ import { FontStyles } from '../components/FontStyles';
 import { ColoredTitle, StyledTitle } from '../components/StyledTitle';
 import type { MaxymiaHomeData, MaxymiaCard, Program } from '../../lib/strapi/types';
 
-const CAMPUS_URL = 'https://maxymia.com/';
+const CAMPUS_URL = '/maxymia/campus';
 
 // Icon/gradient maps for cards that don't have images from Strapi
 const FEATURE_VISUALS = [
@@ -51,7 +51,7 @@ function useCampusLink() {
     (e: React.MouseEvent) => {
       if (!isSignedIn) {
         e.preventDefault();
-        router.push('/sign-in?redirect_url=/maxymia');
+        router.push('/sign-in?redirect_url=/maxymia/campus');
       }
     },
     [isSignedIn, router],
@@ -74,7 +74,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
         <div className="absolute top-1/2 right-10 w-50 h-50 bg-mx-orange/3 rounded-full blur-[80px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full py-16 md:py-24 relative z-10">
+      <div className="px-6 md:px-[128px] w-full py-16 md:py-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left content */}
           <div>
@@ -113,16 +113,14 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="flex flex-wrap gap-4 mb-12"
             >
-              <a
+              <Link
                 href={CAMPUS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
                 onClick={handleCampusClick}
                 className="inline-flex items-center gap-2 bg-mx-orange text-white px-7 py-3.5 rounded-full text-sm font-medium hover:bg-mx-orange-dark transition-colors"
               >
                 Ir al Campus
-                <ArrowUpRight size={18} />
-              </a>
+                <ArrowRight size={18} />
+              </Link>
               <a
                 href="#cursos"
                 className="inline-flex items-center gap-2 border border-white/20 text-white px-7 py-3.5 rounded-full text-sm font-medium hover:bg-white/5 transition-colors"
@@ -172,11 +170,11 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               </div>
               {/* Floating icons */}
               {[
-                { top: '2%', left: '45%', size: 56 },
+                { top: '2%', left: '45%', size: 48 },
                 { top: '82%', left: '3%', size: 48 },
                 { top: '35%', left: '90%', size: 48 },
-                { top: '88%', left: '85%', size: 44 },
-                { top: '28%', left: '-2%', size: 40 },
+                { top: '88%', left: '85%', size: 48 },
+                { top: '28%', left: '-2%', size: 48 },
               ].map((pos, i) => (
                 <m.div
                   key={`${pos.top}-${pos.left}`}
@@ -215,7 +213,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
 function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'] }) {
   return (
     <section className="py-24 md:py-32 relative">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12">
+      <div className="px-6 md:px-[128px]">
         {/* Header */}
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -260,7 +258,7 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
                 ) : (
                   <div className={`absolute inset-0 bg-linear-to-br ${visual.gradient}`} />
                 )}
-                <div className="absolute inset-0 bg-[#060918]/60 group-hover:bg-[#060918]/50 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-[#0b1018]/60 group-hover:bg-[#0b1018]/50 transition-colors duration-500" />
 
                 {/* Content — pinned to top left */}
                 <div className="absolute top-0 left-0 right-0 p-8 md:p-10">
@@ -289,7 +287,7 @@ function CoursesSection({
 
   return (
     <section id="cursos" className="py-24 md:py-32 relative border-t border-white/5">
-      <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+      <div className="px-6 md:px-[128px]">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
           <m.div
@@ -310,20 +308,21 @@ function CoursesSection({
             </p>
           </m.div>
 
-          <m.a
-            href={CAMPUS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={handleCampusClick}
+          <m.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-sm font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
           >
-            Ver todos los cursos
-            <ArrowRight size={14} />
-          </m.a>
+            <Link
+              href={CAMPUS_URL}
+              onClick={handleCampusClick}
+              className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-sm font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
+            >
+              Ver todos los cursos
+              <ArrowRight size={14} />
+            </Link>
+          </m.div>
         </div>
 
         {/* Course Cards */}
@@ -339,7 +338,7 @@ function CoursesSection({
             >
               {/* Image */}
               <div className="relative h-[200px] overflow-hidden bg-[#0d1025]">
-                <div className="absolute inset-0 bg-linear-to-t from-[#060918] via-transparent to-transparent z-10" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#0b1018] via-transparent to-transparent z-10" />
                 <div className="absolute top-3 left-3 z-20">
                   <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white text-xs border border-white/10">
                     {course.type}
@@ -414,7 +413,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
 
   return (
     <section className="relative py-24 md:py-32">
-      <div className="max-w-[1800px] mx-auto px-6 md:px-12">
+      <div className="px-6 md:px-[128px]">
         {/* Header */}
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -567,16 +566,14 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mb-8"
         >
-          <a
+          <Link
             href={CAMPUS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={handleCampusClick}
             className="inline-flex items-center gap-2.5 bg-mx-orange text-white px-10 py-4.5 rounded-full text-base font-medium hover:bg-mx-orange-dark transition-colors"
           >
             Ir al Campus Virtual
-            <ArrowUpRight size={20} />
-          </a>
+            <ArrowRight size={20} />
+          </Link>
         </m.div>
 
         <m.div
@@ -613,11 +610,11 @@ export default function MaxymiaClient({ data, programs }: MaxymiaClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#060918] text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#0b1018] text-white overflow-x-hidden relative">
 
       {/* Sub-brand banner */}
       <div className="fixed top-0 left-0 right-0 z-60 bg-white/0.03 backdrop-blur-sm border-b border-white/5">
-        <div className="max-w-[1800px] mx-auto px-6 md:px-12 flex items-center justify-between h-8">
+        <div className="px-6 md:px-[128px] flex items-center justify-between h-8">
           <Link
             href="/"
             className="group flex items-center gap-2 text-white/30 hover:text-mx-orange transition-colors text-[11px] tracking-wide"

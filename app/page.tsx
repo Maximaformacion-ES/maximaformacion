@@ -37,7 +37,6 @@ export default async function Home() {
       if (strapiHomeData) {
         homeData = strapiHomeData;
       } else {
-        console.log('[Home] Strapi no devolvió datos de Home, usando fallback');
       }
       if (strapiPrograms.length > 0) {
         programs = strapiPrograms;

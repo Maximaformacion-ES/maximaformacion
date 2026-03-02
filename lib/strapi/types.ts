@@ -637,3 +637,173 @@ export interface SiteMetadata {
   twitterCard: string;
   noIndex: boolean;
 }
+
+// ============ Maxymia Course Types (GraphQL) ============
+
+// Content blocks (dynamic zone — __typename discriminator)
+export interface StrapiMaxymiaTextBlock {
+  __typename: 'ComponentMaxymiaTextBlock';
+  html: string;
+}
+
+export interface StrapiMaxymiaVideoBlock {
+  __typename: 'ComponentMaxymiaVideoBlock';
+  vimeoId: string;
+  title: string | null;
+}
+
+export interface StrapiMaxymiaImageBlock {
+  __typename: 'ComponentMaxymiaImageBlock';
+  image: { url: string };
+  alt: string;
+  caption: string | null;
+}
+
+export interface StrapiMaxymiaCodeBlock {
+  __typename: 'ComponentMaxymiaCodeBlock';
+  language: string;
+  code: string;
+  fileName: string | null;
+}
+
+export interface StrapiMaxymiaCalloutBlock {
+  __typename: 'ComponentMaxymiaCalloutBlock';
+  variant: 'info' | 'warning' | 'tip';
+  title: string | null;
+  content: string;
+}
+
+export type StrapiMaxymiaContentBlock =
+  | StrapiMaxymiaTextBlock
+  | StrapiMaxymiaVideoBlock
+  | StrapiMaxymiaImageBlock
+  | StrapiMaxymiaCodeBlock
+  | StrapiMaxymiaCalloutBlock;
+
+// Exam question types (dynamic zone)
+// Note: _en fields are nullable, JSON scalars come as parsed values
+export interface StrapiMaxymiaSingleChoice {
+  __typename: 'ComponentMaxymiaSingleChoice';
+  id: string;
+  question_es: string;
+  question_en: string | null;
+  options: { id: string; text_es: string; text_en: string | null }[];
+  correctIndex: number;
+}
+
+export interface StrapiMaxymiaMultipleChoice {
+  __typename: 'ComponentMaxymiaMultipleChoice';
+  id: string;
+  question_es: string;
+  question_en: string | null;
+  options: { id: string; text_es: string; text_en: string | null }[];
+  correctIndices: number[]; // JSON scalar
+}
+
+export interface StrapiMaxymiaOrdering {
+  __typename: 'ComponentMaxymiaOrdering';
+  id: string;
+  question_es: string;
+  question_en: string | null;
+  items: { id: string; text_es: string; text_en: string | null }[];
+  correctOrder: number[]; // JSON scalar
+}
+
+export interface StrapiMaxymiaFillBlank {
+  __typename: 'ComponentMaxymiaFillBlank';
+  id: string;
+  question_es: string;
+  question_en: string | null;
+  acceptedAnswers: string[]; // JSON scalar
+}
+
+export interface StrapiMaxymiaFreeText {
+  __typename: 'ComponentMaxymiaFreeText';
+  id: string;
+  question_es: string;
+  question_en: string | null;
+  sampleAnswer_es: string | null;
+  sampleAnswer_en: string | null;
+}
+
+export type StrapiMaxymiaExamQuestion =
+  | StrapiMaxymiaSingleChoice
+  | StrapiMaxymiaMultipleChoice
+  | StrapiMaxymiaOrdering
+  | StrapiMaxymiaFillBlank
+  | StrapiMaxymiaFreeText;
+
+// Structure types
+// Note: blocks, lessons, topics, exams are Strapi components (use `id`, not `documentId`)
+export interface StrapiMaxymiaTopic {
+  id: string;
+  title_es: string;
+  title_en: string | null;
+  anchorId: string;
+  content: StrapiMaxymiaContentBlock[];
+}
+
+export interface StrapiMaxymiaLesson {
+  id: string;
+  title_es: string;
+  title_en: string | null;
+  content_es: string | null;
+  content_en: string | null;
+  estimatedMinutes: number | null;
+  order: number;
+  topics: StrapiMaxymiaTopic[] | null;
+}
+
+export interface StrapiMaxymiaExam {
+  id: string;
+  title_es: string;
+  title_en: string | null;
+  description_es: string | null;
+  description_en: string | null;
+  passingScore: number;
+  questions: StrapiMaxymiaExamQuestion[];
+}
+
+export interface StrapiMaxymiaBlock {
+  id: string;
+  title_es: string;
+  title_en: string | null;
+  content_es: string | null;
+  content_en: string | null;
+  order: number;
+  lessons: StrapiMaxymiaLesson[];
+  exam: StrapiMaxymiaExam | null;
+}
+
+export interface StrapiMaxymiaInstructor {
+  documentId: string;
+  name: string;
+  role: string;
+  avatar: { url: string } | null;
+}
+
+export interface StrapiMaxymiaCourse {
+  documentId: string;
+  slug: string;
+  title_es: string;
+  title_en: string | null;
+  description_es: string;
+  description_en: string | null;
+  image: { url: string; alternativeText: string | null } | null;
+  blocks: StrapiMaxymiaBlock[];
+  price: number;
+  language: string | null;
+  level: string;
+  category: string;
+  isPro: boolean | null;
+  tags: string[] | null; // JSON scalar
+  instructor: StrapiMaxymiaInstructor | null;
+  publishedAt?: string;
+}
+
+// GraphQL response wrappers
+export interface MaxymiaCoursesGraphQLResponse {
+  maxymiaCourses_connection: {
+    nodes: StrapiMaxymiaCourse[];
+  };
+}

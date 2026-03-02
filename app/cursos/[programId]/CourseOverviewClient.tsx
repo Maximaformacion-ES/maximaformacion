@@ -18,10 +18,11 @@ import {
   PartyPopper,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 import { FontStyles } from '@/app/components/FontStyles';
-import type { ProgramWithLessons, PurchasedCourse, CourseProgress, Lesson, ModuleWithLessons } from '@/lib/strapi/types';
+import type { ProgramWithLessons, CourseProgress, Lesson, ModuleWithLessons } from '@/lib/strapi/types';
 import { formatTotalDuration, formatDuration } from '@/lib/cloudflare/stream';
 import CourseAccessGate from '@/app/components/CourseAccessGate';
 
@@ -320,24 +321,28 @@ export default function CourseOverviewClient({
   firstLessonId,
   showSuccessMessage,
 }: CourseOverviewClientProps) {
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  const { hasPro, hasAccess: checkAccess, courseProgress, isLoading: campusLoading } = useUserCampus();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set([0]));
   const [successDismissed, setSuccessDismissed] = useState(false);
   const showSuccess = showSuccessMessage && !successDismissed;
 
-  // Get user access and progress
-  const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
-  const purchasedCourses = (user?.publicMetadata?.purchasedCourses as PurchasedCourse[]) || [];
-  const hasPurchased = purchasedCourses.some(
-    (c) => c.programId === program.id || c.documentId === program.documentId
-  );
-  const hasAccess = userHasPro || hasPurchased;
+  const userHasPro = isSignedIn && hasPro;
+  const hasAccess = checkAccess(program.documentId);
 
-  // Get course progress
-  const courseProgress = (user?.publicMetadata?.courseProgress as Record<string, CourseProgress>) || {};
-  const progress = courseProgress[program.documentId];
-  const completedLessons = new Set(progress?.completedLessons || []);
+  // Get course progress from campus hook
+  const progressData = courseProgress[program.documentId];
+  const progress = progressData
+    ? {
+        startedAt: progressData.startedAt || new Date().toISOString(),
+        lastAccessedAt: progressData.lastAccessedAt || new Date().toISOString(),
+        completedLessons: progressData.completedLessons,
+        currentLessonId: progressData.currentLessonId || undefined,
+        progressPercent: 0,
+      }
+    : undefined;
+  const completedLessons = new Set(progressData?.completedLessons || []);
 
   // Hide success message after 5 seconds
   useEffect(() => {
@@ -361,7 +366,7 @@ export default function CourseOverviewClient({
   };
 
   // If user doesn't have access and the course is Pro, show access gate
-  if (isLoaded && program.isPro && !hasAccess) {
+  if (isLoaded && !campusLoading && program.isPro && !hasAccess) {
     return (
       <div className="bg-black min-h-screen text-white selection:bg-amber-500/30 overflow-x-hidden">
         <FontStyles />

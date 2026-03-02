@@ -11,11 +11,13 @@ import {
   UserButton,
   useUser,
 } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 
 interface HeaderProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (value: boolean) => void;
   variant?: 'default' | 'maxymia';
+  navItems?: NavItem[];
 }
 
 interface NavItem {
@@ -36,7 +38,7 @@ const NAV_ITEMS: NavItem[] = [
 const CAMPUS_OPTIONS = [
   { name: 'E-Learning', url: 'https://maximaformacion.com.es/' },
   { name: 'Data Science', url: 'https://www.maximacampus.es/' },
-  { name: 'Maxymia', url: 'https://maxymia.com/' },
+  { name: 'Maxymia', url: '/maxymia/campus' },
 ];
 
 // Shared UserButton appearance config used by both desktop and mobile
@@ -262,7 +264,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className={`fixed inset-0 z-40 pt-24 px-6 ${isDark ? 'bg-[#060918]' : 'bg-mx-bg'}`}
+          className={`fixed inset-0 z-40 pt-24 px-6 ${isDark ? 'bg-[#0b1018]' : 'bg-mx-bg'}`}
         >
           <div className="flex flex-col gap-6">
             {NAV_ITEMS.map((item, i) => (
@@ -364,12 +366,13 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
 
 // --- Main Header component (thin orchestrator) ---
 
-export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, variant = 'default' }) => {
+export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, variant = 'default', navItems }) => {
   const isDark = variant === 'maxymia';
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
+  const { hasPro } = useUserCampus();
 
-  // Check if user has Pro plan from Clerk metadata
-  const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
+  const userHasPro = isSignedIn && hasPro;
+  const items = navItems ?? NAV_ITEMS;
 
   return (
     <>
@@ -377,9 +380,9 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed left-0 right-0 z-50 ${isDark ? 'top-8 bg-[#060918] border-b border-white/10' : 'top-0 bg-mx-bg border-b border-mx-border'}`}
+        className={`fixed left-0 right-0 z-50 ${isDark ? 'top-8 bg-[#0b1018] border-b border-white/10' : 'top-0 bg-mx-bg border-b border-mx-border'}`}
       >
-        <div className="max-w-[1800px] mx-auto px-6 md:px-12 py-6">
+        <div className="px-6 md:px-[128px] py-6">
           <div className="flex items-center justify-between">
             <m.a
               href={isDark ? "/maxymia" : "/"}
@@ -408,7 +411,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
             </m.a>
 
             <div className="hidden lg:flex items-center gap-8">
-              {NAV_ITEMS.map((item) => {
+              {items.map((item) => {
                 const isActive = isDark && item.path === '/maxymia';
                 return (
                   <Link

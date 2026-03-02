@@ -38,7 +38,7 @@ export const MaxymiaFooter: React.FC = () => {
           {/* Brand */}
           <div>
             <Link href="/maxymia" className="inline-block mb-5">
-              <Image src="/logo-completo.webp" alt="Maxymia" className="h-10 w-auto" width={200} height={40} />
+              <Image src="/logo-completo.webp" alt="Maxymia" className="h-10" style={{ width: 'auto' }} width={200} height={40} />
             </Link>
             <p className="text-white/50 text-sm font-light leading-relaxed max-w-[268px]">
               El campus virtual de IA aplicada a ciencias de Máxima Formación. Formación especializada para investigadores y profesionales.

@@ -19,24 +19,22 @@ import {
   Phone,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
-import type { Program, PurchasedCourse } from '@/lib/strapi/types';
+import type { Program } from '@/lib/strapi/types';
 
 interface ProgramSidebarProps {
   program: Program;
 }
 
 export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userHasPro = isSignedIn && user?.publicMetadata?.plan === 'pro';
-  const purchasedCourses = (user?.publicMetadata?.purchasedCourses as PurchasedCourse[]) || [];
-  const hasPurchased = purchasedCourses.some(
-    (c) => c.programId === program.id || c.documentId === program.documentId
-  );
-  const hasAccess = userHasPro || hasPurchased;
+  const userHasPro = isSignedIn && hasPro;
+  const hasAccess = checkAccess(program.documentId);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -154,7 +152,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
         {/* CTA Button */}
         <div className="space-y-3">
-          {isLoaded && hasAccess ? (
+          {isLoaded && !campusLoading && hasAccess ? (
             <Link
               href={`/cursos/${program.documentId || program.id}`}
               className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-base font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
@@ -184,7 +182,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             </m.button>
           )}
 
-          {isLoaded && !userHasPro && (
+          {isLoaded && !campusLoading && !userHasPro && (
             <Link
               href="/pricing"
               className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
