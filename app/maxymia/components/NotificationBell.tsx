@@ -65,7 +65,7 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
       >
         <Bell size={16} className="text-white/60" />
         {isLoaded && hasUnseen && (
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-mx-orange rounded-full" />
         )}
       </button>
 
