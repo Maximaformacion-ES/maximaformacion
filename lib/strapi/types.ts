@@ -798,6 +798,7 @@ export interface StrapiMaxymiaCourse {
   isPro: boolean | null;
   tags: string[] | null; // JSON scalar
   instructor: StrapiMaxymiaInstructor | null;
+  thumbnailTitle?: string | null;
   publishedAt?: string;
 }
 

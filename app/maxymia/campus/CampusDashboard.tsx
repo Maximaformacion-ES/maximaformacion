@@ -57,7 +57,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
   const activeCourse = courses[activeIndex];
 
   return (
-    <section className="relative mb-16 min-h-[80dvh] flex flex-col justify-center">
+    <section className="relative mb-16 h-[80dvh] flex flex-col justify-center overflow-hidden">
       {/* Course image background — full viewport width */}
       {activeCourse && (
         <div className="absolute inset-0 -mx-[128px] max-md:-mx-6" style={{ left: 0, right: 0, marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>

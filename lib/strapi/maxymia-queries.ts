@@ -25,7 +25,7 @@ import type {
 
 const MAXYMIA_COURSES_LIST_QUERY = `
   query MaxymiaCourses {
-    maxymiaCourses_connection {
+    maxymiaCourses_connection(pagination: { limit: -1 }, sort: ["publishedAt:desc"]) {
       nodes {
         documentId
         slug
@@ -40,6 +40,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
         isPro
         tags
         image { url, alternativeText }
+        thumbnailTitle
         publishedAt
         instructor { documentId, name, role, avatar { url } }
         blocks {
@@ -286,6 +287,9 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     isPro: course.isPro ?? false,
     tags: course.tags ?? [],
     category: course.category as MaxymiaCategory,
+    thumbnailTitle: course.thumbnailTitle
+      ? { es: course.thumbnailTitle, en: course.thumbnailTitle }
+      : undefined,
     createdAt: course.publishedAt,
   };
 }
