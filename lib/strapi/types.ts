@@ -800,6 +800,9 @@ export interface StrapiMaxymiaCourse {
   instructor: StrapiMaxymiaInstructor | null;
   thumbnailTitle?: string | null;
   publishedAt?: string;
+  careers?: string | null;
+  objectives?: string | null;
+  audiences?: string | null;
 }
 
 // GraphQL response wrappers

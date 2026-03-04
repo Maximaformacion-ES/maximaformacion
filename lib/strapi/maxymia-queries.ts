@@ -79,7 +79,11 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         isPro
         tags
         image { url, alternativeText }
+        thumbnailTitle
         publishedAt
+        careers
+        objectives
+        audiences
         instructor { documentId, name, role, avatar { url } }
         blocks {
           id
@@ -291,6 +295,9 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
       ? { es: course.thumbnailTitle, en: course.thumbnailTitle }
       : undefined,
     createdAt: course.publishedAt,
+    careers: course.careers ?? undefined,
+    objectives: course.objectives ?? undefined,
+    audiences: course.audiences ?? undefined,
   };
 }
 

@@ -390,6 +390,20 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     studentCount: 2340,
     originalPrice: 149,
     createdAt: '2025-09-15T00:00:00Z',
+    objectives: `- Comprender los fundamentos teóricos de la inteligencia artificial y el aprendizaje automático
+- Implementar redes neuronales básicas utilizando Python y frameworks modernos
+- Conocer los principales modelos de lenguaje y sus aplicaciones prácticas
+- Desarrollar proyectos prácticos de IA aplicada a problemas reales
+- Evaluar y optimizar modelos de machine learning`,
+    audiences: `- Desarrolladores de software que quieran ampliar sus habilidades al campo de la IA
+- Profesionales de datos interesados en técnicas de machine learning
+- Estudiantes de informática, matemáticas o ingenierías
+- Profesionales que busquen una transición al campo de la inteligencia artificial`,
+    careers: `- Ingeniero de Machine Learning
+- Científico de Datos
+- Desarrollador de IA
+- Consultor de Inteligencia Artificial
+- Investigador en IA aplicada`,
   },
 
   // ── Course 2: NLP con Transformers (Spanish) ─────────────────────────
@@ -676,6 +690,20 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     studentCount: 1520,
     originalPrice: 199,
     createdAt: '2025-11-01T00:00:00Z',
+    objectives: `- Dominar las arquitecturas Transformer y sus variantes (BERT, GPT, T5)
+- Implementar pipelines de procesamiento de texto con Hugging Face
+- Desarrollar sistemas de análisis de sentimiento y clasificación de textos
+- Crear aplicaciones de generación de texto y resumen automático
+- Aplicar técnicas de NLP a casos de uso empresariales`,
+    audiences: `- Desarrolladores con conocimientos básicos de Python y machine learning
+- Científicos de datos que quieran especializarse en procesamiento de lenguaje
+- Ingenieros de software interesados en aplicaciones de texto e IA generativa
+- Investigadores que busquen aplicar NLP a sus áreas de estudio`,
+    careers: `- Ingeniero de NLP
+- Especialista en IA Conversacional
+- Desarrollador de Chatbots y Asistentes Virtuales
+- Científico de Datos especializado en Texto
+- Ingeniero de Búsqueda Semántica`,
   },
 
   // ── Course 3: Computer Vision (Spanish) ──────────────────────────────
@@ -815,6 +843,20 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     studentCount: 980,
     originalPrice: 179,
     createdAt: '2026-01-10T00:00:00Z',
+    objectives: `- Comprender los fundamentos de la visión por computador y el procesamiento de imágenes
+- Implementar redes convolucionales (CNN) y Vision Transformers (ViT) con PyTorch
+- Desarrollar sistemas de detección y segmentación de objetos
+- Aplicar técnicas de aumento de datos y transfer learning
+- Desplegar modelos de visión en producción`,
+    audiences: `- Ingenieros de software con interés en visión artificial
+- Científicos de datos que quieran expandir sus habilidades a datos visuales
+- Investigadores en robótica, automóviles autónomos o sector industrial
+- Profesionales del sector médico interesados en análisis de imágenes`,
+    careers: `- Ingeniero de Computer Vision
+- Desarrollador de Sistemas de Visión Artificial
+- Ingeniero de Robótica
+- Especialista en Análisis de Imágenes Médicas
+- Ingeniero de Vehículos Autónomos`,
   },
 
   // ── Course: LLMs para Investigación Científica (NEW — test notifications) ──

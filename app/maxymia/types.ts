@@ -101,6 +101,9 @@ export interface MaxymiaCourse {
   studentCount?: number;
   originalPrice?: number;
   createdAt?: string;
+  careers?: string;
+  objectives?: string;
+  audiences?: string;
 }
 
 // ============ Exam Question Types ============

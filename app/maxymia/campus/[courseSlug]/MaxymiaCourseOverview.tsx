@@ -18,6 +18,7 @@ import {
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
+import MaxymiaCourseDetail from './MaxymiaCourseDetail';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaCourseProgress, Locale } from '../../types';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
@@ -32,7 +33,7 @@ interface Props {
 
 export default function MaxymiaCourseOverview({ course }: Props) {
   const { locale } = useLocale();
-  const { courseProgress } = useUserCampus();
+  const { hasPro, hasAccess: checkAccess, courseProgress, isLoading } = useUserCampus();
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
 
   // Build progress from courseProgress
@@ -69,6 +70,14 @@ export default function MaxymiaCourseOverview({ course }: Props) {
   }, [course, completedSet]);
 
   const enrolled = !!progress;
+
+  // Check if user has access to this course
+  const hasAccess = hasPro || checkAccess(course.id) || enrolled;
+
+  // Show product/detail page if user doesn't have access
+  if (!isLoading && !hasAccess) {
+    return <MaxymiaCourseDetail course={course} />;
+  }
 
   return (
     <div className="px-6 md:px-12 py-12">
