@@ -7,9 +7,6 @@ import Link from 'next/link';
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
-  Star,
-  ChevronDown,
   Users,
   FlaskConical,
   Award,
@@ -24,7 +21,9 @@ import { Header } from '../components/Header';
 import { MaxymiaFooter } from '../components/MaxymiaFooter';
 import { FontStyles } from '../components/FontStyles';
 import { ColoredTitle, StyledTitle } from '../components/StyledTitle';
-import type { MaxymiaHomeData, MaxymiaCard, Program } from '../../lib/strapi/types';
+import type { MaxymiaHomeData, MaxymiaCard } from '../../lib/strapi/types';
+import type { MaxymiaCourse } from './types';
+import MaxymiaCourseCard from './components/MaxymiaCourseCard';
 
 const CAMPUS_URL = '/maxymia/campus';
 
@@ -66,7 +65,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
   const { handleCampusClick } = useCampusLink();
 
   return (
-    <section className="relative min-h-dvh flex items-center overflow-hidden pt-20">
+    <section className="relative flex items-center overflow-hidden pt-12">
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-32 right-[30%] w-125 h-125 bg-mx-orange/5 rounded-full blur-[120px]" />
@@ -74,7 +73,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
         <div className="absolute top-1/2 right-10 w-50 h-50 bg-mx-orange/3 rounded-full blur-[80px]" />
       </div>
 
-      <div className="px-6 md:px-[128px] w-full py-16 md:py-24 relative z-10">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] w-full py-16 md:py-0 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left content */}
           <div>
@@ -92,7 +91,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight mb-8"
+              className="text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl font-black leading-[0.95] tracking-tight mb-8"
             >
               <ColoredTitle text={hero.title} />
             </m.h1>
@@ -102,7 +101,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white/60 text-base md:text-lg font-light leading-relaxed max-w-lg mb-10"
+              className="text-white/60 text-base md:text-lg 2xl:text-xl font-light leading-relaxed max-w-lg mb-10"
             >
               {hero.description}
             </m.p>
@@ -145,8 +144,8 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
                 <React.Fragment key={stat.label}>
                   {i > 0 && <div className="w-px h-10 bg-white/10" />}
                   <div>
-                    <div className="text-white text-xl md:text-2xl font-bold">{stat.value}</div>
-                    <div className="text-white/40 text-xs">{stat.label}</div>
+                    <div className="text-white text-xl md:text-2xl 2xl:text-3xl font-bold">{stat.value}</div>
+                    <div className="text-white/40 text-xs 2xl:text-sm">{stat.label}</div>
                   </div>
                 </React.Fragment>
               ))}
@@ -160,25 +159,38 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
             transition={{ duration: 1, delay: 0.3 }}
             className="hidden lg:flex items-center justify-center"
           >
-            <div className="relative w-[470px] h-[470px]">
+            <div className="relative w-[550px] h-[550px]">
+              {/* Background hero image — round with faded edges */}
+              <div
+                className="absolute inset-0 rounded-full overflow-hidden m-12"
+                style={{ maskImage: 'radial-gradient(circle, black 40%, transparent 70%)', WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 70%)' }}
+              >
+                <Image
+                  src="/hero-image.webp"
+                  alt=""
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
               {/* Outer ring */}
               <div className="absolute inset-0 rounded-full border-2 border-white/10" />
               <div className="absolute inset-4 rounded-full border border-white/5" />
-              {/* Central logo */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Image src="/logo.webp" alt="Maxymia" className="w-[200px] h-[200px] object-contain" width={200} height={200} />
-              </div>
-              {/* Floating icons */}
+              {/* Floating icons — alternating orange/blue bg, dark icon */}
               {[
-                { top: '2%', left: '45%', size: 48 },
-                { top: '82%', left: '3%', size: 48 },
-                { top: '35%', left: '90%', size: 48 },
-                { top: '88%', left: '85%', size: 48 },
-                { top: '28%', left: '-2%', size: 48 },
+                { top: '2%', left: '45%', size: 48, color: 'orange' as const },
+                { top: '82%', left: '3%', size: 48, color: 'orange' as const },
+                { top: '35%', left: '90%', size: 48, color: 'blue' as const },
+                { top: '88%', left: '85%', size: 48, color: 'orange' as const },
+                { top: '28%', left: '-2%', size: 48, color: 'blue' as const },
               ].map((pos, i) => (
                 <m.div
                   key={`${pos.top}-${pos.left}`}
-                  className="absolute bg-white/5 border border-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm"
+                  className={`absolute rounded-full flex items-center justify-center shadow-lg ${
+                    pos.color === 'orange'
+                      ? 'bg-mx-orange/20 text-mx-orange border border-mx-orange/80 shadow-mx-orange/20'
+                      : 'bg-mx-blue/20 text-mx-blue border border-mx-blue/80 shadow-mx-blue/20'
+                  }`}
                   style={{ top: pos.top, left: pos.left, width: pos.size, height: pos.size }}
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -186,7 +198,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
                   {[FlaskConical, BookOpen, Award, Route, Users][i] &&
                     React.createElement([FlaskConical, BookOpen, Award, Route, Users][i], {
                       size: pos.size * 0.35,
-                      className: 'text-mx-orange/70',
+                      className: 'text-current',
                     })}
                 </m.div>
               ))}
@@ -196,14 +208,14 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
       </div>
 
       {/* Scroll indicator */}
-      <m.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      {/* <m.div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
         <span className="text-mx-orange/40 text-xs tracking-widest">SCROLL</span>
         <ChevronDown size={18} className="text-mx-orange/40" />
-      </m.div>
+      </m.div> */}
     </section>
   );
 }
@@ -213,7 +225,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
 function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'] }) {
   return (
     <section className="py-24 md:py-32 relative">
-      <div className="px-6 md:px-[128px]">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
         {/* Header */}
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -227,11 +239,11 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
             <span className="text-mx-blue text-xs tracking-wider">{section.overline}</span>
           </div>
           <h2
-            className="text-3xl md:text-5xl font-black text-white mb-6"
+            className="text-3xl md:text-5xl 2xl:text-6xl font-black text-white mb-6"
           >
             <ColoredTitle text={section.title}/> 
           </h2>
-          <p className="text-white/50 text-base md:text-lg font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/50 text-base md:text-lg 2xl:text-xl font-light max-w-2xl mx-auto leading-relaxed">
             {section.description}
           </p>
         </m.div>
@@ -262,8 +274,8 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
 
                 {/* Content — pinned to top left */}
                 <div className="absolute top-0 left-0 right-0 p-8 md:p-10">
-                  <h3 className="text-white text-lg md:text-xl font-bold mb-2">{card.title}</h3>
-                  <p className="text-white/50 text-sm font-light leading-relaxed max-w-md">{card.description}</p>
+                  <h3 className="text-white text-lg md:text-xl 2xl:text-2xl font-bold mb-2">{card.title}</h3>
+                  <p className="text-white/50 text-sm 2xl:text-base font-light leading-relaxed max-w-md">{card.description}</p>
                 </div>
               </m.div>
             );
@@ -278,16 +290,16 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
 
 function CoursesSection({
   section,
-  programs,
+  courses,
 }: {
   section: MaxymiaHomeData['coursesSection'];
-  programs: Program[];
+  courses: MaxymiaCourse[];
 }) {
   const { handleCampusClick } = useCampusLink();
 
   return (
     <section id="cursos" className="py-24 md:py-32 relative border-t border-white/5">
-      <div className="px-6 md:px-[128px]">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
           <m.div
@@ -303,7 +315,7 @@ function CoursesSection({
             <h2 className="text-5xl md:text-7xl font-black leading-[0.95] text-white mb-4">
               <StyledTitle text={section.title} color="orange" mode="dark" />
             </h2>
-            <p className="text-white/50 text-base font-light max-w-md">
+            <p className="text-white/50 text-base 2xl:text-lg font-light max-w-md">
               {section.description}
             </p>
           </m.div>
@@ -326,79 +338,14 @@ function CoursesSection({
         </div>
 
         {/* Course Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {programs.map((course, i) => (
-            <m.div
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+          {courses.map((course, i) => (
+            <MaxymiaCourseCard
               key={course.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="group rounded-2xl border border-white/10 bg-white/0.02 overflow-hidden hover:border-mx-orange/30 transition-all duration-500"
-            >
-              {/* Image */}
-              <div className="relative h-[200px] overflow-hidden bg-[#0d1025]">
-                <div className="absolute inset-0 bg-linear-to-t from-[#0b1018] via-transparent to-transparent z-10" />
-                <div className="absolute top-3 left-3 z-20">
-                  <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white text-xs border border-white/10">
-                    {course.type}
-                  </span>
-                </div>
-                <div className="absolute bottom-3 left-3 z-20 flex gap-1.5 flex-wrap">
-                  {course.topics.slice(0, 2).map((topic) => (
-                    <span
-                      key={topic.id}
-                      className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/80 text-xs border border-white/10"
-                    >
-                      {topic.name}
-                    </span>
-                  ))}
-                  {course.topics.length > 2 && (
-                    <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/60 text-xs border border-white/10">
-                      +{course.topics.length - 2}
-                    </span>
-                  )}
-                </div>
-                {/* Image or placeholder gradient */}
-                {course.image ? (
-                  <Image src={course.image} alt={course.title} className="absolute inset-0 w-full h-full object-cover" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" unoptimized />
-                ) : (
-                  <div className="absolute inset-0 bg-linear-to-br from-mx-orange/10 via-blue-500/10 to-transparent" />
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star
-                        key={s}
-                        size={14}
-                        className={s <= 4 ? 'text-mx-orange fill-mx-orange' : 'text-white/20'}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-white/70 text-xs">4.0</span>
-                </div>
-
-                <h3 className="text-white text-base font-semibold mb-2 line-clamp-1">{course.title}</h3>
-                <p className="text-white/40 text-sm font-light line-clamp-2 mb-5">{course.description}</p>
-
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {course.originalPrice && (
-                      <span className="text-white/30 text-sm line-through">{course.originalPrice}&euro;</span>
-                    )}
-                    <span className="text-white text-lg font-bold">{course.price}&euro;</span>
-                  </div>
-                  <ArrowUpRight
-                    size={20}
-                    className="text-white/30 group-hover:text-mx-orange transition-colors"
-                  />
-                </div>
-              </div>
-            </m.div>
+              course={course}
+              locale="es"
+              index={i}
+            />
           ))}
         </div>
       </div>
@@ -413,7 +360,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
 
   return (
     <section className="relative py-24 md:py-32">
-      <div className="px-6 md:px-[128px]">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
         {/* Header */}
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -426,7 +373,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
             <Check size={14} className="text-mx-blue" />
             <span className="text-mx-blue text-xs tracking-wider">{section.overline}</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-4">{section.title}</h2>
+          <h2 className="text-3xl md:text-5xl 2xl:text-6xl font-black text-white mb-4">{section.title}</h2>
           <p className="text-white/50 text-base font-light max-w-lg ml-auto leading-relaxed">
             {section.description}
           </p>
@@ -458,8 +405,8 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                 }`}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="text-white text-lg md:text-xl font-bold mb-2 relative z-10">{diff.title}</h3>
-                <p className="text-white/50 text-sm font-light leading-relaxed relative z-10">
+                <h3 className="text-white text-lg md:text-xl 2xl:text-2xl font-bold mb-2 relative z-10">{diff.title}</h3>
+                <p className="text-white/50 text-sm 2xl:text-base font-light leading-relaxed relative z-10">
                   {diff.description}
                 </p>
               </m.div>
@@ -544,7 +491,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-3xl md:text-5xl font-black text-white leading-tight mb-6"
+          className="text-3xl md:text-5xl 2xl:text-6xl font-black text-white leading-tight mb-6"
         >
           <ColoredTitle text={section.title}/>
         </m.h2>
@@ -554,7 +501,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-white/50 text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto mb-10"
+          className="text-white/50 text-base md:text-lg 2xl:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-10"
         >
           {section.description}
         </m.p>
@@ -603,18 +550,18 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
 
 interface MaxymiaClientProps {
   data: MaxymiaHomeData;
-  programs: Program[];
+  courses: MaxymiaCourse[];
 }
 
-export default function MaxymiaClient({ data, programs }: MaxymiaClientProps) {
+export default function MaxymiaClient({ data, courses }: MaxymiaClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#0b1018] text-white overflow-x-hidden relative">
 
       {/* Sub-brand banner */}
-      <div className="fixed top-0 left-0 right-0 z-60 bg-white/0.03 backdrop-blur-sm border-b border-white/5">
-        <div className="px-6 md:px-[128px] flex items-center justify-between h-8">
+      <div className="relative top-0 left-0 right-0 z-60 bg-white/0.03 backdrop-blur-sm border-b border-white/5">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] flex items-center justify-between h-8">
           <Link
             href="/"
             className="group flex items-center gap-2 text-white/30 hover:text-mx-orange transition-colors text-[11px] tracking-wide"
@@ -632,7 +579,7 @@ export default function MaxymiaClient({ data, programs }: MaxymiaClientProps) {
       <main className="relative z-10">
         <HeroSection hero={data.hero} />
         <FeaturesSection section={data.whatIsSection} />
-        <CoursesSection section={data.coursesSection} programs={programs} />
+        <CoursesSection section={data.coursesSection} courses={courses} />
         <WhySection section={data.whyMaxymia} />
         <CTASection section={data.ctaSection} />
       </main>

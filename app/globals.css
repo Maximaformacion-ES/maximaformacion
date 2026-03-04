@@ -137,16 +137,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-mx-bg);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-mx-border);
+  background: rgba(150, 150, 150, 0.35);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #bbb;
+  background: rgba(150, 150, 150, 0.55);
 }
 
 /* No scrollbar utility */

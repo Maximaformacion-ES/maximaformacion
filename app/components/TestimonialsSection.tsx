@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Quote } from 'lucide-react';
 import { StyledTitle } from './StyledTitle';
+import SlideIndicator from './SlideIndicator';
 
 interface Testimonial {
   text: string;
@@ -74,17 +75,12 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
             </m.h2>
 
             {/* Navigation dots */}
-            <div className="flex gap-3">
-              {displayTestimonials.map((testimonial, i) => (
-                <button
-                  key={testimonial.name}
-                  onClick={() => setCurrent(i)}
-                  className={`w-12 h-1 rounded-full transition-all duration-300 ${
-                    i === current ? 'bg-mx-orange' : 'bg-mx-border hover:bg-[#ddd]'
-                  }`}
-                />
-              ))}
-            </div>
+            <SlideIndicator
+              count={displayTestimonials.length}
+              active={current}
+              onSelect={setCurrent}
+              inactiveClass="bg-mx-border hover:bg-[#ddd]"
+            />
           </div>
 
           {/* Right side - Testimonial */}

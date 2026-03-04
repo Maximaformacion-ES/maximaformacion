@@ -380,9 +380,9 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed left-0 right-0 z-50 ${isDark ? 'top-8 bg-[#0b1018] border-b border-white/10' : 'top-0 bg-mx-bg border-b border-mx-border'}`}
+        className={`left-0 right-0 z-50 ${isDark ? 'top-8 bg-[#0b1018] border-b border-white/10' : 'fixed top-0 bg-mx-bg border-b border-mx-border'}`}
       >
-        <div className="px-6 md:px-[128px] py-6">
+        <div className={`px-6 py-6 ${isDark ? 'md:px-32 max-w-[1800px] mx-auto' : 'md:px-12'}`}>
           <div className="flex items-center justify-between">
             <m.a
               href={isDark ? "/maxymia" : "/"}

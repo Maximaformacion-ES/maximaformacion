@@ -25,7 +25,7 @@ function CampusHeader() {
 
   return (
     <header className="relative top-0 left-0 right-0 z-50 bg-[#0b1018] border-b border-white/5">
-      <div className="px-6 md:px-[128px] flex items-center justify-between py-3">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] flex items-center justify-between py-6">
         {/* Logo + Nav */}
         <div className="flex items-center gap-16">
           <Link href="/maxymia" className="flex items-center shrink-0">
@@ -34,7 +34,7 @@ function CampusHeader() {
               alt="Maxymia"
               width={128}
               height={48}
-              className="h-full w-auto"
+              className="h-10 md:h-12 w-auto"
               priority
             />
           </Link>
@@ -92,7 +92,7 @@ function CampusFooter() {
 
   return (
     <footer className="border-t border-white/5 mt-20">
-      <div className="px-6 md:px-[128px] py-16">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Logo + description */}
           <div>
@@ -144,7 +144,7 @@ function CampusFooter() {
 
       {/* Copyright bar */}
       <div className="border-t border-white/5">
-        <div className="px-6 md:px-[128px] py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-white/30 text-xs">
             &copy; {new Date().getFullYear()} Maxymia. {t('footer.rights')}
           </p>

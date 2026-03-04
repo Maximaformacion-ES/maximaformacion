@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getMaxymiaHome } from '@/lib/strapi/queries';
-import { getPrograms } from '@/lib/strapi/queries';
 import { MAXYMIA_HOME_FALLBACK } from '@/app/data/maxymia-fallback';
+import { fetchMaxymiaCourses, getBestRatedCourses } from './data/queries';
 import MaxymiaClient from './MaxymiaClient';
 
 export const metadata: Metadata = {
@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default async function MaxymiaPage() {
-  const [maxymiaData, programsResult] = await Promise.all([
+  const [maxymiaData, allCourses] = await Promise.all([
     getMaxymiaHome(),
-    getPrograms({ featured: true, limit: 4 }).catch(() => ({ programs: [], total: 0, pageCount: 0 })),
+    fetchMaxymiaCourses().catch(() => []),
   ]);
 
   const homeData = maxymiaData || MAXYMIA_HOME_FALLBACK;
-  const programs = programsResult.programs;
+  const topCourses = getBestRatedCourses(allCourses, 8);
 
-  return <MaxymiaClient data={homeData} programs={programs} />;
+  return <MaxymiaClient data={homeData} courses={topCourses} />;
 }

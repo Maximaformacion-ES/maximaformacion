@@ -32,7 +32,7 @@ const maximaLinks = [
 
 export const MaxymiaFooter: React.FC = () => {
   return (
-    <footer className="bg-[#060918] border-t border-white/10 py-16 md:py-20">
+    <footer className="bg-[#0b1018] border-t border-white/10 py-16 md:py-20">
       <div className="max-w-[1280px] mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
           {/* Brand */}

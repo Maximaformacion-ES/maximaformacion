@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
-import { Star, ArrowUpRight, Users } from 'lucide-react';
+import { Star, ArrowUpRight, Users, Calendar, User } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
 import { getCourseMeta } from '../data/queries';
 
@@ -35,7 +35,6 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-
 export default function MaxymiaCourseCard({
   course,
   locale,
@@ -57,16 +56,36 @@ export default function MaxymiaCourseCard({
     ? course.thumbnailTitle[locale].split('\n')
     : [course.title[locale].split(' ').slice(0, 2).join(' ')];
 
+  const createdLabel = course.createdAt
+    ? new Date(course.createdAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', { month: 'short', year: 'numeric' })
+    : null;
+
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [popupSide, setPopupSide] = useState<'right' | 'left'>('right');
+
+  const handleMouseEnter = useCallback(() => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const popupWidth = 300; // 272px + 12px padding
+    if (rect.right + popupWidth > window.innerWidth) {
+      setPopupSide('left');
+    } else {
+      setPopupSide('right');
+    }
+  }, []);
+
   return (
     <m.div
+      ref={cardRef}
+      onMouseEnter={handleMouseEnter}
       layout
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
       transition={{ delay: index * 0.06, duration: 0.5 }}
-      className="group relative rounded-xl overflow-hidden h-full"
+      className="group/card relative h-full"
     >
-      <Link href={`/maxymia/campus/${course.slug}`} className="flex flex-col h-full">
+      <Link href={`/maxymia/campus/${course.slug}`} className="flex flex-col h-full overflow-hidden rounded-xl border border-[#2e3339]">
         {/* Thumbnail area — blue background with chevrons and title */}
         <div className="relative h-[200px] bg-[#527be7] overflow-hidden flex items-center justify-center">
           {/* Course image at 10% opacity behind everything */}
@@ -111,10 +130,10 @@ export default function MaxymiaCourseCard({
         </div>
 
         {/* Orange accent bar */}
-        <div className="h-[5px] bg-mx-orange" />
+        {/* <div className="h-[5px] bg-mx-orange" /> */}
 
         {/* Content area — dark background */}
-        <div className="bg-[#0f141e] px-4 py-4 flex flex-col flex-grow">
+        <div className="bg-[#171c24] px-4 py-4 flex flex-col flex-grow">
           {/* Rating + students */}
           <div className="flex items-center gap-2 mb-2">
             <StarRating rating={rating} />
@@ -127,7 +146,7 @@ export default function MaxymiaCourseCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-white font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover:text-mx-orange transition-colors">
+          <h3 className="text-white font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors">
             {course.title[locale]}
           </h3>
 
@@ -162,7 +181,7 @@ export default function MaxymiaCourseCard({
                     {course.price}&euro;
                   </span>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity">
                   <ArrowUpRight size={14} className="text-white" />
                 </div>
               </div>
@@ -170,6 +189,46 @@ export default function MaxymiaCourseCard({
           </div>
         </div>
       </Link>
+
+      {/* ── Hover detail popup ── */}
+      <div className={`hidden lg:block absolute top-0 z-50 opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-opacity duration-200 ${
+        popupSide === 'right' ? 'left-full pl-3' : 'right-full pr-3'
+      }`}>
+        <div className="w-72 bg-[#171c24] border border-white/40 rounded-xl shadow-2xl shadow-black/40 overflow-hidden">
+          <div className="p-5">
+            {/* Title + date */}
+            <h4 className="text-white font-bold text-sm leading-snug mb-2">
+              {course.title[locale]}
+            </h4>
+            {createdLabel && (
+              <span className="flex items-center gap-1 text-white/40 text-xs mb-2">
+                <Calendar size={10} />
+                {createdLabel}
+              </span>
+            )}
+
+            {/* Description */}
+            <p className="text-white/50 text-xs leading-relaxed line-clamp-5 mb-3 pb-3 border-b border-white/5">
+              {course.description[locale]}
+            </p>
+
+            {/* Author */}
+            <div className="flex items-center gap-2.5">
+              {course.instructor.avatar ? (
+                <img src={course.instructor.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-mx-blue/20 flex items-center justify-center">
+                  <User size={12} className="text-mx-blue" />
+                </div>
+              )}
+              <div>
+                <div className="text-white text-xs font-medium">{course.instructor.name}</div>
+                <div className="text-white/40 text-[10px]">{course.instructor.role}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </m.div>
   );
 }

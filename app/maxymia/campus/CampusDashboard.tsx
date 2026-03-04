@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Star, Users, ArrowRight } from 'lucide-react
 import { useLocale } from '../i18n/LocaleProvider';
 import { getTranslation } from '../i18n/translations';
 import MaxymiaCourseCard from '../components/MaxymiaCourseCard';
+import SlideIndicator from '@/app/components/SlideIndicator';
 import { getBestRatedCourses, getLatestCourse, getRecommendedCourses, getRecentCourses, getCourseMeta } from '../data/queries';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
 
@@ -71,7 +72,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
         </div>
       )}
 
-      <div className="relative px-6 md:px-[128px]">
+      <div className="relative max-w-[1800px] w-full mx-auto px-6 md:px-[128px]">
         <AnimatePresence mode="wait">
           {courses.map((course, i) => {
             if (i !== activeIndex) return null;
@@ -97,7 +98,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                       {badges[i] ?? badges[0]}
                     </span>
 
-                    <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-white leading-tight mb-5 text-balance">
+                    <h1 className="text-3xl md:text-4xl lg:text-6xl 2xl:text-7xl font-bold text-white leading-tight mb-5 text-balance">
                       {course.title[locale].toUpperCase()}
                     </h1>
 
@@ -112,7 +113,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                       </span>
                     </div>
 
-                    <p className="text-white/50 text-base leading-relaxed mb-6 max-w-lg">
+                    <p className="text-white/50 text-base 2xl:text-lg leading-relaxed mb-6 max-w-lg">
                       {course.description[locale]}
                     </p>
 
@@ -135,7 +136,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                         {course.originalPrice && course.originalPrice > course.price && (
                           <span className="text-white/30 text-lg line-through">{course.originalPrice}&euro;</span>
                         )}
-                        <span className="text-mx-orange text-3xl font-bold">{course.price}&euro;</span>
+                        <span className="text-mx-orange text-3xl 2xl:text-4xl font-bold">{course.price}&euro;</span>
                       </div>
                       <Link
                         href={`/maxymia/campus/${course.slug}`}
@@ -154,32 +155,8 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
 
         {/* Slide indicator — bottom right */}
         {courses.length > 1 && (
-          <div className="flex items-center justify-end gap-3 pb-6">
-            {courses.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveIndex(i)}
-                className="relative flex items-center gap-2 group"
-                aria-label={`Slide ${i + 1}`}
-              >
-                <span className={`text-xs font-medium transition-colors ${i === activeIndex ? 'text-white' : 'text-white/30 group-hover:text-white/50'}`}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div className="w-12 h-0.5 bg-white/10 rounded-full overflow-hidden">
-                  {i === activeIndex ? (
-                    <m.div
-                      className="h-full bg-[#527be7] rounded-full"
-                      initial={{ width: '0%' }}
-                      animate={{ width: '100%' }}
-                      transition={{ duration: 10, ease: 'linear' }}
-                      key={activeIndex}
-                    />
-                  ) : (
-                    <div className="h-full w-0 bg-white/20 group-hover:w-full transition-all duration-300 rounded-full" />
-                  )}
-                </div>
-              </button>
-            ))}
+          <div className="flex justify-end pb-6">
+            <SlideIndicator count={courses.length} active={activeIndex} onSelect={setActiveIndex} />
           </div>
         )}
       </div>
@@ -226,7 +203,7 @@ function CourseRow({ title, courses, locale, progressMap, delay = 0 }: CourseRow
     >
       {/* Row header */}
       <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="text-white text-lg md:text-xl font-semibold">{title}</h2>
+        <h2 className="text-white text-lg md:text-xl 2xl:text-2xl font-semibold">{title}</h2>
         {courses.length > 3 && (
           <div className="hidden md:flex items-center gap-1">
             <button
@@ -345,7 +322,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
       <HeroCarousel courses={heroSlides} locale={locale} t={t} />
 
       {/* Course rows */}
-      <div id="courses" className="px-6 md:px-[128px]">
+      <div id="courses" className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
         {/* Recently Added */}
         <CourseRow
           title={t('campus.recentlyAdded')}
