@@ -75,7 +75,7 @@ const UserInfoSection = () => {
             <p className="font-semibold text-mx-text mb-1">
               No has registrado tu nombre completo
             </p>
-            <p className="text-mx-text-muted text-sm mb-4">
+            <p className="text-mx-text-muted text-body-sm mb-4">
               Para generar tus certificados, necesitamos que registres tu nombre
               completo. Asegúrate de ingresarlo correctamente, ya que aparecerá en ellos.
             </p>
@@ -85,19 +85,19 @@ const UserInfoSection = () => {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Nombre"
-                className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-4 py-2.5 rounded-xl focus:border-mx-orange focus:outline-none text-sm"
+                className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-4 py-2.5 rounded-xl focus:border-mx-orange focus:outline-none text-body-sm"
               />
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Apellidos"
-                className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-4 py-2.5 rounded-xl focus:border-mx-orange focus:outline-none text-sm"
+                className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-4 py-2.5 rounded-xl focus:border-mx-orange focus:outline-none text-body-sm"
               />
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="inline-flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-2.5 rounded-xl text-body-sm font-semibold transition-colors disabled:opacity-50"
               >
                 {isSaving ? <Loader2 size={14} className="animate-spin" /> : null}
                 Guardar
@@ -128,21 +128,21 @@ const UserInfoSection = () => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Nombre"
-                    className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-sm"
+                    className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-body-sm"
                   />
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Apellidos"
-                    className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-sm"
+                    className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-body-sm"
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="inline-flex items-center gap-1.5 bg-mx-orange hover:bg-mx-orange-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 bg-mx-orange hover:bg-mx-orange-dark text-white px-4 py-2 rounded-lg text-body-sm font-medium transition-colors disabled:opacity-50"
                   >
                     {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     Guardar
@@ -153,7 +153,7 @@ const UserInfoSection = () => {
                       setFirstName(user.firstName || '');
                       setLastName(user.lastName || '');
                     }}
-                    className="text-mx-text-muted hover:text-mx-text px-4 py-2 rounded-lg text-sm transition-colors"
+                    className="text-mx-text-muted hover:text-mx-text px-4 py-2 rounded-lg text-body-sm transition-colors"
                   >
                     Cancelar
                   </button>
@@ -162,7 +162,7 @@ const UserInfoSection = () => {
             ) : (
               <>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-mx-text">
+                  <h3 className="text-body-lg font-bold text-mx-text">
                     {user.fullName || 'Sin nombre asignado'}
                   </h3>
                   <button
@@ -172,7 +172,7 @@ const UserInfoSection = () => {
                     <Pencil size={14} />
                   </button>
                 </div>
-                <div className="flex items-center gap-2 text-mx-text-muted text-sm">
+                <div className="flex items-center gap-2 text-mx-text-muted text-body-sm">
                   <Mail size={14} className="shrink-0" />
                   <span className="truncate">{user.primaryEmailAddress?.emailAddress}</span>
                 </div>
@@ -184,7 +184,7 @@ const UserInfoSection = () => {
         {/* Connected Accounts */}
         {user.externalAccounts && user.externalAccounts.length > 0 && (
           <div className="border-t border-mx-border pt-5">
-            <p className="text-xs font-medium text-mx-text-muted uppercase tracking-wider mb-3">
+            <p className="text-label-md font-medium text-mx-text-muted uppercase tracking-wider mb-3">
               Cuentas conectadas
             </p>
             <div className="space-y-2">
@@ -198,10 +198,10 @@ const UserInfoSection = () => {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-mx-text capitalize">
+                    <p className="text-body-sm font-medium text-mx-text capitalize">
                       {account.provider === 'google' ? 'Google' : account.provider}
                     </p>
-                    <p className="text-xs text-mx-text-muted truncate">
+                    <p className="text-label-md text-mx-text-muted truncate">
                       {account.emailAddress || 'Conectado'}
                     </p>
                   </div>
@@ -292,7 +292,7 @@ const MisCursosSection = () => {
   }
 
   if (error) {
-    return <p className="text-red-500 text-sm">{error}</p>;
+    return <p className="text-red-500 text-body-sm">{error}</p>;
   }
 
   if (courses.length === 0) {
@@ -302,14 +302,14 @@ const MisCursosSection = () => {
           <BookOpen className="text-mx-orange" size={24} />
         </div>
         <h3 className="text-mx-text font-semibold mb-1">No tienes cursos aún</h3>
-        <p className="text-mx-text-muted text-sm mb-5">
+        <p className="text-mx-text-muted text-body-sm mb-5">
           {hasProAccess
             ? 'Tu suscripción Pro te da acceso a todos los cursos premium.'
             : 'Explora nuestro catálogo y empieza tu formación hoy.'}
         </p>
         <Link
           href="/programas"
-          className="inline-flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-5 py-2.5 rounded-full font-medium text-sm transition-colors"
+          className="inline-flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-5 py-2.5 rounded-full font-medium text-body-sm transition-colors"
         >
           Explorar cursos
           <ArrowRight size={16} />
@@ -323,7 +323,7 @@ const MisCursosSection = () => {
       {/* Continue Learning */}
       {inProgressCourse && (
         <div className="mb-6 p-4 bg-mx-orange/5 border border-mx-orange/20 rounded-xl">
-          <p className="text-mx-orange text-sm font-medium mb-3">Continuar donde lo dejaste</p>
+          <p className="text-mx-orange text-body-sm font-medium mb-3">Continuar donde lo dejaste</p>
           <div className="flex items-center gap-4">
             <Image
               src={inProgressCourse.program.image}
@@ -342,7 +342,7 @@ const MisCursosSection = () => {
                     style={{ width: `${inProgressCourse.progress?.progressPercent || 0}%` }}
                   />
                 </div>
-                <span className="text-mx-orange text-xs font-medium">
+                <span className="text-mx-orange text-label-md font-medium">
                   {inProgressCourse.progress?.progressPercent || 0}%
                 </span>
               </div>
@@ -353,7 +353,7 @@ const MisCursosSection = () => {
                   ? `/lesson/${inProgressCourse.progress.currentLessonId}`
                   : ''
               }`}
-              className="hidden sm:flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-4 py-2 rounded-full font-medium text-sm transition-colors"
+              className="hidden sm:flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-4 py-2 rounded-full font-medium text-body-sm transition-colors"
             >
               <Play size={14} fill="currentColor" />
               Continuar
@@ -372,7 +372,7 @@ const MisCursosSection = () => {
       <div className="mt-6 text-center">
         <Link
           href="/programas"
-          className="text-mx-orange hover:text-mx-orange-dark text-sm font-medium transition-colors"
+          className="text-mx-orange hover:text-mx-orange-dark text-body-sm font-medium transition-colors"
         >
           Ver más cursos →
         </Link>
@@ -408,12 +408,12 @@ const MaxymiaSection = () => {
       <div className="text-center py-8">
         <Sparkles className="text-mx-orange mx-auto mb-3" size={32} />
         <h3 className="text-mx-text font-medium mb-1">Campus Maxymia</h3>
-        <p className="text-mx-text-muted text-sm mb-4">
+        <p className="text-mx-text-muted text-body-sm mb-4">
           Explora cursos de IA aplicada a ciencias
         </p>
         <Link
           href="/maxymia/campus"
-          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-mx-orange-dark transition-colors"
+          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
         >
           Ir al Campus
           <ArrowRight size={14} />
@@ -441,7 +441,7 @@ const MaxymiaSection = () => {
               <Sparkles className="text-mx-orange" size={20} />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-mx-text font-medium text-sm truncate">{course.title.es}</h4>
+              <h4 className="text-mx-text font-medium text-body-sm truncate">{course.title.es}</h4>
               <div className="flex items-center gap-2 mt-1">
                 <div className="flex-1 h-1.5 bg-mx-border rounded-full overflow-hidden">
                   <div
@@ -449,7 +449,7 @@ const MaxymiaSection = () => {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-mx-text-muted text-xs">{pct}%</span>
+                <span className="text-mx-text-muted text-label-md">{pct}%</span>
               </div>
             </div>
             <ArrowRight size={16} className="text-mx-text-muted shrink-0" />
@@ -460,7 +460,7 @@ const MaxymiaSection = () => {
       <div className="pt-2">
         <Link
           href="/maxymia/campus"
-          className="text-mx-orange text-sm hover:underline"
+          className="text-mx-orange text-body-sm hover:underline"
         >
           Ver todos los cursos →
         </Link>
@@ -476,7 +476,7 @@ const CertificadosSection = () => (
     </div>
     <div>
       <h3 className="text-mx-text font-medium">Sin certificados aún</h3>
-      <p className="text-mx-text-muted text-sm">Completa un curso para obtener tu certificado</p>
+      <p className="text-mx-text-muted text-body-sm">Completa un curso para obtener tu certificado</p>
     </div>
   </div>
 );
@@ -543,16 +543,16 @@ const MiPlanSection = () => {
               )}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-mx-text">
+              <h3 className="text-body-lg font-bold text-mx-text">
                 Plan {isPro ? 'Pro' : 'Free'}
               </h3>
-              <p className="text-mx-text-muted text-sm">
+              <p className="text-mx-text-muted text-body-sm">
                 {isPro ? 'Acceso completo a todo el contenido' : 'Plan básico gratuito'}
               </p>
             </div>
           </div>
           {isPro && (
-            <span className="px-3 py-1 bg-mx-orange text-white text-xs font-bold rounded-full">
+            <span className="px-3 py-1 bg-mx-orange text-white text-label-md font-bold rounded-full">
               ACTIVO
             </span>
           )}
@@ -562,7 +562,7 @@ const MiPlanSection = () => {
           {(isPro ? proFeatures : freeFeatures).map((feature) => (
             <div key={feature} className="flex items-center gap-2">
               <Check className={isPro ? 'text-mx-orange' : 'text-mx-text-muted'} size={15} />
-              <span className="text-mx-text text-sm">{feature}</span>
+              <span className="text-mx-text text-body-sm">{feature}</span>
             </div>
           ))}
         </div>
@@ -570,7 +570,7 @@ const MiPlanSection = () => {
         {!isPro && (
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-5 py-2.5 rounded-full font-bold text-sm transition-colors"
+            className="inline-flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-5 py-2.5 rounded-full font-bold text-body-sm transition-colors"
           >
             <Crown size={16} />
             Actualizar a Pro
@@ -583,8 +583,8 @@ const MiPlanSection = () => {
       <div className="flex-1">
         {isPro ? (
           <div className="p-6 bg-mx-bg border border-mx-border rounded-xl h-full">
-            <h3 className="text-lg font-bold text-mx-text mb-4">Información de suscripción</h3>
-            <div className="space-y-3 text-sm">
+            <h3 className="text-body-lg font-bold text-mx-text mb-4">Información de suscripción</h3>
+            <div className="space-y-3 text-body-sm">
               <div className="flex justify-between">
                 <span className="text-mx-text-muted">Estado:</span>
                 <span className={`font-medium ${subscriptionStatus === 'active' ? 'text-green-600' : 'text-mx-orange'}`}>
@@ -610,7 +610,7 @@ const MiPlanSection = () => {
                 <button
                   onClick={handleOpenBillingPortal}
                   disabled={isLoadingPortal}
-                  className="w-full flex items-center justify-center gap-2 bg-mx-bg hover:bg-mx-border/50 text-mx-text border border-mx-border px-4 py-3 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-wait"
+                  className="w-full flex items-center justify-center gap-2 bg-mx-bg hover:bg-mx-border/50 text-mx-text border border-mx-border px-4 py-3 rounded-lg font-medium text-body-sm transition-colors disabled:opacity-50 disabled:cursor-wait"
                 >
                   {isLoadingPortal ? (
                     <>
@@ -625,7 +625,7 @@ const MiPlanSection = () => {
                     </>
                   )}
                 </button>
-                <p className="text-mx-text-muted text-xs text-center mt-3">
+                <p className="text-mx-text-muted text-label-md text-center mt-3">
                   Ver facturas, actualizar método de pago o cancelar suscripción.
                 </p>
               </div>
@@ -633,7 +633,7 @@ const MiPlanSection = () => {
           </div>
         ) : (
           <div className="p-6 bg-mx-orange/5 border border-mx-orange/15 rounded-xl h-full">
-            <h3 className="text-lg font-bold text-mx-text mb-4 flex items-center gap-2">
+            <h3 className="text-body-lg font-bold text-mx-text mb-4 flex items-center gap-2">
               <Crown className="text-mx-orange" size={18} />
               Beneficios de Pro
             </h3>
@@ -648,11 +648,11 @@ const MiPlanSection = () => {
               ].map((benefit) => (
                 <div key={benefit} className="flex items-center gap-2">
                   <Check className="text-mx-orange" size={14} />
-                  <span className="text-mx-text-muted text-sm">{benefit}</span>
+                  <span className="text-mx-text-muted text-body-sm">{benefit}</span>
                 </div>
               ))}
             </div>
-            <p className="text-mx-orange text-sm mt-4 font-medium">
+            <p className="text-mx-orange text-body-sm mt-4 font-medium">
               Desde €29/mes · Cancela cuando quieras
             </p>
           </div>
@@ -680,14 +680,14 @@ const SeguridadSection = () => {
     <div className="space-y-6">
       {/* Email addresses */}
       <div>
-        <h3 className="text-sm font-semibold text-mx-text mb-3">Correos electrónicos</h3>
+        <h3 className="text-body-sm font-semibold text-mx-text mb-3">Correos electrónicos</h3>
         <div className="space-y-2">
           {user.emailAddresses.map((email) => (
             <div key={email.id} className="flex items-center gap-3 p-3 bg-mx-bg border border-mx-border rounded-xl">
               <Mail size={16} className="text-mx-text-muted shrink-0" />
-              <span className="text-sm text-mx-text flex-1 truncate">{email.emailAddress}</span>
+              <span className="text-body-sm text-mx-text flex-1 truncate">{email.emailAddress}</span>
               {email.id === user.primaryEmailAddressId && (
-                <span className="text-xs font-medium text-mx-orange bg-mx-orange/10 px-2 py-0.5 rounded-full">
+                <span className="text-label-md font-medium text-mx-orange bg-mx-orange/10 px-2 py-0.5 rounded-full">
                   Primario
                 </span>
               )}
@@ -698,7 +698,7 @@ const SeguridadSection = () => {
 
       {/* Connected accounts */}
       <div>
-        <h3 className="text-sm font-semibold text-mx-text mb-3">Cuentas conectadas</h3>
+        <h3 className="text-body-sm font-semibold text-mx-text mb-3">Cuentas conectadas</h3>
         {user.externalAccounts && user.externalAccounts.length > 0 ? (
           <div className="space-y-2">
             {user.externalAccounts.map((account) => (
@@ -709,11 +709,11 @@ const SeguridadSection = () => {
                   <Shield size={16} className="text-mx-text-muted" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-mx-text capitalize">
+                  <span className="text-body-sm font-medium text-mx-text capitalize">
                     {account.provider === 'google' ? 'Google' : account.provider}
                   </span>
                   {account.emailAddress && (
-                    <span className="text-xs text-mx-text-muted ml-2">{account.emailAddress}</span>
+                    <span className="text-label-md text-mx-text-muted ml-2">{account.emailAddress}</span>
                   )}
                 </div>
                 <Check size={14} className="text-green-500 shrink-0" />
@@ -721,21 +721,21 @@ const SeguridadSection = () => {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-mx-text-muted">No hay cuentas conectadas.</p>
+          <p className="text-body-sm text-mx-text-muted">No hay cuentas conectadas.</p>
         )}
       </div>
 
       {/* Active sessions info */}
       <div>
-        <h3 className="text-sm font-semibold text-mx-text mb-3">Sesión actual</h3>
+        <h3 className="text-body-sm font-semibold text-mx-text mb-3">Sesión actual</h3>
         <div className="p-3 bg-mx-bg border border-mx-border rounded-xl">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
               <Check size={14} className="text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-mx-text">Sesión activa</p>
-              <p className="text-xs text-mx-text-muted">
+              <p className="text-body-sm font-medium text-mx-text">Sesión activa</p>
+              <p className="text-label-md text-mx-text-muted">
                 Último acceso: {new Date().toLocaleDateString('es-ES', {
                   day: 'numeric', month: 'long', year: 'numeric'
                 })}
@@ -799,7 +799,7 @@ export default function PerfilPage() {
                       <button
                         key={item.key}
                         onClick={() => setActiveSection(item.key)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-body-sm font-medium whitespace-nowrap transition-colors ${
                           activeSection === item.key
                             ? 'bg-mx-orange/10 text-mx-orange'
                             : 'text-mx-text-muted hover:text-mx-text hover:bg-mx-border/30'
@@ -817,7 +817,7 @@ export default function PerfilPage() {
                       <button
                         key={item.key}
                         onClick={() => setActiveSection(item.key)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-left ${
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-body-sm font-medium transition-colors text-left ${
                           activeSection === item.key
                             ? 'bg-mx-orange/10 text-mx-orange'
                             : 'text-mx-text-muted hover:text-mx-text hover:bg-mx-border/30'
@@ -833,7 +833,7 @@ export default function PerfilPage() {
                       <Link
                         href="https://maximaformacion.com.es/"
                         target="_blank"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-mx-text-muted hover:text-mx-text hover:bg-mx-border/30 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-body-sm font-medium text-mx-text-muted hover:text-mx-text hover:bg-mx-border/30 transition-colors"
                       >
                         <BookOpen size={18} />
                         Ir al Campus
@@ -845,7 +845,7 @@ export default function PerfilPage() {
 
                 {/* ─── Content Area ─── */}
                 <div className="flex-1 p-6 md:p-8 overflow-y-auto">
-                  <h2 className="text-xl font-bold text-mx-text mb-6">
+                  <h2 className="text-heading-sm font-bold text-mx-text mb-6">
                     {sectionTitles[activeSection]}
                   </h2>
 

@@ -30,7 +30,7 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
             <button
               key={cat}
               onClick={() => setActiveFilter(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap cursor-pointer ${
+              className={`px-5 py-2 rounded-full text-body-sm font-medium transition-all duration-300 whitespace-nowrap cursor-pointer ${
                 activeFilter === cat
                   ? 'bg-mx-orange text-white'
                   : 'bg-mx-card text-mx-text-muted border border-mx-border hover:border-mx-orange/30'
@@ -49,13 +49,13 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
             placeholder="Buscar artículo..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-mx-card border border-mx-border rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-mx-orange transition-colors text-mx-text placeholder:text-mx-text-muted/50"
+            className="w-full bg-mx-card border border-mx-border rounded-full pl-10 pr-4 py-2.5 text-body-sm focus:outline-none focus:border-mx-orange transition-colors text-mx-text placeholder:text-mx-text-muted/50"
           />
         </div>
       </div>
 
       {/* Results Count */}
-      <div className="mt-3 text-xs text-mx-text-muted font-medium tracking-wider uppercase">
+      <div className="mt-3 text-label-md text-mx-text-muted font-medium tracking-wider uppercase">
         Mostrando {resultsCount} resultados
       </div>
     </div>

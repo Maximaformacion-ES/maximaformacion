@@ -73,13 +73,13 @@ export const InnovacionServicesSection: React.FC = () => {
           className="flex md:justify-end mb-12 md:mb-20"
         >
           <div className="max-w-lg md:text-right">
-            <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
               Nuestros servicios
             </span>
-            <h2 className="text-[#016157] text-3xl md:text-6xl font-black mb-6">
+            <h2 className="text-[#016157] text-heading-lg md:text-display-md font-black mb-6">
               Todo lo que debes saber
             </h2>
-            <p className="text-mx-text-muted text-lg font-light">
+            <p className="text-mx-text-muted text-body-lg font-light">
               Desarrollamos aplicaciones inteligentes, brindamos asesoría estadística especializada
               y diseñamos soluciones funcionales con potencial patentable.
             </p>
@@ -167,10 +167,10 @@ function ServiceCell({
         }`}
       >
         <service.icon className="text-mx-orange mb-5" size={40} />
-        <h3 className="text-xl font-bold text-mx-text mb-2">{service.title}</h3>
-        <p className="text-sm text-mx-text-muted font-light">{service.tagline}</p>
+        <h3 className="text-heading-sm font-bold text-mx-text mb-2">{service.title}</h3>
+        <p className="text-body-sm text-mx-text-muted font-light">{service.tagline}</p>
         {/* Description always visible on mobile */}
-        <p className="md:hidden text-sm text-mx-text-muted font-light leading-relaxed mt-3">
+        <p className="md:hidden text-body-sm text-mx-text-muted font-light leading-relaxed mt-3">
           {service.description}
         </p>
       </div>
@@ -181,8 +181,8 @@ function ServiceCell({
           isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
-        <h3 className="text-lg font-bold text-mx-text mb-3">{service.title}</h3>
-        <p className="text-sm text-mx-text-muted font-light leading-relaxed">
+        <h3 className="text-body-lg font-bold text-mx-text mb-3">{service.title}</h3>
+        <p className="text-body-sm text-mx-text-muted font-light leading-relaxed">
           {service.description}
         </p>
       </div>

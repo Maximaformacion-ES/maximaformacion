@@ -231,7 +231,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
                     >
                       <ChevronLeft size={14} />
                     </button>
-                    <span className="text-mx-text-muted text-sm px-2 tabular-nums">
+                    <span className="text-mx-text-muted text-body-sm px-2 tabular-nums">
                       {currentPage}/{totalPages}
                     </span>
                     <button
@@ -255,7 +255,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Buscar programa..."
-                    className="pl-9 pr-4 py-1.5 rounded-full text-sm bg-mx-card border border-mx-border text-mx-text placeholder:text-mx-text-muted/50 focus:outline-none focus:border-mx-blue transition-all w-full"
+                    className="pl-9 pr-4 py-1.5 rounded-full text-body-sm bg-mx-card border border-mx-border text-mx-text placeholder:text-mx-text-muted/50 focus:outline-none focus:border-mx-blue transition-all w-full"
                   />
                 </div>
               }

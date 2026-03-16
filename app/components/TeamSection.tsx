@@ -103,7 +103,7 @@ function MemberAvatar({ member, size = 'md' }: { member: TeamMember; size?: 'lg'
         </div>
         {member.linkedin && <LinkedInBadge />}
       </a>
-      <span className="text-white text-sm font-medium text-center">{member.name}</span>
+      <span className="text-white text-body-sm font-medium text-center">{member.name}</span>
     </div>
   );
 }
@@ -132,7 +132,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-white text-4xl md:text-6xl font-black text-center mb-20 uppercase"
+          className="text-white text-display-sm md:text-display-md font-black text-center mb-20 uppercase"
         >
           Nuestro Equipo
         </m.h2>
@@ -147,9 +147,9 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
           >
             <MemberAvatar member={ceo} size="lg" />
             <div className="text-center md:text-left">
-              <h3 className="text-white text-2xl md:text-3xl font-bold">{ceo.name}</h3>
-              <p className="text-white/60 text-sm font-light mb-3">CEO de Máxima Formación</p>
-              <p className="text-white/80 text-lg italic">
+              <h3 className="text-white text-heading-md md:text-heading-lg font-bold">{ceo.name}</h3>
+              <p className="text-white/60 text-body-sm font-light mb-3">CEO de Máxima Formación</p>
+              <p className="text-white/80 text-body-lg italic">
                 &laquo;Más que un equipo, una gran familia.&raquo;
               </p>
             </div>
@@ -166,7 +166,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
               viewport={{ once: true }}
             >
               <div className="flex items-center gap-6 mb-10">
-                <span className="text-white/50 text-sm font-medium tracking-widest uppercase shrink-0">
+                <span className="text-white/50 text-body-sm font-medium tracking-widest uppercase shrink-0">
                   {dept.label}
                 </span>
                 <div className="flex-1 h-px bg-white/10" />

@@ -61,7 +61,7 @@ const pricingFeatures = [
 
 function CellValue({ value }: { value: boolean | string }) {
   if (typeof value === 'string') {
-    return <span className="text-sm text-mx-text font-medium">{value}</span>;
+    return <span className="text-body-sm text-mx-text font-medium">{value}</span>;
   }
   return value ? (
     <Check size={18} style={{ color: SAPO_TEAL }} className="mx-auto" />
@@ -84,34 +84,34 @@ export const InnovacionSAPOSection: React.FC = () => {
             className="lg:w-1/2"
           >
             <span
-              className="text-sm font-medium tracking-[0.5em] uppercase mb-4 block"
+              className="text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block"
               style={{ color: SAPO_TEAL }}
             >
               Te presentamos nuestra APP
             </span>
-            <h2 className="text-3xl md:text-6xl font-black mb-6" style={{ color: SAPO_TEAL }}>
+            <h2 className="text-heading-lg md:text-display-md font-black mb-6" style={{ color: SAPO_TEAL }}>
               Conoce SAPO
             </h2>
-            <p className="text-mx-text-muted text-lg md:text-xl font-light leading-relaxed mb-8">
+            <p className="text-mx-text-muted text-body-lg md:text-heading-sm font-light leading-relaxed mb-8">
               Una app que automatiza el análisis estadístico y genera resultados listos para publicar,
               sin necesidad de programar.
             </p>
 
             <div className="space-y-4 mb-8">
               <div className="p-6 border rounded-lg" style={{ borderColor: `${SAPO_TEAL}20`, backgroundColor: `${SAPO_TEAL}05` }}>
-                <h3 className="text-lg font-bold text-mx-text mb-2">
+                <h3 className="text-body-lg font-bold text-mx-text mb-2">
                   Asistencia estadística automatizada
                 </h3>
-                <p className="text-mx-text-muted font-light text-sm">
+                <p className="text-mx-text-muted font-light text-body-sm">
                   La app te guía paso a paso: recopila información clave de tu estudio y te sugiere
                   automáticamente la metodología estadística más adecuada.
                 </p>
               </div>
               <div className="p-6 border rounded-lg" style={{ borderColor: `${SAPO_TEAL}20`, backgroundColor: `${SAPO_TEAL}05` }}>
-                <h3 className="text-lg font-bold text-mx-text mb-2">
+                <h3 className="text-body-lg font-bold text-mx-text mb-2">
                   Generación automática de resultados
                 </h3>
-                <p className="text-mx-text-muted font-light text-sm">
+                <p className="text-mx-text-muted font-light text-body-sm">
                   Obtén análisis listos para publicar sin necesidad de programar. Genera descriptivos
                   avanzados, gráficos y resultados estadísticos con rigor científico.
                 </p>
@@ -163,7 +163,7 @@ export const InnovacionSAPOSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl font-bold text-mx-text text-center mb-16 relative"
+            className="text-heading-lg font-bold text-mx-text text-center mb-16 relative"
           >
             Características principales
           </m.h3>
@@ -180,8 +180,8 @@ export const InnovacionSAPOSection: React.FC = () => {
               >
                 <feature.icon className="shrink-0 mt-1" size={22} style={{ color: SAPO_TEAL }} />
                 <div>
-                  <h4 className="text-base font-bold text-mx-text mb-1">{feature.title}</h4>
-                  <p className="text-sm text-mx-text-muted font-light leading-relaxed">
+                  <h4 className="text-body-md font-bold text-mx-text mb-1">{feature.title}</h4>
+                  <p className="text-body-sm text-mx-text-muted font-light leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -196,38 +196,38 @@ export const InnovacionSAPOSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h3 className="text-3xl font-bold text-mx-text text-center mb-12">Planes y precios</h3>
+          <h3 className="text-heading-lg font-bold text-mx-text text-center mb-12">Planes y precios</h3>
 
           <div className="overflow-x-auto -mx-6 px-6 pt-4">
             <table className="w-full min-w-[600px] border-collapse table-fixed">
               <thead>
                 <tr>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-mx-text-muted uppercase tracking-wider border-b border-mx-border w-[40%]">
+                  <th className="text-left py-4 px-6 text-label-lg font-medium text-mx-text-muted uppercase tracking-wider border-b border-mx-border w-[40%]">
                     Característica
                   </th>
                   <th className="text-center py-4 px-4 border-b border-mx-border w-[20%]">
-                    <div className="text-base font-bold text-mx-text">Gratuito</div>
-                    <div className="text-2xl font-black text-mx-text mt-1">0€</div>
+                    <div className="text-body-md font-bold text-mx-text">Gratuito</div>
+                    <div className="text-heading-md font-black text-mx-text mt-1">0€</div>
                   </th>
                   <th
                     className="text-center py-4 px-4 border-b border-mx-border w-[20%] rounded-t-lg relative"
                     style={{ backgroundColor: `${SAPO_TEAL}08` }}
                   >
                     <div
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full"
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 text-white text-label-sm font-bold uppercase tracking-widest rounded-full"
                       style={{ backgroundColor: SAPO_TEAL }}
                     >
                       Popular
                     </div>
-                    <div className="text-base font-bold text-mx-text">Mensual</div>
-                    <div className="text-2xl font-black text-mx-text mt-1">
-                      2.99€<span className="text-sm font-normal text-mx-text-muted">/mes</span>
+                    <div className="text-body-md font-bold text-mx-text">Mensual</div>
+                    <div className="text-heading-md font-black text-mx-text mt-1">
+                      2.99€<span className="text-label-lg font-normal text-mx-text-muted">/mes</span>
                     </div>
                   </th>
                   <th className="text-center py-4 px-4 border-b border-mx-border w-[20%]">
-                    <div className="text-base font-bold text-mx-text">Anual</div>
-                    <div className="text-2xl font-black text-mx-text mt-1">
-                      24.99€<span className="text-sm font-normal text-mx-text-muted">/año</span>
+                    <div className="text-body-md font-bold text-mx-text">Anual</div>
+                    <div className="text-heading-md font-black text-mx-text mt-1">
+                      24.99€<span className="text-label-lg font-normal text-mx-text-muted">/año</span>
                     </div>
                   </th>
                 </tr>
@@ -238,7 +238,7 @@ export const InnovacionSAPOSection: React.FC = () => {
                     key={row.label}
                     className={idx % 2 === 0 ? '' : 'bg-mx-card/50'}
                   >
-                    <td className="py-3.5 px-6 text-sm text-mx-text font-light border-b border-mx-border/50">
+                    <td className="py-3.5 px-6 text-body-sm text-mx-text font-light border-b border-mx-border/50">
                       {row.label}
                     </td>
                     <td className="py-3.5 px-4 text-center border-b border-mx-border/50">
@@ -264,7 +264,7 @@ export const InnovacionSAPOSection: React.FC = () => {
                       href="https://biomaximainnovacion.es/sapo"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block px-6 py-2.5 rounded-full text-sm font-medium border border-mx-border text-mx-text hover:opacity-80 transition-colors"
+                      className="inline-block px-6 py-2.5 rounded-full text-body-sm font-medium border border-mx-border text-mx-text hover:opacity-80 transition-colors"
                     >
                       Empezar gratis
                     </a>
@@ -274,7 +274,7 @@ export const InnovacionSAPOSection: React.FC = () => {
                       href="https://biomaximainnovacion.es/sapo"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block px-6 py-2.5 rounded-full text-sm font-medium text-white hover:opacity-90 transition-colors"
+                      className="inline-block px-6 py-2.5 rounded-full text-body-sm font-medium text-white hover:opacity-90 transition-colors"
                       style={{ backgroundColor: SAPO_TEAL }}
                     >
                       Suscribirse
@@ -285,7 +285,7 @@ export const InnovacionSAPOSection: React.FC = () => {
                       href="https://biomaximainnovacion.es/sapo"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block px-6 py-2.5 rounded-full text-sm font-medium border border-mx-border text-mx-text hover:opacity-80 transition-colors"
+                      className="inline-block px-6 py-2.5 rounded-full text-body-sm font-medium border border-mx-border text-mx-text hover:opacity-80 transition-colors"
                     >
                       Suscribirse
                     </a>

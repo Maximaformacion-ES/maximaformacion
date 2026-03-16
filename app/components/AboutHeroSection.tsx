@@ -67,7 +67,7 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
         <m.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-6"
+          className="inline-block text-mx-orange text-label-lg font-medium tracking-[0.5em] uppercase mb-6"
         >
           {heroOverline}
         </m.span>
@@ -75,7 +75,7 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-mx-blue text-6xl md:text-8xl lg:text-9xl font-black "
+          className="text-mx-blue text-display-md md:text-display-lg lg:text-display-lg font-black "
         >
           {heroTitle}
         </m.h1>

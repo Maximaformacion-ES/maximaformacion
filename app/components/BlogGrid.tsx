@@ -29,7 +29,7 @@ export const BlogGrid: React.FC<BlogGridProps> = ({ posts }) => {
               className="flex flex-col items-center justify-center py-20 text-mx-text-muted"
             >
               <Search size={48} className="mb-4 opacity-20" />
-              <p className="text-lg">No se encontraron artículos con esos criterios.</p>
+              <p className="text-body-lg">No se encontraron artículos con esos criterios.</p>
             </m.div>
           )}
         </AnimatePresence>
@@ -39,7 +39,7 @@ export const BlogGrid: React.FC<BlogGridProps> = ({ posts }) => {
       {posts.length > 0 && (
         <div className="mt-16 flex justify-center">
           <button className="group flex items-center gap-2 px-8 py-4 border border-mx-border rounded-full hover:border-mx-orange hover:bg-mx-orange/5 transition-all duration-300 cursor-pointer">
-            <span className="text-sm font-medium text-mx-text-muted group-hover:text-mx-orange tracking-wide">
+            <span className="text-body-sm font-medium text-mx-text-muted group-hover:text-mx-orange tracking-wide">
               Cargar más artículos
             </span>
           </button>

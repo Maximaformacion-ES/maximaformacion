@@ -39,15 +39,15 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
           </div>
 
           {/* Title */}
-          <span className="inline-flex items-center gap-2 text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4">
+          <span className="inline-flex items-center gap-2 text-amber-500 text-body-sm font-medium tracking-[0.3em] uppercase mb-4">
             <Crown size={16} />
             Contenido Exclusivo Pro
           </span>
-          <h2 className="text-3xl md:text-5xl font-black  mb-6">
+          <h2 className="text-heading-lg md:text-display-sm font-black  mb-6">
             Este programa requiere{' '}
             <span className="text-amber-500">Pro</span>
           </h2>
-          <p className="text-white/60 font-light text-lg mb-10 max-w-2xl mx-auto">
+          <p className="text-white/60 font-light text-body-lg mb-10 max-w-2xl mx-auto">
             &quot;{programTitle}&quot; es un programa exclusivo para miembros Pro.
             Actualiza tu plan para acceder a todo el contenido y beneficios.
           </p>
@@ -72,13 +72,13 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
           <div className="p-8 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/30 rounded-2xl mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Sparkles className="text-amber-500" size={20} />
-              <span className="text-white/60 text-sm">Plan Pro</span>
+              <span className="text-white/60 text-body-sm">Plan Pro</span>
             </div>
             <div className="flex items-baseline justify-center gap-1 mb-4">
-              <span className="text-5xl font-black text-white">€29</span>
+              <span className="text-display-sm font-black text-white">€29</span>
               <span className="text-white/60">/mes</span>
             </div>
-            <p className="text-white/40 text-sm mb-6">
+            <p className="text-white/40 text-body-sm mb-6">
               Facturación mensual • Cancela cuando quieras
             </p>
             <Link
@@ -94,7 +94,7 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
           {/* Back Link */}
           <Link
             href="/programas"
-            className="text-white/60 hover:text-amber-500 transition-colors text-sm"
+            className="text-white/60 hover:text-amber-500 transition-colors text-body-sm"
           >
             ← Volver al catálogo de programas
           </Link>

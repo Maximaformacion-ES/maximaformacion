@@ -36,7 +36,7 @@ export default function Certificate({
       <div className="flex justify-end mb-4 print:hidden">
         <button
           onClick={handlePrint}
-          className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-mx-orange-dark transition-colors"
+          className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
         >
           <Download size={16} />
           {locale === 'es' ? 'Imprimir / Descargar PDF' : 'Print / Download PDF'}
@@ -58,28 +58,28 @@ export default function Certificate({
           {/* Logo / Brand */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <Award className="text-[#F7A000]" size={32} />
-            <span className="text-[#060918] text-xl font-bold tracking-wide">MAXYMIA</span>
+            <span className="text-[#060918] text-heading-sm font-bold tracking-wide">MAXYMIA</span>
           </div>
 
           {/* Title */}
-          <h1 className="text-[#060918] text-3xl md:text-4xl font-bold mb-2">
+          <h1 className="text-[#060918] text-heading-lg md:text-display-sm font-bold mb-2">
             {locale === 'es' ? 'Certificado de Finalización' : 'Certificate of Completion'}
           </h1>
           <div className="w-24 h-0.5 bg-[#F7A000] mx-auto mb-8" />
 
           {/* Body */}
-          <p className="text-[#666] text-lg mb-2">
+          <p className="text-[#666] text-body-lg mb-2">
             {locale === 'es' ? 'Se certifica que' : 'This certifies that'}
           </p>
-          <p className="text-[#060918] text-3xl font-bold mb-6 font-serif italic">
+          <p className="text-[#060918] text-heading-lg font-bold mb-6 font-serif italic">
             {studentName}
           </p>
-          <p className="text-[#666] text-lg mb-2">
+          <p className="text-[#666] text-body-lg mb-2">
             {locale === 'es'
               ? 'ha completado satisfactoriamente el curso'
               : 'has successfully completed the course'}
           </p>
-          <p className="text-[#060918] text-2xl font-semibold mb-8">
+          <p className="text-[#060918] text-heading-md font-semibold mb-8">
             {courseTitle}
           </p>
 
@@ -87,22 +87,22 @@ export default function Certificate({
           <div className="flex justify-center gap-16 mt-12">
             <div className="text-center">
               <div className="w-32 border-b border-[#333] mb-2" />
-              <p className="text-[#666] text-sm">{date}</p>
-              <p className="text-[#999] text-xs">
+              <p className="text-[#666] text-body-sm">{date}</p>
+              <p className="text-[#999] text-label-md">
                 {locale === 'es' ? 'Fecha' : 'Date'}
               </p>
             </div>
             <div className="text-center">
               <div className="w-32 border-b border-[#333] mb-2" />
-              <p className="text-[#666] text-sm">{instructor}</p>
-              <p className="text-[#999] text-xs">
+              <p className="text-[#666] text-body-sm">{instructor}</p>
+              <p className="text-[#999] text-label-md">
                 {locale === 'es' ? 'Instructor' : 'Instructor'}
               </p>
             </div>
           </div>
 
           {/* Footer */}
-          <p className="text-[#ccc] text-xs mt-12">
+          <p className="text-[#ccc] text-label-md mt-12">
             Campus de IA Aplicada a Ciencias — maxymia.com
           </p>
         </div>

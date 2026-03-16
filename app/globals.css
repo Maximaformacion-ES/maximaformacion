@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 
 @custom-variant dark (&:is(.dark *));
@@ -90,6 +91,61 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* ── Typography Scale ──
+     4 tiers × 3 sizes. Use with Tailwind breakpoint prefixes:
+     class="text-display-sm md:text-display-md lg:text-display-lg"
+
+     Tier      | sm (mobile) | md (tablet)  | lg (desktop/2K+)
+     ----------|-------------|--------------|------------------
+     display   | 48px        | 72px         | 120px
+     heading   | 20px        | 28px         | 42px
+     body      | 14px        | 16px         | 20px
+     label     | 10px        | 12px         | 16px
+  */
+
+  /* Display – hero titles, section titles */
+  --text-display-sm: 48px;
+  --text-display-md: 72px;
+  --text-display-lg: 120px;
+
+  /* Heading – H1, H2, H3, card titles */
+  --text-heading-sm: 20px;
+  --text-heading-md: 28px;
+  --text-heading-lg: 42px;
+
+  /* Body – paragraphs, descriptions */
+  --text-body-sm: 14px;
+  --text-body-md: 16px;
+  --text-body-lg: 20px;
+
+  /* Label – metadata, badges, captions */
+  --text-label-sm: 10px;
+  --text-label-md: 12px;
+  --text-label-lg: 16px;
+
+  /* Line Heights */
+  --leading-display: 0.9;
+  --leading-heading: 1.25;
+  --leading-body: 1.6;
+  --leading-label: 1.4;
+
+  /* Letter Spacing */
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.01em;
+  --tracking-body: 0em;
+  --tracking-label: 0.015em;
+
+  /* Font Weights */
+  --font-weight-thin: 100;
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
 }
 
 /* Film grain overlay effect */
@@ -1077,6 +1133,7 @@ a[href*="/billing"],
     @apply bg-background text-foreground;
   }
 }
+
 
 /* Accessibility: Reduce motion for users who prefer it (WCAG 2.3.3) */
 @media (prefers-reduced-motion: reduce) {

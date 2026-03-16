@@ -40,7 +40,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               transition={{ duration: 0.5 }}
               className="mb-4 flex items-center gap-3 flex-wrap"
             >
-              <span className={`inline-block px-3 py-1 text-[10px] font-black tracking-[0.2em] uppercase rounded-full ${
+              <span className={`inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full ${
                 program.type === 'Master'
                   ? 'bg-mx-blue text-white'
                   : 'bg-mx-orange text-white'
@@ -48,12 +48,12 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
                 {program.type}
               </span>
               {program.isPro && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] text-white rounded-full shadow-lg shadow-[#f7a000]/30">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-label-sm font-black tracking-wider uppercase bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] text-white rounded-full shadow-lg shadow-[#f7a000]/30">
                   <Crown size={10} /> PRO
                 </span>
               )}
               {program.featured && (
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-mx-orange uppercase tracking-widest">
+                <span className="inline-flex items-center gap-1.5 text-label-sm font-bold text-mx-orange uppercase tracking-widest">
                   <Award size={10} /> Destacado
                 </span>
               )}
@@ -64,7 +64,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
+              className="text-heading-lg md:text-display-sm lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
             >
               {program.title}
             </m.h1>
@@ -80,7 +80,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
                 {program.topics.map((topic) => (
                   <span
                     key={topic.id}
-                    className="px-3 py-1 bg-mx-text/10 backdrop-blur-md text-mx-text-muted text-xs font-medium rounded-full"
+                    className="px-3 py-1 bg-mx-text/10 backdrop-blur-md text-mx-text-muted text-label-md font-medium rounded-full"
                   >
                     {topic.name}
                   </span>
@@ -93,7 +93,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-base md:text-lg text-mx-text-muted font-light mb-6 max-w-2xl"
+              className="text-body-md md:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {program.description}
             </m.p>
@@ -107,15 +107,15 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
             >
               <div className="flex items-center gap-2 text-mx-text">
                 <Clock size={16} className="text-mx-orange" />
-                <span className="text-sm font-medium">{program.duration} horas</span>
+                <span className="text-body-sm font-medium">{program.duration} horas</span>
               </div>
               <div className="flex items-center gap-2 text-mx-text">
                 <BookOpen size={16} className="text-mx-orange" />
-                <span className="text-sm font-medium">{program.ects} créditos</span>
+                <span className="text-body-sm font-medium">{program.ects} créditos</span>
               </div>
               <div className="flex items-center gap-2 text-mx-text">
                 <Award size={16} className="text-mx-orange" />
-                <span className="text-sm font-medium">{program.modules.length} módulos</span>
+                <span className="text-body-sm font-medium">{program.modules.length} módulos</span>
               </div>
             </m.div>
 

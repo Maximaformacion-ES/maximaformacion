@@ -47,7 +47,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-label-lg leading-label tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </m.p>
@@ -55,7 +55,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-blue text-4xl md:text-6xl lg:text-7xl font-black tracking-tight"
+              className="text-mx-blue text-display-sm md:text-display-md lg:text-display-md font-black tracking-display leading-display"
             >
               <StyledTitle text={title} color="blue" />
             </m.h2>

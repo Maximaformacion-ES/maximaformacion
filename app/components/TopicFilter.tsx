@@ -18,7 +18,7 @@ export const TopicFilterTrigger: React.FC<TopicFilterTriggerProps> = ({
 }) => (
   <button
     onClick={toggle}
-    className={`flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
+    className={`flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-5 md:py-2 rounded-full text-label-md md:text-body-sm font-medium transition-all duration-300 whitespace-nowrap border ${
       selectedCount > 0
         ? 'bg-mx-orange/20 text-mx-orange border-mx-orange/50'
         : isOpen
@@ -29,7 +29,7 @@ export const TopicFilterTrigger: React.FC<TopicFilterTriggerProps> = ({
     <Filter size={12} className="md:w-[14px] md:h-[14px]" />
     <span>Tema</span>
     {selectedCount > 0 && (
-      <span className="bg-mx-orange text-white text-[10px] md:text-xs w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center">
+      <span className="bg-mx-orange text-white text-label-sm md:text-label-md w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center">
         {selectedCount}
       </span>
     )}
@@ -69,7 +69,7 @@ export const TopicBadgesRow: React.FC<TopicBadgesRowProps> = ({
               <button
                 key={topic.id}
                 onClick={() => onToggle(topic.name)}
-                className={`px-3 py-1 md:px-4 md:py-1.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
+                className={`px-3 py-1 md:px-4 md:py-1.5 rounded-full text-label-md md:text-body-sm font-medium transition-all duration-300 whitespace-nowrap border ${
                   isSelected
                     ? 'bg-mx-orange text-white border-mx-orange'
                     : 'bg-mx-card text-mx-text-muted border-mx-border hover:border-mx-orange/50 hover:text-mx-text'

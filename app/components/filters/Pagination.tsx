@@ -29,7 +29,7 @@ export function Pagination({
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+          className={`w-9 h-9 rounded-full flex items-center justify-center text-body-sm font-medium transition-all ${
             page === currentPage
               ? tc.paginationActive
               : tc.paginationBtn

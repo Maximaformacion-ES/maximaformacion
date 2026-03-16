@@ -32,7 +32,7 @@ export function FilterBar({
         <div className="flex items-center gap-2">
           <button
             onClick={onToggleFilters}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm transition-all ${
               filtersExpanded || hasActiveFilters ? tc.btnActive : tc.btn
             }`}
           >
@@ -70,7 +70,7 @@ export function FilterBar({
 
       {/* Results counter */}
       <div className="py-5">
-        <p className={`${tc.resultsText} text-xs tracking-[0.3em] uppercase`}>
+        <p className={`${tc.resultsText} text-label-md tracking-[0.3em] uppercase`}>
           {defaultResultsLabel}
         </p>
       </div>

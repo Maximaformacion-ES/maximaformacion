@@ -105,14 +105,14 @@ export default function CourseAccessGate({
           </div>
 
           {/* Title */}
-          <span className="inline-flex items-center gap-2 text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4">
+          <span className="inline-flex items-center gap-2 text-amber-500 text-body-sm font-medium tracking-[0.3em] uppercase mb-4">
             <Crown size={16} />
             Contenido Premium
           </span>
-          <h2 className="text-3xl md:text-5xl font-black  mb-6">
+          <h2 className="text-heading-lg md:text-display-sm font-black  mb-6">
             Accede a &quot;{program.title}&quot;
           </h2>
-          <p className="text-white/60 font-light text-lg mb-10 max-w-2xl mx-auto">
+          <p className="text-white/60 font-light text-body-lg mb-10 max-w-2xl mx-auto">
             Este programa es exclusivo. Elige la opción que mejor se adapte a ti.
           </p>
         </m.div>
@@ -128,20 +128,20 @@ export default function CourseAccessGate({
           >
             <div className="flex items-center justify-center gap-2 mb-4">
               <ShoppingCart className="text-white" size={24} />
-              <span className="text-white font-semibold text-lg">Comprar este curso</span>
+              <span className="text-white font-semibold text-body-lg">Comprar este curso</span>
             </div>
 
             <div className="flex items-baseline justify-center gap-1 mb-2">
               {program.originalPrice && program.originalPrice > program.price && (
-                <span className="text-white/40 text-xl line-through mr-2">
+                <span className="text-white/40 text-heading-sm line-through mr-2">
                   {formatPrice(program.originalPrice)}
                 </span>
               )}
-              <span className="text-5xl font-black text-white">
+              <span className="text-display-sm font-black text-white">
                 {formatPrice(program.price)}
               </span>
             </div>
-            <p className="text-white/40 text-sm mb-6 text-center">
+            <p className="text-white/40 text-body-sm mb-6 text-center">
               Pago único • Acceso permanente
             </p>
 
@@ -150,13 +150,13 @@ export default function CourseAccessGate({
               {courseFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Check className="text-green-500 flex-shrink-0" size={16} />
-                  <span className="text-white/70 text-sm">{feature}</span>
+                  <span className="text-white/70 text-body-sm">{feature}</span>
                 </div>
               ))}
             </div>
 
             {error && (
-              <p className="text-red-400 text-sm mb-4 text-center">{error}</p>
+              <p className="text-red-400 text-body-sm mb-4 text-center">{error}</p>
             )}
 
             <button
@@ -186,20 +186,20 @@ export default function CourseAccessGate({
             className="p-8 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/30 rounded-2xl relative overflow-hidden"
           >
             {/* Recommended Badge */}
-            <div className="absolute top-0 right-0 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-bl-xl">
+            <div className="absolute top-0 right-0 bg-amber-500 text-black text-label-md font-bold px-4 py-1 rounded-bl-xl">
               RECOMENDADO
             </div>
 
             <div className="flex items-center justify-center gap-2 mb-4">
               <Crown className="text-amber-500" size={24} />
-              <span className="text-amber-500 font-semibold text-lg">Suscripción Pro</span>
+              <span className="text-amber-500 font-semibold text-body-lg">Suscripción Pro</span>
             </div>
 
             <div className="flex items-baseline justify-center gap-1 mb-2">
-              <span className="text-5xl font-black text-white">€18</span>
+              <span className="text-display-sm font-black text-white">€18</span>
               <span className="text-white/60">/mes</span>
             </div>
-            <p className="text-white/40 text-sm mb-6 text-center">
+            <p className="text-white/40 text-body-sm mb-6 text-center">
               Cancela cuando quieras
             </p>
 
@@ -208,7 +208,7 @@ export default function CourseAccessGate({
               {proFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Sparkles className="text-amber-500 flex-shrink-0" size={16} />
-                  <span className="text-white/70 text-sm">{feature}</span>
+                  <span className="text-white/70 text-body-sm">{feature}</span>
                 </div>
               ))}
             </div>
@@ -222,7 +222,7 @@ export default function CourseAccessGate({
               <ArrowRight size={18} />
             </Link>
 
-            <p className="text-center text-white/40 text-xs mt-4">
+            <p className="text-center text-white/40 text-label-md mt-4">
               Acceso a +50 cursos y masters
             </p>
           </m.div>
@@ -237,7 +237,7 @@ export default function CourseAccessGate({
         >
           <Link
             href="/programas"
-            className="text-white/60 hover:text-amber-500 transition-colors text-sm"
+            className="text-white/60 hover:text-amber-500 transition-colors text-body-sm"
           >
             ← Volver al catálogo de programas
           </Link>

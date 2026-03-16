@@ -1,10 +1,10 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import { LocaleProvider, useLocale } from '../i18n/LocaleProvider';
 import { getTranslation } from '../i18n/translations';
@@ -20,6 +20,20 @@ const CAMPUS_NAV = [
 ];
 
 function CampusHeader() {
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLessonPage = mounted && /\/maxymia\/campus\/[^/]+\/lesson\//.test(pathname);
+
+  if (isLessonPage) return <LessonHeader />;
+  return <DefaultCampusHeader />;
+}
+
+function DefaultCampusHeader() {
   const pathname = usePathname();
   const courses = useCampusCourses();
 
@@ -49,7 +63,7 @@ function CampusHeader() {
                   className="relative px-4 py-2 rounded-lg"
                 >
                   <span
-                    className={`text-[14px] 2xl:text-[16px] ${
+                    className={`text-body-sm 2xl:text-body-md ${
                       isActive ? 'font-medium text-white' : 'font-normal text-white/50 hover:text-white/70 transition-colors'
                     }`}
                   >
@@ -86,57 +100,122 @@ function CampusHeader() {
   );
 }
 
+function LessonHeader() {
+  const pathname = usePathname();
+  const { locale } = useLocale();
+  const courses = useCampusCourses();
+
+  // Extract courseSlug from path: /maxymia/campus/:courseSlug/lesson/:lessonId
+  const segments = pathname.split('/');
+  const courseSlugIndex = segments.indexOf('campus') + 1;
+  const courseSlug = segments[courseSlugIndex] || '';
+  const course = courses.find((c) => c.slug === courseSlug);
+  const courseTitle = course?.title[locale] ?? '';
+
+  return (
+    <header className="relative top-0 left-0 right-0 z-50 bg-[#0b1018] border-b border-white/5">
+      <div className="px-6 md:px-8 flex items-center justify-between py-3">
+        {/* Left: back + logo + breadcrumb */}
+        <div className="flex items-center gap-4 min-w-0">
+          <Link
+            href={`/maxymia/campus/${courseSlug}`}
+            className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors shrink-0"
+          >
+            <ChevronLeft size={16} />
+          </Link>
+
+          <Link href="/maxymia" className="shrink-0 hidden md:block">
+            <Image
+              src="/logo-completo.webp"
+              alt="Maxymia"
+              width={96}
+              height={36}
+              className="h-8 w-auto"
+            />
+          </Link>
+
+          {courseTitle && (
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-white/20 hidden md:block">|</span>
+              <Link
+                href={`/maxymia/campus/${courseSlug}`}
+                className="text-white/50 hover:text-white/70 text-label-md md:text-body-sm truncate transition-colors"
+              >
+                {courseTitle}
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Right: avatar */}
+        <div className="flex items-center gap-3">
+          <div className="rounded-full p-px">
+            <UserButton
+              afterSignOutUrl="/maxymia"
+              appearance={{
+                elements: {
+                  avatarBox: 'w-6 h-6',
+                },
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function CampusFooter() {
   const { locale } = useLocale();
   const t = (key: string) => getTranslation(locale, key);
 
   return (
-    <footer className="border-t border-white/5 mt-20">
+    <footer className="border-t border-white/5">
       <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Logo + description */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-mx-orange to-amber-500 flex items-center justify-center">
-                <span className="text-white font-bold text-xs">M</span>
+                <span className="text-white font-bold text-label-md">M</span>
               </div>
               <span className="text-white font-semibold tracking-tight">Maxymia</span>
             </div>
-            <p className="text-white/40 text-sm leading-relaxed mb-5">
+            <p className="text-white/40 text-body-sm leading-relaxed mb-5">
               {t('footer.description')}
             </p>
           </div>
 
           {/* Campus */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.campus')}</h4>
+            <h4 className="text-white font-semibold text-body-sm mb-4">{t('footer.campus')}</h4>
             <ul className="space-y-2.5">
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.allCourses')}</Link></li>
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.myProgress')}</Link></li>
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.certificates')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.allCourses')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.myProgress')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.certificates')}</Link></li>
             </ul>
           </div>
 
           {/* Specialties */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.specialties')}</h4>
+            <h4 className="text-white font-semibold text-body-sm mb-4">{t('footer.specialties')}</h4>
             <ul className="space-y-2.5">
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.ia')}</Link></li>
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.dataScience')}</Link></li>
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.machineLearning')}</Link></li>
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.nlp')}</Link></li>
-              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.cv')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.ia')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.dataScience')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.machineLearning')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.nlp')}</Link></li>
+              <li><Link href="/maxymia/campus" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.cv')}</Link></li>
             </ul>
           </div>
 
           {/* Company */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4">{t('footer.company')}</h4>
+            <h4 className="text-white font-semibold text-body-sm mb-4">{t('footer.company')}</h4>
             <ul className="space-y-2.5">
-              <li><Link href="/maxymia" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.about')}</Link></li>
-              <li><Link href="/consultoria" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.contact')}</Link></li>
-              <li><Link href="#" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.privacy')}</Link></li>
-              <li><Link href="#" className="text-white/40 hover:text-white/70 text-sm transition-colors">{t('footer.terms')}</Link></li>
+              <li><Link href="/maxymia" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.about')}</Link></li>
+              <li><Link href="/consultoria" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.contact')}</Link></li>
+              <li><Link href="#" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.privacy')}</Link></li>
+              <li><Link href="#" className="text-white/40 hover:text-white/70 text-body-sm transition-colors">{t('footer.terms')}</Link></li>
             </ul>
           </div>
         </div>
@@ -145,10 +224,10 @@ function CampusFooter() {
       {/* Copyright bar */}
       <div className="border-t border-white/5">
         <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-white/30 text-xs">
+          <p className="text-white/30 text-label-md">
             &copy; {new Date().getFullYear()} Maxymia. {t('footer.rights')}
           </p>
-          <p className="text-white/20 text-xs">
+          <p className="text-white/20 text-label-md">
             Maxima Formacion
           </p>
         </div>
@@ -163,6 +242,9 @@ interface CampusShellProps {
 }
 
 export default function CampusShell({ children, courses = [] }: CampusShellProps) {
+  const pathname = usePathname();
+  const isLessonPage = /\/maxymia\/campus\/[^/]+\/lesson\//.test(pathname);
+
   return (
     <LocaleProvider>
       <CampusCoursesContext.Provider value={courses}>
@@ -171,7 +253,7 @@ export default function CampusShell({ children, courses = [] }: CampusShellProps
           <main className="relative z-10">
             {children}
           </main>
-          <CampusFooter />
+          {!isLessonPage && <CampusFooter />}
         </div>
       </CampusCoursesContext.Provider>
     </LocaleProvider>

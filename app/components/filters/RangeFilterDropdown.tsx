@@ -30,7 +30,7 @@ export function RangeFilterDropdown({
     <div className="relative">
       <button
         onClick={onToggle}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm transition-all ${
           isActive ? tc.btnActive : tc.btn
         }`}
       >
@@ -53,14 +53,14 @@ export function RangeFilterDropdown({
           >
             {/* Range display */}
             <div className="flex items-center justify-between mb-4">
-              <span className={`${tc.rangeValue} text-sm font-medium`}>{formatValue(value[0])}</span>
-              <span className={`${tc.rangeDash} text-xs`}>–</span>
-              <span className={`${tc.rangeValue} text-sm font-medium`}>{formatValue(value[1])}</span>
+              <span className={`${tc.rangeValue} text-body-sm font-medium`}>{formatValue(value[0])}</span>
+              <span className={`${tc.rangeDash} text-label-md`}>–</span>
+              <span className={`${tc.rangeValue} text-body-sm font-medium`}>{formatValue(value[1])}</span>
             </div>
 
             {/* Min slider */}
             <div className="mb-3">
-              <label className={`${tc.rangeLabel} text-xs mb-1 block`}>Min</label>
+              <label className={`${tc.rangeLabel} text-label-md mb-1 block`}>Min</label>
               <input
                 type="range"
                 min={min}
@@ -77,7 +77,7 @@ export function RangeFilterDropdown({
 
             {/* Max slider */}
             <div className="mb-3">
-              <label className={`${tc.rangeLabel} text-xs mb-1 block`}>Max</label>
+              <label className={`${tc.rangeLabel} text-label-md mb-1 block`}>Max</label>
               <input
                 type="range"
                 min={min}
@@ -96,7 +96,7 @@ export function RangeFilterDropdown({
             {isActive && (
               <button
                 onClick={() => onChange([min, max])}
-                className={`${tc.resetBtn} text-xs hover:underline mt-1`}
+                className={`${tc.resetBtn} text-label-md hover:underline mt-1`}
               >
                 Reset
               </button>

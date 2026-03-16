@@ -44,13 +44,13 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
             />
           ) : (
             <div className="w-24 h-24 rounded-full bg-mx-orange/10 border-2 border-mx-orange/30 flex items-center justify-center">
-              <span className="text-2xl font-bold text-mx-orange">
+              <span className="text-heading-md font-bold text-mx-orange">
                 {getInitials(post.author.name)}
               </span>
             </div>
           )}
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-2xl font-bold text-mx-text mb-2">{post.author.name}</h3>
+            <h3 className="text-heading-md font-bold text-mx-text mb-2">{post.author.name}</h3>
             {post.author.role && (
               <p className="text-mx-orange mb-4 font-medium">{post.author.role}</p>
             )}
@@ -68,7 +68,7 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
                     title={post.author.email}
                   >
                     <Mail size={18} />
-                    <span className="text-sm">{post.author.email}</span>
+                    <span className="text-body-sm">{post.author.email}</span>
                   </a>
                 )}
                 {post.author.linkedin && (
@@ -80,7 +80,7 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
                     title="LinkedIn"
                   >
                     <Linkedin size={18} />
-                    <span className="text-sm">LinkedIn</span>
+                    <span className="text-body-sm">LinkedIn</span>
                   </a>
                 )}
               </div>

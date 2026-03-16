@@ -15,7 +15,7 @@ export const MissionVisionSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Lo que nos define
           </span>
         </m.div>
@@ -30,9 +30,9 @@ export const MissionVisionSection: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-5">
               <Target className="text-mx-orange" size={22} />
-              <h3 className="text-2xl font-black text-mx-text uppercase tracking-wide">Misión</h3>
+              <h3 className="text-heading-md font-black text-mx-text uppercase tracking-wide">Misión</h3>
             </div>
-            <p className="text-base text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
+            <p className="text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
               Ofrecer formación online rigurosa y práctica que{' '}
               <span className="text-mx-text font-medium">transforme la vida profesional</span>{' '}
               de nuestros alumnos, proporcionándoles herramientas y conocimientos que generen un impacto real en sus carreras.
@@ -50,9 +50,9 @@ export const MissionVisionSection: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-5">
               <Eye className="text-mx-orange" size={22} />
-              <h3 className="text-2xl font-black text-mx-text uppercase tracking-wide">Visión</h3>
+              <h3 className="text-heading-md font-black text-mx-text uppercase tracking-wide">Visión</h3>
             </div>
-            <p className="text-base text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
+            <p className="text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
               Ser el{' '}
               <span className="text-mx-text font-medium">referente en formación especializada de habla hispana</span>,
               liderando la innovación pedagógica y estableciendo nuevos estándares de calidad educativa online.
@@ -70,14 +70,14 @@ export const MissionVisionSection: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-6">
               <ShieldCheck className="text-mx-orange" size={22} />
-              <h3 className="text-2xl font-black text-mx-text uppercase tracking-wide">Valores</h3>
+              <h3 className="text-heading-md font-black text-mx-text uppercase tracking-wide">Valores</h3>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
               {['Cercanía', 'Rigor académico', 'Innovación constante', 'Compromiso con el alumno'].map(
                 (valor) => (
                   <span
                     key={valor}
-                    className="px-5 py-2.5 border border-mx-border rounded-full text-mx-text text-sm font-medium hover:border-mx-orange/50 hover:bg-mx-orange/5 transition-all duration-300"
+                    className="px-5 py-2.5 border border-mx-border rounded-full text-mx-text text-body-sm font-medium hover:border-mx-orange/50 hover:bg-mx-orange/5 transition-all duration-300"
                   >
                     {valor}
                   </span>

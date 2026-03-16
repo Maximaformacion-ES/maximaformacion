@@ -75,7 +75,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Type badge - top left */}
           <div className="relative z-20 flex items-center gap-2 justify-between">
             <span
-              className={`px-4 py-2 backdrop-blur-sm text-xs font-medium rounded-full ${
+              className={`px-4 py-2 backdrop-blur-sm text-label-md font-medium rounded-full ${
                 isMaster
                   ? "bg-mx-blue text-white"
                   : "bg-mx-orange border border-mx-orange text-white"
@@ -84,7 +84,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               {program.type}
             </span>
             {program.isPro && (
-              <span className="flex items-center gap-1 px-3 py-2 text-[10px] font-black tracking-wider uppercase text-white rounded-full bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] shadow-lg shadow-[#f7a000]/30">
+              <span className="flex items-center gap-1 px-3 py-2 text-label-sm font-black tracking-wider uppercase text-white rounded-full bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] shadow-lg shadow-[#f7a000]/30">
                 <Crown size={10} /> PRO
               </span>
             )}
@@ -96,13 +96,13 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               {program.topics.slice(0, 2).map((topic) => (
                 <span
                   key={topic.name}
-                  className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.5)] text-white text-xs font-medium rounded-full"
+                  className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.5)] text-white text-label-md font-medium rounded-full"
                 >
                   {topic.name}
                 </span>
               ))}
               {program.topics.length > 2 && (
-                <span className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.4)] text-white text-xs font-medium rounded-full">
+                <span className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.4)] text-white text-label-md font-medium rounded-full">
                   +{program.topics.length - 2}
                 </span>
               )}
@@ -132,20 +132,20 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
                 />
               ))}
             </div>
-            <span className="text-mx-text-muted text-sm">
+            <span className="text-mx-text-muted text-body-sm">
               {displayRating.toFixed(1)}
             </span>
-            <span className="text-mx-text-muted text-sm">
+            <span className="text-mx-text-muted text-body-sm">
               ({displayStudents} estudiantes)
             </span>
           </div>
 
           {/* Title & Description */}
           <div className="flex flex-col gap-2 mb-4">
-            <h3 className="text-mx-text-muted text-xl font-medium line-clamp-2">
+            <h3 className="text-mx-text-muted text-heading-sm font-medium line-clamp-2">
               {program.title}
             </h3>
-            <p className="text-mx-text-muted text-sm 2xl:text-base font-light line-clamp-3 leading-normal">
+            <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light line-clamp-3 leading-normal">
               {program.description}
             </p>
           </div>
@@ -154,12 +154,12 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           <div className="flex items-center justify-between pt-4 mt-auto border-t border-[#ddd]">
             <div className="flex items-center gap-2">
               {program.originalPrice && (
-                <span className="text-mx-text-muted text-sm font-light line-through">
+                <span className="text-mx-text-muted text-body-sm font-light line-through">
                   {program.originalPrice}€
                 </span>
               )}
               <span
-                className={`${program.originalPrice ? "text-mx-orange" : "text-mx-text"} text-xl font-medium`}
+                className={`${program.originalPrice ? "text-mx-orange" : "text-mx-text"} text-heading-sm font-medium`}
               >
                 {program.price}€
               </span>

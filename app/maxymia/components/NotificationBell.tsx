@@ -80,7 +80,7 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
           >
             {/* Header */}
             <div className="px-4 py-3 border-b border-white/5">
-              <h3 className="text-sm font-medium text-white">
+              <h3 className="text-body-sm font-medium text-white">
                 {t('notifications.title')}
               </h3>
             </div>
@@ -90,7 +90,7 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
               {newCourses.length === 0 ? (
                 <div className="px-4 py-8 text-center">
                   <Bell size={24} className="mx-auto mb-2 text-white/20" />
-                  <p className="text-sm text-white/40">
+                  <p className="text-body-sm text-white/40">
                     {t('notifications.empty')}
                   </p>
                 </div>
@@ -136,10 +136,10 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-body-sm font-medium text-white truncate">
                           {course.title[locale]}
                         </p>
-                        <p className="text-xs text-white/40 mt-0.5">
+                        <p className="text-label-md text-white/40 mt-0.5">
                           {course.createdAt && formatRelativeDate(course.createdAt, locale, t)}
                         </p>
                       </div>

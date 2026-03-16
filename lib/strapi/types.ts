@@ -747,8 +747,6 @@ export interface StrapiMaxymiaLesson {
   id: string;
   title_es: string;
   title_en: string | null;
-  content_es: string | null;
-  content_en: string | null;
   estimatedMinutes: number | null;
   order: number;
   topics: StrapiMaxymiaTopic[] | null;
@@ -768,8 +766,6 @@ export interface StrapiMaxymiaBlock {
   id: string;
   title_es: string;
   title_en: string | null;
-  content_es: string | null;
-  content_en: string | null;
   order: number;
   lessons: StrapiMaxymiaLesson[];
   exam: StrapiMaxymiaExam | null;

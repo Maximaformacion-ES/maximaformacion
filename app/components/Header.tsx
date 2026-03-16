@@ -125,7 +125,7 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
         <div className="hidden md:flex items-center gap-3">
           <Link href="/sign-in">
             <m.button
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 hover:cursor-pointer ${isDark ? 'border border-white/30 text-white hover:bg-white/10' : 'border border-mx-blue text-mx-blue hover:bg-mx-blue hover:text-white'}`}
+              className={`flex items-center gap-2 px-4 py-2 text-body-sm font-medium rounded-full transition-all duration-300 hover:cursor-pointer ${isDark ? 'border border-white/30 text-white hover:bg-white/10' : 'border border-mx-blue text-mx-blue hover:bg-mx-blue hover:text-white'}`}
               whileTap={{ scale: 0.98 }}
             >
               <User size={16} />
@@ -134,7 +134,7 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
           </Link>
           <Link href="/sign-up">
             <m.button
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-300 hover:cursor-pointer ${isDark ? 'bg-mx-orange text-white hover:bg-mx-orange-dark' : 'bg-mx-blue text-white hover:bg-mx-blue/90'}`}
+              className={`flex items-center gap-2 px-4 py-2 text-body-sm font-medium rounded-full transition-colors duration-300 hover:cursor-pointer ${isDark ? 'bg-mx-orange text-white hover:bg-mx-orange-dark' : 'bg-mx-blue text-white hover:bg-mx-blue/90'}`}
               whileTap={{ scale: 0.98 }}
             >
               Registrarse
@@ -147,7 +147,7 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
         <div className="hidden md:flex items-center gap-3">
           {/* Pro Status / Upgrade CTA */}
           {userHasPro ? (
-            <div className="flex items-center gap-2 bg-mx-orange/10 border border-mx-orange/30 text-mx-orange px-4 py-2 text-sm font-bold rounded-full">
+            <div className="flex items-center gap-2 bg-mx-orange/10 border border-mx-orange/30 text-mx-orange px-4 py-2 text-body-sm font-bold rounded-full">
               <Crown size={14} />
               Pro
               <Check size={14} />
@@ -155,7 +155,7 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
           ) : (
             <Link href="/pricing">
               <m.button
-                className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 text-sm font-bold rounded-full hover:bg-mx-orange-dark transition-all duration-300 shadow-lg shadow-mx-orange/20 whitespace-nowrap"
+                className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 text-body-sm font-bold rounded-full hover:bg-mx-orange-dark transition-all duration-300 shadow-lg shadow-mx-orange/20 whitespace-nowrap"
 
                 whileTap={{ scale: 0.98 }}
               >
@@ -204,7 +204,7 @@ function CampusDropdown({ isDark }: CampusDropdownProps) {
     <div className="hidden md:block relative" ref={dropdownRef}>
       <m.button
         onClick={() => setIsCampusDropdownOpen(!isCampusDropdownOpen)}
-        className="flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 text-sm font-medium rounded-full hover:bg-mx-orange/90 transition-colors duration-300"
+        className="flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 text-body-sm font-medium rounded-full hover:bg-mx-orange/90 transition-colors duration-300"
         whileTap={{ scale: 0.98 }}
       >
         Campus
@@ -232,7 +232,7 @@ function CampusDropdown({ isDark }: CampusDropdownProps) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className={`block px-4 py-3 text-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 last:border-b-0 ${isDark ? 'text-white/80 border-b border-white/10' : 'text-mx-text border-b border-mx-border'}`}
+                className={`block px-4 py-3 text-body-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 last:border-b-0 ${isDark ? 'text-white/80 border-b border-white/10' : 'text-mx-text border-b border-mx-border'}`}
                 onClick={() => setIsCampusDropdownOpen(false)}
               >
                 <div className="flex items-center justify-between">
@@ -272,7 +272,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
                 key={item.name}
                 href={item.path}
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-3xl font-light ${isDark ? 'text-white' : 'text-mx-text'}`}
+                className={`text-heading-lg font-light ${isDark ? 'text-white' : 'text-mx-text'}`}
               >
                 <m.span
                   initial={{ opacity: 0, x: -20 }}
@@ -290,14 +290,14 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
               transition={{ delay: 0.6 }}
               className="mt-8 flex flex-col gap-3"
             >
-              <span className="text-mx-text-muted text-sm mb-2">Mi cuenta:</span>
+              <span className="text-mx-text-muted text-body-sm mb-2">Mi cuenta:</span>
               <SignedOut>
                 <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
                   <m.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.65 }}
-                    className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-base font-light rounded-full transition-colors"
+                    className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-body-md font-light rounded-full transition-colors"
                   >
                     <span>Iniciar sesion</span>
                     <User size={18} />
@@ -308,7 +308,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="flex items-center justify-between gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-3 text-base font-medium rounded-full transition-colors"
+                    className="flex items-center justify-between gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-3 text-body-md font-medium rounded-full transition-colors"
                   >
                     <span>Registrarse</span>
                     <ArrowUpRight size={18} />
@@ -339,7 +339,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
               transition={{ delay: 0.8 }}
               className="mt-6 flex flex-col gap-3"
             >
-              <span className="text-mx-text-muted text-sm mb-2">Acceder al Campus:</span>
+              <span className="text-mx-text-muted text-body-sm mb-2">Acceder al Campus:</span>
               {CAMPUS_OPTIONS.map((option, index) => (
                 <m.a
                   key={option.name}
@@ -349,7 +349,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.8 + index * 0.1 }}
-                  className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-base font-light rounded-full transition-colors"
+                  className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-body-md font-light rounded-full transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span>{option.name}</span>
@@ -417,7 +417,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                   <Link
                     key={item.name}
                     href={item.path}
-                    className={`text-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white' : 'text-white/80') : 'text-mx-text'}`}
+                    className={`text-body-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white' : 'text-white/80') : 'text-mx-text'}`}
                   >
                     {item.name}
                     <span className={`absolute -bottom-1 left-0 h-px bg-mx-orange transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />

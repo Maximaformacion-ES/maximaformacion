@@ -52,12 +52,12 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
         {/* Access Type Badge */}
         <div className="absolute top-3 right-3">
           {accessType === 'pro' ? (
-            <span className="flex items-center gap-1 bg-amber-500/90 text-black text-xs font-bold px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 bg-amber-500/90 text-black text-label-md font-bold px-2 py-1 rounded-full">
               <Crown size={12} />
               Pro
             </span>
           ) : (
-            <span className="flex items-center gap-1 bg-green-500/90 text-black text-xs font-bold px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 bg-green-500/90 text-black text-label-md font-bold px-2 py-1 rounded-full">
               <ShoppingBag size={12} />
               Comprado
             </span>
@@ -67,7 +67,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
         {/* Completion Badge */}
         {isCompleted && (
           <div className="absolute top-3 left-3">
-            <span className="flex items-center gap-1 bg-green-500 text-black text-xs font-bold px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 bg-green-500 text-black text-label-md font-bold px-2 py-1 rounded-full">
               <CheckCircle size={12} />
               Completado
             </span>
@@ -87,7 +87,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
 
       {/* Course Info */}
       <div className="p-4">
-        <span className="text-amber-500 text-xs font-medium tracking-wider uppercase">
+        <span className="text-amber-500 text-label-md font-medium tracking-wider uppercase">
           {program.type}
         </span>
         <h3 className="text-white font-semibold mt-1 mb-2 line-clamp-2">
@@ -98,8 +98,8 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
         {hasStarted && (
           <div className="mb-3">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-white/40 text-xs">Progreso</span>
-              <span className="text-amber-500 text-xs font-medium">{progressPercent}%</span>
+              <span className="text-white/40 text-label-md">Progreso</span>
+              <span className="text-amber-500 text-label-md font-medium">{progressPercent}%</span>
             </div>
             <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
               <m.div
@@ -116,7 +116,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
         )}
 
         {/* Meta info */}
-        <div className="flex items-center justify-between text-white/40 text-xs mb-4">
+        <div className="flex items-center justify-between text-white/40 text-label-md mb-4">
           {'totalLessons' in program && (
             <span>{program.totalLessons} lecciones</span>
           )}
@@ -142,7 +142,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
 
         {/* Last accessed */}
         {progress?.lastAccessedAt && (
-          <p className="text-white/30 text-xs text-center mt-3">
+          <p className="text-white/30 text-label-md text-center mt-3">
             Último acceso:{' '}
             {new Date(progress.lastAccessedAt).toLocaleDateString('es-ES', {
               day: 'numeric',

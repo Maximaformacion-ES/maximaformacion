@@ -232,7 +232,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
             {post.tags.map(tag => (
               <span
                 key={tag}
-                className="px-4 py-2 bg-mx-card border border-mx-border text-sm text-mx-text-muted rounded-full hover:border-mx-orange/50 hover:text-mx-orange transition-colors"
+                className="px-4 py-2 bg-mx-card border border-mx-border text-body-sm text-mx-text-muted rounded-full hover:border-mx-orange/50 hover:text-mx-orange transition-colors"
               >
                 {tag}
               </span>

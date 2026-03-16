@@ -19,10 +19,10 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-mx-blue text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-8">
+          <h2 className="text-mx-blue text-display-sm md:text-display-md lg:text-display-md font-black tracking-tight mb-8">
             ¿LISTO PARA <span className="text-stroke text-mx-orange">COMENZAR?</span>
           </h2>
-          <p className="text-xl text-mx-text-muted font-light mb-12 max-w-2xl mx-auto">
+          <p className="text-heading-sm text-mx-text-muted font-light mb-12 max-w-2xl mx-auto">
             Únete a cientos de profesionales que ya están transformando su carrera con este programa.
           </p>
         </m.div>

@@ -46,6 +46,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: '¿Qué es la Inteligencia Artificial?',
               en: 'What is Artificial Intelligence?',
             },
+            topics: [],
             estimatedMinutes: 25,
             content: {
               es: [
@@ -110,6 +111,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Tipos de IA y Machine Learning',
               en: 'Types of AI and Machine Learning',
             },
+            topics: [],
             estimatedMinutes: 30,
             content: {
               es: [
@@ -280,6 +282,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Perceptrones y redes feedforward',
               en: 'Perceptrons and feedforward networks',
             },
+            topics: [],
             estimatedMinutes: 35,
             content: {
               es: [
@@ -344,6 +347,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Backpropagation y entrenamiento',
               en: 'Backpropagation and training',
             },
+            topics: [],
             estimatedMinutes: 40,
             content: {
               es: [
@@ -451,6 +455,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Tokenización y representación de texto',
               en: 'Tokenization and text representation',
             },
+            topics: [],
             estimatedMinutes: 30,
             content: {
               es: [
@@ -485,6 +490,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Modelos de secuencia: RNN y LSTM',
               en: 'Sequence models: RNN and LSTM',
             },
+            topics: [],
             estimatedMinutes: 35,
             content: {
               es: [
@@ -540,6 +546,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Atención es todo lo que necesitas',
               en: 'Attention is all you need',
             },
+            topics: [],
             estimatedMinutes: 45,
             content: {
               es: [
@@ -604,6 +611,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Usando Hugging Face Transformers',
               en: 'Using Hugging Face Transformers',
             },
+            topics: [],
             estimatedMinutes: 40,
             content: {
               es: [
@@ -751,6 +759,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Fundamentos de CNNs',
               en: 'CNN Fundamentals',
             },
+            topics: [],
             estimatedMinutes: 35,
             content: {
               es: [
@@ -894,6 +903,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: '¿Qué son los LLMs?',
               en: 'What are LLMs?',
             },
+            topics: [],
             estimatedMinutes: 30,
             content: {
               es: [{ type: 'text', html: '<h2>Modelos de Lenguaje a Gran Escala</h2><p>Los LLMs son modelos de aprendizaje profundo entrenados con grandes cantidades de texto que pueden generar, resumir y analizar lenguaje natural con una capacidad sin precedentes.</p>' }],
@@ -906,6 +916,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Prompting para científicos',
               en: 'Prompting for scientists',
             },
+            topics: [],
             estimatedMinutes: 25,
             content: {
               es: [{ type: 'text', html: '<h2>Técnicas de Prompting</h2><p>Aprende las mejores técnicas de prompting para obtener resultados precisos en contextos de investigación científica.</p>' }],

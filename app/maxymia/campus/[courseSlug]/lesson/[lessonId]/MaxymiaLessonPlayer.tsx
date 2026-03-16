@@ -2,6 +2,7 @@
 
 import React, { useMemo, useCallback, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import {
   ArrowLeft,
@@ -23,7 +24,8 @@ interface Props {
 
 export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   const { locale } = useLocale();
-  const { courseProgress } = useUserCampus();
+  const router = useRouter();
+  const { courseProgress, refetch } = useUserCampus();
   const [markedComplete, setMarkedComplete] = useState(false);
 
   const completedSet = useMemo(() => {
@@ -66,8 +68,8 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'complete',
-          programDocumentId: course.id,
-          lessonDocumentId: lesson.id,
+          programId: course.id,
+          lessonId: lesson.id,
         }),
       });
       setMarkedComplete(true);
@@ -76,8 +78,17 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     }
   }, [course.id, lesson.id]);
 
+  const handleNext = useCallback(async () => {
+    if (!nav?.next) return;
+    if (!isCompleted) {
+      await handleMarkComplete();
+      await refetch();
+    }
+    router.push(`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`);
+  }, [nav, isCompleted, handleMarkComplete, refetch, router, course.slug]);
+
   return (
-    <div className="flex min-h-[calc(100vh-2rem)]">
+    <div className="flex h-[calc(100vh-2rem)] overflow-hidden">
       {/* Sidebar */}
       <MaxymiaLessonSidebar
         course={course}
@@ -86,28 +97,28 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
         locale={locale}
       />
 
-      {/* Main content */}
-      <div className="flex-1 min-w-0">
+      {/* Main content — only this part scrolls */}
+      <div className="flex-1 min-w-0 overflow-y-auto">
         {/* Header bar */}
-        <div className="sticky top-8 z-30 bg-[#0b1018]/80 backdrop-blur-sm border-b border-white/5 px-6 py-3 flex items-center justify-between gap-4">
+        <div className="sticky top-0 z-30 bg-[#0b1018]/80 backdrop-blur-sm border-b border-white/5 px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <Link
               href={`/maxymia/campus/${course.slug}`}
-              className="text-white/40 hover:text-mx-orange transition-colors flex-shrink-0"
+              className="text-white/40 hover:text-mx-orange transition-colors shrink-0"
             >
               <ChevronLeft size={18} />
             </Link>
             <div className="min-w-0">
-              <p className="text-white/30 text-[10px] tracking-widest uppercase truncate">
+              <p className="text-white/30 text-label-sm tracking-widest uppercase truncate">
                 {course.title[locale]}
               </p>
-              <p className="text-white text-sm font-medium truncate">
+              <p className="text-white text-body-sm font-medium truncate">
                 {lesson.title[locale]}
               </p>
             </div>
           </div>
           {nav && (
-            <span className="text-white/30 text-xs flex-shrink-0">
+            <span className="text-white/30 text-label-md shrink-0">
               {nav.currentIndex + 1}/{nav.totalLessons}
             </span>
           )}
@@ -121,32 +132,12 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
           className="px-6 md:px-12 lg:px-16 py-10 max-w-4xl"
         >
           {/* Block breadcrumb */}
-          <p className="text-mx-orange text-xs tracking-[0.2em] uppercase mb-6">
+          <p className="text-mx-orange text-label-md tracking-[0.2em] uppercase mb-6">
             {block.title[locale]}
           </p>
 
           {/* Content */}
           <LessonContentRenderer content={lesson.content[locale]} locale={locale} />
-
-          {/* Mark as complete */}
-          <div className="mt-16 mb-8 flex items-center gap-4">
-            {isCompleted ? (
-              <div className="flex items-center gap-2 text-mx-orange">
-                <CheckCircle size={20} />
-                <span className="text-sm font-medium">
-                  {locale === 'es' ? 'Lección completada' : 'Lesson completed'}
-                </span>
-              </div>
-            ) : (
-              <button
-                onClick={handleMarkComplete}
-                className="flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-mx-orange-dark transition-colors"
-              >
-                <CheckCircle size={16} />
-                {locale === 'es' ? 'Marcar como completada' : 'Mark as completed'}
-              </button>
-            )}
-          </div>
 
           {/* Navigation */}
           {nav && (
@@ -154,7 +145,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               {nav.prev ? (
                 <Link
                   href={`/maxymia/campus/${course.slug}/lesson/${nav.prev.lessonId}`}
-                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-sm"
+                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
                 >
                   <ArrowLeft size={16} />
                   <span className="hidden sm:inline">{nav.prev.title[locale]}</span>
@@ -164,14 +155,14 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
                 <div />
               )}
               {nav.next ? (
-                <Link
-                  href={`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`}
-                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-sm"
+                <button
+                  onClick={handleNext}
+                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
                 >
                   <span className="hidden sm:inline">{nav.next.title[locale]}</span>
                   <span className="sm:hidden">{locale === 'es' ? 'Siguiente' : 'Next'}</span>
                   <ArrowRight size={16} />
-                </Link>
+                </button>
               ) : (
                 <div />
               )}

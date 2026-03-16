@@ -84,14 +84,14 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-mx-blue/80 bg-mx-blue/10 mb-8"
             >
               <span className="w-2 h-2 rounded-full bg-mx-orange animate-pulse" />
-              <span className="text-mx-blue text-xs tracking-wider">{hero.overline}</span>
+              <span className="text-mx-blue text-label-md tracking-wider">{hero.overline}</span>
             </m.div>
 
             <m.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl font-black leading-[0.95] tracking-tight mb-8"
+              className="text-display-sm md:text-display-md lg:text-display-md 2xl:text-display-lg font-black leading-[0.95] tracking-tight mb-8"
             >
               <ColoredTitle text={hero.title} />
             </m.h1>
@@ -101,7 +101,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white/60 text-base md:text-lg 2xl:text-xl font-light leading-relaxed max-w-lg mb-10"
+              className="text-white/60 text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-lg mb-10"
             >
               {hero.description}
             </m.p>
@@ -115,14 +115,14 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               <Link
                 href={CAMPUS_URL}
                 onClick={handleCampusClick}
-                className="inline-flex items-center gap-2 bg-mx-orange text-white px-7 py-3.5 rounded-full text-sm font-medium hover:bg-mx-orange-dark transition-colors"
+                className="inline-flex items-center gap-2 bg-mx-orange text-white px-7 py-3.5 rounded-full text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
               >
                 Ir al Campus
                 <ArrowRight size={18} />
               </Link>
               <a
                 href="#cursos"
-                className="inline-flex items-center gap-2 border border-white/20 text-white px-7 py-3.5 rounded-full text-sm font-medium hover:bg-white/5 transition-colors"
+                className="inline-flex items-center gap-2 border border-white/20 text-white px-7 py-3.5 rounded-full text-body-sm font-medium hover:bg-white/5 transition-colors"
               >
                 <Play size={16} />
                 Explorar cursos
@@ -144,8 +144,8 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
                 <React.Fragment key={stat.label}>
                   {i > 0 && <div className="w-px h-10 bg-white/10" />}
                   <div>
-                    <div className="text-white text-xl md:text-2xl 2xl:text-3xl font-bold">{stat.value}</div>
-                    <div className="text-white/40 text-xs 2xl:text-sm">{stat.label}</div>
+                    <div className="text-white text-heading-sm md:text-heading-md 2xl:text-heading-lg font-bold">{stat.value}</div>
+                    <div className="text-white/40 text-label-md 2xl:text-label-lg">{stat.label}</div>
                   </div>
                 </React.Fragment>
               ))}
@@ -213,7 +213,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <span className="text-mx-orange/40 text-xs tracking-widest">SCROLL</span>
+        <span className="text-mx-orange/40 text-label-md tracking-widest">SCROLL</span>
         <ChevronDown size={18} className="text-mx-orange/40" />
       </m.div> */}
     </section>
@@ -236,14 +236,14 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-mx-blue/80 bg-mx-blue/10 mb-6">
             <FlaskConical size={14} className="text-mx-blue" />
-            <span className="text-mx-blue text-xs tracking-wider">{section.overline}</span>
+            <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
           <h2
-            className="text-3xl md:text-5xl 2xl:text-6xl font-black text-white mb-6"
+            className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-white mb-6"
           >
             <ColoredTitle text={section.title}/> 
           </h2>
-          <p className="text-white/50 text-base md:text-lg 2xl:text-xl font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/50 text-body-md md:text-body-lg 2xl:text-heading-sm font-light max-w-2xl mx-auto leading-relaxed">
             {section.description}
           </p>
         </m.div>
@@ -274,8 +274,8 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
 
                 {/* Content — pinned to top left */}
                 <div className="absolute top-0 left-0 right-0 p-8 md:p-10">
-                  <h3 className="text-white text-lg md:text-xl 2xl:text-2xl font-bold mb-2">{card.title}</h3>
-                  <p className="text-white/50 text-sm 2xl:text-base font-light leading-relaxed max-w-md">{card.description}</p>
+                  <h3 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2">{card.title}</h3>
+                  <p className="text-white/50 text-body-sm 2xl:text-body-md font-light leading-relaxed max-w-md">{card.description}</p>
                 </div>
               </m.div>
             );
@@ -310,12 +310,12 @@ function CoursesSection({
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-mx-blue/80 bg-mx-blue/10 mb-5">
               <BookOpen size={14} className="text-mx-blue" />
-              <span className="text-mx-blue text-xs tracking-wider">{section.overline}</span>
+              <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-black leading-[0.95] text-white mb-4">
+            <h2 className="text-display-sm md:text-display-md font-black leading-[0.95] text-white mb-4">
               <StyledTitle text={section.title} color="orange" mode="dark" />
             </h2>
-            <p className="text-white/50 text-base 2xl:text-lg font-light max-w-md">
+            <p className="text-white/50 text-body-md 2xl:text-body-lg font-light max-w-md">
               {section.description}
             </p>
           </m.div>
@@ -329,7 +329,7 @@ function CoursesSection({
             <Link
               href={CAMPUS_URL}
               onClick={handleCampusClick}
-              className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-sm font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
+              className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-label-lg font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
             >
               Ver todos los cursos
               <ArrowRight size={14} />
@@ -371,10 +371,10 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-mx-blue/80 bg-mx-blue/10 mb-5">
             <Check size={14} className="text-mx-blue" />
-            <span className="text-mx-blue text-xs tracking-wider">{section.overline}</span>
+            <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
-          <h2 className="text-3xl md:text-5xl 2xl:text-6xl font-black text-white mb-4">{section.title}</h2>
-          <p className="text-white/50 text-base font-light max-w-lg ml-auto leading-relaxed">
+          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-white mb-4">{section.title}</h2>
+          <p className="text-white/50 text-body-md font-light max-w-lg ml-auto leading-relaxed">
             {section.description}
           </p>
         </m.div>
@@ -400,13 +400,13 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                 {activeCard === i && (
                   <div className="absolute -top-6 -left-6 w-32 h-32 bg-mx-orange/10 rounded-full blur-[50px] pointer-events-none" />
                 )}
-                <span className={`text-xs font-mono tracking-widest mb-2 block relative z-10 ${
+                <span className={`text-label-md font-mono tracking-widest mb-2 block relative z-10 ${
                   activeCard === i ? 'text-mx-orange' : 'text-mx-orange/40'
                 }`}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="text-white text-lg md:text-xl 2xl:text-2xl font-bold mb-2 relative z-10">{diff.title}</h3>
-                <p className="text-white/50 text-sm 2xl:text-base font-light leading-relaxed relative z-10">
+                <h3 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 relative z-10">{diff.title}</h3>
+                <p className="text-white/50 text-body-sm 2xl:text-body-md font-light leading-relaxed relative z-10">
                   {diff.description}
                 </p>
               </m.div>
@@ -491,7 +491,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-3xl md:text-5xl 2xl:text-6xl font-black text-white leading-tight mb-6"
+          className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-white leading-tight mb-6"
         >
           <ColoredTitle text={section.title}/>
         </m.h2>
@@ -501,7 +501,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-white/50 text-base md:text-lg 2xl:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-10"
+          className="text-white/50 text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-2xl mx-auto mb-10"
         >
           {section.description}
         </m.p>
@@ -516,7 +516,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           <Link
             href={CAMPUS_URL}
             onClick={handleCampusClick}
-            className="inline-flex items-center gap-2.5 bg-mx-orange text-white px-10 py-4.5 rounded-full text-base font-medium hover:bg-mx-orange-dark transition-colors"
+            className="inline-flex items-center gap-2.5 bg-mx-orange text-white px-10 py-4.5 rounded-full text-body-md font-medium hover:bg-mx-orange-dark transition-colors"
           >
             Ir al Campus Virtual
             <ArrowRight size={20} />
@@ -528,7 +528,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-wrap items-center justify-center gap-6 text-white/60 text-sm"
+          className="flex flex-wrap items-center justify-center gap-6 text-white/60 text-label-lg"
         >
           {[
             { icon: Check, text: 'Registro gratuito' },
@@ -564,13 +564,13 @@ export default function MaxymiaClient({ data, courses }: MaxymiaClientProps) {
         <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] flex items-center justify-between h-8">
           <Link
             href="/"
-            className="group flex items-center gap-2 text-white/30 hover:text-mx-orange transition-colors text-[11px] tracking-wide"
+            className="group flex items-center gap-2 text-white/30 hover:text-mx-orange transition-colors text-label-sm tracking-wide"
           >
             <ArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
             <span className="hidden sm:inline">Volver a</span>
             <span className="font-medium text-white/50 group-hover:text-mx-orange transition-colors">Máxima Formación</span>
           </Link>
-          <span className="text-white/80 text-[10px] tracking-widest uppercase hidden md:block">Campus de IA Aplicada a Ciencias</span>
+          <span className="text-white/80 text-label-sm tracking-widest uppercase hidden md:block">Campus de IA Aplicada a Ciencias</span>
         </div>
       </div>
       <FontStyles />

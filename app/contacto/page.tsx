@@ -38,10 +38,10 @@ const ContactPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+              <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
                 Atención Personalizada
               </span>
-              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black leading-[0.9] mb-12 text-mx-blue">
+              <h1 className="text-display-sm md:text-display-md lg:text-display-lg font-black leading-[0.9] mb-12 text-mx-blue">
                 ¿EN QUÉ PODEMOS <br />
                 <span className="text-stroke text-mx-orange">AYUDARTE?</span>
               </h1>
@@ -51,7 +51,7 @@ const ContactPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 1 }}
-              className="max-w-2xl text-mx-text-muted text-lg md:text-xl font-light leading-relaxed"
+              className="max-w-2xl text-mx-text-muted text-body-lg md:text-heading-sm font-light leading-relaxed"
             >
               Creemos en ti, llegarás hasta donde tú quieras llegar. En Máxima Formación te proporcionamos los conocimientos y las herramientas para que puedas lograrlo.
             </m.p>
@@ -67,11 +67,11 @@ const ContactPage = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-mx-blue tracking-tight mb-8">Escríbenos</h2>
+              <h2 className="text-heading-lg font-bold text-mx-blue tracking-tight mb-8">Escríbenos</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label htmlFor="contact-name" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Nombre Completo</label>
+                    <label htmlFor="contact-name" className="text-label-md uppercase tracking-widest text-mx-text-muted font-medium">Nombre Completo</label>
                     <input
                       id="contact-name"
                       type="text"
@@ -83,7 +83,7 @@ const ContactPage = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="contact-email" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Email Corporativo</label>
+                    <label htmlFor="contact-email" className="text-label-md uppercase tracking-widest text-mx-text-muted font-medium">Email Corporativo</label>
                     <input
                       id="contact-email"
                       type="email"
@@ -97,7 +97,7 @@ const ContactPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="contact-phone" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Teléfono</label>
+                  <label htmlFor="contact-phone" className="text-label-md uppercase tracking-widest text-mx-text-muted font-medium">Teléfono</label>
                   <input
                     id="contact-phone"
                     type="tel"
@@ -109,7 +109,7 @@ const ContactPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="contact-message" className="text-xs uppercase tracking-widest text-mx-text-muted font-medium">Mensaje</label>
+                  <label htmlFor="contact-message" className="text-label-md uppercase tracking-widest text-mx-text-muted font-medium">Mensaje</label>
                   <textarea
                     id="contact-message"
                     rows={5}
@@ -123,7 +123,7 @@ const ContactPage = () => {
 
                 <button
                   type="submit"
-                  className="group w-full bg-mx-orange text-white py-5 rounded-xl font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer"
+                  className="group w-full bg-mx-orange text-white py-5 rounded-xl font-bold text-body-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer"
                 >
                   Enviar Mensaje
                   <Send size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -139,15 +139,15 @@ const ContactPage = () => {
               className="space-y-10"
             >
               <div>
-                <h2 className="text-3xl font-bold text-mx-blue tracking-tight mb-8">Vías de contacto</h2>
+                <h2 className="text-heading-lg font-bold text-mx-blue tracking-tight mb-8">Vías de contacto</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="p-8 bg-mx-bg rounded-2xl border border-mx-border hover:border-mx-orange/30 transition-all group">
                     <div className="w-12 h-12 rounded-xl bg-mx-orange/10 flex items-center justify-center mb-6 group-hover:bg-mx-orange group-hover:text-white text-mx-orange transition-all">
                       <Mail size={20} />
                     </div>
                     <h3 className="font-bold text-mx-text mb-2">Email</h3>
-                    <p className="text-mx-text-muted text-sm mb-4">Para consultas generales y soporte.</p>
-                    <a href="mailto:cursos@maximaformacion.es" className="text-sm font-medium text-mx-orange hover:underline">cursos@maximaformacion.es</a>
+                    <p className="text-mx-text-muted text-body-sm mb-4">Para consultas generales y soporte.</p>
+                    <a href="mailto:cursos@maximaformacion.es" className="text-body-sm font-medium text-mx-orange hover:underline">cursos@maximaformacion.es</a>
                   </div>
 
                   <div className="p-8 bg-mx-bg rounded-2xl border border-mx-border hover:border-mx-orange/30 transition-all group">
@@ -155,14 +155,14 @@ const ContactPage = () => {
                       <Phone size={20} />
                     </div>
                     <h3 className="font-bold text-mx-text mb-2">Llámanos</h3>
-                    <p className="text-mx-text-muted text-sm mb-4">Lunes a Viernes de 9:00 a 18:00.</p>
-                    <a href="tel:+34635659391" className="text-sm font-medium text-mx-orange hover:underline">+34 635 65 93 91</a>
+                    <p className="text-mx-text-muted text-body-sm mb-4">Lunes a Viernes de 9:00 a 18:00.</p>
+                    <a href="tel:+34635659391" className="text-body-sm font-medium text-mx-orange hover:underline">+34 635 65 93 91</a>
                   </div>
                 </div>
               </div>
 
               <div className="p-8 bg-mx-bg rounded-2xl border border-mx-border">
-                <h3 className="text-xl font-bold text-mx-text mb-6 flex items-center gap-3">
+                <h3 className="text-heading-sm font-bold text-mx-text mb-6 flex items-center gap-3">
                   <MessageSquare className="text-mx-orange" size={20} />
                   Escríbenos si:
                 </h3>
@@ -174,7 +174,7 @@ const ContactPage = () => {
                     "Te ha surgido alguna duda durante el proceso.",
                     "Estás organizando un congreso o evento."
                   ].map((item) => (
-                    <li key={item} className="flex items-start gap-4 text-sm text-mx-text-muted">
+                    <li key={item} className="flex items-start gap-4 text-body-sm text-mx-text-muted">
                       <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-mx-orange shrink-0" />
                       {item}
                     </li>
@@ -191,8 +191,8 @@ const ContactPage = () => {
                   ))}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-mx-text">Nuestro equipo está online</p>
-                  <p className="text-xs text-mx-text-muted">Respuesta media en menos de 24h</p>
+                  <p className="text-body-sm font-bold text-mx-text">Nuestro equipo está online</p>
+                  <p className="text-label-md text-mx-text-muted">Respuesta media en menos de 24h</p>
                 </div>
               </div>
             </m.div>
@@ -204,24 +204,24 @@ const ContactPage = () => {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
               <div className="lg:col-span-1">
-                <h2 className="text-4xl font-black text-mx-blue mb-6">
+                <h2 className="text-display-sm font-black text-mx-blue mb-6">
                   DÓNDE <br /><span className="text-stroke text-mx-orange">ESTAMOS</span>
                 </h2>
                 <div className="space-y-6 text-mx-text-muted">
                   <div className="flex gap-4">
                     <MapPin className="shrink-0 text-mx-orange" />
-                    <p className="text-sm leading-relaxed">
+                    <p className="text-body-sm leading-relaxed">
                       Av. de la Innovación, 1, <br />
                       18016 Granada <br />
                     </p>
                   </div>
                   <div className="flex gap-4">
                     <Clock className="shrink-0 text-mx-orange" />
-                    <p className="text-sm">9:00 AM — 6:00 PM (GMT+1)</p>
+                    <p className="text-body-sm">9:00 AM — 6:00 PM (GMT+1)</p>
                   </div>
                   <div className="flex gap-4">
                     <Globe className="shrink-0 text-mx-orange" />
-                    <p className="text-sm">Servicio Global / 100% Online</p>
+                    <p className="text-body-sm">Servicio Global / 100% Online</p>
                   </div>
                 </div>
               </div>

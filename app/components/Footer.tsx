@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
                 className="h-10 md:h-12 w-auto "
               />
             </Link>
-            <p className="text-mx-text-muted text-sm font-light mt-4 max-w-xs leading-relaxed">
+            <p className="text-mx-text-muted text-body-sm font-light mt-4 max-w-xs leading-relaxed">
               Formación profesional experta para impulsar tu carrera al
               siguiente nivel.
             </p>
@@ -101,7 +101,7 @@ export const Footer: React.FC = () => {
                     <li key={link.href}>
                       <a
                         href={link.href}
-                        className="text-mx-text-muted hover:text-mx-orange text-sm font-light transition-colors"
+                        className="text-mx-text-muted hover:text-mx-orange text-body-sm font-light transition-colors"
                       >
                         {link.label}
                       </a>
@@ -115,7 +115,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-mx-text-muted text-sm">
+          <p className="text-mx-text-muted text-body-sm">
             © 2026 Maximaformación. Todos los derechos reservados.
           </p>
         </div>

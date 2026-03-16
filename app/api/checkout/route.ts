@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
+import { fetchMaxymiaCourseBySlug } from '@/app/maxymia/data/queries';
 
 // Price IDs from your Stripe Dashboard - replace these with your actual price IDs
 const PRICE_IDS = {
@@ -13,11 +14,12 @@ const PRICE_IDS = {
 };
 
 interface CheckoutRequestBody {
-  type?: 'subscription' | 'course';
+  type?: 'subscription' | 'course' | 'maxymia-course';
   planId?: string;
   planPeriod?: 'month' | 'year';
   programId?: string;
   documentId?: string;
+  slug?: string;
 }
 
 export async function POST(request: Request) {
@@ -47,10 +49,70 @@ export async function POST(request: Request) {
 
     const user = await currentUser();
     const body: CheckoutRequestBody = await request.json();
-    const { type = 'subscription', planId, planPeriod = 'month', programId, documentId } = body;
+    const { type = 'subscription', planId, planPeriod = 'month', programId, documentId, slug } = body;
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    // Handle course purchase (one-time payment)
+    // Handle Maxymia course purchase (one-time payment)
+    if (type === 'maxymia-course') {
+      if (!slug) {
+        return NextResponse.json(
+          { error: 'Course slug is required for Maxymia course purchase' },
+          { status: 400 }
+        );
+      }
+
+      // Fetch course using the same Strapi + fallback logic the frontend uses
+      const course = await fetchMaxymiaCourseBySlug(slug);
+
+      if (!course) {
+        return NextResponse.json(
+          { error: 'Course not found' },
+          { status: 404 }
+        );
+      }
+
+      if (!course.price || course.price <= 0) {
+        return NextResponse.json(
+          { error: 'This course is not available for purchase.' },
+          { status: 400 }
+        );
+      }
+
+      // Create an ad-hoc Stripe price from the course price
+      const stripePrice = await stripe.prices.create({
+        currency: 'eur',
+        unit_amount: Math.round(course.price * 100),
+        product_data: {
+          name: course.title.es,
+          metadata: { courseId: course.id, slug: course.slug, type: 'maxymia-course' },
+        },
+      });
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [{ price: stripePrice.id, quantity: 1 }],
+        success_url: `${baseUrl}/maxymia/campus/${course.slug}?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/maxymia/campus/${course.slug}?canceled=true`,
+        customer_email: user?.emailAddresses?.[0]?.emailAddress,
+        metadata: {
+          userId,
+          type: 'maxymia-course',
+          courseId: course.id,
+          courseSlug: course.slug,
+          courseTitle: course.title.es,
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'auto',
+      });
+
+      return NextResponse.json({
+        url: session.url,
+        sessionId: session.id,
+      });
+    }
+
+    // Handle program course purchase (one-time payment)
     if (type === 'course') {
       if (!programId && !documentId) {
         return NextResponse.json(

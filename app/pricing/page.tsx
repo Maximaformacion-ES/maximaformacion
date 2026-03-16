@@ -96,7 +96,7 @@ function BillingToggle({
     <div className="inline-flex items-center gap-1 p-1 bg-mx-card border border-mx-border rounded-full">
       <button
         onClick={() => setBillingPeriod('monthly')}
-        className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+        className={`px-6 py-2.5 rounded-full text-body-sm font-medium transition-all duration-300 ${
           billingPeriod === 'monthly'
             ? 'bg-mx-orange text-white'
             : 'text-mx-text-muted hover:text-mx-text'
@@ -106,14 +106,14 @@ function BillingToggle({
       </button>
       <button
         onClick={() => setBillingPeriod('yearly')}
-        className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+        className={`px-6 py-2.5 rounded-full text-body-sm font-medium transition-all duration-300 flex items-center gap-2 ${
           billingPeriod === 'yearly'
             ? 'bg-mx-orange text-white'
             : 'text-mx-text-muted hover:text-mx-text'
         }`}
       >
         Anual
-        <span className={`text-xs px-2 py-0.5 rounded-full ${
+        <span className={`text-label-md px-2 py-0.5 rounded-full ${
           billingPeriod === 'yearly' ? 'bg-white/20' : 'bg-green-50 text-green-600'
         }`}>
           Ahorra 20%
@@ -152,7 +152,7 @@ function PlanCard({
       {/* Badge */}
       {plan.badge && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="inline-flex items-center gap-2 bg-mx-orange text-white px-4 py-1.5 rounded-full text-sm font-bold">
+          <span className="inline-flex items-center gap-2 bg-mx-orange text-white px-4 py-1.5 rounded-full text-body-sm font-bold">
             <Zap size={14} />
             {plan.badge}
           </span>
@@ -166,13 +166,13 @@ function PlanCard({
         }`}>
           <plan.icon className={plan.highlighted ? 'text-mx-orange' : 'text-mx-text-muted'} size={24} />
         </div>
-        <h3 className="text-2xl font-bold text-mx-text">{plan.name}</h3>
+        <h3 className="text-heading-md font-bold text-mx-text">{plan.name}</h3>
       </div>
 
       {/* Price */}
       <div className="mb-6">
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl md:text-5xl font-black text-mx-text">
+          <span className="text-display-sm md:text-display-sm font-black text-mx-text">
             €{billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly}
           </span>
           <span className="text-mx-text-muted font-light">
@@ -180,7 +180,7 @@ function PlanCard({
           </span>
         </div>
         {billingPeriod === 'yearly' && plan.price.monthly > 0 && (
-          <p className="text-mx-orange text-sm mt-2">
+          <p className="text-mx-orange text-body-sm mt-2">
             Equivalente a €{Math.round(plan.price.yearly / 12)}/mes
           </p>
         )}
@@ -248,7 +248,7 @@ function ComparisonTable() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-black text-mx-blue mb-4">
+          <h2 className="text-heading-lg md:text-display-sm font-black text-mx-blue mb-4">
             Comparativa de planes
           </h2>
           <p className="text-mx-text-muted font-light">
@@ -317,16 +317,16 @@ function PricingCTA({ isSignedIn }: { isSignedIn: boolean | undefined }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-white text-3xl md:text-6xl lg:text-7xl font-black mb-8">
+          <h2 className="text-white text-heading-lg md:text-display-md lg:text-display-md font-black mb-8">
             ¿Listo para dar el siguiente paso?
           </h2>
-          <p className="text-white/70 text-lg md:text-2xl font-light mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-white/70 text-body-lg md:text-heading-md font-light mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed">
             Únete a miles de profesionales que ya están impulsando sus carreras con Máxima Formación Pro
           </p>
 
           <Link
             href={isSignedIn ? '#' : '/sign-up'}
-            className="group inline-flex items-center gap-3 bg-mx-orange text-white px-10 py-5 rounded-full text-base font-bold tracking-wide hover:bg-mx-orange-dark transition-all duration-300"
+            className="group inline-flex items-center gap-3 bg-mx-orange text-white px-10 py-5 rounded-full text-body-md font-bold tracking-wide hover:bg-mx-orange-dark transition-all duration-300"
           >
             Comenzar con Pro
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -418,14 +418,14 @@ function PricingContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-flex items-center gap-2 text-mx-orange text-sm font-medium tracking-[0.3em] uppercase mb-6">
+              <span className="inline-flex items-center gap-2 text-mx-orange text-body-sm font-medium tracking-[0.3em] uppercase mb-6">
                 <Sparkles size={16} />
                 Planes y Precios
               </span>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-mx-blue mb-6">
+              <h1 className="text-display-sm md:text-display-md lg:text-display-md font-black text-mx-blue mb-6">
                 <StyledTitle text="INVIERTE EN TU {FUTURO}" color="blue" />
               </h1>
-              <p className="text-mx-text-muted font-light text-lg md:text-xl max-w-2xl mx-auto mb-10">
+              <p className="text-mx-text-muted font-light text-body-lg md:text-heading-sm max-w-2xl mx-auto mb-10">
                 Elige el plan que mejor se adapte a tus necesidades y comienza tu camino hacia la excelencia profesional
               </p>
 
@@ -494,7 +494,7 @@ export default function PricingPage() {
     <Suspense
       fallback={
         <div className="bg-mx-bg min-h-screen text-mx-text flex items-center justify-center">
-          <p className="text-mx-text-muted text-lg">Cargando...</p>
+          <p className="text-mx-text-muted text-body-lg">Cargando...</p>
         </div>
       }
     >

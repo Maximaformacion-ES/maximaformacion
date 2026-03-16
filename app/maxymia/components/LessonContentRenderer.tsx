@@ -1,10 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
+import { marked } from 'marked';
 import { Info, AlertTriangle, Lightbulb } from 'lucide-react';
 import VimeoPlayer from '@/app/components/VimeoPlayer';
 import type { ContentBlock, Locale } from '../types';
+
+/**
+ * Detect if a string is markdown (not already HTML).
+ * If it starts with a tag like <p>, <h1>, <div> etc., treat as HTML.
+ * Otherwise parse as markdown.
+ */
+function toHtml(input: string): string {
+  const trimmed = input.trim();
+  // Already HTML — starts with a tag
+  if (/^<[a-z][\s\S]*>/i.test(trimmed)) {
+    return trimmed;
+  }
+  // Parse markdown to HTML
+  return marked.parse(trimmed, { async: false }) as string;
+}
 
 interface LessonContentRendererProps {
   content: ContentBlock[];
@@ -24,12 +40,7 @@ export default function LessonContentRenderer({ content }: LessonContentRenderer
 function ContentBlockRenderer({ block }: { block: ContentBlock }) {
   switch (block.type) {
     case 'text':
-      return (
-        <div
-          className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-strong:text-white prose-a:text-mx-orange"
-          dangerouslySetInnerHTML={{ __html: block.html }}
-        />
-      );
+      return <TextBlockRenderer html={block.html} />;
 
     case 'video':
       return (
@@ -55,7 +66,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             />
           </div>
           {block.caption && (
-            <figcaption className="text-white/40 text-sm mt-3 text-center italic">
+            <figcaption className="text-white/40 text-body-sm mt-3 text-center italic">
               {block.caption}
             </figcaption>
           )}
@@ -67,12 +78,12 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
         <div className="my-6 rounded-xl overflow-hidden border border-white/10">
           {block.fileName && (
             <div className="bg-white/[0.05] px-4 py-2 border-b border-white/10 flex items-center gap-2">
-              <span className="text-white/50 text-xs font-mono">{block.fileName}</span>
-              <span className="text-white/20 text-[10px] uppercase">{block.language}</span>
+              <span className="text-white/50 text-label-md font-mono">{block.fileName}</span>
+              <span className="text-white/20 text-label-sm uppercase">{block.language}</span>
             </div>
           )}
           <pre className="bg-[#0d1117] p-4 overflow-x-auto">
-            <code className="text-sm font-mono text-white/80 leading-relaxed">
+            <code className="text-body-sm font-mono text-white/80 leading-relaxed">
               {block.code}
             </code>
           </pre>
@@ -109,9 +120,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             <Icon size={20} className={`${v.iconColor} flex-shrink-0 mt-0.5`} />
             <div>
               {block.title && (
-                <p className="text-white font-medium text-sm mb-1">{block.title}</p>
+                <p className="text-white font-medium text-body-sm mb-1">{block.title}</p>
               )}
-              <p className="text-white/60 text-sm leading-relaxed">{block.content}</p>
+              <p className="text-white/60 text-body-sm leading-relaxed">{block.content}</p>
             </div>
           </div>
         </div>
@@ -121,4 +132,14 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     default:
       return null;
   }
+}
+
+function TextBlockRenderer({ html }: { html: string }) {
+  const rendered = useMemo(() => toHtml(html), [html]);
+  return (
+    <div
+      className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-strong:text-white prose-a:text-mx-orange"
+      dangerouslySetInnerHTML={{ __html: rendered }}
+    />
+  );
 }

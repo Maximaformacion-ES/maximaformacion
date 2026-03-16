@@ -53,7 +53,7 @@ export const ConsultoriaHeroSection: React.FC<ConsultoriaHeroSectionProps> = ({ 
         <m.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-6"
+          className="inline-block text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-6"
         >
           {heroOverline}
         </m.span>
@@ -61,7 +61,7 @@ export const ConsultoriaHeroSection: React.FC<ConsultoriaHeroSectionProps> = ({ 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-7xl font-black  mb-6 text-mx-blue"
+          className="text-display-sm md:text-display-md lg:text-display-md font-black  mb-6 text-mx-blue"
         >
           {heroTitle}
         </m.h1>
@@ -69,7 +69,7 @@ export const ConsultoriaHeroSection: React.FC<ConsultoriaHeroSectionProps> = ({ 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-mx-text-muted text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto"
+          className="text-mx-text-muted text-body-lg md:text-heading-sm font-light mb-10 max-w-2xl mx-auto"
         >
           {heroDescription}
         </m.p>
@@ -78,7 +78,7 @@ export const ConsultoriaHeroSection: React.FC<ConsultoriaHeroSectionProps> = ({ 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="group inline-flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-base font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
+          className="group inline-flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-body-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
         >
           Consulta gratuita
           <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

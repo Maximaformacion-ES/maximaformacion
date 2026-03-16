@@ -134,13 +134,13 @@ export default function LessonPlayerClient({
               <span className="hidden md:inline">Volver al curso</span>
             </Link>
             <div className="h-6 w-px bg-white/20" />
-            <h1 className="text-sm md:text-base font-medium truncate max-w-[200px] md:max-w-none">
+            <h1 className="text-body-sm md:text-body-md font-medium truncate max-w-[200px] md:max-w-none">
               {program.title}
             </h1>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-white/40 text-sm hidden md:block">
+            <span className="text-white/40 text-body-sm hidden md:block">
               Lección {navigation.currentIndex + 1} de {navigation.totalLessons}
             </span>
             <button
@@ -182,27 +182,14 @@ export default function LessonPlayerClient({
             {/* Title and Completion Status */}
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-2">{lesson.title}</h2>
+                <h2 className="text-heading-md md:text-heading-lg font-bold mb-2">{lesson.title}</h2>
                 {navigation.currentModule && (
                   <p className="text-white/40">
                     Módulo: {navigation.currentModule.title}
                   </p>
                 )}
               </div>
-              {showCompleted ? (
-                <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-4 py-2 rounded-full">
-                  <CheckCircle size={18} />
-                  <span className="font-medium">Completada</span>
-                </div>
-              ) : (
-                <button
-                  onClick={handleLessonComplete}
-                  className="flex items-center gap-2 text-white/60 hover:text-amber-500 bg-white/5 hover:bg-amber-500/10 px-4 py-2 rounded-full transition-colors"
-                >
-                  <CheckCircle size={18} />
-                  <span>Marcar como completada</span>
-                </button>
-              )}
+              
             </div>
 
             {/* Description */}
@@ -216,7 +203,7 @@ export default function LessonPlayerClient({
             {/* Resources */}
             {lesson.resources && lesson.resources.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Recursos descargables</h3>
+                <h3 className="text-body-lg font-semibold mb-4">Recursos descargables</h3>
                 <div className="space-y-2">
                   {lesson.resources.map((resource) => (
                     <a

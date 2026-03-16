@@ -26,7 +26,7 @@ export function FilterDropdown({
     <div className="relative">
       <button
         onClick={onToggle}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm transition-all ${
           value ? tc.btnActive : tc.btn
         }`}
       >
@@ -53,7 +53,7 @@ export function FilterDropdown({
                 onClick={() => {
                   onChange(option.value === 'all' ? null : option.value);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                className={`w-full text-left px-4 py-2.5 text-body-sm transition-colors ${
                   (option.value === 'all' && !value) || option.value === value
                     ? tc.dropdownItemActive
                     : tc.dropdownItem

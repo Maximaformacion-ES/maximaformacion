@@ -37,18 +37,18 @@ export default function ExamResults({
         )}
       </div>
 
-      <h3 className="text-white text-2xl font-bold mb-2">
+      <h3 className="text-white text-heading-md font-bold mb-2">
         {passed
           ? (locale === 'es' ? '¡Examen aprobado!' : 'Exam passed!')
           : (locale === 'es' ? 'No superado' : 'Not passed')
         }
       </h3>
 
-      <div className="text-4xl font-black mb-2">
+      <div className="text-display-sm font-black mb-2">
         <span className={passed ? 'text-green-400' : 'text-red-400'}>{score}%</span>
       </div>
 
-      <p className="text-white/50 text-sm mb-6">
+      <p className="text-white/50 text-body-sm mb-6">
         {correctCount}/{totalQuestions}{' '}
         {locale === 'es' ? 'respuestas correctas' : 'correct answers'}
         {' · '}
@@ -58,14 +58,14 @@ export default function ExamResults({
       {passed ? (
         <div className="flex items-center justify-center gap-2 text-green-400">
           <CheckCircle size={16} />
-          <span className="text-sm">
+          <span className="text-body-sm">
             {locale === 'es' ? 'Resultado guardado' : 'Result saved'}
           </span>
         </div>
       ) : (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-mx-orange-dark transition-colors"
+          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
         >
           <RefreshCw size={16} />
           {locale === 'es' ? 'Intentar de nuevo' : 'Try again'}

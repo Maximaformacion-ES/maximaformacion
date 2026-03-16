@@ -148,9 +148,9 @@ export default function ExamContainer({
       <div className="flex items-center gap-3 mb-8">
         <FileQuestion className="text-purple-400" size={24} />
         <div>
-          <h3 className="text-white text-lg font-semibold">{exam.title[locale]}</h3>
+          <h3 className="text-white text-body-lg font-semibold">{exam.title[locale]}</h3>
           {exam.description && (
-            <p className="text-white/40 text-sm">{exam.description[locale]}</p>
+            <p className="text-white/40 text-body-sm">{exam.description[locale]}</p>
           )}
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function ExamContainer({
       <div className="space-y-8">
         {exam.questions.map((q, i) => (
           <div key={q.id} className="p-5 rounded-xl border border-white/10 bg-white/[0.02]">
-            <span className="text-white/30 text-xs mb-3 block">
+            <span className="text-white/30 text-label-md mb-3 block">
               {locale === 'es' ? 'Pregunta' : 'Question'} {i + 1}/{exam.questions.length}
             </span>
             <QuestionRenderer

@@ -114,15 +114,15 @@ export default function MaxymiaCourseCard({
           <div className="relative z-10 text-center px-12">
             {thumbnailLines.length > 1 ? (
               <>
-                <p className="text-white/70 text-xs tracking-widest uppercase font-medium shadow-2xl">
+                <p className="text-white/70 text-label-md tracking-widest uppercase font-medium shadow-2xl">
                   {thumbnailLines[0]}
                 </p>
-                <p className="text-white text-2xl font-black tracking-tight leading-tight shadow-2xl">
+                <p className="text-white text-heading-md font-black tracking-tight leading-tight shadow-2xl">
                   {thumbnailLines.slice(1).join(' ')}
                 </p>
               </>
             ) : (
-              <p className="text-white text-xl font-black tracking-tight leading-tight uppercase shadow-2xl">
+              <p className="text-white text-heading-sm font-black tracking-tight leading-tight uppercase shadow-2xl">
                 {thumbnailLines[0]}
               </p>
             )}
@@ -137,16 +137,16 @@ export default function MaxymiaCourseCard({
           {/* Rating + students */}
           <div className="flex items-center gap-2 mb-2">
             <StarRating rating={rating} />
-            <span className="text-white/60 text-xs font-medium">{rating.toFixed(1)}</span>
-            <span className="text-white/30 text-xs">|</span>
-            <span className="flex items-center gap-1 text-white/40 text-xs">
+            <span className="text-white/60 text-label-md font-medium">{rating.toFixed(1)}</span>
+            <span className="text-white/30 text-label-md">|</span>
+            <span className="flex items-center gap-1 text-white/40 text-label-md">
               <Users size={11} />
               {studentLabel} {locale === 'es' ? 'estudiantes' : 'students'}
             </span>
           </div>
 
           {/* Title */}
-          <h3 className="text-white font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors">
+          <h3 className="text-white font-semibold text-body-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors">
             {course.title[locale]}
           </h3>
 
@@ -155,10 +155,10 @@ export default function MaxymiaCourseCard({
             {enrolled || progress ? (
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-mx-orange text-xs font-medium">
+                  <span className="text-mx-orange text-label-md font-medium">
                     {progressPercent}%
                   </span>
-                  <span className="text-white/30 text-xs">
+                  <span className="text-white/30 text-label-md">
                     {completedCount}/{totalLessons}
                   </span>
                 </div>
@@ -173,11 +173,11 @@ export default function MaxymiaCourseCard({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {course.originalPrice && course.originalPrice > course.price && (
-                    <span className="text-white/30 text-sm line-through">
+                    <span className="text-white/30 text-body-sm line-through">
                       {course.originalPrice}&euro;
                     </span>
                   )}
-                  <span className="text-mx-orange font-bold text-lg">
+                  <span className="text-mx-orange font-bold text-body-lg">
                     {course.price}&euro;
                   </span>
                 </div>
@@ -194,21 +194,21 @@ export default function MaxymiaCourseCard({
       <div className={`hidden lg:block absolute top-0 z-50 opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-opacity duration-200 ${
         popupSide === 'right' ? 'left-full pl-3' : 'right-full pr-3'
       }`}>
-        <div className="w-72 bg-[#171c24] border border-white/40 rounded-xl shadow-2xl shadow-black/40 overflow-hidden">
+        <div className="w-72 2xl:w-80 bg-[#171c24] border border-white/40 rounded-xl shadow-2xl shadow-black/40">
           <div className="p-5">
             {/* Title + date */}
-            <h4 className="text-white font-bold text-sm leading-snug mb-2">
+            <h4 className="text-white font-bold text-body-sm leading-snug mb-2">
               {course.title[locale]}
             </h4>
             {createdLabel && (
-              <span className="flex items-center gap-1 text-white/40 text-xs mb-2">
+              <span className="flex items-center gap-1 text-white/40 text-label-md mb-2">
                 <Calendar size={10} />
                 {createdLabel}
               </span>
             )}
 
             {/* Description */}
-            <p className="text-white/50 text-xs leading-relaxed line-clamp-5 mb-3 pb-3 border-b border-white/5">
+            <p className="text-white/50 text-label-md leading-relaxed mb-3 pb-3 border-b border-white/5">
               {course.description[locale]}
             </p>
 
@@ -222,8 +222,8 @@ export default function MaxymiaCourseCard({
                 </div>
               )}
               <div>
-                <div className="text-white text-xs font-medium">{course.instructor.name}</div>
-                <div className="text-white/40 text-[10px]">{course.instructor.role}</div>
+                <div className="text-white text-label-md font-medium">{course.instructor.name}</div>
+                <div className="text-white/40 text-label-sm">{course.instructor.role}</div>
               </div>
             </div>
           </div>

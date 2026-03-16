@@ -37,7 +37,7 @@ export default function FillBlankQuestion({
                 onChange={(e) => onAnswerChange(i, e.target.value)}
                 disabled={submitted}
                 placeholder={locale === 'es' ? 'Tu respuesta...' : 'Your answer...'}
-                className={`flex-1 px-4 py-3 rounded-lg border text-sm text-white bg-white/[0.03] placeholder:text-white/20 focus:outline-none transition-colors ${
+                className={`flex-1 px-4 py-3 rounded-lg border text-body-sm text-white bg-white/[0.03] placeholder:text-white/20 focus:outline-none transition-colors ${
                   submitted
                     ? isCorrect
                       ? 'border-green-500/50 bg-green-500/10'
@@ -51,7 +51,7 @@ export default function FillBlankQuestion({
                   : (
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <XCircle size={18} className="text-red-400" />
-                      <span className="text-green-400 text-xs">
+                      <span className="text-green-400 text-label-md">
                         {blank.acceptedAnswers[0]}
                       </span>
                     </div>

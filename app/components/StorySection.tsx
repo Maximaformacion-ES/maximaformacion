@@ -6,12 +6,12 @@ export const StorySection: React.FC = () => {
   return (
     <section className="py-48 px-6 md:px-12 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
       <div>
-        <span className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4 block">NUESTRA HISTORIA</span>
-        <h2 className="text-mx-blue text-4xl md:text-5xl font-bold mb-8 leading-tight">
+        <span className="text-mx-orange text-label-lg leading-label tracking-[0.3em] uppercase mb-4 block">NUESTRA HISTORIA</span>
+        <h2 className="text-mx-blue text-display-sm md:text-display-sm font-bold mb-8 leading-heading">
           "No se trata de llegar alto, se trata de llegar lejos."
         </h2>
       </div>
-      <div className="space-y-6 text-lg text-mx-text-muted font-light leading-relaxed">
+      <div className="space-y-6 text-body-lg text-mx-text-muted font-light leading-body">
         <p>
           Máxima Formación nace con un propósito claro: democratizar la formación superior online de alta calidad, especializada y con un enfoque humano y cercano.
         </p>
@@ -20,12 +20,12 @@ export const StorySection: React.FC = () => {
         </p>
         <div className="pt-8 grid grid-cols-2 gap-8 border-t border-mx-border">
           <div>
-            <span className="text-mx-orange text-3xl font-bold block">15+</span>
-            <span className="text-xs text-mx-text-muted uppercase tracking-widest">Años de experiencia</span>
+            <span className="text-mx-orange text-heading-lg font-bold block">15+</span>
+            <span className="text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Años de experiencia</span>
           </div>
           <div>
-            <span className="text-mx-orange text-3xl font-bold block">10k+</span>
-            <span className="text-xs text-mx-text-muted uppercase tracking-widest">Alumnos formados</span>
+            <span className="text-mx-orange text-heading-lg font-bold block">10k+</span>
+            <span className="text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Alumnos formados</span>
           </div>
         </div>
       </div>

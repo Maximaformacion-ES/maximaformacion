@@ -107,7 +107,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-mx-blue text-[12px] md:text-base tracking-[0.3em] uppercase mb-8"
+            className="text-mx-blue text-label-md md:text-body-md leading-label tracking-[0.3em] uppercase mb-8"
           >
             {overline}
           </m.p>
@@ -117,7 +117,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center text-mx-blue text-[12vw] md:text-[10vw] lg:text-[8vw] font-black leading-[0.85] "
+            className="text-center text-mx-blue text-display-sm md:text-display-md lg:text-display-lg font-black leading-display tracking-display"
           >
             <StyledTitle text={title} />
           </m.h1>
@@ -126,7 +126,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="mt-8 md:mt-12 text-mx-text-muted text-base md:text-xl font-light text-center max-w-2xl leading-relaxed"
+            className="mt-8 md:mt-12 text-mx-text-muted text-body-md md:text-heading-sm font-light text-center max-w-2xl leading-body"
           >
             {description}
           </m.p>
@@ -139,7 +139,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           >
             <m.a
               href="/programas"
-              className="group flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-base font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
+              className="group flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-body-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
               
               whileTap={{ scale: 0.98 }}
             >
@@ -151,7 +151,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </m.a>
             <m.a
               href="/programas"
-              className="flex items-center justify-center gap-3 border border-mx-orange text-mx-orange px-8 py-4 text-base font-light rounded-full hover:bg-mx-orange/10 hover:border-mx-orange transition-colors"
+              className="flex items-center justify-center gap-3 border border-mx-orange text-mx-orange px-8 py-4 text-body-md font-light rounded-full hover:bg-mx-orange/10 hover:border-mx-orange transition-colors"
               
               whileTap={{ scale: 0.98 }}
             >
@@ -166,7 +166,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             transition={{ delay: 1.5 }}
             className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
           >
-            <span className="text-mx-orange text-xs tracking-widest uppercase">
+            <span className="text-mx-orange text-label-md leading-label tracking-widest uppercase">
               Scroll
             </span>
             <m.div

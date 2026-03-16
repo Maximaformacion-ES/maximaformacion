@@ -40,13 +40,13 @@ export const InnovacionProjectsSection: React.FC = () => {
           viewport={{ once: true }}
           className="mb-10 md:mb-16 max-w-lg"
         >
-          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Nuestros proyectos
           </span>
-          <h2 className="text-[#016157] text-3xl md:text-5xl font-black mb-4">
+          <h2 className="text-[#016157] text-heading-lg md:text-display-sm font-black mb-4">
             Soluciones aplicadas
           </h2>
-          <p className="text-mx-text-muted text-base font-light">
+          <p className="text-mx-text-muted text-body-md font-light">
             Cada proyecto refleja nuestro compromiso con la innovación funcional y el impacto real
             en el sector científico-sanitario.
           </p>
@@ -80,10 +80,10 @@ export const InnovacionProjectsSection: React.FC = () => {
 
               {/* Title + description at bottom-left */}
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                <h3 className="text-white text-xl md:text-2xl font-bold mb-2 group-hover:text-mx-orange transition-colors">
+                <h3 className="text-white text-heading-sm md:text-heading-md font-bold mb-2 group-hover:text-mx-orange transition-colors">
                   {project.title}
                 </h3>
-                <p className="text-white/70 text-sm font-light leading-relaxed opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 max-w-sm">
+                <p className="text-white/70 text-body-sm font-light leading-relaxed opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 max-w-sm">
                   {project.description}
                 </p>
               </div>

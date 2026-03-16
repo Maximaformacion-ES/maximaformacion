@@ -45,13 +45,13 @@ export const FeaturesSection: React.FC = () => {
             viewport={{ once: true }}
             className="lg:w-2/5 flex flex-col justify-center"
           >
-            <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            <span className="text-mx-orange text-label-lg leading-label font-medium tracking-[0.5em] uppercase mb-4 block">
               Nuestras fortalezas
             </span>
-            <h2 className="text-mx-blue text-4xl md:text-5xl lg:text-5xl font-black mb-6 leading-tight text-balance">
+            <h2 className="text-mx-blue text-display-sm md:text-display-sm lg:text-display-sm font-black mb-6 leading-heading text-balance">
               La Ciencia de Datos al servicio de tu negocio
             </h2>
-            <p className="text-mx-text-muted text-lg font-light leading-relaxed text-balance">
+            <p className="text-mx-text-muted text-body-lg font-light leading-body text-balance">
               Herramientas, metodología y experiencia para transformar datos en decisiones
             </p>
           </m.div>
@@ -68,7 +68,7 @@ export const FeaturesSection: React.FC = () => {
                 className="group relative p-6 rounded-2xl border border-mx-border bg-mx-card hover:border-mx-orange/30 hover:-translate-y-0.5 transition-all duration-400 overflow-hidden"
               >
                 {/* Large background number */}
-                <span className="absolute -bottom-3 -right-1 text-7xl font-black text-mx-blue/5 leading-none select-none pointer-events-none">
+                <span className="absolute -bottom-3 -right-1 text-display-md font-black text-mx-blue/5 leading-none select-none pointer-events-none">
                   {String(idx + 1).padStart(2, '0')}
                 </span>
 
@@ -76,10 +76,10 @@ export const FeaturesSection: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-mx-orange/10 flex items-center justify-center mb-4">
                     <feature.icon className="text-mx-orange" size={20} />
                   </div>
-                  <h3 className="text-base font-bold text-mx-text mb-1.5 group-hover:text-mx-blue transition-colors duration-300">
+                  <h3 className="text-body-md font-bold text-mx-text mb-1.5 group-hover:text-mx-blue transition-colors duration-300">
                     {feature.title}
                   </h3>
-                  <p className="text-mx-text-muted text-sm font-light leading-relaxed">
+                  <p className="text-mx-text-muted text-body-sm font-light leading-body">
                     {feature.description}
                   </p>
                 </div>

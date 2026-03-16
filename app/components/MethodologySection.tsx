@@ -55,13 +55,13 @@ export const MethodologySection: React.FC = () => {
             viewport={{ once: true }}
             className="lg:w-2/5 flex flex-col justify-center"
           >
-            <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
               Metodología
             </span>
-            <h2 className="text-mx-blue text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-balance">
+            <h2 className="text-mx-blue text-display-sm md:text-display-sm lg:text-display-md font-black mb-6 leading-tight text-balance">
               Formación que marca la diferencia
             </h2>
-            <p className="text-mx-text-muted text-lg font-light leading-relaxed text-balance">
+            <p className="text-mx-text-muted text-body-lg font-light leading-relaxed text-balance">
               Nuestra metodología está diseñada para garantizar tu éxito profesional
             </p>
           </m.div>
@@ -78,16 +78,16 @@ export const MethodologySection: React.FC = () => {
                 className="group flex items-center gap-5 py-5 border-b border-mx-border last:border-b-0"
               >
                 {/* Number */}
-                <span className="text-mx-orange text-sm font-bold tabular-nums shrink-0 w-6">
+                <span className="text-mx-orange text-body-sm font-bold tabular-nums shrink-0 w-6">
                   {String(idx + 1).padStart(2, '0')}
                 </span>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-bold text-mx-text group-hover:text-mx-blue transition-colors duration-300">
+                  <h3 className="text-body-md font-bold text-mx-text group-hover:text-mx-blue transition-colors duration-300">
                     {point.title}
                   </h3>
-                  <p className="text-mx-text-muted text-sm font-light mt-0.5">
+                  <p className="text-mx-text-muted text-body-sm font-light mt-0.5">
                     {point.description}
                   </p>
                 </div>

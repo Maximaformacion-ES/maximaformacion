@@ -58,11 +58,18 @@ export interface MaxymiaExam {
   questions: ExamQuestion[];
 }
 
+export interface MaxymiaTopic {
+  id: string;
+  title: LocalizedString;
+  anchorId: string;
+}
+
 export interface MaxymiaLesson {
   id: string;
   title: LocalizedString;
   content: LocalizedContent;
   estimatedMinutes: number;
+  topics: MaxymiaTopic[];
 }
 
 export interface MaxymiaBlock {

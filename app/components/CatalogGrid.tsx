@@ -67,7 +67,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
               className="flex flex-col items-center justify-center py-20 text-mx-text-muted"
             >
               <Search size={48} className="mb-4 opacity-60 text-mx-orange" />
-              <p className="text-lg">No se encontraron programas con esos criterios.</p>
+              <p className="text-body-lg">No se encontraron programas con esos criterios.</p>
             </m.div>
           )}
         </AnimatePresence>
@@ -100,7 +100,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
               <button
                 key={page}
                 onClick={() => handlePageChange(page)}
-                className={`w-10 h-10 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`w-10 h-10 rounded-full text-body-sm font-medium transition-all duration-300 ${
                   currentPage === page
                     ? 'bg-mx-orange text-white'
                     : 'border border-mx-border hover:border-mx-orange hover:bg-mx-orange/10'

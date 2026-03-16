@@ -70,11 +70,11 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
           transition={{ duration: 0.8 }}
           className="mb-6 flex items-center justify-center gap-4"
         >
-          <span className="inline-block px-4 py-1.5 text-xs font-medium tracking-wider uppercase bg-mx-blue text-white rounded-full">
+          <span className="inline-block px-4 py-1.5 text-label-md font-medium tracking-wider uppercase bg-mx-blue text-white rounded-full">
             {post.category}
           </span>
           {post.featured && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-mx-orange uppercase tracking-widest">
+            <span className="inline-flex items-center gap-1.5 text-label-md font-bold text-mx-orange uppercase tracking-widest">
               <Award size={12} /> Destacado
             </span>
           )}
@@ -84,7 +84,7 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
-          className="text-2xl md:text-5xl lg:text-7xl font-black text-mx-blue mb-6 md:mb-8 leading-tight"
+          className="text-heading-md md:text-display-sm lg:text-display-md font-black text-mx-blue mb-6 md:mb-8 leading-tight"
         >
           {post.title}
         </m.h1>
@@ -93,7 +93,7 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-base md:text-xl text-mx-text-muted font-light mb-8 md:mb-12 max-w-3xl mx-auto"
+          className="text-body-md md:text-heading-sm text-mx-text-muted font-light mb-8 md:mb-12 max-w-3xl mx-auto"
         >
           {post.excerpt}
         </m.p>
@@ -107,15 +107,15 @@ export const BlogHeroSection: React.FC<BlogHeroSectionProps> = ({ post }) => {
           <div className="flex items-center gap-3 text-mx-text">
             <Calendar size={20} className="text-mx-orange" />
             <div className="text-left">
-              <div className="text-xs text-mx-text-muted uppercase tracking-widest">Publicado</div>
-              <div className="text-base font-bold">{formatDate(post.publishedAt)}</div>
+              <div className="text-label-md text-mx-text-muted uppercase tracking-widest">Publicado</div>
+              <div className="text-body-md font-bold">{formatDate(post.publishedAt)}</div>
             </div>
           </div>
           <div className="flex items-center gap-3 text-mx-text">
             <Clock size={20} className="text-mx-orange" />
             <div className="text-left">
-              <div className="text-xs text-mx-text-muted uppercase tracking-widest">Tiempo de lectura</div>
-              <div className="text-base font-bold">{post.readTime}</div>
+              <div className="text-label-md text-mx-text-muted uppercase tracking-widest">Tiempo de lectura</div>
+              <div className="text-body-md font-bold">{post.readTime}</div>
             </div>
           </div>
         </m.div>

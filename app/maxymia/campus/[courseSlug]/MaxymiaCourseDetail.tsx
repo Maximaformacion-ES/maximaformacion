@@ -107,11 +107,11 @@ function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Lo
       <div className="relative z-10 text-center px-12">
         {lines.length > 1 ? (
           <>
-            <p className="text-white/70 text-xs tracking-widest uppercase font-medium">{lines[0]}</p>
-            <p className="text-white text-2xl font-black tracking-tight leading-tight">{lines.slice(1).join(' ')}</p>
+            <p className="text-white/70 text-label-md tracking-widest uppercase font-medium">{lines[0]}</p>
+            <p className="text-white text-heading-md font-black tracking-tight leading-tight">{lines.slice(1).join(' ')}</p>
           </>
         ) : (
-          <p className="text-white text-xl font-black tracking-tight leading-tight uppercase">{lines[0]}</p>
+          <p className="text-white text-heading-sm font-black tracking-tight leading-tight uppercase">{lines[0]}</p>
         )}
       </div>
     </div>
@@ -209,14 +209,14 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               transition={{ duration: 0.5 }}
               className="mb-4 flex items-center gap-3 flex-wrap"
             >
-              <span className="inline-block px-3 py-1 text-[10px] font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
+              <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
                 {CATEGORY_LABELS[course.category]?.[locale] ?? course.category}
               </span>
-              <span className="inline-block px-3 py-1 text-[10px] font-medium tracking-wider uppercase rounded-full bg-white/10 text-white/70">
+              <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-white/10 text-white/70">
                 {LEVEL_LABELS[course.level]?.[locale]}
               </span>
               {course.isPro && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-black tracking-wider uppercase bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] text-white rounded-full shadow-lg shadow-[#f7a000]/30">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-label-sm font-black tracking-wider uppercase bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] text-white rounded-full shadow-lg shadow-[#f7a000]/30">
                   <Crown size={10} /> PRO
                 </span>
               )}
@@ -227,7 +227,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-3 max-w-3xl leading-tight text-white"
+              className="text-heading-lg md:text-display-sm lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-white"
             >
               {course.title[locale]}
             </m.h1>
@@ -243,7 +243,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                 {course.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-white/10 backdrop-blur-md text-white/60 text-xs font-medium rounded-full"
+                    className="px-3 py-1 bg-white/10 backdrop-blur-md text-white/60 text-label-md font-medium rounded-full"
                   >
                     {tag}
                   </span>
@@ -256,7 +256,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-base md:text-lg text-white/60 font-light mb-6 max-w-2xl"
+              className="text-body-md md:text-body-lg text-white/60 font-light mb-6 max-w-2xl"
             >
               {course.description[locale]}
             </m.p>
@@ -282,8 +282,8 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                 )}
               </div>
               <div>
-                <p className="text-white text-sm font-medium">{course.instructor.name}</p>
-                <p className="text-white/40 text-xs">{course.instructor.role}</p>
+                <p className="text-white text-body-sm font-medium">{course.instructor.name}</p>
+                <p className="text-white/40 text-label-md">{course.instructor.role}</p>
               </div>
             </m.div>
 
@@ -297,10 +297,10 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               >
                 <div className="flex items-center gap-1">
                   <StarRating rating={course.rating} />
-                  <span className="text-white font-semibold text-sm ml-1">{course.rating}</span>
+                  <span className="text-white font-semibold text-body-sm ml-1">{course.rating}</span>
                 </div>
                 {course.studentCount != null && (
-                  <span className="text-white/40 text-xs">
+                  <span className="text-white/40 text-label-md">
                     ({course.studentCount.toLocaleString()}{' '}
                     {locale === 'es' ? 'estudiantes' : 'students'})
                   </span>
@@ -317,19 +317,19 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
             >
               <div className="flex items-center gap-2 text-white/80">
                 <BookOpen size={16} className="text-mx-orange" />
-                <span className="text-sm font-medium">
+                <span className="text-body-sm font-medium">
                   {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-white/80">
                 <Clock size={16} className="text-mx-orange" />
-                <span className="text-sm font-medium">
+                <span className="text-body-sm font-medium">
                   {Math.round(totalMinutes / 60)}h {totalMinutes % 60}min
                 </span>
               </div>
               <div className="flex items-center gap-2 text-white/80">
                 <BarChart3 size={16} className="text-mx-orange" />
-                <span className="text-sm font-medium">
+                <span className="text-body-sm font-medium">
                   {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'}
                 </span>
               </div>
@@ -390,9 +390,9 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'course',
+          type: 'maxymia-course',
           documentId: course.id,
-          programId: course.id,
+          slug: course.slug,
         }),
       });
 
@@ -433,8 +433,8 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
               <div key={item.label} className="flex items-start gap-2">
                 <item.icon size={14} className="text-mx-orange shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-[10px] text-white/40 uppercase tracking-widest">{item.label}</div>
-                  <div className="text-white text-sm font-medium">{item.value}</div>
+                  <div className="text-label-sm text-white/40 uppercase tracking-widest">{item.label}</div>
+                  <div className="text-white text-body-sm font-medium">{item.value}</div>
                 </div>
               </div>
             ))}
@@ -446,18 +446,18 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
           <div>
             <div className="flex items-baseline gap-3">
               {course.originalPrice != null && (
-                <span className="text-white/40 text-lg line-through">{course.originalPrice}€</span>
+                <span className="text-white/40 text-body-lg line-through">{course.originalPrice}€</span>
               )}
-              <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-4xl font-black`}>
+              <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-display-sm font-black`}>
                 {course.price}€
               </span>
             </div>
             {course.originalPrice != null && (
-              <div className="mt-1 text-mx-orange text-xs font-bold">
+              <div className="mt-1 text-mx-orange text-label-md font-bold">
                 {locale === 'es' ? 'Ahorra' : 'Save'} {course.originalPrice - course.price}€
               </div>
             )}
-            <p className="text-white/40 text-xs mt-1">
+            <p className="text-white/40 text-label-md mt-1">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
             </p>
           </div>
@@ -465,7 +465,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
           {/* Guarantee */}
           <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
             <ShieldCheck size={18} className="text-mx-orange shrink-0" />
-            <span className="text-xs text-white/60 font-light">
+            <span className="text-label-md text-white/60 font-light">
               <span className="font-semibold text-mx-orange">
                 {locale === 'es' ? '14 días de garantía' : '14-day guarantee'}
               </span>
@@ -474,14 +474,14 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
             </span>
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-500 text-body-sm">{error}</p>}
 
           {/* CTA Buttons */}
           <div className="space-y-3">
             {isLoaded && !campusLoading && hasAccess ? (
               <Link
                 href={`/maxymia/campus/${course.slug}/lesson/${course.blocks[0]?.lessons[0]?.id}`}
-                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-base font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
+                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
               >
                 {locale === 'es' ? 'Acceder al Curso' : 'Access Course'}
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -490,7 +490,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
               <m.button
                 onClick={handlePurchase}
                 disabled={isLoading}
-                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-base font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 whileHover={{ scale: isLoading ? 1 : 1.02 }}
                 whileTap={{ scale: isLoading ? 1 : 0.98 }}
               >
@@ -511,7 +511,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
             {isLoaded && !campusLoading && !userHasPro && (
               <Link
                 href="/pricing"
-                className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
+                className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
               >
                 <Crown size={16} />
                 {locale === 'es' ? 'O hazte Pro por €18/mes' : 'Or go Pro for €18/mo'}
@@ -523,19 +523,19 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
 
           {/* Contact */}
           <div className="space-y-3">
-            <div className="text-xs text-white/40 uppercase tracking-widest font-bold">
+            <div className="text-label-md text-white/40 uppercase tracking-widest font-bold">
               {locale === 'es' ? 'Contacto' : 'Contact'}
             </div>
             <a
               href="mailto:cursos@maximaformacion.es"
-              className="flex items-center gap-3 text-white/40 text-sm hover:text-mx-orange transition-colors"
+              className="flex items-center gap-3 text-white/40 text-body-sm hover:text-mx-orange transition-colors"
             >
               <Mail size={14} />
               cursos@maximaformacion.es
             </a>
             <a
               href="tel:+34635659391"
-              className="flex items-center gap-3 text-white/40 text-sm hover:text-mx-orange transition-colors"
+              className="flex items-center gap-3 text-white/40 text-body-sm hover:text-mx-orange transition-colors"
             >
               <Phone size={14} />
               +34 635 65 93 91
@@ -605,7 +605,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
   }, [locale, course.objectives, course.audiences, course.careers]);
 
   const markdownTabClasses =
-    'text-sm sm:text-base text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[\'\'] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
+    'text-body-sm sm:text-body-md text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[\'\'] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
 
   return (
     <div>
@@ -615,7 +615,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`relative px-2 sm:px-3 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+            className={`relative px-2 sm:px-3 py-3 text-label-md sm:text-body-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeTab === tab.value ? 'text-mx-orange' : 'text-white/40 hover:text-mx-orange'
             }`}
           >
@@ -652,13 +652,13 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <p className="text-sm sm:text-lg text-white/60 font-light leading-relaxed">
+              <p className="text-body-sm sm:text-body-lg text-white/60 font-light leading-relaxed">
                 {course.description[locale]}
               </p>
 
               {/* Instructor card */}
               <div className="mt-8 p-6 bg-white/[0.03] border border-white/10 rounded-xl">
-                <h3 className="text-white font-semibold text-sm mb-4 uppercase tracking-widest">
+                <h3 className="text-white font-semibold text-body-sm mb-4 uppercase tracking-widest">
                   Instructor
                 </h3>
                 <div className="flex items-center gap-4">
@@ -677,7 +677,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                   </div>
                   <div>
                     <p className="text-white font-medium">{course.instructor.name}</p>
-                    <p className="text-white/40 text-sm">{course.instructor.role}</p>
+                    <p className="text-white/40 text-body-sm">{course.instructor.role}</p>
                   </div>
                 </div>
               </div>
@@ -692,7 +692,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <div className="mb-4 text-white/40 text-sm">
+              <div className="mb-4 text-white/40 text-body-sm">
                 {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} •{' '}
                 {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
               </div>
@@ -708,15 +708,15 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <span className="text-mx-orange text-xs font-bold">
+                          <span className="text-mx-orange text-label-md font-bold">
                             {locale === 'es' ? 'Bloque' : 'Block'} {index + 1}
                           </span>
-                          <span className="flex items-center gap-1.5 text-white/30 text-xs">
+                          <span className="flex items-center gap-1.5 text-white/30 text-label-md">
                             <BookOpen size={12} />
                             {block.lessons.length} {locale === 'es' ? 'lecciones' : 'lessons'}
                           </span>
                         </div>
-                        <h3 className="text-base md:text-lg font-bold text-white group-hover:text-mx-orange transition-colors duration-300">
+                        <h3 className="text-body-md md:text-body-lg font-bold text-white group-hover:text-mx-orange transition-colors duration-300">
                           {block.title[locale]}
                         </h3>
                       </div>
@@ -749,11 +749,11 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                               >
                                 <div className="flex items-start gap-3">
                                   <div className="w-1 h-1 rounded-full bg-mx-orange mt-2 shrink-0" />
-                                  <span className="font-light text-sm text-white/70">
+                                  <span className="font-light text-body-sm text-white/70">
                                     {lesson.title[locale]}
                                   </span>
                                 </div>
-                                <span className="text-white/30 text-xs ml-4 shrink-0">
+                                <span className="text-white/30 text-label-md ml-4 shrink-0">
                                   {lesson.estimatedMinutes} min
                                 </span>
                               </m.div>
@@ -761,7 +761,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                             {block.exam && (
                               <div className="flex items-center gap-3 py-3 text-purple-300/70">
                                 <FileQuestion size={14} className="shrink-0" />
-                                <span className="text-sm">{block.exam.title[locale]}</span>
+                                <span className="text-body-sm">{block.exam.title[locale]}</span>
                               </div>
                             )}
                           </div>
@@ -875,9 +875,9 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'course',
+          type: 'maxymia-course',
           documentId: course.id,
-          programId: course.id,
+          slug: course.slug,
         }),
       });
 
@@ -915,14 +915,14 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             <Lock className="text-amber-500" size={40} />
           </div>
 
-          <span className="inline-flex items-center gap-2 text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4">
+          <span className="inline-flex items-center gap-2 text-amber-500 text-body-sm font-medium tracking-[0.3em] uppercase mb-4">
             <Crown size={16} />
             {locale === 'es' ? 'Contenido Premium' : 'Premium Content'}
           </span>
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
+          <h2 className="text-heading-lg md:text-display-sm font-black text-white mb-6">
             {locale === 'es' ? 'Accede a' : 'Access'} &quot;{course.title[locale]}&quot;
           </h2>
-          <p className="text-white/60 font-light text-lg mb-10 max-w-2xl mx-auto">
+          <p className="text-white/60 font-light text-body-lg mb-10 max-w-2xl mx-auto">
             {locale === 'es'
               ? 'Este curso es exclusivo. Elige la opción que mejor se adapte a ti.'
               : 'This course is exclusive. Choose the option that suits you best.'}
@@ -941,20 +941,20 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
           >
             <div className="flex items-center justify-center gap-2 mb-4">
               <ShoppingCart className="text-white" size={24} />
-              <span className="text-white font-semibold text-lg">
+              <span className="text-white font-semibold text-body-lg">
                 {locale === 'es' ? 'Comprar este curso' : 'Buy this course'}
               </span>
             </div>
 
             <div className="flex items-baseline justify-center gap-1 mb-2">
               {course.originalPrice != null && course.originalPrice > course.price && (
-                <span className="text-white/40 text-xl line-through mr-2">
+                <span className="text-white/40 text-heading-sm line-through mr-2">
                   {formatPrice(course.originalPrice)}
                 </span>
               )}
-              <span className="text-5xl font-black text-white">{formatPrice(course.price)}</span>
+              <span className="text-display-sm font-black text-white">{formatPrice(course.price)}</span>
             </div>
-            <p className="text-white/40 text-sm mb-6 text-center">
+            <p className="text-white/40 text-body-sm mb-6 text-center">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
             </p>
 
@@ -962,12 +962,12 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               {courseFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Check className="text-green-500 flex-shrink-0" size={16} />
-                  <span className="text-white/70 text-sm">{feature}</span>
+                  <span className="text-white/70 text-body-sm">{feature}</span>
                 </div>
               ))}
             </div>
 
-            {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
+            {error && <p className="text-red-400 text-body-sm mb-4 text-center">{error}</p>}
 
             <button
               onClick={handlePurchase}
@@ -996,22 +996,22 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="p-8 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/30 rounded-2xl relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-bl-xl">
+            <div className="absolute top-0 right-0 bg-amber-500 text-black text-label-md font-bold px-4 py-1 rounded-bl-xl">
               {locale === 'es' ? 'RECOMENDADO' : 'RECOMMENDED'}
             </div>
 
             <div className="flex items-center justify-center gap-2 mb-4">
               <Crown className="text-amber-500" size={24} />
-              <span className="text-amber-500 font-semibold text-lg">
+              <span className="text-amber-500 font-semibold text-body-lg">
                 {locale === 'es' ? 'Suscripción Pro' : 'Pro Subscription'}
               </span>
             </div>
 
             <div className="flex items-baseline justify-center gap-1 mb-2">
-              <span className="text-5xl font-black text-white">€18</span>
+              <span className="text-display-sm font-black text-white">€18</span>
               <span className="text-white/60">/{locale === 'es' ? 'mes' : 'mo'}</span>
             </div>
-            <p className="text-white/40 text-sm mb-6 text-center">
+            <p className="text-white/40 text-body-sm mb-6 text-center">
               {locale === 'es' ? 'Cancela cuando quieras' : 'Cancel anytime'}
             </p>
 
@@ -1019,7 +1019,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               {proFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Sparkles className="text-amber-500 flex-shrink-0" size={16} />
-                  <span className="text-white/70 text-sm">{feature}</span>
+                  <span className="text-white/70 text-body-sm">{feature}</span>
                 </div>
               ))}
             </div>
@@ -1033,7 +1033,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               <ArrowRight size={18} />
             </Link>
 
-            <p className="text-center text-white/40 text-xs mt-4">
+            <p className="text-center text-white/40 text-label-md mt-4">
               {locale === 'es' ? 'Acceso a +50 cursos y masters' : 'Access to 50+ courses and masters'}
             </p>
           </m.div>
@@ -1049,7 +1049,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
         >
           <Link
             href="/maxymia/campus/cursos"
-            className="text-white/60 hover:text-amber-500 transition-colors text-sm"
+            className="text-white/60 hover:text-amber-500 transition-colors text-body-sm"
           >
             ← {locale === 'es' ? 'Volver al catálogo de cursos' : 'Back to course catalog'}
           </Link>
@@ -1071,13 +1071,13 @@ function CourseCTASection({ locale }: { locale: Locale }) {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-[#527be7] text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-8">
+          <h2 className="text-[#527be7] text-display-sm md:text-display-md lg:text-display-md font-black tracking-tight mb-8">
             {locale === 'es' ? '¿LISTO PARA ' : 'READY TO '}
             <span className="text-stroke" style={{ WebkitTextFillColor: '#0b1018' }}>
               {locale === 'es' ? 'COMENZAR?' : 'START?'}
             </span>
           </h2>
-          <p className="text-xl text-white/40 font-light mb-12 max-w-2xl mx-auto">
+          <p className="text-heading-sm text-white/40 font-light mb-12 max-w-2xl mx-auto">
             {locale === 'es'
               ? 'Únete a cientos de profesionales que ya están transformando su carrera con este curso.'
               : 'Join hundreds of professionals already transforming their careers with this course.'}

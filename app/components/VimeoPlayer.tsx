@@ -91,7 +91,7 @@ export default function VimeoPlayer({
         </div>
         {title && (
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-            <p className="text-white font-medium text-lg">{title}</p>
+            <p className="text-white font-medium text-body-lg">{title}</p>
           </div>
         )}
       </div>

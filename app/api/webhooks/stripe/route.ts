@@ -37,25 +37,27 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
 
         await upsertUser(userId, session.customer_email || undefined);
 
-        if (paymentType === 'course' && session.mode === 'payment') {
+        if ((paymentType === 'course' || paymentType === 'maxymia-course') && session.mode === 'payment') {
+          // For legacy 'course' type: programId/documentId/programTitle
+          // For 'maxymia-course' type: courseId/courseSlug/courseTitle
+          const documentId = session.metadata?.documentId || session.metadata?.courseId;
           const programId = session.metadata?.programId;
-          const documentId = session.metadata?.documentId;
-          const programTitle = session.metadata?.programTitle;
+          const title = session.metadata?.programTitle || session.metadata?.courseTitle;
           const paymentIntentId = session.payment_intent as string;
 
-          if (!programId || !documentId) {
-            console.error('Missing programId or documentId in session metadata');
+          if (!documentId) {
+            console.error('Missing documentId/courseId in session metadata');
             return true;
           }
 
           await createEnrollment({
             clerkId: userId,
-            programId: Number(programId),
+            programId: programId ? Number(programId) : undefined,
             programDocumentId: documentId,
             accessType: 'purchased',
             stripePaymentId: paymentIntentId,
             price: (session.amount_total || 0) / 100,
-            title: programTitle,
+            title,
           });
 
           if (customerId) {
@@ -68,7 +70,7 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
             });
           }
 
-          console.log(`User ${userId} purchased course: ${programTitle} (${documentId})`);
+          console.log(`User ${userId} purchased ${paymentType}: ${title} (${documentId})`);
         } else {
           const subscriptionId = session.subscription as string;
 
@@ -167,16 +169,16 @@ async function handleWithClerk(event: Stripe.Event) {
       const user = await client.users.getUser(userId);
       const currentMetadata = user.publicMetadata || {};
 
-      if (paymentType === 'course' && session.mode === 'payment') {
+      if ((paymentType === 'course' || paymentType === 'maxymia-course') && session.mode === 'payment') {
+        const documentId = session.metadata?.documentId || session.metadata?.courseId;
         const programId = session.metadata?.programId;
-        const documentId = session.metadata?.documentId;
-        const programTitle = session.metadata?.programTitle;
+        const title = session.metadata?.programTitle || session.metadata?.courseTitle;
         const paymentIntentId = session.payment_intent as string;
 
-        if (!programId || !documentId) break;
+        if (!documentId) break;
 
         interface PurchasedCourse {
-          programId: number;
+          programId: number | null;
           documentId: string;
           purchasedAt: string;
           stripePaymentId: string;
@@ -186,7 +188,7 @@ async function handleWithClerk(event: Stripe.Event) {
 
         const existingPurchases = (currentMetadata.purchasedCourses as PurchasedCourse[]) || [];
         const alreadyPurchased = existingPurchases.some(
-          (p) => p.documentId === documentId || p.programId === Number(programId)
+          (p) => p.documentId === documentId
         );
 
         if (!alreadyPurchased) {
@@ -195,12 +197,12 @@ async function handleWithClerk(event: Stripe.Event) {
               ...currentMetadata,
               stripeCustomerId: customerId || currentMetadata.stripeCustomerId,
               purchasedCourses: [...existingPurchases, {
-                programId: Number(programId),
+                programId: programId ? Number(programId) : null,
                 documentId,
                 purchasedAt: new Date().toISOString(),
                 stripePaymentId: paymentIntentId,
                 price: (session.amount_total || 0) / 100,
-                title: programTitle,
+                title,
               }],
             },
           });

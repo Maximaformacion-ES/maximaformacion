@@ -91,8 +91,8 @@ export default function LessonSidebar({
         {/* Progress */}
         <div className="p-4 border-b border-white/10">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-white/60 text-sm">Tu progreso</span>
-            <span className="text-amber-500 font-medium text-sm">
+            <span className="text-white/60 text-body-sm">Tu progreso</span>
+            <span className="text-amber-500 font-medium text-body-sm">
               {completedCount}/{totalLessons} completadas
             </span>
           </div>
@@ -125,7 +125,7 @@ export default function LessonSidebar({
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-sm ${
+                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-body-sm ${
                         moduleCompleted
                           ? 'bg-green-500/20 text-green-500'
                           : 'bg-white/10 text-white/60'
@@ -138,8 +138,8 @@ export default function LessonSidebar({
                       )}
                     </div>
                     <div className="text-left min-w-0">
-                      <p className="font-medium text-sm truncate">{module.title}</p>
-                      <p className="text-white/40 text-xs">
+                      <p className="font-medium text-body-sm truncate">{module.title}</p>
+                      <p className="text-white/40 text-label-md">
                         {moduleProgress}/{module.lessonCount} • {formatTotalDuration(module.totalDuration)}
                       </p>
                     </div>
@@ -195,13 +195,13 @@ export default function LessonSidebar({
                             </div>
                             <div className="flex-1 min-w-0">
                               <p
-                                className={`text-sm truncate ${
+                                className={`text-body-sm truncate ${
                                   isActive ? 'text-amber-500 font-medium' : 'text-white/70'
                                 }`}
                               >
                                 {lesson.title}
                               </p>
-                              <div className="flex items-center gap-1 text-white/40 text-xs">
+                              <div className="flex items-center gap-1 text-white/40 text-label-md">
                                 <Clock size={10} />
                                 {formatDuration(lesson.duration)}
                               </div>
@@ -222,7 +222,7 @@ export default function LessonSidebar({
           <Link
             href={`/cursos/${program.documentId}`}
             onClick={onClose}
-            className="block w-full text-center py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors text-sm"
+            className="block w-full text-center py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors text-body-sm"
           >
             Ver resumen del curso
           </Link>

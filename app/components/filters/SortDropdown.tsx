@@ -22,7 +22,7 @@ export function SortDropdown<T extends string = string>({
     <div className="relative">
       <button
         onClick={onToggle}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm ${tc.btn} transition-all`}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm ${tc.btn} transition-all`}
       >
         <ArrowUpDown size={13} />
         {sortLabel && (
@@ -50,7 +50,7 @@ export function SortDropdown<T extends string = string>({
               <button
                 key={option.value}
                 onClick={() => onChange(option.value)}
-                className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                className={`w-full text-left px-4 py-2.5 text-body-sm transition-colors ${
                   option.value === value
                     ? tc.dropdownItemActive
                     : tc.dropdownItem

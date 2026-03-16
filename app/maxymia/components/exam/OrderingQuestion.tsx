@@ -30,7 +30,7 @@ export default function OrderingQuestion({
   return (
     <div>
       <p className="text-white font-medium mb-1">{question.question[locale]}</p>
-      <p className="text-white/40 text-xs mb-4">
+      <p className="text-white/40 text-label-md mb-4">
         {locale === 'es' ? 'Ordena los elementos usando las flechas' : 'Order the items using the arrows'}
       </p>
       <div className="space-y-2">
@@ -50,8 +50,8 @@ export default function OrderingQuestion({
               className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${borderClass} ${bgClass} transition-colors`}
             >
               <GripVertical size={16} className="text-white/20 flex-shrink-0" />
-              <span className="text-white/40 text-xs w-5">{positionIndex + 1}.</span>
-              <span className="text-white/80 text-sm flex-1">{question.items[itemIndex][locale]}</span>
+              <span className="text-white/40 text-label-md w-5">{positionIndex + 1}.</span>
+              <span className="text-white/80 text-body-sm flex-1">{question.items[itemIndex][locale]}</span>
               {!submitted && (
                 <div className="flex gap-1">
                   <button

@@ -61,7 +61,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-orange text-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-body-sm tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </m.p>
@@ -69,7 +69,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-blue text-4xl md:text-6xl font-black tracking-tight mb-8"
+              className="text-mx-blue text-display-sm md:text-display-md font-black tracking-tight mb-8"
             >
               <StyledTitle text={title} />
             </m.h2>
@@ -96,17 +96,17 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               >
                 <Quote size={48} className="text-mx-orange/30 mb-6" />
 
-                <p className="text-mx-text text-xl md:text-2xl font-light leading-relaxed mb-8">
+                <p className="text-mx-text text-heading-sm md:text-heading-md font-light leading-relaxed mb-8">
                   &ldquo;{displayTestimonials[current].text}&rdquo;
                 </p>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-mx-orange/10 flex items-center justify-center text-mx-orange text-xl font-bold">
+                  <div className="w-14 h-14 rounded-full bg-mx-orange/10 flex items-center justify-center text-mx-orange text-heading-sm font-bold">
                     {displayTestimonials[current].name.charAt(0)}
                   </div>
                   <div>
                     <div className="text-mx-text font-bold">{displayTestimonials[current].name}</div>
-                    <div className="text-mx-text-muted text-sm">{displayTestimonials[current].role}</div>
+                    <div className="text-mx-text-muted text-body-sm">{displayTestimonials[current].role}</div>
                   </div>
                 </div>
               </m.div>

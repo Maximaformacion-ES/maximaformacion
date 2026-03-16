@@ -40,7 +40,7 @@ export const MaxymiaFooter: React.FC = () => {
             <Link href="/maxymia" className="inline-block mb-5">
               <Image src="/logo-completo.webp" alt="Maxymia" className="h-10" style={{ width: 'auto' }} width={200} height={40} />
             </Link>
-            <p className="text-white/50 text-sm font-light leading-relaxed max-w-[268px]">
+            <p className="text-white/50 text-body-sm font-light leading-relaxed max-w-[268px]">
               El campus virtual de IA aplicada a ciencias de Máxima Formación. Formación especializada para investigadores y profesionales.
             </p>
             {/* Social links */}
@@ -68,13 +68,13 @@ export const MaxymiaFooter: React.FC = () => {
           {/* Link Columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">{category}</h4>
+              <h4 className="text-white/40 text-label-md font-semibold uppercase tracking-widest mb-5">{category}</h4>
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-white/60 hover:text-white text-sm font-light transition-colors"
+                      className="text-white/60 hover:text-white text-body-sm font-light transition-colors"
                     >
                       {link.label}
                     </a>
@@ -86,14 +86,14 @@ export const MaxymiaFooter: React.FC = () => {
 
           {/* Máxima Formación Column */}
           <div>
-            <h4 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">Máxima Formación</h4>
+            <h4 className="text-white/40 text-label-md font-semibold uppercase tracking-widest mb-5">Máxima Formación</h4>
             <ul className="space-y-3">
               {maximaLinks.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
                     {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                    className="text-white/60 hover:text-white text-sm font-light transition-colors inline-flex items-center gap-1"
+                    className="text-white/60 hover:text-white text-body-sm font-light transition-colors inline-flex items-center gap-1"
                   >
                     {link.label}
                     {link.external && <ArrowUpRight size={10} className="opacity-60" />}
@@ -106,12 +106,12 @@ export const MaxymiaFooter: React.FC = () => {
 
         {/* Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/30 text-xs">
+          <p className="text-white/30 text-label-md">
             &copy; 2025 Maxymia &mdash; Campus Virtual de Máxima Formación. Todos los derechos reservados.
           </p>
           <div className="flex gap-5">
             {['Política de Privacidad', 'Aviso Legal', 'Cookies'].map((text) => (
-              <button key={text} type="button" className="text-white/30 hover:text-white/60 text-xs transition-colors">
+              <button key={text} type="button" className="text-white/30 hover:text-white/60 text-label-md transition-colors">
                 {text}
               </button>
             ))}

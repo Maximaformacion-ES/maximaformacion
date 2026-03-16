@@ -92,55 +92,55 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                 className="py-12 md:py-20"
               >
                 <div>
-                  <div className="max-w-2xl">
+                  <div className="lg:w-1/2 w-full">
                     {/* Badge */}
-                    <span className="inline-block px-3 py-1 mb-5 text-[11px] font-bold tracking-widest uppercase bg-mx-blue/20 text-mx-blue rounded-full border border-mx-blue/30">
+                    <span className="inline-block px-3 py-1 mb-5 text-label-sm font-bold tracking-widest uppercase bg-mx-blue/20 text-mx-blue rounded-full border border-mx-blue/30">
                       {badges[i] ?? badges[0]}
                     </span>
 
-                    <h1 className="text-3xl md:text-4xl lg:text-6xl 2xl:text-7xl font-bold text-white leading-tight mb-5 text-balance">
+                    <h1 className="text-heading-md md:text-heading-lg 2xl:text-display-sm font-bold text-white leading-tight mb-5 text-balance">
                       {course.title[locale].toUpperCase()}
                     </h1>
 
                     {/* Rating + students */}
                     <div className="flex items-center gap-3 mb-4">
                       <StarRating rating={rating} size={16} />
-                      <span className="text-white/70 text-sm font-medium">{rating.toFixed(1)}</span>
+                      <span className="text-white/70 text-body-sm font-medium">{rating.toFixed(1)}</span>
                       <span className="text-white/20">|</span>
-                      <span className="flex items-center gap-1 text-white/50 text-sm">
+                      <span className="flex items-center gap-1 text-white/50 text-body-sm">
                         <Users size={14} />
                         {studentLabel} {t('campus.students')}
                       </span>
                     </div>
 
-                    <p className="text-white/50 text-base 2xl:text-lg leading-relaxed mb-6 max-w-lg">
+                    <p className="text-white/50 text-body-md 2xl:text-body-lg leading-relaxed mb-6 max-w-lg">
                       {course.description[locale]}
                     </p>
 
                     {/* Instructor */}
                     <div className="flex items-center gap-3 mb-8">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-mx-orange/30 to-purple-500/30 flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">
+                        <span className="text-white font-semibold text-body-sm">
                           {course.instructor.name.charAt(0)}
                         </span>
                       </div>
                       <div>
-                        <p className="text-white text-sm font-medium">{course.instructor.name}</p>
-                        <p className="text-white/40 text-xs">{course.instructor.role}</p>
+                        <p className="text-white text-body-sm font-medium">{course.instructor.name}</p>
+                        <p className="text-white/40 text-label-md">{course.instructor.role}</p>
                       </div>
                     </div>
 
                     {/* Price + CTA */}
-                    <div className="flex items-center gap-5">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
                       <div className="flex items-baseline gap-2">
                         {course.originalPrice && course.originalPrice > course.price && (
-                          <span className="text-white/30 text-lg line-through">{course.originalPrice}&euro;</span>
+                          <span className="text-white/30 text-body-lg line-through">{course.originalPrice}&euro;</span>
                         )}
-                        <span className="text-mx-orange text-3xl 2xl:text-4xl font-bold">{course.price}&euro;</span>
+                        <span className="text-mx-orange text-heading-lg 2xl:text-display-sm font-bold">{course.price}&euro;</span>
                       </div>
                       <Link
                         href={`/maxymia/campus/${course.slug}`}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-mx-orange hover:bg-mx-orange/90 text-white font-semibold rounded-lg transition-colors text-sm"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3 bg-mx-orange hover:bg-mx-orange/90 text-white font-semibold rounded-lg transition-colors text-label-md md:text-body-sm w-fit"
                       >
                         {t('campus.startLearning')}
                         <ArrowRight size={16} />
@@ -203,7 +203,7 @@ function CourseRow({ title, courses, locale, progressMap, delay = 0 }: CourseRow
     >
       {/* Row header */}
       <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="text-white text-lg md:text-xl 2xl:text-2xl font-semibold">{title}</h2>
+        <h2 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-semibold">{title}</h2>
         {courses.length > 3 && (
           <div className="hidden md:flex items-center gap-1">
             <button

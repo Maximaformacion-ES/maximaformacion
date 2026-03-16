@@ -22,7 +22,7 @@ export default function MultipleChoiceQuestion({
   return (
     <div>
       <p className="text-white font-medium mb-1">{question.question[locale]}</p>
-      <p className="text-white/40 text-xs mb-4">
+      <p className="text-white/40 text-label-md mb-4">
         {locale === 'es' ? 'Selecciona todas las respuestas correctas' : 'Select all correct answers'}
       </p>
       <div className="space-y-2">
@@ -62,7 +62,7 @@ export default function MultipleChoiceQuestion({
               ) : (
                 <Square size={18} className="text-white/20 flex-shrink-0" />
               )}
-              <span className="text-white/80 text-sm flex-1">{option[locale]}</span>
+              <span className="text-white/80 text-body-sm flex-1">{option[locale]}</span>
               {submitted && isCorrect && <CheckCircle size={14} className="text-green-400" />}
               {submitted && isSelected && !isCorrect && <XCircle size={14} className="text-red-400" />}
             </button>

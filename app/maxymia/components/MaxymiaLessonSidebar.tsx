@@ -39,10 +39,10 @@ export default function MaxymiaLessonSidebar({
       {/* Progress header */}
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-white/60 text-xs">
+          <span className="text-white/60 text-label-md">
             {completedLessons.size}/{totalLessons} {locale === 'es' ? 'completadas' : 'completed'}
           </span>
-          <span className="text-mx-orange text-xs font-semibold">{progressPercent}%</span>
+          <span className="text-mx-orange text-label-md font-semibold">{progressPercent}%</span>
         </div>
         <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
           <div
@@ -71,7 +71,7 @@ export default function MaxymiaLessonSidebar({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-80 flex-shrink-0 border-r border-white/10 bg-white/[0.02] h-[calc(100vh-2rem)] sticky top-8 overflow-hidden">
+      <aside className="hidden lg:block w-80 flex-shrink-0 border-r border-white/10 bg-white/[0.02] h-[calc(100vh-2rem)] overflow-hidden">
         {sidebarContent}
       </aside>
 
@@ -102,7 +102,7 @@ export default function MaxymiaLessonSidebar({
               className="fixed left-0 top-0 bottom-0 w-80 bg-[#0a0d1a] z-50 lg:hidden"
             >
               <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <span className="text-white text-sm font-medium">
+                <span className="text-white text-body-sm font-medium">
                   {locale === 'es' ? 'Contenido' : 'Content'}
                 </span>
                 <button onClick={() => setMobileOpen(false)}>
@@ -142,8 +142,8 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
       >
         <div className="flex items-center gap-2 text-left">
           <BookOpen size={14} className="text-white/30 flex-shrink-0" />
-          <span className="text-white/70 text-xs font-medium line-clamp-1">{block.title[locale]}</span>
-          <span className="text-white/20 text-[10px]">{completedInBlock}/{block.lessons.length}</span>
+          <span className="text-white/70 text-label-md font-medium line-clamp-1">{block.title[locale]}</span>
+          <span className="text-white/20 text-label-sm">{completedInBlock}/{block.lessons.length}</span>
         </div>
         {open ? <ChevronUp size={14} className="text-white/30" /> : <ChevronDown size={14} className="text-white/30" />}
       </button>
@@ -164,7 +164,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                 <Link
                   key={lesson.id}
                   href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}`}
-                  className={`flex items-center gap-2.5 px-4 pl-8 py-2.5 text-xs transition-colors ${
+                  className={`flex items-center gap-2.5 px-4 pl-8 py-2.5 text-label-md transition-colors ${
                     isCurrent
                       ? 'bg-mx-orange/10 text-mx-orange border-l-2 border-mx-orange'
                       : 'text-white/50 hover:text-white/80 hover:bg-white/[0.03]'
@@ -180,7 +180,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
               );
             })}
             {block.exam && (
-              <div className="flex items-center gap-2 px-4 pl-8 py-2.5 text-xs text-purple-400/70">
+              <div className="flex items-center gap-2 px-4 pl-8 py-2.5 text-label-md text-purple-400/70">
                 <FileQuestion size={11} className="flex-shrink-0" />
                 <span className="line-clamp-1">{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
               </div>

@@ -114,7 +114,7 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
     >
       <div className="flex items-center gap-2 mb-4">
         <List className="w-4 h-4 text-mx-orange" />
-        <span className="text-mx-orange text-xs tracking-[0.3em] uppercase font-medium">
+        <span className="text-mx-orange text-label-md tracking-[0.3em] uppercase font-medium">
           Índice
         </span>
       </div>
@@ -126,7 +126,7 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
               href={`#${heading.id}`}
               onClick={(e) => handleClick(e, heading.id)}
               className={`
-                block py-1.5 text-sm transition-all duration-200 border-l-2
+                block py-1.5 text-body-sm transition-all duration-200 border-l-2
                 ${heading.level === 3 ? 'pl-6' : 'pl-4'}
                 ${
                   activeId === heading.id

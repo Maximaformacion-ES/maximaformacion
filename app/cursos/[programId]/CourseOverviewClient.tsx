@@ -53,13 +53,13 @@ function CourseHero({
         >
           {/* Course Info */}
           <div>
-            <span className="text-amber-500 text-sm font-medium tracking-[0.3em] uppercase mb-4 block">
+            <span className="text-amber-500 text-body-sm font-medium tracking-[0.3em] uppercase mb-4 block">
               {program.type}
             </span>
-            <h1 className="text-4xl md:text-5xl font-black  mb-6">
+            <h1 className="text-display-sm md:text-display-sm font-black  mb-6">
               {program.title}
             </h1>
-            <p className="text-white/60 font-light text-lg mb-8">
+            <p className="text-white/60 font-light text-body-lg mb-8">
               {program.description}
             </p>
 
@@ -83,7 +83,7 @@ function CourseHero({
             {progress && (
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-white/60 text-sm">Tu progreso</span>
+                  <span className="text-white/60 text-body-sm">Tu progreso</span>
                   <span className="text-amber-500 font-medium">{progressPercent}%</span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -182,12 +182,12 @@ function LessonRow({
           <p className="text-white/80 font-medium">
             {lesson.title}
             {isFree && !hasAccess && (
-              <span className="ml-2 text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-label-md bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full">
                 Vista previa
               </span>
             )}
           </p>
-          <p className="text-white/40 text-sm">
+          <p className="text-white/40 text-body-sm">
             {formatDuration(lesson.duration)}
           </p>
         </div>
@@ -257,7 +257,7 @@ function ModuleAccordion({
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-white">{module.title}</h3>
-            <p className="text-white/40 text-sm">
+            <p className="text-white/40 text-body-sm">
               {module.lessonCount} lecciones • {formatTotalDuration(module.totalDuration)}
               {showProgress && (
                 <span className="ml-2 text-amber-500">
@@ -426,7 +426,7 @@ export default function CourseOverviewClient({
         {/* Module List */}
         <section className="py-16 px-6 md:px-12">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-8">Contenido del curso</h2>
+            <h2 className="text-heading-md font-bold mb-8">Contenido del curso</h2>
 
             <div className="space-y-4">
               {program.moduleRelations.map((module, moduleIndex) => (

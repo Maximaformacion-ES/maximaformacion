@@ -58,10 +58,10 @@ export const ServicesGridSection: React.FC = () => {
           viewport={{ once: true }}
           className="mb-12 md:mb-16"
         >
-          <span className="text-mx-orange text-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Así podemos ayudarte
           </span>
-          <h2 className="text-mx-blue text-3xl md:text-5xl font-black text-balance md:w-2/3">
+          <h2 className="text-mx-blue text-heading-lg md:text-display-sm font-black text-balance md:w-2/3">
             Resolvemos los desafíos estadísticos de tu empresa
           </h2>
         </m.div>
@@ -92,7 +92,7 @@ export const ServicesGridSection: React.FC = () => {
                   }`} />
 
                   {/* Number */}
-                  <span className={`text-sm font-bold tabular-nums transition-colors duration-300 ${
+                  <span className={`text-body-sm font-bold tabular-nums transition-colors duration-300 ${
                     isActive ? 'text-mx-orange' : 'text-mx-text-muted'
                   }`}>
                     {String(idx + 1).padStart(2, '0')}
@@ -106,7 +106,7 @@ export const ServicesGridSection: React.FC = () => {
                   </div>
 
                   {/* Title */}
-                  <span className={`text-lg font-semibold transition-colors duration-300 ${
+                  <span className={`text-body-lg font-semibold transition-colors duration-300 ${
                     isActive ? 'text-mx-blue' : 'text-mx-text group-hover:text-mx-blue'
                   }`}>
                     {service.title}
@@ -133,10 +133,10 @@ export const ServicesGridSection: React.FC = () => {
                 </span>
 
                 <div className="relative z-10">
-                  <h3 className="text-2xl md:text-5xl lg:text-6xl font-black text-mx-blue mb-4 md:mb-6">
+                  <h3 className="text-heading-md md:text-display-sm lg:text-display-md font-black text-mx-blue mb-4 md:mb-6">
                     <StyledTitle text={'{' + activeService.title.toUpperCase() + '}'} color="blue" />
                   </h3>
-                  <p className="text-mx-text-muted text-base md:text-xl lg:text-2xl font-light leading-relaxed max-w-xl">
+                  <p className="text-mx-text-muted text-body-md md:text-heading-sm lg:text-heading-md font-light leading-relaxed max-w-xl">
                     {activeService.description}
                   </p>
                 </div>

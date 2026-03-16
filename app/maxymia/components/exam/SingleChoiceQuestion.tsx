@@ -56,7 +56,7 @@ export default function SingleChoiceQuestion({
               }`}>
                 {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-mx-orange" />}
               </div>
-              <span className="text-white/80 text-sm flex-1">{option[locale]}</span>
+              <span className="text-white/80 text-body-sm flex-1">{option[locale]}</span>
               {submitted && isCorrect && <CheckCircle size={16} className="text-green-400" />}
               {submitted && isSelected && !isCorrect && <XCircle size={16} className="text-red-400" />}
             </button>

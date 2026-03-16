@@ -89,15 +89,11 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
           id
           title_es
           title_en
-          content_es
-          content_en
           order
           lessons {
             id
             title_es
             title_en
-            content_es
-            content_en
             estimatedMinutes
             order
             topics {
@@ -170,30 +166,22 @@ function transformContentBlock(block: StrapiMaxymiaContentBlock): ContentBlock {
 }
 
 /**
- * Build LocalizedContent from Strapi richtext fields + optional topics.
- * - content_es/content_en (richtext) → one TextBlock per locale
- * - topics[] contain ContentBlocks that are NOT bilingual, so they're appended to both locales
+ * Build LocalizedContent from optional topics.
+ * topics[] contain ContentBlocks that are appended to both locales.
  */
 function transformLocalizedContent(
-  contentEs: string | null,
-  contentEn: string | null,
   topics?: StrapiMaxymiaLesson['topics']
 ): LocalizedContent {
-  const esBlocks: ContentBlock[] = [];
-  const enBlocks: ContentBlock[] = [];
-
-  if (contentEs) esBlocks.push({ type: 'text', html: contentEs });
-  if (contentEn) enBlocks.push({ type: 'text', html: contentEn });
+  const blocks: ContentBlock[] = [];
 
   if (topics) {
     for (const topic of topics) {
       const topicBlocks = (topic.content ?? []).map(transformContentBlock);
-      esBlocks.push(...topicBlocks);
-      enBlocks.push(...topicBlocks);
+      blocks.push(...topicBlocks);
     }
   }
 
-  return { es: esBlocks, en: enBlocks };
+  return { es: blocks, en: blocks };
 }
 
 function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
@@ -255,8 +243,13 @@ function transformLesson(lesson: StrapiMaxymiaLesson): MaxymiaLesson {
   return {
     id: String(lesson.id),
     title: { es: lesson.title_es, en: lesson.title_en ?? lesson.title_es },
-    content: transformLocalizedContent(lesson.content_es, lesson.content_en, lesson.topics),
+    content: transformLocalizedContent(lesson.topics),
     estimatedMinutes: lesson.estimatedMinutes ?? 0,
+    topics: (lesson.topics ?? []).map((t) => ({
+      id: String(t.id),
+      title: { es: t.title_es, en: t.title_en ?? t.title_es },
+      anchorId: t.anchorId,
+    })),
   };
 }
 
@@ -265,7 +258,7 @@ function transformBlock(block: StrapiMaxymiaBlock): MaxymiaBlock {
   return {
     id: String(block.id),
     title: { es: block.title_es, en: block.title_en ?? block.title_es },
-    content: transformLocalizedContent(block.content_es, block.content_en),
+    content: transformLocalizedContent(),
     lessons: sortedLessons.map(transformLesson),
     exam: block.exam ? transformExam(block.exam) : undefined,
   };

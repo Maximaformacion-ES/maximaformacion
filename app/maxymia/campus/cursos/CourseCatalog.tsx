@@ -208,10 +208,10 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
         </div>
 
         <div className="relative z-10 text-center px-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-5xl 2xl:text-6xl font-black tracking-tight text-white mb-3 lg:mb-4">
+          <h1 className="text-heading-md sm:text-heading-lg lg:text-display-sm 2xl:text-display-md font-black tracking-tight text-white mb-3 lg:mb-4">
             {t('courses.title')}
           </h1>
-          <p className="text-white/50 text-xs sm:text-sm lg:text-base 2xl:text-lg max-w-xl mx-auto">
+          <p className="text-white/50 text-label-md sm:text-body-sm lg:text-body-md 2xl:text-body-lg max-w-xl mx-auto">
             {t('courses.subtitle')}
           </p>
         </div>
@@ -253,7 +253,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
               >
                 <ChevronLeft size={14} />
               </button>
-              <span className="text-white/60 text-sm px-2 tabular-nums">
+              <span className="text-white/60 text-body-sm px-2 tabular-nums">
                 {currentPage}/{totalPages}
               </span>
               <button
@@ -276,7 +276,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('campus.searchPlaceholder')}
-                className="pl-9 pr-4 py-1.5 rounded-full text-sm bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[#527be7]/50  transition-all w-full"
+                className="pl-9 pr-4 py-1.5 rounded-full text-body-sm bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[#527be7]/50  transition-all w-full"
               />
             </div>
           }
@@ -360,7 +360,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-white/40 text-sm">{t('campus.noResults')}</p>
+            <p className="text-white/40 text-body-sm">{t('campus.noResults')}</p>
           </div>
         )}
 

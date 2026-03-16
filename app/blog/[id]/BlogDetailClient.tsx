@@ -28,10 +28,10 @@ export default function BlogDetailClient({ post, relatedPosts }: BlogDetailClien
 
         <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
           <div className="text-center max-w-2xl">
-            <h1 className="text-6xl md:text-8xl font-black text-mx-blue mb-6">
+            <h1 className="text-display-md md:text-display-lg font-black text-mx-blue mb-6">
               404
             </h1>
-            <h2 className="text-3xl md:text-4xl font-bold text-mx-text mb-4">
+            <h2 className="text-heading-lg md:text-display-sm font-bold text-mx-text mb-4">
               Artículo no encontrado
             </h2>
             <p className="text-mx-text-muted mb-8 font-light">
@@ -39,7 +39,7 @@ export default function BlogDetailClient({ post, relatedPosts }: BlogDetailClien
             </p>
             <Link
               href="/blog"
-              className="inline-flex items-center gap-3 bg-mx-orange text-white px-8 py-4 text-base font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
+              className="inline-flex items-center gap-3 bg-mx-orange text-white px-8 py-4 text-body-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
             >
               Ver todos los artículos
             </Link>

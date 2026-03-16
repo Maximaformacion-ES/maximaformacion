@@ -52,7 +52,7 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
             <button
               key={cat}
               onClick={() => setActiveFilter(cat)}
-              className={`px-3 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+              className={`px-3 py-1.5 md:px-6 md:py-2 rounded-full text-label-md md:text-body-sm font-medium transition-all duration-300 whitespace-nowrap ${
                 activeFilter === cat
                   ? 'bg-mx-orange text-white'
                   : 'bg-mx-card text-mx-text-muted border border-mx-border hover:border-mx-orange/50'
@@ -92,7 +92,7 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
               >
                 <ChevronLeft size={14} />
               </button>
-              <span className="text-xs text-mx-text-muted px-2 whitespace-nowrap">
+              <span className="text-label-md text-mx-text-muted px-2 whitespace-nowrap">
                 {currentPage} / {totalPages}
               </span>
               <button
@@ -119,7 +119,7 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
               placeholder="Buscar programa..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-mx-card border border-mx-border rounded-full pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-mx-orange transition-colors text-mx-text placeholder:text-mx-text-muted/50"
+              className="w-full bg-mx-card border border-mx-border rounded-full pl-10 pr-4 py-2.5 text-body-sm focus:outline-none focus:border-mx-orange transition-colors text-mx-text placeholder:text-mx-text-muted/50"
             />
           </div>
         </div>
@@ -137,7 +137,7 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
 
       {/* Results Count + Mobile Pagination */}
       <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs text-mx-text-muted">
+        <span className="text-label-md text-mx-text-muted">
           MOSTRANDO {resultsCount} RESULTADOS
         </span>
 
@@ -158,7 +158,7 @@ export const CatalogFilterBar: React.FC<CatalogFilterBarProps> = ({
             >
               <ChevronLeft size={14} />
             </button>
-            <span className="text-xs text-mx-text-muted px-2 whitespace-nowrap">
+            <span className="text-label-md text-mx-text-muted px-2 whitespace-nowrap">
               {currentPage} / {totalPages}
             </span>
             <button

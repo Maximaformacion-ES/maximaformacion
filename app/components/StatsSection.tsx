@@ -38,8 +38,8 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               className="text-center"
             >
               <stat.icon size={28} className="text-mx-orange mx-auto mb-4" strokeWidth={1.5} />
-              <div className="text-mx-orange text-4xl md:text-6xl font-black tracking-tight">{stat.value}</div>
-              <div className="text-mx-orange-dark text-sm md:text-base font-light mt-2">{stat.label}</div>
+              <div className="text-mx-orange text-display-sm md:text-display-md font-black tracking-display leading-display">{stat.value}</div>
+              <div className="text-mx-orange-dark text-label-lg md:text-body-md font-light mt-2 leading-label">{stat.label}</div>
             </m.div>
           ))}
         </div>

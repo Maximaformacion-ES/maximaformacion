@@ -52,11 +52,11 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
         {post.featured && (
-          <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-mx-orange text-white text-[10px] font-bold uppercase tracking-widest rounded-full">
+          <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-mx-orange text-white text-label-sm font-bold uppercase tracking-widest rounded-full">
             <Award size={12} /> Destacado
           </div>
         )}
-        <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 bg-mx-blue text-white text-xs font-medium rounded-full">
+        <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 bg-mx-blue text-white text-label-md font-medium rounded-full">
           {post.category}
         </div>
       </div>
@@ -64,7 +64,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
       {/* Card Content */}
       <div className="p-6 flex flex-col flex-grow">
         {/* Metadata */}
-        <div className="flex items-center gap-4 mb-4 text-mx-text-muted text-xs">
+        <div className="flex items-center gap-4 mb-4 text-mx-text-muted text-label-md">
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
             {formatDate(post.publishedAt)}
@@ -76,12 +76,12 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
         </div>
 
         {/* Title */}
-        <h3 className="text-lg md:text-xl font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors duration-300 leading-tight line-clamp-2">
+        <h3 className="text-body-lg md:text-heading-sm font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors duration-300 leading-tight line-clamp-2">
           {post.title}
         </h3>
 
         {/* Excerpt */}
-        <p className="text-mx-text-muted text-sm font-light mb-4 line-clamp-3 flex-grow">
+        <p className="text-mx-text-muted text-body-sm font-light mb-4 line-clamp-3 flex-grow">
           {post.excerpt}
         </p>
 
@@ -90,7 +90,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
           {post.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="px-3 py-1 bg-mx-card border border-mx-border text-xs text-mx-text-muted rounded-full"
+              className="px-3 py-1 bg-mx-card border border-mx-border text-label-md text-mx-text-muted rounded-full"
             >
               {tag}
             </span>
@@ -113,17 +113,17 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-mx-orange/10 border border-mx-orange/30 flex items-center justify-center">
-                    <span className="text-xs font-bold text-mx-orange">
+                    <span className="text-label-md font-bold text-mx-orange">
                       {getInitials(post.author.name)}
                     </span>
                   </div>
                 )}
                 <div>
-                  <p className="text-xs font-bold text-mx-text">
+                  <p className="text-label-md font-bold text-mx-text">
                     {post.author.name}
                   </p>
                   {post.author.role && (
-                    <p className="text-xs text-mx-text-muted">
+                    <p className="text-label-md text-mx-text-muted">
                       {post.author.role}
                     </p>
                   )}

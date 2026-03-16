@@ -14,10 +14,10 @@ export const InnovacionCTASection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-white text-3xl md:text-6xl lg:text-7xl font-black mb-8">
+          <h2 className="text-white text-heading-lg md:text-display-md lg:text-display-md font-black mb-8">
             No te quedes con dudas
           </h2>
-          <p className="text-white/70 text-lg md:text-2xl font-light mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-white/70 text-body-lg md:text-heading-md font-light mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed">
             ¿Necesitas ayuda con tu proyecto? Contacta con nosotros y descubre cómo podemos
             transformar tus ideas en soluciones tecnológicas innovadoras.
           </p>
@@ -25,7 +25,7 @@ export const InnovacionCTASection: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link
               href="/contacto"
-              className="group bg-mx-orange text-white px-10 py-5 rounded-full text-base font-bold tracking-wide hover:bg-mx-orange-dark transition-all duration-300 flex items-center gap-3"
+              className="group bg-mx-orange text-white px-10 py-5 rounded-full text-body-md font-bold tracking-wide hover:bg-mx-orange-dark transition-all duration-300 flex items-center gap-3"
             >
               Contacta con nosotros
               <ArrowUpRight
@@ -37,7 +37,7 @@ export const InnovacionCTASection: React.FC = () => {
               href="https://biomaximainnovacion.es/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group border border-white/20 text-white px-10 py-5 rounded-full text-base font-light tracking-wide hover:bg-white/10 hover:border-white/40 transition-all duration-300 flex items-center gap-3"
+              className="group border border-white/20 text-white px-10 py-5 rounded-full text-body-md font-light tracking-wide hover:bg-white/10 hover:border-white/40 transition-all duration-300 flex items-center gap-3"
             >
               Visitar Biomáxima
               <ArrowUpRight
