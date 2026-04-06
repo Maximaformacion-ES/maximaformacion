@@ -79,12 +79,15 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   }, [course.id, lesson.id]);
 
   const handleNext = useCallback(async () => {
-    if (!nav?.next) return;
     if (!isCompleted) {
       await handleMarkComplete();
       await refetch();
     }
-    router.push(`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`);
+    if (nav?.next) {
+      router.push(`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`);
+    } else {
+      router.push(`/maxymia/campus/${course.slug}`);
+    }
   }, [nav, isCompleted, handleMarkComplete, refetch, router, course.slug]);
 
   return (
@@ -110,7 +113,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
             </Link>
             <div className="min-w-0">
               <p className="text-white/30 text-label-sm tracking-widest uppercase truncate">
-                {course.title[locale]}
+                {block.title[locale]}
               </p>
               <p className="text-white text-body-sm font-medium truncate">
                 {lesson.title[locale]}
@@ -129,19 +132,19 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="px-6 md:px-12 lg:px-16 py-10 max-w-4xl"
+          className="px-6 md:px-12 lg:px-16 py-10 max-w-4xl mx-auto"
         >
-          {/* Block breadcrumb */}
-          <p className="text-mx-orange text-label-md tracking-[0.2em] uppercase mb-6">
-            {block.title[locale]}
-          </p>
+          {/* Lesson title */}
+          <h1 className="text-white text-heading-md md:text-heading-lg font-bold mb-6">
+            {lesson.title[locale]}
+          </h1>
 
           {/* Content */}
           <LessonContentRenderer content={lesson.content[locale]} locale={locale} />
 
           {/* Navigation */}
           {nav && (
-            <div className="flex items-center justify-between pt-8 border-t border-white/10">
+            <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
               {nav.prev ? (
                 <Link
                   href={`/maxymia/campus/${course.slug}/lesson/${nav.prev.lessonId}`}
@@ -164,7 +167,19 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
                   <ArrowRight size={16} />
                 </button>
               ) : (
-                <div />
+                <button
+                  onClick={handleNext}
+                  className={`flex items-center gap-2 transition-colors text-body-sm ${
+                    isCompleted
+                      ? 'text-green-400 hover:text-green-300'
+                      : 'bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange/90'
+                  }`}
+                >
+                  {isCompleted
+                    ? (locale === 'es' ? '✓ Curso completado' : '✓ Course completed')
+                    : (locale === 'es' ? 'Completar curso' : 'Complete course')
+                  }
+                </button>
               )}
             </div>
           )}

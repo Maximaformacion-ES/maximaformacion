@@ -192,8 +192,9 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
                       : 'bg-mx-blue/20 text-mx-blue border border-mx-blue/80 shadow-mx-blue/20'
                   }`}
                   style={{ top: pos.top, left: pos.left, width: pos.size, height: pos.size }}
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
                 >
                   {[FlaskConical, BookOpen, Award, Route, Users][i] &&
                     React.createElement([FlaskConical, BookOpen, Award, Route, Users][i], {

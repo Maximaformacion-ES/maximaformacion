@@ -3,7 +3,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
-import { Star, ArrowUpRight, Users, Calendar, User } from 'lucide-react';
+import { Star, ArrowUpRight, Users, Calendar, User, Trophy } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
 import { getCourseMeta } from '../data/queries';
 
@@ -45,6 +45,7 @@ export default function MaxymiaCourseCard({
   const { totalLessons } = getCourseMeta(course);
   const completedCount = progress?.completedLessons.length ?? 0;
   const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const isFullyCompleted = progressPercent === 100 && totalLessons > 0;
 
   const rating = course.rating ?? 0;
   const studentCount = course.studentCount ?? 0;
@@ -85,9 +86,18 @@ export default function MaxymiaCourseCard({
       transition={{ delay: index * 0.06, duration: 0.5 }}
       className="group/card relative h-full"
     >
-      <Link href={`/maxymia/campus/${course.slug}`} className="flex flex-col h-full overflow-hidden rounded-xl border border-[#2e3339]">
-        {/* Thumbnail area — blue background with chevrons and title */}
-        <div className="relative h-[200px] bg-[#527be7] overflow-hidden flex items-center justify-center">
+      <Link href={`/maxymia/campus/${course.slug}`} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-[#2e3339]'}`}>
+        {/* Thumbnail area */}
+        <div className={`relative h-[200px] overflow-hidden flex items-center justify-center ${isFullyCompleted ? 'bg-gradient-to-br from-amber-600 to-amber-800' : 'bg-[#527be7]'}`}>
+          {/* Completion badge */}
+          {isFullyCompleted && (
+            <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-500/30">
+              <Trophy size={12} className="text-amber-400" />
+              <span className="text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                {locale === 'es' ? 'Completado' : 'Completed'}
+              </span>
+            </div>
+          )}
           {/* Course image at 10% opacity behind everything */}
           <img
             src={course.image}
@@ -154,20 +164,45 @@ export default function MaxymiaCourseCard({
           <div className="mt-auto pt-3 border-t border-white/10">
             {enrolled || progress ? (
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-mx-orange text-label-md font-medium">
-                    {progressPercent}%
-                  </span>
-                  <span className="text-white/30 text-label-md">
-                    {completedCount}/{totalLessons}
-                  </span>
-                </div>
-                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-mx-orange to-amber-400 rounded-full transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
+                {isFullyCompleted ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Trophy size={14} className="text-amber-400" />
+                      <span className="text-amber-400 text-body-sm font-semibold">
+                        {locale === 'es' ? 'Curso completado' : 'Course completed'}
+                      </span>
+                    </div>
+                    <div className="w-7 h-7 rounded-full bg-amber-500/10 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity">
+                      <ArrowUpRight size={14} className="text-amber-400" />
+                    </div>
+                  </div>
+                ) : completedCount > 0 ? (
+                  <>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-mx-orange text-label-md font-medium">
+                        {progressPercent}%
+                      </span>
+                      <span className="text-white/30 text-label-md">
+                        {completedCount}/{totalLessons}
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-mx-orange to-amber-400 rounded-full transition-all duration-500"
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-green-400 text-body-sm font-medium">
+                      ✓ {locale === 'es' ? 'Comprado' : 'Purchased'}
+                    </span>
+                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity">
+                      <ArrowUpRight size={14} className="text-white" />
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex items-center justify-between">

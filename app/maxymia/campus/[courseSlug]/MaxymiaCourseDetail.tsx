@@ -148,11 +148,8 @@ export default function MaxymiaCourseDetail({ course }: Props) {
         }
       />
 
-      {/* Access Gate */}
-      <CourseAccessGate course={course} locale={locale} />
-
       {/* Mobile Sidebar */}
-      <section className="pb-16 px-6 md:px-12 lg:hidden">
+      <section className="pb-16 px-6 md:px-[128px] lg:hidden">
         <div className="max-w-[1400px] mx-auto">
           <CourseSidebar
             course={course}
@@ -185,20 +182,20 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
   return (
     <section className="relative pt-12 pb-12 md:pt-16 md:pb-16 overflow-visible">
       {/* Background image with dark overlays */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 min-h-full">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0b1018]/95 via-[#0b1018]/85 to-[#0b1018]/60 z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0b1018] via-[#0b1018]/30 to-transparent z-10" />
         <Image
           src={course.image}
           alt={course.title[locale]}
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-contain opacity-40"
           fill
           sizes="100vw"
           unoptimized
         />
       </div>
 
-      <div className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12">
+      <div className="relative z-20 max-w-[1800px] mx-auto px-6 md:px-[128px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
@@ -256,7 +253,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-body-md md:text-body-lg text-white/60 font-light mb-6 max-w-2xl"
+              className="text-body-md 2xl:text-body-lg text-white/60 font-light mb-6 max-w-2xl"
             >
               {course.description[locale]}
             </m.p>
@@ -307,33 +304,6 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                 )}
               </m.div>
             )}
-
-            {/* Stats pills */}
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex flex-wrap items-center gap-6 mb-8"
-            >
-              <div className="flex items-center gap-2 text-white/80">
-                <BookOpen size={16} className="text-mx-orange" />
-                <span className="text-body-sm font-medium">
-                  {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80">
-                <Clock size={16} className="text-mx-orange" />
-                <span className="text-body-sm font-medium">
-                  {Math.round(totalMinutes / 60)}h {totalMinutes % 60}min
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80">
-                <BarChart3 size={16} className="text-mx-orange" />
-                <span className="text-body-sm font-medium">
-                  {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'}
-                </span>
-              </div>
-            </m.div>
 
             {/* Tabs */}
             {tabs && (
@@ -587,12 +557,11 @@ interface TabsProps {
 }
 
 function CourseTabs({ course, locale, totalLessons }: TabsProps) {
-  const [activeTab, setActiveTab] = useState('descripcion');
+  const [activeTab, setActiveTab] = useState('contenido');
   const [expandedBlock, setExpandedBlock] = useState<number | null>(0);
 
   const tabs = useMemo<TabDef[]>(() => {
     const t: TabDef[] = [
-      { value: 'descripcion', label: locale === 'es' ? 'Descripción' : 'Description', icon: BookOpen },
       { value: 'contenido', label: locale === 'es' ? 'Temario' : 'Syllabus', icon: ListOrdered },
     ];
     if (course.objectives)
@@ -622,7 +591,6 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
             <span className="flex items-center gap-1 sm:gap-2">
               <tab.icon className="size-3.5 sm:size-4" />
               <span className="sm:hidden">
-                {tab.value === 'descripcion' && 'Info'}
                 {tab.value === 'contenido' && (locale === 'es' ? 'Temario' : 'Content')}
                 {tab.value === 'objetivos' && (locale === 'es' ? 'Objetivos' : 'Goals')}
                 {tab.value === 'audiencia' && (locale === 'es' ? 'Audiencia' : 'Audience')}
@@ -644,46 +612,6 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
       {/* Tab content */}
       <div className="pt-6 md:pt-4">
         <AnimatePresence mode="wait">
-          {activeTab === 'descripcion' && (
-            <m.div
-              key="descripcion"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <p className="text-body-sm sm:text-body-lg text-white/60 font-light leading-relaxed">
-                {course.description[locale]}
-              </p>
-
-              {/* Instructor card */}
-              <div className="mt-8 p-6 bg-white/[0.03] border border-white/10 rounded-xl">
-                <h3 className="text-white font-semibold text-body-sm mb-4 uppercase tracking-widest">
-                  Instructor
-                </h3>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
-                    {course.instructor.avatar ? (
-                      <Image
-                        src={course.instructor.avatar}
-                        alt={course.instructor.name}
-                        width={56}
-                        height={56}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <User size={24} className="text-white/40" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">{course.instructor.name}</p>
-                    <p className="text-white/40 text-body-sm">{course.instructor.role}</p>
-                  </div>
-                </div>
-              </div>
-            </m.div>
-          )}
-
           {activeTab === 'contenido' && (
             <m.div
               key="contenido"
@@ -902,27 +830,27 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
     new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
 
   return (
-    <section className="py-20 md:py-32 px-6 md:px-12 bg-gradient-to-b from-[#0b1018] to-[#060810]">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-12 md:py-20 px-6 md:px-[128px] bg-gradient-to-b from-[#0b1018] to-[#060810]">
+      <div className="max-w-4xl mx-auto">
         <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
-          <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center">
-            <Lock className="text-amber-500" size={40} />
+          <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center">
+            <Lock className="text-amber-500" size={22} />
           </div>
 
-          <span className="inline-flex items-center gap-2 text-amber-500 text-body-sm font-medium tracking-[0.3em] uppercase mb-4">
-            <Crown size={16} />
+          <span className="inline-flex items-center gap-2 text-amber-500 text-label-md font-medium tracking-[0.3em] uppercase mb-3">
+            <Crown size={14} />
             {locale === 'es' ? 'Contenido Premium' : 'Premium Content'}
           </span>
-          <h2 className="text-heading-lg md:text-display-sm font-black text-white mb-6">
+          <h2 className="text-heading-md md:text-heading-lg font-bold text-white mb-4">
             {locale === 'es' ? 'Accede a' : 'Access'} &quot;{course.title[locale]}&quot;
           </h2>
-          <p className="text-white/60 font-light text-body-lg mb-10 max-w-2xl mx-auto">
+          <p className="text-white/60 font-light text-body-sm md:text-body-md mb-8 max-w-xl mx-auto">
             {locale === 'es'
               ? 'Este curso es exclusivo. Elige la opción que mejor se adapte a ti.'
               : 'This course is exclusive. Choose the option that suits you best.'}
@@ -930,35 +858,35 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
         </m.div>
 
         {/* Two Options */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {/* Buy Course */}
           <m.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="p-8 bg-white/5 border border-white/10 hover:border-white/20 rounded-2xl transition-all"
+            className="p-6 bg-white/5 border border-white/10 hover:border-white/20 rounded-xl transition-all"
           >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <ShoppingCart className="text-white" size={24} />
-              <span className="text-white font-semibold text-body-lg">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <ShoppingCart className="text-white" size={18} />
+              <span className="text-white font-semibold text-body-sm">
                 {locale === 'es' ? 'Comprar este curso' : 'Buy this course'}
               </span>
             </div>
 
-            <div className="flex items-baseline justify-center gap-1 mb-2">
+            <div className="flex items-baseline justify-center gap-1 mb-1">
               {course.originalPrice != null && course.originalPrice > course.price && (
-                <span className="text-white/40 text-heading-sm line-through mr-2">
+                <span className="text-white/40 text-body-md line-through mr-2">
                   {formatPrice(course.originalPrice)}
                 </span>
               )}
-              <span className="text-display-sm font-black text-white">{formatPrice(course.price)}</span>
+              <span className="text-heading-md font-black text-white">{formatPrice(course.price)}</span>
             </div>
-            <p className="text-white/40 text-body-sm mb-6 text-center">
+            <p className="text-white/40 text-label-md mb-5 text-center">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
             </p>
 
-            <div className="space-y-3 mb-8">
+            <div className="space-y-2.5 mb-6">
               {courseFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Check className="text-green-500 flex-shrink-0" size={16} />
@@ -972,7 +900,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             <button
               onClick={handlePurchase}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 bg-white hover:bg-white/90 text-black px-6 py-4 rounded-full font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-white hover:bg-white/90 text-black px-5 py-3 rounded-full text-body-sm font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -994,28 +922,28 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="p-8 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/30 rounded-2xl relative overflow-hidden"
+            className="p-6 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/30 rounded-xl relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 bg-amber-500 text-black text-label-md font-bold px-4 py-1 rounded-bl-xl">
+            <div className="absolute top-0 right-0 bg-amber-500 text-black text-label-sm font-bold px-3 py-0.5 rounded-bl-lg">
               {locale === 'es' ? 'RECOMENDADO' : 'RECOMMENDED'}
             </div>
 
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Crown className="text-amber-500" size={24} />
-              <span className="text-amber-500 font-semibold text-body-lg">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Crown className="text-amber-500" size={18} />
+              <span className="text-amber-500 font-semibold text-body-sm">
                 {locale === 'es' ? 'Suscripción Pro' : 'Pro Subscription'}
               </span>
             </div>
 
-            <div className="flex items-baseline justify-center gap-1 mb-2">
-              <span className="text-display-sm font-black text-white">€18</span>
-              <span className="text-white/60">/{locale === 'es' ? 'mes' : 'mo'}</span>
+            <div className="flex items-baseline justify-center gap-1 mb-1">
+              <span className="text-heading-md font-black text-white">€18</span>
+              <span className="text-white/60 text-body-sm">/{locale === 'es' ? 'mes' : 'mo'}</span>
             </div>
-            <p className="text-white/40 text-body-sm mb-6 text-center">
+            <p className="text-white/40 text-label-md mb-5 text-center">
               {locale === 'es' ? 'Cancela cuando quieras' : 'Cancel anytime'}
             </p>
 
-            <div className="space-y-3 mb-8">
+            <div className="space-y-2.5 mb-6">
               {proFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Sparkles className="text-amber-500 flex-shrink-0" size={16} />
@@ -1026,7 +954,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
 
             <Link
               href="/pricing"
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-6 py-4 rounded-full font-bold transition-all duration-300 shadow-lg shadow-amber-500/30"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-5 py-3 rounded-full text-body-sm font-bold transition-all duration-300 shadow-lg shadow-amber-500/30"
             >
               <Crown size={18} />
               {locale === 'es' ? 'Hazte Pro' : 'Go Pro'}
@@ -1045,7 +973,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="text-center mt-12"
+          className="text-center mt-8"
         >
           <Link
             href="/maxymia/campus/cursos"
@@ -1063,7 +991,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
 
 function CourseCTASection({ locale }: { locale: Locale }) {
   return (
-    <section className="py-24 md:py-32 px-6 md:px-12">
+    <section className="py-24 md:py-32 px-6 md:px-[128px]">
       <div className="max-w-[1200px] mx-auto text-center">
         <m.div
           initial={{ opacity: 0, y: 40 }}

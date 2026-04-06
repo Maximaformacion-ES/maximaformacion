@@ -7,36 +7,31 @@ import { ArrowUpRight } from 'lucide-react';
 
 const footerLinks = {
   Campus: [
-    { label: 'Catálogo de cursos', href: '#cursos' },
-    { label: 'Rutas de aprendizaje', href: '#' },
-    { label: 'Labs virtuales', href: '#' },
-    { label: 'Comunidad', href: '#' },
-    { label: 'Certificaciones', href: '#' },
+    { label: 'Catálogo de cursos', href: '/maxymia/campus/cursos' },
+    { label: 'Mi campus', href: '/maxymia/campus' },
   ],
-  Especialidades: [
-    { label: 'Machine Learning', href: '#' },
-    { label: 'Bioinformática', href: '#' },
-    { label: 'Visión Artificial', href: '#' },
-    { label: 'NLP Científico', href: '#' },
-    { label: 'IA Farmacéutica', href: '#' },
+  'Máxima Formación': [
+    { label: 'Programas', href: '/programas' },
+    { label: 'Consultoría', href: '/consultoria' },
+    { label: 'Innovación', href: '/innovacion' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Contacto', href: '/contacto' },
   ],
 };
 
-const maximaLinks = [
-  { label: 'Ir a la web', href: '/', external: true },
-  { label: 'Másters', href: '/programas' },
-  { label: 'Cursos', href: '/programas' },
-  { label: 'Contacto', href: '/contacto' },
-  { label: 'Blog', href: '/blog' },
+const externalLinks = [
+  { label: 'Campus E-Learning', href: 'https://maximaformacion.com.es/' },
+  { label: 'Campus Data Science', href: 'https://www.maximacampus.es/' },
+  { label: 'Biomáxima', href: 'https://biomaximainnovacion.es/' },
 ];
 
 export const MaxymiaFooter: React.FC = () => {
   return (
     <footer className="bg-[#0b1018] border-t border-white/10 py-16 md:py-20">
-      <div className="max-w-[1280px] mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-28">
+        <div className="flex flex-col lg:flex-row gap-12 mb-16">
           {/* Brand */}
-          <div>
+          <div className="lg:flex-1">
             <Link href="/maxymia" className="inline-block mb-5">
               <Image src="/logo-completo.webp" alt="Maxymia" className="h-10" style={{ width: 'auto' }} width={200} height={40} />
             </Link>
@@ -65,49 +60,52 @@ export const MaxymiaFooter: React.FC = () => {
             </div>
           </div>
 
-          {/* Link Columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="text-white/40 text-label-md font-semibold uppercase tracking-widest mb-5">{category}</h4>
+          <div className="grid grid-cols-3 gap-8 lg:flex lg:flex-row lg:gap-28">
+            {/* Link Columns */}
+            {Object.entries(footerLinks).map(([category, links]) => (
+              <div key={category}>
+                <h4 className="text-white/40 text-label-md font-semibold uppercase tracking-widest mb-5">{category}</h4>
+                <ul className="space-y-3">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-white/60 hover:text-white text-body-sm font-light transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+
+            {/* External Links Column */}
+            <div>
+              <h4 className="text-white/40 text-label-md font-semibold uppercase tracking-widest mb-5">Plataformas</h4>
               <ul className="space-y-3">
-                {links.map((link) => (
+                {externalLinks.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-white/60 hover:text-white text-body-sm font-light transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/60 hover:text-white text-body-sm font-light transition-colors inline-flex items-center gap-1"
                     >
                       {link.label}
+                      <ArrowUpRight size={10} className="opacity-60" />
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-          ))}
-
-          {/* Máxima Formación Column */}
-          <div>
-            <h4 className="text-white/40 text-label-md font-semibold uppercase tracking-widest mb-5">Máxima Formación</h4>
-            <ul className="space-y-3">
-              {maximaLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                    className="text-white/60 hover:text-white text-body-sm font-light transition-colors inline-flex items-center gap-1"
-                  >
-                    {link.label}
-                    {link.external && <ArrowUpRight size={10} className="opacity-60" />}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/30 text-label-md">
-            &copy; 2025 Maxymia &mdash; Campus Virtual de Máxima Formación. Todos los derechos reservados.
+            &copy; 2026 Maxymia &mdash; Campus Virtual de Máxima Formación. Todos los derechos reservados.
           </p>
           <div className="flex gap-5">
             {['Política de Privacidad', 'Aviso Legal', 'Cookies'].map((text) => (

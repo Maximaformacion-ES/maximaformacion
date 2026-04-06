@@ -9,6 +9,7 @@ export const Footer: React.FC = () => {
     Formación: [
       { label: "Programas", href: "/programas" },
       { label: "Pricing", href: "/pricing" },
+      { label: "Maxymia", href: "/maxymia" },
     ],
     Servicios: [
       { label: "Consultoría", href: "/consultoria" },
@@ -33,7 +34,7 @@ export const Footer: React.FC = () => {
                 alt="Maxima Formación"
                 width={200}
                 height={66}
-                className="h-10 md:h-12 w-auto "
+                className="h-10 md:h-12 w-auto"
               />
             </Link>
             <p className="text-mx-text-muted text-body-sm font-light mt-4 max-w-xs leading-relaxed">

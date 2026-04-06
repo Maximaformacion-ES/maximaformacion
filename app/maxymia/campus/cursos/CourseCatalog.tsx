@@ -11,6 +11,7 @@ import {
   Hourglass,
   Star,
 } from 'lucide-react';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getTranslation } from '../../i18n/translations';
 import { getMaxymiaCategories, getCourseMeta } from '../../data/queries';
@@ -39,6 +40,7 @@ interface CourseCatalogProps {
 
 export default function CourseCatalog({ courses }: CourseCatalogProps) {
   const { locale } = useLocale();
+  const { courseProgress, hasAccess } = useUserCampus();
   const t = useCallback(
     (key: string) => getTranslation(locale, key),
     [locale]
@@ -354,6 +356,8 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
                 key={course.id}
                 course={course}
                 locale={locale}
+                progress={courseProgress[course.id] ? { courseId: course.id, completedLessons: courseProgress[course.id].completedLessons, currentLessonId: courseProgress[course.id].currentLessonId, examResults: {}, startedAt: courseProgress[course.id].startedAt ?? '', lastAccessedAt: courseProgress[course.id].lastAccessedAt ?? '' } : undefined}
+                enrolled={hasAccess(course.id) || !!courseProgress[course.id]}
                 index={idx}
               />
             ))}

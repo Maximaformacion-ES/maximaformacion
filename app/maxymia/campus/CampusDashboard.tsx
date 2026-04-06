@@ -170,10 +170,11 @@ interface CourseRowProps {
   courses: MaxymiaCourse[];
   locale: Locale;
   progressMap: Record<string, MaxymiaCourseProgress>;
+  hasAccess: (id: string) => boolean;
   delay?: number;
 }
 
-function CourseRow({ title, courses, locale, progressMap, delay = 0 }: CourseRowProps) {
+function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }: CourseRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -245,7 +246,7 @@ function CourseRow({ title, courses, locale, progressMap, delay = 0 }: CourseRow
                 course={course}
                 locale={locale}
                 progress={progressMap[course.id]}
-                enrolled={!!progressMap[course.id]}
+                enrolled={hasAccess(course.id) || !!progressMap[course.id]}
                 index={i}
               />
             </div>
@@ -269,7 +270,7 @@ interface CampusDashboardProps {
 export default function CampusDashboard({ courses }: CampusDashboardProps) {
   const { locale } = useLocale();
   const t = (key: string) => getTranslation(locale, key);
-  const { courseProgress, isLoading } = useUserCampus();
+  const { courseProgress, hasAccess, isLoading } = useUserCampus();
 
   // Build progress map
   const progressMap: Record<string, MaxymiaCourseProgress> = useMemo(() => {
@@ -306,14 +307,25 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
     [courses, enrolledCourseIds]
   );
   const recentCourses = useMemo(() => getRecentCourses(courses, 10), [courses]);
-  const inProgressCourses = useMemo(() => {
-    return courses
-      .filter((c) => progressMap[c.id])
-      .sort((a, b) => {
-        const pa = progressMap[a.id];
-        const pb = progressMap[b.id];
-        return new Date(pb.lastAccessedAt).getTime() - new Date(pa.lastAccessedAt).getTime();
-      });
+  const { inProgressCourses, completedCourses } = useMemo(() => {
+    const inProgress: MaxymiaCourse[] = [];
+    const completed: MaxymiaCourse[] = [];
+    for (const c of courses) {
+      const p = progressMap[c.id];
+      if (!p) continue;
+      const { totalLessons } = getCourseMeta(c);
+      if (totalLessons > 0 && p.completedLessons.length >= totalLessons) {
+        completed.push(c);
+      } else {
+        inProgress.push(c);
+      }
+    }
+    inProgress.sort((a, b) => {
+      const pa = progressMap[a.id];
+      const pb = progressMap[b.id];
+      return new Date(pb.lastAccessedAt).getTime() - new Date(pa.lastAccessedAt).getTime();
+    });
+    return { inProgressCourses: inProgress, completedCourses: completed };
   }, [courses, progressMap]);
 
   return (
@@ -329,6 +341,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
           courses={recentCourses}
           locale={locale}
           progressMap={progressMap}
+          hasAccess={hasAccess}
           delay={0.05}
         />
 
@@ -338,6 +351,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
           courses={bestRatedCourses}
           locale={locale}
           progressMap={progressMap}
+          hasAccess={hasAccess}
           delay={0.1}
         />
 
@@ -347,6 +361,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
           courses={recommendedCourses}
           locale={locale}
           progressMap={progressMap}
+          hasAccess={hasAccess}
           delay={0.2}
         />
 
@@ -357,7 +372,20 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
             courses={inProgressCourses}
             locale={locale}
             progressMap={progressMap}
+            hasAccess={hasAccess}
             delay={0.3}
+          />
+        )}
+
+        {/* Completed Courses */}
+        {!isLoading && completedCourses.length > 0 && (
+          <CourseRow
+            title={t('campus.completedRow')}
+            courses={completedCourses}
+            locale={locale}
+            progressMap={progressMap}
+            hasAccess={hasAccess}
+            delay={0.35}
           />
         )}
       </div>
