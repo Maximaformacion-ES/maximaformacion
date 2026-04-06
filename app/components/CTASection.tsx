@@ -37,7 +37,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-blue text-display-sm md:text-display-md lg:text-display-lg font-black tracking-display leading-display mb-8"
+          className="text-mx-blue text-display-sm md:text-display-md lg:text-display-lg font-black tracking-display leading-[1] mb-8"
         >
           <StyledTitle text={title} />
         </m.h2>

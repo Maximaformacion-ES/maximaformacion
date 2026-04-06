@@ -339,14 +339,15 @@ function CoursesSection({
         </div>
 
         {/* Course Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-3 md:gap-5">
           {courses.map((course, i) => (
-            <MaxymiaCourseCard
-              key={course.id}
-              course={course}
-              locale="es"
-              index={i}
-            />
+            <div key={course.id} className={i >= 5 ? 'hidden sm:block' : ''}>
+              <MaxymiaCourseCard
+                course={course}
+                locale="es"
+                index={i}
+              />
+            </div>
           ))}
         </div>
       </div>

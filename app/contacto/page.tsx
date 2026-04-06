@@ -204,7 +204,7 @@ const ContactPage = () => {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
               <div className="lg:col-span-1">
-                <h2 className="text-display-sm font-black text-mx-blue mb-6">
+                <h2 className="text-display-sm font-black text-mx-blue mb-6 leading-heading">
                   DÓNDE <br /><span className="text-stroke text-mx-orange">ESTAMOS</span>
                 </h2>
                 <div className="space-y-6 text-mx-text-muted">

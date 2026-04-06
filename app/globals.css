@@ -187,6 +187,13 @@
   overflow: hidden;
 }
 
+.line-clamp-6 {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

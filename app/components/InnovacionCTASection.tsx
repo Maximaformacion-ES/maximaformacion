@@ -14,7 +14,7 @@ export const InnovacionCTASection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-white text-heading-lg md:text-display-md lg:text-display-md font-black mb-8">
+          <h2 className="text-white text-heading-lg md:text-display-md lg:text-display-md font-black mb-8 uppercase text-balance">
             No te quedes con dudas
           </h2>
           <p className="text-white/70 text-body-lg md:text-heading-md font-light mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed">

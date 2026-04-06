@@ -6,21 +6,21 @@ import { Target, Eye, ShieldCheck } from 'lucide-react';
 
 export const MissionVisionSection: React.FC = () => {
   return (
-    <section className="pb-52 bg-mx-bg px-6 md:px-12">
+    <section className="pb-24 sm:pb-36 md:pb-52 bg-mx-bg px-4 sm:px-6 md:px-12">
       <div className="max-w-4xl mx-auto">
         {/* Section header */}
         <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
         >
-          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-body-sm font-medium tracking-[0.3em] sm:tracking-[0.5em] uppercase mb-4 block">
             Lo que nos define
           </span>
         </m.div>
 
-        <div className="space-y-16">
+        <div className="space-y-10 sm:space-y-16">
           {/* Misión */}
           <m.div
             initial={{ opacity: 0, y: 20 }}

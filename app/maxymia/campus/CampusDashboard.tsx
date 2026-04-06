@@ -58,7 +58,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
   const activeCourse = courses[activeIndex];
 
   return (
-    <section className="relative mb-16 h-[80dvh] flex flex-col justify-center overflow-hidden">
+    <section className="relative mb-8 sm:mb-16 min-h-[60dvh] sm:h-[80dvh] flex flex-col justify-center overflow-hidden">
       {/* Course image background — full viewport width */}
       {activeCourse && (
         <div className="absolute inset-0 -mx-[128px] max-md:-mx-6" style={{ left: 0, right: 0, marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
@@ -72,7 +72,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
         </div>
       )}
 
-      <div className="relative max-w-[1800px] w-full mx-auto px-6 md:px-[128px]">
+      <div className="relative max-w-[1800px] w-full mx-auto px-4 sm:px-6 md:px-[128px]">
         <AnimatePresence mode="wait">
           {courses.map((course, i) => {
             if (i !== activeIndex) return null;
@@ -98,7 +98,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                       {badges[i] ?? badges[0]}
                     </span>
 
-                    <h1 className="text-heading-md md:text-heading-lg 2xl:text-display-sm font-bold text-white leading-tight mb-5 text-balance">
+                    <h1 className="text-heading-sm sm:text-heading-md md:text-heading-lg 2xl:text-display-sm font-bold text-white leading-tight mb-3 sm:mb-5 text-balance">
                       {course.title[locale].toUpperCase()}
                     </h1>
 
@@ -113,7 +113,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                       </span>
                     </div>
 
-                    <p className="text-white/50 text-body-md 2xl:text-body-lg leading-relaxed mb-6 max-w-lg">
+                    <p className="text-white/50 text-body-sm sm:text-body-md 2xl:text-body-lg leading-relaxed mb-4 sm:mb-6 max-w-lg">
                       {course.description[locale]}
                     </p>
 
@@ -136,7 +136,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                         {course.originalPrice && course.originalPrice > course.price && (
                           <span className="text-white/30 text-body-lg line-through">{course.originalPrice}&euro;</span>
                         )}
-                        <span className="text-mx-orange text-heading-lg 2xl:text-display-sm font-bold">{course.price}&euro;</span>
+                        <span className="text-mx-orange text-heading-md sm:text-heading-lg 2xl:text-display-sm font-bold">{course.price}&euro;</span>
                       </div>
                       <Link
                         href={`/maxymia/campus/${course.slug}`}
@@ -200,11 +200,11 @@ function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
-      className="mb-12"
+      className="mb-10 sm:mb-12"
     >
       {/* Row header */}
-      <div className="flex items-center justify-between mb-4 px-1">
-        <h2 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-semibold">{title}</h2>
+      <div className="flex items-center justify-between mb-3 sm:mb-4 px-1">
+        <h2 className="text-white text-body-md sm:text-body-lg md:text-heading-sm 2xl:text-heading-md font-semibold">{title}</h2>
         {courses.length > 3 && (
           <div className="hidden md:flex items-center gap-1">
             <button
@@ -334,7 +334,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
       <HeroCarousel courses={heroSlides} locale={locale} t={t} />
 
       {/* Course rows */}
-      <div id="courses" className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
+      <div id="courses" className="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-[128px]">
         {/* Recently Added */}
         <CourseRow
           title={t('campus.recentlyAdded')}

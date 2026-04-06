@@ -40,7 +40,7 @@ export const InnovacionAboutSection: React.FC = () => {
           <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Sobre Biomáxima
           </span>
-          <h2 className="text-[#016157] text-heading-lg md:text-display-md font-black mb-6">
+          <h2 className="text-[#016157] text-heading-lg md:text-display-md font-black mb-6 leading-heading">
             <StyledTitle text="BIOMÁXIMA {INNOVACION®}" />
           </h2>
           <p className="text-mx-text-muted text-body-lg md:text-heading-sm font-light leading-relaxed">

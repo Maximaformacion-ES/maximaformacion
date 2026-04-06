@@ -5,6 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Menu, X, ChevronDown, User, Crown, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import {
   SignedIn,
   SignedOut,
@@ -122,7 +123,7 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
   return (
     <>
       <SignedOut>
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden xl:flex items-center gap-3">
           <Link href="/sign-in">
             <m.button
               className={`flex items-center gap-2 px-4 py-2 text-body-sm font-medium rounded-full transition-all duration-300 hover:cursor-pointer ${isDark ? 'border border-white/30 text-white hover:bg-white/10' : 'border border-mx-blue text-mx-blue hover:bg-mx-blue hover:text-white'}`}
@@ -144,7 +145,7 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
       </SignedOut>
 
       <SignedIn>
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden xl:flex items-center gap-3">
           {/* Pro Status / Upgrade CTA */}
           {userHasPro ? (
             <div className="flex items-center gap-2 bg-mx-orange/10 border border-mx-orange/30 text-mx-orange px-4 py-2 text-body-sm font-bold rounded-full">
@@ -201,7 +202,7 @@ function CampusDropdown({ isDark }: CampusDropdownProps) {
   }, [isCampusDropdownOpen]);
 
   return (
-    <div className="hidden md:block relative" ref={dropdownRef}>
+    <div className="hidden xl:block relative" ref={dropdownRef}>
       <m.button
         onClick={() => setIsCampusDropdownOpen(!isCampusDropdownOpen)}
         className="flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 text-body-sm font-medium rounded-full hover:bg-mx-orange/90 transition-colors duration-300"
@@ -254,111 +255,135 @@ interface MobileMenuProps {
   isDark: boolean;
   isSignedIn: boolean | undefined;
   userHasPro: boolean | undefined;
+  pathname: string;
 }
 
-function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
+function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark, pathname }: MobileMenuProps) {
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isMenuOpen]);
+
+  const panelBg = isDark ? 'bg-[#0f1520]' : 'bg-white';
+  const borderColor = isDark ? 'border-white/10' : 'border-black/10';
+  const textColor = isDark ? 'text-white' : 'text-mx-text';
+  const textMuted = isDark ? 'text-white/50' : 'text-mx-text-muted';
+  const sectionLabel = isDark ? 'text-white/30' : 'text-mx-text-muted';
+  const linkHoverBg = isDark ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.03]';
+  const activeBg = isDark ? 'bg-white/5' : 'bg-black/5';
+  const activeBorder = isDark ? 'border-mx-blue' : 'border-mx-orange';
+
   return (
     <AnimatePresence>
       {isMenuOpen && (
-        <m.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className={`fixed inset-0 z-40 pt-24 px-6 ${isDark ? 'bg-[#0b1018]' : 'bg-mx-bg'}`}
-        >
-          <div className="flex flex-col gap-6">
-            {NAV_ITEMS.map((item, i) => (
-              <Link
-                key={item.name}
-                href={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`text-heading-lg font-light ${isDark ? 'text-white' : 'text-mx-text'}`}
-              >
-                <m.span
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  {item.name}
-                </m.span>
-              </Link>
-            ))}
-            {/* Mobile Auth Buttons */}
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="mt-8 flex flex-col gap-3"
-            >
-              <span className="text-mx-text-muted text-body-sm mb-2">Mi cuenta:</span>
+        <div className="fixed inset-0 z-[60] xl:hidden">
+          {/* Backdrop */}
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsMenuOpen(false)}
+          />
+
+          {/* Panel */}
+          <m.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className={`absolute top-0 right-0 w-64 h-full ${panelBg} border-l ${borderColor} shadow-2xl shadow-black/50 flex flex-col`}
+          >
+            {/* Header: close button */}
+            <div className={`flex items-center justify-between px-4 py-3.5 border-b ${borderColor}`}>
               <SignedOut>
-                <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
-                  <m.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.65 }}
-                    className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-body-md font-light rounded-full transition-colors"
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/sign-in"
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`px-3 py-1.5 text-label-md font-medium rounded-lg ${textMuted} ${linkHoverBg} transition-colors`}
                   >
-                    <span>Iniciar sesion</span>
-                    <User size={18} />
-                  </m.div>
-                </Link>
-                <Link href="/sign-up" onClick={() => setIsMenuOpen(false)}>
-                  <m.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 }}
-                    className="flex items-center justify-between gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-3 text-body-md font-medium rounded-full transition-colors"
+                    Iniciar sesión
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="px-3 py-1.5 text-label-md font-medium rounded-lg bg-mx-orange text-white hover:bg-mx-orange/90 transition-colors"
                   >
-                    <span>Registrarse</span>
-                    <ArrowUpRight size={18} />
-                  </m.div>
-                </Link>
+                    Registrarse
+                  </Link>
+                </div>
               </SignedOut>
               <SignedIn>
-                <Link
-                  href="/perfil"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-4 px-6 py-3 bg-mx-border/50 hover:bg-mx-orange/10 rounded-full transition-colors"
-                >
-                  <UserButton
-                    afterSignOutUrl="/"
-                    userProfileMode="navigation"
-                    userProfileUrl="/perfil"
-                    appearance={MOBILE_USER_BUTTON_APPEARANCE}
-                  />
-                  <span className="text-mx-text font-light">Mi perfil</span>
-                </Link>
+                <div />
               </SignedIn>
-            </m.div>
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="p-1.5 rounded-full hover:bg-black/5 transition-colors"
+              >
+                <X size={16} className={textMuted} />
+              </button>
+            </div>
 
-            {/* Campus Links */}
+            {/* Nav links */}
+            <nav className="flex flex-col pt-5 pb-3">
+              {NAV_ITEMS.map((item, i) => {
+                const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
+                return (
+                  <m.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                  >
+                    <Link
+                      href={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`block px-4 py-2.5 text-label-md font-medium transition-colors border-l-2 ${
+                        isActive
+                          ? `${textColor} ${activeBg} ${activeBorder}`
+                          : `${textMuted} ${linkHoverBg} border-transparent`
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  </m.div>
+                );
+              })}
+            </nav>
+
+            {/* Campus links */}
             <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mt-6 flex flex-col gap-3"
+              transition={{ delay: 0.4 }}
+              className={`px-4 py-3 border-t ${borderColor}`}
             >
-              <span className="text-mx-text-muted text-body-sm mb-2">Acceder al Campus:</span>
-              {CAMPUS_OPTIONS.map((option, index) => (
-                <m.a
-                  key={option.name}
-                  href={option.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
-                  className="flex items-center justify-between gap-2 bg-mx-border/50 hover:bg-mx-border text-mx-text px-6 py-3 text-body-md font-light rounded-full transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span>{option.name}</span>
-                  <ArrowUpRight size={18} />
-                </m.a>
-              ))}
+              <span className={`${sectionLabel} text-label-sm font-semibold uppercase tracking-widest`}>Campus</span>
+              <div className="mt-2 flex flex-col gap-1">
+                {CAMPUS_OPTIONS.map((option) => (
+                  <a
+                    key={option.name}
+                    href={option.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center justify-between px-3 py-2 text-label-md font-medium rounded-lg ${textMuted} ${linkHoverBg} transition-colors`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span>{option.name}</span>
+                    <ArrowUpRight size={11} className="opacity-50" />
+                  </a>
+                ))}
+              </div>
             </m.div>
-          </div>
-        </m.div>
+          </m.div>
+        </div>
       )}
     </AnimatePresence>
   );
@@ -368,6 +393,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark }: MobileMenuProps) {
 
 export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, variant = 'default', navItems }) => {
   const isDark = variant === 'maxymia';
+  const pathname = usePathname();
   const { isSignedIn } = useUser();
   const { hasPro } = useUserCampus();
 
@@ -382,7 +408,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className={`left-0 right-0 z-50 ${isDark ? 'top-8 bg-[#0b1018] border-b border-white/10' : 'fixed top-0 bg-mx-bg border-b border-mx-border'}`}
       >
-        <div className={`px-6 py-6 ${isDark ? 'md:px-32 max-w-[1800px] mx-auto' : 'md:px-12'}`}>
+        <div className={`px-4 py-3 sm:px-6 sm:py-6 ${isDark ? 'md:px-32 max-w-[1800px] mx-auto' : 'md:px-12'}`}>
           <div className="flex items-center justify-between">
             <m.a
               href={isDark ? "/maxymia" : "/"}
@@ -395,7 +421,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                   alt="Maxymia"
                   width={200}
                   height={80}
-                  className="h-10 md:h-12 w-auto"
+                  className="h-8 sm:h-10 md:h-12 w-auto"
                   priority
                 />
               ) : (
@@ -404,20 +430,20 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                   alt="Maxima Formacion"
                   width={200}
                   height={80}
-                  className="h-12 md:h-14 w-auto"
+                  className="h-9 sm:h-12 md:h-14 w-auto"
                   priority
                 />
               )}
             </m.a>
 
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden xl:flex items-center gap-8">
               {items.map((item) => {
-                const isActive = isDark && item.path === '/maxymia';
+                const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
                 return (
                   <Link
                     key={item.name}
                     href={item.path}
-                    className={`text-body-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white' : 'text-white/80') : 'text-mx-text'}`}
+                    className={`text-body-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white font-medium' : 'text-white/80') : (isActive ? 'text-mx-orange' : 'text-mx-text')}`}
                   >
                     {item.name}
                     <span className={`absolute -bottom-1 left-0 h-px bg-mx-orange transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />
@@ -426,17 +452,32 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
               })}
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <DesktopAuthButtons isDark={isDark} userHasPro={userHasPro} />
               <CampusDropdown isDark={isDark} />
 
-              <m.button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`lg:hidden p-2 ${isDark ? 'text-white' : 'text-mx-text'}`}
-                whileTap={{ scale: 0.9 }}
-              >
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </m.button>
+              {/* Mobile: user avatar + burger */}
+              <div className="flex xl:hidden items-center gap-2">
+                <SignedIn>
+                  <UserButton
+                    afterSignOutUrl="/"
+                    userProfileMode="navigation"
+                    userProfileUrl="/perfil"
+                    appearance={{
+                      elements: {
+                        avatarBox: { width: '28px', height: '28px', border: isDark ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,0,0,0.15)' },
+                      },
+                    }}
+                  />
+                </SignedIn>
+                <m.button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className={`p-2 ${isDark ? 'text-white' : 'text-mx-text'}`}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                </m.button>
+              </div>
             </div>
           </div>
         </div>
@@ -448,6 +489,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
         isDark={isDark}
         isSignedIn={isSignedIn}
         userHasPro={userHasPro}
+        pathname={pathname}
       />
     </>
   );

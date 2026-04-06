@@ -68,7 +68,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-display-sm md:text-display-md lg:text-display-lg font-black mb-6 text-[#016157]"
+          className="text-display-sm md:text-display-md lg:text-display-md font-black mb-6 text-[#016157] uppercase text-balance"
         >
           {heroTitle}
         </m.h1>

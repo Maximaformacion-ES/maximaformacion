@@ -143,14 +143,7 @@ export default function MaxymiaCourseDetail({ course }: Props) {
             totalExams={totalExams}
           />
         }
-        tabs={
-          <CourseTabs course={course} locale={locale} totalLessons={totalLessons} />
-        }
-      />
-
-      {/* Mobile Sidebar */}
-      <section className="pb-16 px-6 md:px-[128px] lg:hidden">
-        <div className="max-w-[1400px] mx-auto">
+        mobileSidebar={
           <CourseSidebar
             course={course}
             locale={locale}
@@ -158,8 +151,11 @@ export default function MaxymiaCourseDetail({ course }: Props) {
             totalMinutes={totalMinutes}
             totalExams={totalExams}
           />
-        </div>
-      </section>
+        }
+        tabs={
+          <CourseTabs course={course} locale={locale} totalLessons={totalLessons} />
+        }
+      />
 
       {/* CTA Section */}
       <CourseCTASection locale={locale} />
@@ -175,10 +171,11 @@ interface HeroProps {
   totalLessons: number;
   totalMinutes: number;
   sidebar?: React.ReactNode;
+  mobileSidebar?: React.ReactNode;
   tabs?: React.ReactNode;
 }
 
-function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar, tabs }: HeroProps) {
+function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar, mobileSidebar, tabs }: HeroProps) {
   return (
     <section className="relative pt-12 pb-12 md:pt-16 md:pb-16 overflow-visible">
       {/* Background image with dark overlays */}
@@ -224,7 +221,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-heading-lg md:text-display-sm lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-white"
+              className="text-heading-md md:text-heading-lg lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-white"
             >
               {course.title[locale]}
             </m.h1>
@@ -302,6 +299,18 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                     {locale === 'es' ? 'estudiantes' : 'students'})
                   </span>
                 )}
+              </m.div>
+            )}
+
+            {/* Mobile Sidebar — before tabs so purchase is visible early */}
+            {mobileSidebar && (
+              <m.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.5 }}
+                className="lg:hidden mb-8"
+              >
+                {mobileSidebar}
               </m.div>
             )}
 
@@ -391,7 +400,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
   ];
 
   return (
-    <div className="sticky top-24">
+    <div className="lg:sticky lg:top-24">
       <div className="border border-white/15 bg-[#171c24] overflow-hidden rounded-lg">
         {/* Course Thumbnail */}
         <CourseThumbnail course={course} locale={locale} />
@@ -991,7 +1000,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
 
 function CourseCTASection({ locale }: { locale: Locale }) {
   return (
-    <section className="py-24 md:py-32 px-6 md:px-[128px]">
+    <section className="py-16 md:py-32 px-6 md:px-[128px]">
       <div className="max-w-[1200px] mx-auto text-center">
         <m.div
           initial={{ opacity: 0, y: 40 }}
@@ -999,13 +1008,13 @@ function CourseCTASection({ locale }: { locale: Locale }) {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-[#527be7] text-display-sm md:text-display-md lg:text-display-md font-black tracking-tight mb-8">
+          <h2 className="text-[#527be7] text-heading-lg md:text-display-sm lg:text-display-md font-black tracking-tight mb-6 md:mb-8">
             {locale === 'es' ? '¿LISTO PARA ' : 'READY TO '}
             <span className="text-stroke" style={{ WebkitTextFillColor: '#0b1018' }}>
               {locale === 'es' ? 'COMENZAR?' : 'START?'}
             </span>
           </h2>
-          <p className="text-heading-sm text-white/40 font-light mb-12 max-w-2xl mx-auto">
+          <p className="text-body-md md:text-heading-sm text-white/40 font-light mb-8 md:mb-12 max-w-2xl mx-auto">
             {locale === 'es'
               ? 'Únete a cientos de profesionales que ya están transformando su carrera con este curso.'
               : 'Join hundreds of professionals already transforming their careers with this course.'}

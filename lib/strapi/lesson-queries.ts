@@ -126,29 +126,14 @@ export async function getProgramWithLessons(
   draft = false
 ): Promise<ProgramWithLessons | null> {
   try {
-    // Deep populate to get modules with lessons
-    const populate = {
-      image: true,
-      modules: {
-        populate: {
-          units: true,
-        },
-      },
-      topics: {
-        fields: ['name', 'documentId'],
-      },
-      moduleRelations: {
-        populate: {
-          lessons: {
-            populate: {
-              resources: true,
-            },
-          },
-        },
-      },
-    };
-
-    const queryString = `populate=${encodeURIComponent(JSON.stringify(populate))}`;
+    // Deep populate using bracket notation (Strapi 5 format)
+    const queryString = [
+      'populate[image]=true',
+      'populate[modules][populate][units]=true',
+      'populate[topics][fields][0]=name',
+      'populate[topics][fields][1]=documentId',
+      'populate[moduleRelations][populate][lessons][populate][resources]=true',
+    ].join('&');
 
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
       `/api/programs/${id}?${queryString}`,

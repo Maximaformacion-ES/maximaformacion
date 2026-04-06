@@ -14,7 +14,7 @@ export const ConsultoriaCTASection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-mx-bg text-display-sm md:text-display-md lg:text-display-md font-black mb-8 text-balance">
+          <h2 className="text-mx-bg text-display-sm md:text-display-md lg:text-display-md font-black mb-8 text-balance uppercase">
               Toma decisiones concluyentes basadas en datos
             </h2>
           <p className="text-mx-bg text-heading-sm md:text-heading-md font-light mb-12 max-w-3xl mx-auto leading-relaxed">

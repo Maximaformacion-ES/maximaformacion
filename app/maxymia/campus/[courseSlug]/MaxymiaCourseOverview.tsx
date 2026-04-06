@@ -292,12 +292,8 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                         <Image src="/iconBlue.svg" alt="" width={32} height={33} className="absolute left-0" />
                         <Image src="/iconOrange.svg" alt="" width={32} height={33} className="absolute right-0" />
                         <div className="text-center px-10">
-                          <Trophy size={24} className="text-amber-400 mx-auto mb-2" />
-                          <p className="text-amber-400 text-label-md font-black tracking-[0.2em] uppercase">
-                            {locale === 'es' ? 'Completado' : 'Completed'}
-                          </p>
-                          <p className="text-white/30 text-label-sm mt-1">
-                            {totalLessons}/{totalLessons}
+                          <p className="text-mx-orange text-body-lg font-black tracking-[0.2em] uppercase">
+                            {locale === 'es' ? 'COMPLETADO' : 'COMPLETED'}
                           </p>
                         </div>
                       </div>

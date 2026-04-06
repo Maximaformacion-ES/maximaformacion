@@ -84,8 +84,7 @@ export const InnovacionSAPOSection: React.FC = () => {
             className="lg:w-1/2"
           >
             <span
-              className="text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block"
-              style={{ color: SAPO_TEAL }}
+              className="text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block text-mx-orange"
             >
               Te presentamos nuestra APP
             </span>

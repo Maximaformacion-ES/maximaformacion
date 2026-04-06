@@ -43,7 +43,7 @@ export const InnovacionProjectsSection: React.FC = () => {
           <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
             Nuestros proyectos
           </span>
-          <h2 className="text-[#016157] text-heading-lg md:text-display-sm font-black mb-4">
+          <h2 className="text-[#016157] text-heading-lg md:text-display-sm font-black mb-4 uppercase leading-heading">
             Soluciones aplicadas
           </h2>
           <p className="text-mx-text-muted text-body-md font-light">

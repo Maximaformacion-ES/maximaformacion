@@ -130,6 +130,21 @@ const translations: Record<Locale, Record<string, string>> = {
     'sort.students': 'Más estudiantes',
     'pagination.of': 'de',
 
+    // My Courses
+    'myCourses.emptyTitle': 'Aún no tienes cursos',
+    'myCourses.emptyDesc': 'Explora nuestro catálogo y encuentra el curso perfecto para ti.',
+    'myCourses.exploreCatalog': 'Explorar catálogo',
+    'myCourses.heroContext': 'Tienes {n} curso(s) en progreso. ¡Sigue así!',
+    'myCourses.heroContextNone': 'Todos tus cursos en un solo lugar.',
+    'myCourses.totalCourses': 'Total cursos',
+    'myCourses.inProgress': 'En progreso',
+    'myCourses.completedStat': 'Completados',
+    'myCourses.globalProgress': 'Progreso global',
+    'myCourses.inProgressSection': 'Seguir Cursando',
+    'myCourses.notStartedSection': 'Sin Empezar',
+    'myCourses.completedSection': 'Completados',
+    'myCourses.recommendedSection': 'También te puede interesar',
+
     // Language
     'lang.switch': 'Cambiar idioma',
   },
@@ -261,6 +276,21 @@ const translations: Record<Locale, Record<string, string>> = {
     'sort.newest': 'Newest',
     'sort.students': 'Most students',
     'pagination.of': 'of',
+
+    // My Courses
+    'myCourses.emptyTitle': 'You don\'t have any courses yet',
+    'myCourses.emptyDesc': 'Explore our catalog and find the perfect course for you.',
+    'myCourses.exploreCatalog': 'Explore catalog',
+    'myCourses.heroContext': 'You have {n} course(s) in progress. Keep it up!',
+    'myCourses.heroContextNone': 'All your courses in one place.',
+    'myCourses.totalCourses': 'Total courses',
+    'myCourses.inProgress': 'In progress',
+    'myCourses.completedStat': 'Completed',
+    'myCourses.globalProgress': 'Overall progress',
+    'myCourses.inProgressSection': 'Continue Learning',
+    'myCourses.notStartedSection': 'Not Started',
+    'myCourses.completedSection': 'Completed',
+    'myCourses.recommendedSection': 'You might also like',
 
     // Language
     'lang.switch': 'Switch language',

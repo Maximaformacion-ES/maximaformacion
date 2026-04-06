@@ -526,9 +526,9 @@ const MiPlanSection = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {/* Current Plan */}
-      <div className={`flex-1 p-6 rounded-xl border ${
+      <div className={`p-4 sm:p-6 rounded-xl border ${
         isPro ? 'bg-mx-orange/5 border-mx-orange/30' : 'bg-mx-bg border-mx-border'
       }`}>
         <div className="flex items-center justify-between mb-4">
@@ -579,10 +579,10 @@ const MiPlanSection = () => {
         )}
       </div>
 
-      {/* Right column: billing (Pro) or benefits (Free) */}
-      <div className="flex-1">
+      {/* Billing (Pro) or Benefits (Free) */}
+      <div>
         {isPro ? (
-          <div className="p-6 bg-mx-bg border border-mx-border rounded-xl h-full">
+          <div className="p-4 sm:p-6 bg-mx-bg border border-mx-border rounded-xl">
             <h3 className="text-body-lg font-bold text-mx-text mb-4">Información de suscripción</h3>
             <div className="space-y-3 text-body-sm">
               <div className="flex justify-between">
@@ -632,12 +632,12 @@ const MiPlanSection = () => {
             )}
           </div>
         ) : (
-          <div className="p-6 bg-mx-orange/5 border border-mx-orange/15 rounded-xl h-full">
+          <div className="p-4 sm:p-6 bg-mx-orange/5 border border-mx-orange/15 rounded-xl">
             <h3 className="text-body-lg font-bold text-mx-text mb-4 flex items-center gap-2">
               <Crown className="text-mx-orange" size={18} />
               Beneficios de Pro
             </h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               {[
                 'Cursos exclusivos',
                 'Certificados',
@@ -780,32 +780,32 @@ export default function PerfilPage() {
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
-      <main className="relative z-10 pt-32 pb-32">
+      <main className="relative z-10 pt-20 sm:pt-28 md:pt-32 pb-16 sm:pb-24 md:pb-32">
         {/* Profile Layout */}
-        <section className="px-6 md:px-12">
+        <section className="px-3 sm:px-6 md:px-12">
           <div className="max-w-5xl mx-auto">
             <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white border border-mx-border rounded-2xl overflow-hidden"
+              className="bg-white border border-mx-border rounded-xl sm:rounded-2xl overflow-hidden"
             >
-              <div className="flex flex-col md:flex-row min-h-[500px]">
+              <div className="flex flex-col md:flex-row md:min-h-[500px]">
                 {/* ─── Sidebar Nav ─── */}
                 <nav className="md:w-56 lg:w-64 shrink-0 border-b md:border-b-0 md:border-r border-mx-border bg-mx-bg/50">
                   {/* Mobile: horizontal scroll */}
-                  <div className="flex md:hidden overflow-x-auto no-scrollbar p-2 gap-1">
+                  <div className="flex md:hidden overflow-x-auto no-scrollbar p-1.5 gap-0.5">
                     {navItems.map((item) => (
                       <button
                         key={item.key}
                         onClick={() => setActiveSection(item.key)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-body-sm font-medium whitespace-nowrap transition-colors ${
+                        className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-label-md font-medium whitespace-nowrap transition-colors ${
                           activeSection === item.key
                             ? 'bg-mx-orange/10 text-mx-orange'
                             : 'text-mx-text-muted hover:text-mx-text hover:bg-mx-border/30'
                         }`}
                       >
-                        {item.icon}
+                        <span className="[&>svg]:w-3.5 [&>svg]:h-3.5">{item.icon}</span>
                         {item.label}
                       </button>
                     ))}
@@ -844,8 +844,8 @@ export default function PerfilPage() {
                 </nav>
 
                 {/* ─── Content Area ─── */}
-                <div className="flex-1 p-6 md:p-8 overflow-y-auto">
-                  <h2 className="text-heading-sm font-bold text-mx-text mb-6">
+                <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-x-hidden overflow-y-auto">
+                  <h2 className="text-body-lg sm:text-heading-sm font-bold text-mx-text mb-4 sm:mb-6">
                     {sectionTitles[activeSection]}
                   </h2>
 

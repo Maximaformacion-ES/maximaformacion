@@ -4,21 +4,21 @@ import React from 'react';
 
 export const StorySection: React.FC = () => {
   return (
-    <section className="py-48 px-6 md:px-12 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+    <section className="py-20 sm:py-32 md:py-48 px-4 sm:px-6 md:px-12 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 md:gap-20">
       <div>
-        <span className="text-mx-orange text-label-lg leading-label tracking-[0.3em] uppercase mb-4 block">NUESTRA HISTORIA</span>
-        <h2 className="text-mx-blue text-display-sm md:text-display-sm font-bold mb-8 leading-heading">
+        <span className="text-mx-orange text-label-md sm:text-label-lg leading-label tracking-[0.2em] sm:tracking-[0.3em] uppercase mb-4 block">NUESTRA HISTORIA</span>
+        <h2 className="text-mx-blue text-heading-lg sm:text-display-sm font-bold mb-6 sm:mb-8 leading-heading">
           "No se trata de llegar alto, se trata de llegar lejos."
         </h2>
       </div>
-      <div className="space-y-6 text-body-lg text-mx-text-muted font-light leading-body">
+      <div className="space-y-4 sm:space-y-6 text-body-md sm:text-body-lg text-mx-text-muted font-light leading-body">
         <p>
           Máxima Formación nace con un propósito claro: democratizar la formación superior online de alta calidad, especializada y con un enfoque humano y cercano.
         </p>
         <p>
           Nuestro nombre no es casual. Buscamos la <strong className="text-mx-text">máxima</strong> excelencia en nuestros programas, la <strong className="text-mx-text">máxima</strong> atención a nuestros alumnos y el <strong className="text-mx-text">máximo</strong> impacto en sus carreras profesionales.
         </p>
-        <div className="pt-8 grid grid-cols-2 gap-8 border-t border-mx-border">
+        <div className="pt-6 sm:pt-8 grid grid-cols-2 gap-4 sm:gap-8 border-t border-mx-border">
           <div>
             <span className="text-mx-orange text-heading-lg font-bold block">15+</span>
             <span className="text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Años de experiencia</span>

@@ -8,6 +8,7 @@ import { ArrowUpRight } from 'lucide-react';
 const footerLinks = {
   Campus: [
     { label: 'Catálogo de cursos', href: '/maxymia/campus/cursos' },
+    { label: 'Mis cursos', href: '/maxymia/campus/mis-cursos' },
     { label: 'Mi campus', href: '/maxymia/campus' },
   ],
   'Máxima Formación': [
