@@ -75,7 +75,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Type badge - top left */}
           <div className="relative z-20 flex items-center gap-2 justify-between">
             <span
-              className={`px-4 py-2 backdrop-blur-sm text-label-md font-medium rounded-full ${
+              className={`px-4 py-2 backdrop-blur-sm text-label-sm md:text-label-md font-medium rounded-full ${
                 isMaster
                   ? "bg-mx-blue text-white"
                   : "bg-mx-orange border border-mx-orange text-white"
@@ -96,8 +96,8 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               {program.topics.slice(0, 2).map((topic) => (
                 <span
                   key={topic.name}
-                  className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.5)] text-white text-label-md font-medium rounded-full"
-                >
+                  className="px-4 py-2 backdrop-blur-[1px] bg-[rgba(102,101,99,0.3)] border border-[rgba(102,101,99,0.5)] text-white text-label-sm md:text-label-md font-medium rounded-full"
+>
                   {topic.name}
                 </span>
               ))}

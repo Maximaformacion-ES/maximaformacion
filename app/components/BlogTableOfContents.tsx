@@ -114,7 +114,7 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
     >
       <div className="flex items-center gap-2 mb-4">
         <List className="w-4 h-4 text-mx-orange" />
-        <span className="text-mx-orange text-label-md tracking-[0.3em] uppercase font-medium">
+        <span className="text-mx-orange text-label-sm md:text-label-md tracking-[0.3em] uppercase font-medium">
           Índice
         </span>
       </div>

@@ -9,6 +9,7 @@ import { ProgramHeroSection } from '../../components/ProgramHeroSection';
 import { ProgramTabs } from '../../components/ProgramTabs';
 import { ProgramSidebar } from '../../components/ProgramSidebar';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
+import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import ProGateWrapper from './ProGateWrapper';
 import type { Program } from '@/lib/strapi/types';
 
@@ -28,18 +29,18 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
 
         <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
           <div className="text-center max-w-2xl">
-            <h1 className="text-display-md md:text-display-lg font-black  mb-6">
+            <h1 className="text-display-sm md:text-display-md font-black mb-6">
               404
             </h1>
-            <h2 className="text-heading-lg md:text-display-sm font-bold mb-4">
+            <h2 className="text-heading-sm md:text-heading-md xl:text-heading-lg font-bold mb-4">
               Programa no encontrado
             </h2>
-            <p className="text-mx-text-muted mb-8 font-light">
+            <p className="text-body-sm md:text-body-md text-mx-text-muted mb-8 font-light">
               El programa que buscas no existe o ha sido eliminado.
             </p>
             <Link
               href="/programas"
-              className="inline-flex items-center gap-3 bg-mx-orange text-white px-8 py-4 text-body-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
+              className="inline-flex items-center gap-3 bg-mx-orange text-white px-8 py-4 text-label-sm md:text-label-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
             >
               Ver todos los programas
             </Link>
@@ -76,6 +77,11 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
       </main>
 
       <Footer />
+
+      {/* Sticky mobile purchase bar */}
+      <ProgramMobileCTA program={program} />
+      {/* Bottom spacing so footer isn't hidden behind the sticky bar */}
+      <div className="h-20 lg:hidden" />
     </div>
   );
 }

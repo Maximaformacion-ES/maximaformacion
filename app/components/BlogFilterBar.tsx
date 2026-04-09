@@ -55,7 +55,7 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
       </div>
 
       {/* Results Count */}
-      <div className="mt-3 text-label-md text-mx-text-muted font-medium tracking-wider uppercase">
+      <div className="mt-3 text-label-sm md:text-label-md text-mx-text-muted font-medium tracking-wider uppercase">
         Mostrando {resultsCount} resultados
       </div>
     </div>

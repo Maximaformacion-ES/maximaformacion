@@ -121,7 +121,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
         <div>
           <div className="flex items-baseline gap-3">
             {program.originalPrice && (
-              <span className="text-mx-text-muted text-body-lg line-through">
+              <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
                 {program.originalPrice}€
               </span>
             )}
@@ -130,17 +130,17 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             </span>
           </div>
           {program.originalPrice && (
-            <div className="mt-1 text-mx-orange text-label-md font-bold">
+            <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold">
               Ahorra {program.originalPrice - program.price}€
             </div>
           )}
-          <p className="text-mx-text-muted text-label-md mt-1">Pago único • Acceso permanente</p>
+          <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
         </div>
 
         {/* Guarantee badge */}
         <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
           <ShieldCheck size={18} className="text-mx-orange shrink-0" />
-          <span className="text-label-md text-mx-text-muted font-light">
+          <span className="text-label-sm md:text-label-md text-mx-text-muted font-light">
             <span className="font-semibold text-mx-orange">14 días de garantía</span> — Devolución del 100%
           </span>
         </div>
@@ -155,7 +155,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           {isLoaded && !campusLoading && hasAccess ? (
             <Link
               href={`/cursos/${program.documentId || program.id}`}
-              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
+              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
               Acceder al Curso
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -164,7 +164,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             <m.button
               onClick={handlePurchaseCourse}
               disabled={isLoading}
-              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               whileHover={{ scale: isLoading ? 1 : 1.02 }}
               whileTap={{ scale: isLoading ? 1 : 0.98 }}
             >
@@ -198,7 +198,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
         {/* Contact */}
         <div className="space-y-3">
-          <div className="text-label-md text-mx-text-muted uppercase tracking-widest font-bold">
+          <div className="text-label-sm md:text-label-md text-mx-text-muted uppercase tracking-widest font-bold">
             Contacto
           </div>
           <a

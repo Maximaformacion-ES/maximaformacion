@@ -58,18 +58,18 @@ export const ServicesGridSection: React.FC = () => {
           viewport={{ once: true }}
           className="mb-12 md:mb-16"
         >
-          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
             Así podemos ayudarte
           </span>
-          <h2 className="text-mx-blue text-heading-lg md:text-display-sm font-black text-balance md:w-2/3">
+          <h2 className="text-mx-blue text-heading-sm md:text-heading-md xl:text-heading-lg font-black text-balance md:w-2/3">
             Resolvemos los desafíos estadísticos de tu empresa
           </h2>
         </m.div>
 
         {/* Interactive list + detail panel */}
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12">
           {/* Left: clickable list */}
-          <div className="lg:w-2/5 space-y-1">
+          <div className="lg:w-2/5 grid grid-cols-2 lg:grid-cols-1 gap-1">
             {services.map((service, idx) => {
               const isActive = idx === activeIndex;
               return (
@@ -80,7 +80,7 @@ export const ServicesGridSection: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.06 }}
                   onClick={() => setActiveIndex(idx)}
-                  className={`group relative w-full flex items-center gap-4 px-6 py-5 rounded-xl text-left transition-all duration-300 cursor-pointer ${
+                  className={`group relative w-full flex items-center gap-2 lg:gap-4 px-3 py-3 lg:px-6 lg:py-5 rounded-xl text-left transition-all duration-300 cursor-pointer ${
                     isActive
                       ? 'bg-mx-card border border-mx-orange/30 shadow-lg'
                       : 'border border-transparent hover:bg-mx-card/60 hover:border-mx-border'
@@ -91,22 +91,22 @@ export const ServicesGridSection: React.FC = () => {
                     isActive ? 'bg-mx-orange' : 'bg-transparent group-hover:bg-mx-border'
                   }`} />
 
-                  {/* Number */}
-                  <span className={`text-body-sm font-bold tabular-nums transition-colors duration-300 ${
+                  {/* Number - hidden on mobile */}
+                  <span className={`hidden lg:inline text-body-sm font-bold tabular-nums transition-colors duration-300 ${
                     isActive ? 'text-mx-orange' : 'text-mx-text-muted'
                   }`}>
                     {String(idx + 1).padStart(2, '0')}
                   </span>
 
                   {/* Icon */}
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${
+                  <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${
                     isActive ? 'bg-mx-orange text-white' : 'bg-mx-orange/10 text-mx-orange'
                   }`}>
-                    <service.icon size={20} />
+                    <service.icon size={18} />
                   </div>
 
                   {/* Title */}
-                  <span className={`text-body-lg font-semibold transition-colors duration-300 ${
+                  <span className={`text-body-sm md:text-body-md font-semibold transition-colors duration-300 ${
                     isActive ? 'text-mx-blue' : 'text-mx-text group-hover:text-mx-blue'
                   }`}>
                     {service.title}
@@ -133,10 +133,10 @@ export const ServicesGridSection: React.FC = () => {
                 </span>
 
                 <div className="relative z-10">
-                  <h3 className="text-heading-md md:text-display-sm lg:text-display-md font-black text-mx-blue mb-4 md:mb-6">
+                  <h3 className="text-heading-sm md:text-heading-md xl:text-heading-lg font-black text-mx-blue mb-4 md:mb-6">
                     <StyledTitle text={'{' + activeService.title.toUpperCase() + '}'} color="blue" />
                   </h3>
-                  <p className="text-mx-text-muted text-body-md md:text-heading-sm lg:text-heading-md font-light leading-relaxed max-w-xl">
+                  <p className="text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light leading-relaxed max-w-xl">
                     {activeService.description}
                   </p>
                 </div>

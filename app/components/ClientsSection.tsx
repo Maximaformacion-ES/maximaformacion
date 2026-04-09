@@ -28,10 +28,10 @@ export const ClientsSection: React.FC = () => {
               className="h-full relative overflow-hidden p-10 md:p-14 rounded-2xl text-white flex flex-col justify-center"
               style={{ backgroundColor: 'var(--color-mx-blue)' }}
             >
-              <span className="text-white/40 text-body-sm font-medium tracking-[0.5em] uppercase mb-10 block">
+              <span className="text-white/40 text-label-sm md:text-label-md font-medium tracking-[0.5em] uppercase mb-10 block">
                 Confían en nosotros
               </span>
-              <p className="text-white/90 text-heading-sm md:text-heading-md font-light leading-relaxed italic mb-8">
+              <p className="text-white/90 text-body-sm md:text-body-md xl:text-body-lg font-light leading-relaxed italic mb-8">
                 &ldquo;Gracias al equipo de Máxima Consultoría, optimizamos nuestros procesos de análisis de datos reduciendo significativamente los tiempos de decisión.&rdquo;
               </p>
               <div className="w-8 h-0.5 bg-white/20 mb-4" />
@@ -49,10 +49,10 @@ export const ClientsSection: React.FC = () => {
               viewport={{ once: true }}
               className="mb-10"
             >
-              <h2 className="text-mx-blue text-heading-lg md:text-display-sm font-black mb-4 text-balance">
+              <h2 className="text-mx-blue text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-4 text-balance">
                 Empresas e instituciones líderes
               </h2>
-              <p className="text-mx-text-muted font-light leading-relaxed">
+              <p className="text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed">
                 Más de 10 años de experiencia liderando proyectos en empresas, entidades públicas y centros de investigación
               </p>
             </m.div>
@@ -67,7 +67,7 @@ export const ClientsSection: React.FC = () => {
                   transition={{ delay: idx * 0.06 }}
                   className="group flex items-center justify-center p-6 border border-mx-border bg-mx-card rounded-xl hover:border-mx-orange/30 hover:-translate-y-0.5 transition-all duration-400"
                 >
-                  <span className="text-mx-text-muted group-hover:text-mx-blue text-body-lg font-bold tracking-wide transition-colors duration-300">
+                  <span className="text-mx-text-muted group-hover:text-mx-blue text-body-sm md:text-body-md font-bold tracking-wide transition-colors duration-300">
                     {client.name}
                   </span>
                 </m.div>

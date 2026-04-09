@@ -29,7 +29,7 @@ export const BlogGrid: React.FC<BlogGridProps> = ({ posts }) => {
               className="flex flex-col items-center justify-center py-20 text-mx-text-muted"
             >
               <Search size={48} className="mb-4 opacity-20" />
-              <p className="text-body-lg">No se encontraron artículos con esos criterios.</p>
+              <p className="text-body-sm md:text-body-md">No se encontraron artículos con esos criterios.</p>
             </m.div>
           )}
         </AnimatePresence>

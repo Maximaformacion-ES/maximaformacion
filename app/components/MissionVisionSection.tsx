@@ -6,21 +6,21 @@ import { Target, Eye, ShieldCheck } from 'lucide-react';
 
 export const MissionVisionSection: React.FC = () => {
   return (
-    <section className="pb-24 sm:pb-36 md:pb-52 bg-mx-bg px-4 sm:px-6 md:px-12">
+    <section className="pb-24 md:pb-36 xl:pb-52 bg-mx-bg px-4 md:px-6 xl:px-12">
       <div className="max-w-4xl mx-auto">
         {/* Section header */}
         <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12 sm:mb-20"
+          className="text-center mb-12 md:mb-20"
         >
-          <span className="text-mx-orange text-body-sm font-medium tracking-[0.3em] sm:tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.3em] md:tracking-[0.5em] uppercase mb-4 block">
             Lo que nos define
           </span>
         </m.div>
 
-        <div className="space-y-10 sm:space-y-16">
+        <div className="space-y-10 md:space-y-16">
           {/* Misión */}
           <m.div
             initial={{ opacity: 0, y: 20 }}
@@ -30,9 +30,9 @@ export const MissionVisionSection: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-5">
               <Target className="text-mx-orange" size={22} />
-              <h3 className="text-heading-md font-black text-mx-text uppercase tracking-wide">Misión</h3>
+              <h3 className="text-heading-sm md:text-heading-md font-black text-mx-text uppercase tracking-wide">Misión</h3>
             </div>
-            <p className="text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
+            <p className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
               Ofrecer formación online rigurosa y práctica que{' '}
               <span className="text-mx-text font-medium">transforme la vida profesional</span>{' '}
               de nuestros alumnos, proporcionándoles herramientas y conocimientos que generen un impacto real en sus carreras.
@@ -50,9 +50,9 @@ export const MissionVisionSection: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-5">
               <Eye className="text-mx-orange" size={22} />
-              <h3 className="text-heading-md font-black text-mx-text uppercase tracking-wide">Visión</h3>
+              <h3 className="text-heading-sm md:text-heading-md font-black text-mx-text uppercase tracking-wide">Visión</h3>
             </div>
-            <p className="text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
+            <p className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
               Ser el{' '}
               <span className="text-mx-text font-medium">referente en formación especializada de habla hispana</span>,
               liderando la innovación pedagógica y estableciendo nuevos estándares de calidad educativa online.
@@ -70,7 +70,7 @@ export const MissionVisionSection: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-6">
               <ShieldCheck className="text-mx-orange" size={22} />
-              <h3 className="text-heading-md font-black text-mx-text uppercase tracking-wide">Valores</h3>
+              <h3 className="text-heading-sm md:text-heading-md font-black text-mx-text uppercase tracking-wide">Valores</h3>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
               {['Cercanía', 'Rigor académico', 'Innovación constante', 'Compromiso con el alumno'].map(

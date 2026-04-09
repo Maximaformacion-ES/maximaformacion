@@ -37,17 +37,17 @@ export const InnovacionAboutSection: React.FC = () => {
           viewport={{ once: true }}
           className="max-w-2xl mb-16"
         >
-          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
             Sobre Biomáxima
           </span>
-          <h2 className="text-[#016157] text-heading-lg md:text-display-md font-black mb-6 leading-heading">
+          <h2 className="text-[#016157] text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6 leading-heading">
             <StyledTitle text="BIOMÁXIMA {INNOVACION®}" />
           </h2>
-          <p className="text-mx-text-muted text-body-lg md:text-heading-sm font-light leading-relaxed">
+          <p className="text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light leading-relaxed">
             Empresa altamente especializada en el desarrollo de soluciones tecnológicas avanzadas,
             enfocándose principalmente en los campos de la ciencia, la salud y la medicina.
           </p>
-          <p className="text-mx-text-muted font-light leading-relaxed text-body-lg mt-4">
+          <p className="text-mx-text-muted font-light leading-relaxed text-body-sm md:text-body-md mt-4">
             Nuestro compromiso es innovar y crear herramientas que no solo optimicen procesos,
             sino que también mejoren la calidad de vida de las personas. A través de un equipo
             multidisciplinario de expertos en tecnología, biomedicina y análisis de datos,
@@ -100,7 +100,7 @@ export const InnovacionAboutSection: React.FC = () => {
                     <h3 className="text-heading-sm md:text-heading-md font-bold text-mx-text mb-4">
                       {item.title}
                     </h3>
-                    <p className="text-mx-text-muted font-light leading-relaxed">
+                    <p className="text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed">
                       {item.description}
                     </p>
                   </div>
@@ -122,7 +122,7 @@ export const InnovacionAboutSection: React.FC = () => {
             <span className="block text-[6rem] leading-none text-mx-orange/20 font-serif select-none -mb-6">
               &ldquo;
             </span>
-            <p className="text-heading-sm md:text-heading-md text-mx-text italic leading-relaxed text-balance">
+            <p className="text-body-sm md:text-body-md xl:text-body-lg text-mx-text italic leading-relaxed text-balance">
               Biomáxima se proyecta como un{' '}
               <span className="text-[#016157] not-italic font-semibold">
                 referente nacional e internacional en asesoría y soluciones biotecnológicas y biosanitarias
@@ -133,7 +133,7 @@ export const InnovacionAboutSection: React.FC = () => {
               </span>{' '}
               para mejorar la eficiencia, precisión y aplicabilidad de la investigación en salud y biotecnología.
             </p>
-            <footer className="mt-6 text-label-lg text-mx-text-muted font-medium tracking-wide uppercase">
+            <footer className="mt-6 text-label-sm md:text-label-md text-mx-text-muted font-medium tracking-wide uppercase">
               — Visión de Biomáxima Innovación
             </footer>
           </blockquote>

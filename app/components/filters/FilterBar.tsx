@@ -26,6 +26,13 @@ export function FilterBar({
 
   return (
     <div>
+      {/* Search on top for mobile */}
+      {searchSlot && (
+        <div className="md:hidden pb-4">
+          {searchSlot}
+        </div>
+      )}
+
       {/* Top row: Filtros + Sort + Pagination + Search */}
       <div className="flex items-center justify-between gap-4 pb-4">
         {/* Left: filter toggle + sort */}
@@ -43,8 +50,8 @@ export function FilterBar({
           {sortSlot}
         </div>
 
-        {/* Right: pagination + search */}
-        <div className="flex items-center gap-3 w-1/3">
+        {/* Right: pagination + search (hidden on mobile, search shown above) */}
+        <div className="hidden md:flex items-center gap-3 w-1/3">
           {paginationSlot}
           {searchSlot}
         </div>

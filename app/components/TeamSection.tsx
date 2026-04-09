@@ -82,7 +82,7 @@ function LinkedInBadge() {
 }
 
 function MemberAvatar({ member, size = 'md' }: { member: TeamMember; size?: 'lg' | 'md' }) {
-  const sizeClasses = size === 'lg' ? 'w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40' : 'w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28';
+  const sizeClasses = size === 'lg' ? 'w-24 h-24 md:w-32 md:h-32 xl:w-40 xl:h-40' : 'w-20 h-20 md:w-24 md:h-24 xl:w-28 xl:h-28';
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -125,14 +125,14 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
     .filter((dept) => dept.members.length > 0);
 
   return (
-    <section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 md:px-12 bg-mx-blue">
+    <section className="py-16 md:py-24 xl:py-32 px-4 md:px-6 xl:px-12 bg-mx-blue">
       <div className="max-w-[1200px] mx-auto">
         {/* Title */}
         <m.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-white text-heading-lg sm:text-display-sm md:text-display-md font-black text-center mb-12 sm:mb-20 uppercase"
+          className="text-white text-heading-sm md:text-heading-md xl:text-heading-lg font-black text-center mb-12 md:mb-20 uppercase"
         >
           Nuestro Equipo
         </m.h2>
@@ -143,13 +143,13 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-col md:flex-row items-center justify-center gap-5 sm:gap-8 mb-12 sm:mb-20"
+            className="flex flex-col md:flex-row items-center justify-center gap-5 md:gap-8 mb-12 md:mb-20"
           >
             <MemberAvatar member={ceo} size="lg" />
             <div className="text-center md:text-left">
-              <h3 className="text-white text-heading-md md:text-heading-lg font-bold">{ceo.name}</h3>
+              <h3 className="text-white text-heading-sm md:text-heading-md xl:text-heading-lg font-bold">{ceo.name}</h3>
               <p className="text-white/60 text-body-sm font-light mb-3">CEO de Máxima Formación</p>
-              <p className="text-white/80 text-body-lg italic">
+              <p className="text-white/80 text-body-sm md:text-body-md italic">
                 &laquo;Más que un equipo, una gran familia.&raquo;
               </p>
             </div>
@@ -157,7 +157,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
         )}
 
         {/* Departments */}
-        <div className="space-y-10 sm:space-y-16">
+        <div className="space-y-10 md:space-y-16">
           {departments.map((dept) => (
             <m.div
               key={dept.label}
@@ -165,14 +165,14 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <div className="flex items-center gap-4 sm:gap-6 mb-6 sm:mb-10">
+              <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-10">
                 <span className="text-white/50 text-body-sm font-medium tracking-widest uppercase shrink-0">
                   {dept.label}
                 </span>
                 <div className="flex-1 h-px bg-white/10" />
               </div>
 
-              <div className="flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-14">
+              <div className="flex flex-wrap justify-center gap-6 md:gap-10 xl:gap-14">
                 {dept.members.map((member) => (
                   <MemberAvatar key={member.id} member={member} />
                 ))}

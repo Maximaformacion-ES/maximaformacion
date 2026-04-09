@@ -91,27 +91,27 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
   return (
     <div>
       {/* Tab bar */}
-      <div className="relative flex border-b border-mx-border gap-1 sm:gap-6 lg:gap-8 w-full overflow-x-auto scrollbar-hide -mx-2 px-2">
+      <div className="relative flex border-b border-mx-border gap-1 md:gap-6 xl:gap-8 w-full overflow-x-auto scrollbar-hide -mx-2 px-2">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`relative px-2 sm:px-3 py-3 text-label-md sm:text-body-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+            className={`relative px-2 md:px-3 py-3 text-label-sm md:text-label-md font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeTab === tab.value
                 ? "text-mx-orange"
                 : "text-mx-text-muted hover:text-mx-orange"
             }`}
           >
-            <span className="flex items-center gap-1 sm:gap-2">
-              {tab.icon && <tab.icon className="size-3.5 sm:size-4" />}
-              <span className="sm:hidden">
+            <span className="flex items-center gap-1 md:gap-2">
+              {tab.icon && <tab.icon className="size-3.5 md:size-4" />}
+              <span className="md:hidden">
                 {tab.value === "descripcion" && "Info"}
                 {tab.value === "temario" && "Temario"}
                 {tab.value === "objetivos" && "Objetivos"}
                 {tab.value === "audiencia" && "Audiencia"}
                 {tab.value === "salidas" && "Salidas"}
               </span>
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden md:inline">{tab.label}</span>
             </span>
             {activeTab === tab.value && (
               <m.div
@@ -137,7 +137,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.longDescription}
-                className="text-body-sm sm:text-body-lg text-mx-text-muted font-light leading-relaxed"
+                className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed"
               />
             </m.div>
           )}
@@ -169,15 +169,15 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <span className="text-mx-orange text-label-md font-bold">
+                          <span className="text-mx-orange text-label-sm md:text-label-md font-bold">
                             Módulo {index + 1}
                           </span>
-                          <span className="flex items-center gap-1.5 text-mx-text-muted text-label-md">
+                          <span className="flex items-center gap-1.5 text-mx-text-muted text-label-sm md:text-label-md">
                             <Clock size={12} />
                             {module.hours}h
                           </span>
                         </div>
-                        <h3 className="text-body-md md:text-body-lg font-bold text-mx-text group-hover:text-mx-orange transition-colors duration-300">
+                        <h3 className="text-body-sm md:text-body-md font-bold text-mx-text group-hover:text-mx-orange transition-colors duration-300">
                           {module.title}
                         </h3>
                         <p className="text-mx-text-muted mt-1 text-body-sm font-light">
@@ -203,7 +203,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                           className="overflow-hidden"
                         >
                           <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-mx-border">
-                            <h4 className="text-label-md font-bold text-mx-text-muted uppercase tracking-widest mb-3">
+                            <h4 className="text-label-sm md:text-label-md font-bold text-mx-text-muted uppercase tracking-widest mb-3">
                               Unidades del Módulo
                             </h4>
                             <div className="grid md:grid-cols-1">
@@ -242,7 +242,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.objectives}
-                className="text-body-sm sm:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
+                className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
               />
             </m.div>
           )}
@@ -257,7 +257,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.audience}
-                className="text-body-sm sm:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
+                className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
               />
             </m.div>
           )}
@@ -272,7 +272,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
             >
               <MarkdownContent
                 content={program.careers}
-                className="text-body-sm sm:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
+                className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
               />
             </m.div>
           )}

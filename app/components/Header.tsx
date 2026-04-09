@@ -27,7 +27,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { name: 'Conocenos', path: '/conocenos' },
+  { name: 'Conócenos', path: '/conocenos' },
   { name: 'Formacion', path: '/programas' },
   { name: 'Consultoria', path: '/consultoria' },
   { name: 'Innovacion', path: '/innovacion' },

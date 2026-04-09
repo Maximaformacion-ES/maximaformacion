@@ -484,13 +484,14 @@ const CertificadosSection = () => (
 // ─── Mi Plan Section ─────────────────────────────────────────────────
 const MiPlanSection = () => {
   const { isSignedIn } = useUser();
-  const { hasPro, subscription } = useUserCampus();
+  const { hasPro, isTrialing, subscription } = useUserCampus();
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
   const isPro = isSignedIn && hasPro;
   const subscribedAt = subscription?.startedAt;
   const subscriptionStatus = subscription?.status;
   const stripeCustomerId = subscription?.stripeCustomerId;
+  const trialEnd = subscription?.trialEnd;
 
   const handleOpenBillingPortal = async () => {
     setIsLoadingPortal(true);
@@ -552,8 +553,10 @@ const MiPlanSection = () => {
             </div>
           </div>
           {isPro && (
-            <span className="px-3 py-1 bg-mx-orange text-white text-label-md font-bold rounded-full">
-              ACTIVO
+            <span className={`px-3 py-1 text-white text-label-md font-bold rounded-full ${
+              isTrialing ? 'bg-amber-500' : 'bg-mx-orange'
+            }`}>
+              {isTrialing ? 'PRUEBA' : 'ACTIVO'}
             </span>
           )}
         </div>
@@ -587,13 +590,31 @@ const MiPlanSection = () => {
             <div className="space-y-3 text-body-sm">
               <div className="flex justify-between">
                 <span className="text-mx-text-muted">Estado:</span>
-                <span className={`font-medium ${subscriptionStatus === 'active' ? 'text-green-600' : 'text-mx-orange'}`}>
-                  {subscriptionStatus === 'active' ? 'Activa' : subscriptionStatus || 'Activa'}
+                <span className={`font-medium ${
+                  subscriptionStatus === 'active' ? 'text-green-600'
+                    : subscriptionStatus === 'trialing' ? 'text-amber-500'
+                    : 'text-mx-orange'
+                }`}>
+                  {subscriptionStatus === 'active' ? 'Activa'
+                    : subscriptionStatus === 'trialing' ? 'Prueba'
+                    : subscriptionStatus || 'Activa'}
                 </span>
               </div>
+              {isTrialing && trialEnd && (
+                <div className="flex justify-between">
+                  <span className="text-mx-text-muted">La prueba termina el:</span>
+                  <span className="text-mx-text font-medium">
+                    {new Date(trialEnd).toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </span>
+                </div>
+              )}
               {subscribedAt && (
                 <div className="flex justify-between">
-                  <span className="text-mx-text-muted">Suscrito desde:</span>
+                  <span className="text-mx-text-muted">{isTrialing ? 'Prueba iniciada:' : 'Suscrito desde:'}</span>
                   <span className="text-mx-text">
                     {new Date(subscribedAt).toLocaleDateString('es-ES', {
                       day: 'numeric',
@@ -601,6 +622,13 @@ const MiPlanSection = () => {
                       year: 'numeric'
                     })}
                   </span>
+                </div>
+              )}
+              {isTrialing && (
+                <div className="mt-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <p className="text-mx-text text-label-md">
+                    Después de la prueba, tu suscripción se renovará automáticamente. Puedes cancelar en cualquier momento desde el portal de facturación.
+                  </p>
                 </div>
               )}
             </div>

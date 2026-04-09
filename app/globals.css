@@ -94,14 +94,16 @@
 
   /* ── Typography Scale ──
      4 tiers × 3 sizes. Use with Tailwind breakpoint prefixes:
-     class="text-display-sm md:text-display-md lg:text-display-lg"
+     class="text-display-sm md:text-display-md xl:text-display-lg"
 
-     Tier      | sm (mobile) | md (tablet)  | lg (desktop/2K+)
-     ----------|-------------|--------------|------------------
+     Tier      | sm (mobile) | md (tablet)  | xl (desktop ≥1280px)
+     ----------|-------------|--------------|---------------------
      display   | 48px        | 72px         | 120px
      heading   | 20px        | 28px         | 42px
      body      | 14px        | 16px         | 20px
      label     | 10px        | 12px         | 16px
+
+     Ver TYPOGRAPHY.md para la guía completa de uso por elemento.
   */
 
   /* Display – hero titles, section titles */
@@ -115,14 +117,14 @@
   --text-heading-lg: 42px;
 
   /* Body – paragraphs, descriptions */
-  --text-body-sm: 14px;
+  --text-body-sm: 12px;
   --text-body-md: 16px;
-  --text-body-lg: 20px;
+  --text-body-lg: 16px;
 
   /* Label – metadata, badges, captions */
   --text-label-sm: 10px;
   --text-label-md: 12px;
-  --text-label-lg: 16px;
+  --text-label-lg: 14px;
 
   /* Line Heights */
   --leading-display: 0.9;
@@ -146,6 +148,11 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
   --font-weight-black: 900;
+}
+
+/* Safe area for devices with home indicator */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Film grain overlay effect */

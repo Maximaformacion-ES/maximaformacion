@@ -84,21 +84,21 @@ export const InnovacionSAPOSection: React.FC = () => {
             className="lg:w-1/2"
           >
             <span
-              className="text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block text-mx-orange"
+              className="text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block text-mx-orange"
             >
               Te presentamos nuestra APP
             </span>
-            <h2 className="text-heading-lg md:text-display-md font-black mb-6" style={{ color: SAPO_TEAL }}>
+            <h2 className="text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6" style={{ color: SAPO_TEAL }}>
               Conoce SAPO
             </h2>
-            <p className="text-mx-text-muted text-body-lg md:text-heading-sm font-light leading-relaxed mb-8">
+            <p className="text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light leading-relaxed mb-8">
               Una app que automatiza el análisis estadístico y genera resultados listos para publicar,
               sin necesidad de programar.
             </p>
 
             <div className="space-y-4 mb-8">
               <div className="p-6 border rounded-lg" style={{ borderColor: `${SAPO_TEAL}20`, backgroundColor: `${SAPO_TEAL}05` }}>
-                <h3 className="text-body-lg font-bold text-mx-text mb-2">
+                <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-2">
                   Asistencia estadística automatizada
                 </h3>
                 <p className="text-mx-text-muted font-light text-body-sm">
@@ -107,7 +107,7 @@ export const InnovacionSAPOSection: React.FC = () => {
                 </p>
               </div>
               <div className="p-6 border rounded-lg" style={{ borderColor: `${SAPO_TEAL}20`, backgroundColor: `${SAPO_TEAL}05` }}>
-                <h3 className="text-body-lg font-bold text-mx-text mb-2">
+                <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-2">
                   Generación automática de resultados
                 </h3>
                 <p className="text-mx-text-muted font-light text-body-sm">
@@ -162,7 +162,7 @@ export const InnovacionSAPOSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-heading-lg font-bold text-mx-text text-center mb-16 relative"
+            className="text-heading-sm md:text-heading-md xl:text-heading-lg font-bold text-mx-text text-center mb-16 relative"
           >
             Características principales
           </m.h3>
@@ -179,7 +179,7 @@ export const InnovacionSAPOSection: React.FC = () => {
               >
                 <feature.icon className="shrink-0 mt-1" size={22} style={{ color: SAPO_TEAL }} />
                 <div>
-                  <h4 className="text-body-md font-bold text-mx-text mb-1">{feature.title}</h4>
+                  <h4 className="text-body-sm md:text-body-md font-bold text-mx-text mb-1">{feature.title}</h4>
                   <p className="text-body-sm text-mx-text-muted font-light leading-relaxed">
                     {feature.description}
                   </p>
@@ -195,18 +195,78 @@ export const InnovacionSAPOSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h3 className="text-heading-lg font-bold text-mx-text text-center mb-12">Planes y precios</h3>
+          <h3 className="text-heading-sm md:text-heading-md xl:text-heading-lg font-bold text-mx-text text-center mb-8 md:mb-12">Planes y precios</h3>
 
-          <div className="overflow-x-auto -mx-6 px-6 pt-4">
-            <table className="w-full min-w-[600px] border-collapse table-fixed">
+          {/* Mobile: stacked pricing cards */}
+          <div className="md:hidden space-y-4">
+            {([
+              { name: 'Gratuito', price: '0€', suffix: '', featured: false, features: pricingFeatures.map(f => ({ label: f.label, value: f.free })) },
+              { name: 'Mensual', price: '2.99€', suffix: '/mes', featured: true, features: pricingFeatures.map(f => ({ label: f.label, value: f.monthly })) },
+              { name: 'Anual', price: '24.99€', suffix: '/año', featured: false, features: pricingFeatures.map(f => ({ label: f.label, value: f.yearly })) },
+            ] as const).map((plan) => (
+              <div
+                key={plan.name}
+                className={`rounded-xl border p-5 ${plan.featured ? 'border-[#016157]/30 bg-[#016157]/5' : 'border-mx-border bg-mx-card'}`}
+              >
+                <div className="flex items-baseline justify-between mb-4">
+                  <div>
+                    <div className="text-body-sm font-bold text-mx-text">{plan.name}</div>
+                    {plan.featured && (
+                      <span className="inline-block mt-1 px-2 py-0.5 text-white text-label-sm font-bold uppercase tracking-widest rounded-full" style={{ backgroundColor: SAPO_TEAL }}>
+                        Popular
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-heading-sm font-black text-mx-text">
+                    {plan.price}<span className="text-label-sm font-normal text-mx-text-muted">{plan.suffix}</span>
+                  </div>
+                </div>
+                <ul className="space-y-2">
+                  {plan.features.map((f) => {
+                    const included = typeof f.value === 'string' ? true : f.value;
+                    return (
+                      <li key={f.label} className={`flex items-center gap-2 text-body-sm ${included ? 'text-mx-text' : 'text-mx-text-muted/40'}`}>
+                        {included ? (
+                          <Check size={14} style={{ color: SAPO_TEAL }} className="shrink-0" />
+                        ) : (
+                          <X size={14} className="shrink-0" />
+                        )}
+                        <span className="font-light">{f.label}</span>
+                        {typeof f.value === 'string' && (
+                          <span className="ml-auto text-label-sm font-medium text-mx-text-muted">{f.value}</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <a
+                  href="https://biomaximainnovacion.es/sapo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`block text-center mt-4 px-6 py-2.5 rounded-full text-body-sm font-medium transition-colors ${
+                    plan.featured
+                      ? 'text-white hover:opacity-90'
+                      : 'border border-mx-border text-mx-text hover:opacity-80'
+                  }`}
+                  style={plan.featured ? { backgroundColor: SAPO_TEAL } : undefined}
+                >
+                  {plan.price === '0€' ? 'Empezar gratis' : 'Suscribirse'}
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: comparison table */}
+          <div className="hidden md:block pt-4">
+            <table className="w-full border-collapse table-fixed">
               <thead>
                 <tr>
-                  <th className="text-left py-4 px-6 text-label-lg font-medium text-mx-text-muted uppercase tracking-wider border-b border-mx-border w-[40%]">
+                  <th className="text-left py-4 px-6 text-label-sm md:text-label-md font-medium text-mx-text-muted uppercase tracking-wider border-b border-mx-border w-[40%]">
                     Característica
                   </th>
                   <th className="text-center py-4 px-4 border-b border-mx-border w-[20%]">
-                    <div className="text-body-md font-bold text-mx-text">Gratuito</div>
-                    <div className="text-heading-md font-black text-mx-text mt-1">0€</div>
+                    <div className="text-body-sm md:text-body-md font-bold text-mx-text">Gratuito</div>
+                    <div className="text-heading-sm md:text-heading-md font-black text-mx-text mt-1">0€</div>
                   </th>
                   <th
                     className="text-center py-4 px-4 border-b border-mx-border w-[20%] rounded-t-lg relative"
@@ -218,15 +278,15 @@ export const InnovacionSAPOSection: React.FC = () => {
                     >
                       Popular
                     </div>
-                    <div className="text-body-md font-bold text-mx-text">Mensual</div>
-                    <div className="text-heading-md font-black text-mx-text mt-1">
-                      2.99€<span className="text-label-lg font-normal text-mx-text-muted">/mes</span>
+                    <div className="text-body-sm md:text-body-md font-bold text-mx-text">Mensual</div>
+                    <div className="text-heading-sm md:text-heading-md font-black text-mx-text mt-1">
+                      2.99€<span className="text-label-sm md:text-label-md font-normal text-mx-text-muted">/mes</span>
                     </div>
                   </th>
                   <th className="text-center py-4 px-4 border-b border-mx-border w-[20%]">
-                    <div className="text-body-md font-bold text-mx-text">Anual</div>
-                    <div className="text-heading-md font-black text-mx-text mt-1">
-                      24.99€<span className="text-label-lg font-normal text-mx-text-muted">/año</span>
+                    <div className="text-body-sm md:text-body-md font-bold text-mx-text">Anual</div>
+                    <div className="text-heading-sm md:text-heading-md font-black text-mx-text mt-1">
+                      24.99€<span className="text-label-sm md:text-label-md font-normal text-mx-text-muted">/año</span>
                     </div>
                   </th>
                 </tr>

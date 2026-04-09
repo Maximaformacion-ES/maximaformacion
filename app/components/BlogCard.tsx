@@ -56,7 +56,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
             <Award size={12} /> Destacado
           </div>
         )}
-        <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 bg-mx-blue text-white text-label-md font-medium rounded-full">
+        <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 bg-mx-blue text-white text-label-sm md:text-label-md font-medium rounded-full">
           {post.category}
         </div>
       </div>
@@ -64,7 +64,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
       {/* Card Content */}
       <div className="p-6 flex flex-col flex-grow">
         {/* Metadata */}
-        <div className="flex items-center gap-4 mb-4 text-mx-text-muted text-label-md">
+        <div className="flex items-center gap-4 mb-4 text-mx-text-muted text-label-sm md:text-label-md">
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
             {formatDate(post.publishedAt)}
@@ -76,7 +76,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
         </div>
 
         {/* Title */}
-        <h3 className="text-body-lg md:text-heading-sm font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors duration-300 leading-tight line-clamp-2">
+        <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors duration-300 leading-tight line-clamp-2">
           {post.title}
         </h3>
 
@@ -90,7 +90,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
           {post.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="px-3 py-1 bg-mx-card border border-mx-border text-label-md text-mx-text-muted rounded-full"
+              className="px-3 py-1 bg-mx-card border border-mx-border text-label-sm md:text-label-md text-mx-text-muted rounded-full"
             >
               {tag}
             </span>
@@ -113,17 +113,17 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-mx-orange/10 border border-mx-orange/30 flex items-center justify-center">
-                    <span className="text-label-md font-bold text-mx-orange">
+                    <span className="text-label-sm md:text-label-md font-bold text-mx-orange">
                       {getInitials(post.author.name)}
                     </span>
                   </div>
                 )}
                 <div>
-                  <p className="text-label-md font-bold text-mx-text">
+                  <p className="text-label-sm md:text-label-md font-bold text-mx-text">
                     {post.author.name}
                   </p>
                   {post.author.role && (
-                    <p className="text-label-md text-mx-text-muted">
+                    <p className="text-label-sm md:text-label-md text-mx-text-muted">
                       {post.author.role}
                     </p>
                   )}

@@ -64,7 +64,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-heading-lg md:text-display-sm lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
+              className="text-display-sm md:text-display-md font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
             >
               {program.title}
             </m.h1>
@@ -80,7 +80,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
                 {program.topics.map((topic) => (
                   <span
                     key={topic.id}
-                    className="px-3 py-1 bg-mx-text/10 backdrop-blur-md text-mx-text-muted text-label-md font-medium rounded-full"
+                    className="px-3 py-1 bg-mx-text/10 backdrop-blur-md text-mx-text-muted text-label-sm md:text-label-md font-medium rounded-full"
                   >
                     {topic.name}
                   </span>
@@ -93,7 +93,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-body-md md:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
+              className="text-body-sm md:text-body-md xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {program.description}
             </m.p>

@@ -35,6 +35,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
+import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import type { MaxymiaCourse, Locale } from '../../types';
 
 const CATEGORY_LABELS: Record<string, Record<Locale, string>> = {
@@ -159,6 +160,10 @@ export default function MaxymiaCourseDetail({ course }: Props) {
 
       {/* CTA Section */}
       <CourseCTASection locale={locale} />
+
+      {/* Sticky mobile purchase bar */}
+      <MaxymiaMobileCTA course={course} />
+      <div className="h-20 lg:hidden" />
     </div>
   );
 }

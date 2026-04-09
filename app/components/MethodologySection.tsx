@@ -55,13 +55,13 @@ export const MethodologySection: React.FC = () => {
             viewport={{ once: true }}
             className="lg:w-2/5 flex flex-col justify-center"
           >
-            <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
               Metodología
             </span>
-            <h2 className="text-mx-blue text-display-sm md:text-display-sm lg:text-display-md font-black mb-6 leading-tight text-balance">
+            <h2 className="text-mx-blue text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6 leading-tight text-balance">
               Formación que marca la diferencia
             </h2>
-            <p className="text-mx-text-muted text-body-lg font-light leading-relaxed text-balance">
+            <p className="text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed text-balance">
               Nuestra metodología está diseñada para garantizar tu éxito profesional
             </p>
           </m.div>
@@ -84,7 +84,7 @@ export const MethodologySection: React.FC = () => {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-body-md font-bold text-mx-text group-hover:text-mx-blue transition-colors duration-300">
+                  <h3 className="text-body-sm md:text-body-md font-bold text-mx-text group-hover:text-mx-blue transition-colors duration-300">
                     {point.title}
                   </h3>
                   <p className="text-mx-text-muted text-body-sm font-light mt-0.5">

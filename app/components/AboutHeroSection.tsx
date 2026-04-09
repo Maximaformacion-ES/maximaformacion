@@ -63,11 +63,11 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
         </div>
       </m.div>
 
-      <div className="relative z-20 text-center px-4 sm:px-6 mt-[-10vh]">
+      <div className="relative z-20 text-center px-4 md:px-6 mt-[-10vh]">
         <m.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block text-mx-orange text-label-md sm:text-label-lg font-medium tracking-[0.3em] sm:tracking-[0.5em] uppercase mb-4 sm:mb-6"
+          className="inline-block text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.3em] md:tracking-[0.5em] uppercase mb-4 md:mb-6"
         >
           {heroOverline}
         </m.span>
@@ -75,7 +75,7 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-mx-blue text-heading-lg sm:text-display-sm md:text-display-md lg:text-display-lg font-black"
+          className="text-mx-blue text-display-sm md:text-display-md xl:text-display-lg font-black"
         >
           {heroTitle}
         </m.h1>

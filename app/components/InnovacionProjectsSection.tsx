@@ -40,13 +40,13 @@ export const InnovacionProjectsSection: React.FC = () => {
           viewport={{ once: true }}
           className="mb-10 md:mb-16 max-w-lg"
         >
-          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
             Nuestros proyectos
           </span>
-          <h2 className="text-[#016157] text-heading-lg md:text-display-sm font-black mb-4 uppercase leading-heading">
+          <h2 className="text-[#016157] text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-4 uppercase leading-heading">
             Soluciones aplicadas
           </h2>
-          <p className="text-mx-text-muted text-body-md font-light">
+          <p className="text-mx-text-muted text-body-sm md:text-body-md font-light">
             Cada proyecto refleja nuestro compromiso con la innovación funcional y el impacto real
             en el sector científico-sanitario.
           </p>

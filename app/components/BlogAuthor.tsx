@@ -44,18 +44,18 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
             />
           ) : (
             <div className="w-24 h-24 rounded-full bg-mx-orange/10 border-2 border-mx-orange/30 flex items-center justify-center">
-              <span className="text-heading-md font-bold text-mx-orange">
+              <span className="text-heading-sm md:text-heading-md font-bold text-mx-orange">
                 {getInitials(post.author.name)}
               </span>
             </div>
           )}
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-heading-md font-bold text-mx-text mb-2">{post.author.name}</h3>
+            <h3 className="text-heading-sm md:text-heading-md font-bold text-mx-text mb-2">{post.author.name}</h3>
             {post.author.role && (
-              <p className="text-mx-orange mb-4 font-medium">{post.author.role}</p>
+              <p className="text-mx-orange text-body-sm md:text-body-md mb-4 font-medium">{post.author.role}</p>
             )}
             {post.author.roleDescription && (
-              <p className="text-mx-text-muted font-light mb-4">
+              <p className="text-mx-text-muted text-body-sm md:text-body-md font-light mb-4">
                 {post.author.roleDescription}
               </p>
             )}

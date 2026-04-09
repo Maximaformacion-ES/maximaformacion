@@ -67,7 +67,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
               className="flex flex-col items-center justify-center py-20 text-mx-text-muted"
             >
               <Search size={48} className="mb-4 opacity-60 text-mx-orange" />
-              <p className="text-body-lg">No se encontraron programas con esos criterios.</p>
+              <p className="text-body-sm md:text-body-md">No se encontraron programas con esos criterios.</p>
             </m.div>
           )}
         </AnimatePresence>

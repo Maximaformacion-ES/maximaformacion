@@ -10,7 +10,7 @@ export const CatalogHeader: React.FC = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-display-sm md:text-display-md lg:text-display-lg font-black leading-[0.9] mb-6 text-mx-blue"
+        className="text-display-sm md:text-display-md font-black leading-[0.9] my-6 text-mx-blue"
       >
         NUESTROS <span className="text-stroke text-mx-orange">PROGRAMAS</span>
       </m.h1>
@@ -18,7 +18,7 @@ export const CatalogHeader: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="text-heading-sm text-mx-text-muted max-w-2xl font-light"
+        className="text-body-sm md:text-body-md xl:text-body-lg text-mx-text-muted max-w-2xl font-light"
       >
         Explora nuestra oferta académica de excelencia diseñada para impulsar tu carrera al siguiente nivel.
       </m.p>

@@ -73,18 +73,22 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           console.log(`User ${userId} purchased ${paymentType}: ${title} (${documentId})`);
         } else {
           const subscriptionId = session.subscription as string;
+          const isTrial = paymentType === 'trial';
+
+          // Retrieve subscription to get actual status (may be 'trialing')
+          const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
 
           await upsertSubscription({
             clerkId: userId,
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
-            status: 'active',
+            status: stripeSubscription.status,
             plan: 'pro',
             startedAt: new Date(),
           });
 
           await updateUserPlan(userId, 'pro');
-          console.log(`User ${userId} upgraded to Pro`);
+          console.log(`User ${userId} upgraded to Pro${isTrial ? ' (trial)' : ''}`);
         }
         return true;
       }
@@ -209,13 +213,20 @@ async function handleWithClerk(event: Stripe.Event) {
         }
       } else {
         const subscriptionId = session.subscription as string;
+        const isTrial = paymentType === 'trial';
+
+        // Retrieve subscription to get actual status
+        const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+
         await client.users.updateUserMetadata(userId, {
           publicMetadata: {
             ...currentMetadata,
             plan: 'pro',
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
+            subscriptionStatus: stripeSubscription.status,
             subscribedAt: new Date().toISOString(),
+            ...(isTrial ? { hasUsedTrial: true } : {}),
           },
         });
       }

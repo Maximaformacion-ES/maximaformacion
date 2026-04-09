@@ -45,19 +45,19 @@ export const FeaturesSection: React.FC = () => {
             viewport={{ once: true }}
             className="lg:w-2/5 flex flex-col justify-center"
           >
-            <span className="text-mx-orange text-label-lg leading-label font-medium tracking-[0.5em] uppercase mb-4 block">
+            <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label font-medium tracking-[0.5em] uppercase mb-4 block">
               Nuestras fortalezas
             </span>
-            <h2 className="text-mx-blue text-display-sm md:text-display-sm lg:text-display-sm font-black mb-6 leading-heading text-balance">
+            <h2 className="text-mx-blue text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6 leading-heading text-balance">
               La Ciencia de Datos al servicio de tu negocio
             </h2>
-            <p className="text-mx-text-muted text-body-lg font-light leading-body text-balance">
+            <p className="text-mx-text-muted text-body-sm md:text-body-md font-light leading-body text-balance">
               Herramientas, metodología y experiencia para transformar datos en decisiones
             </p>
           </m.div>
 
           {/* Left side: 2x2 grid */}
-          <div className="lg:w-3/5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="lg:w-3/5 grid grid-cols-1 md:grid-cols-2 gap-4">
             {features.map((feature, idx) => (
               <m.div
                 key={feature.title}
@@ -76,7 +76,7 @@ export const FeaturesSection: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-mx-orange/10 flex items-center justify-center mb-4">
                     <feature.icon className="text-mx-orange" size={20} />
                   </div>
-                  <h3 className="text-body-md font-bold text-mx-text mb-1.5 group-hover:text-mx-blue transition-colors duration-300">
+                  <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-1.5 group-hover:text-mx-blue transition-colors duration-300">
                     {feature.title}
                   </h3>
                   <p className="text-mx-text-muted text-body-sm font-light leading-body">

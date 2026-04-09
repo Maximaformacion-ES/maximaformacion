@@ -60,7 +60,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
         <m.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-6"
+          className="inline-block text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-6"
         >
           {heroOverline}
         </m.span>
@@ -68,7 +68,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-display-sm md:text-display-md lg:text-display-md font-black mb-6 text-[#016157] uppercase text-balance"
+          className="text-display-sm md:text-display-md font-black mb-6 text-[#016157] uppercase text-balance"
         >
           {heroTitle}
         </m.h1>
@@ -76,7 +76,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-mx-text-muted text-body-lg md:text-heading-sm font-light mb-10 max-w-2xl mx-auto"
+          className="text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light mb-10 max-w-2xl mx-auto"
         >
           {heroDescription}
         </m.p>
@@ -85,7 +85,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="group inline-flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-body-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
+          className="group inline-flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-label-sm md:text-label-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
         >
           Descubre más
           <ArrowRight

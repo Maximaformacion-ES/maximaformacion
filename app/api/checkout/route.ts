@@ -14,7 +14,7 @@ const PRICE_IDS = {
 };
 
 interface CheckoutRequestBody {
-  type?: 'subscription' | 'course' | 'maxymia-course';
+  type?: 'subscription' | 'course' | 'maxymia-course' | 'trial';
   planId?: string;
   planPeriod?: 'month' | 'year';
   programId?: string;
@@ -175,6 +175,61 @@ export async function POST(request: Request) {
         },
         allow_promotion_codes: true,
         billing_address_collection: 'auto',
+      });
+
+      return NextResponse.json({
+        url: session.url,
+        sessionId: session.id,
+      });
+    }
+
+    // Handle trial (7-day Pro trial for 1€)
+    if (type === 'trial') {
+      const recurringPriceId = planPeriod === 'year'
+        ? process.env.STRIPE_PRO_YEARLY_PRICE_ID
+        : process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
+
+      const trialPriceId = process.env.STRIPE_PRO_TRIAL_PRICE_ID;
+
+      if (!recurringPriceId || !trialPriceId) {
+        return NextResponse.json(
+          { error: 'Trial prices not configured' },
+          { status: 500 }
+        );
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        customer_email: user?.emailAddresses?.[0]?.emailAddress,
+        line_items: [
+          {
+            price: recurringPriceId,
+            quantity: 1,
+          },
+          {
+            price: trialPriceId,
+            quantity: 1,
+          },
+        ],
+        subscription_data: {
+          trial_period_days: 7,
+          metadata: {
+            userId,
+            planId: 'pro',
+            planPeriod: planPeriod || 'month',
+            isTrial: 'true',
+          },
+        },
+        metadata: {
+          userId,
+          type: 'trial',
+          planPeriod: planPeriod || 'month',
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'auto',
+        success_url: `${baseUrl}/pricing?success=true&trial=true`,
+        cancel_url: `${baseUrl}/pricing`,
       });
 
       return NextResponse.json({

@@ -44,8 +44,30 @@ export async function GET() {
           getAllCourseProgress(userId),
         ]);
 
+        // Determine hasUsedTrial: check subscription metadata or if status was ever trialing
+        const hasUsedTrial = subscription?.status === 'trialing'
+          || subscription?.status === 'active' && !!subscription?.startedAt;
+
+        // For trial users, fetch trial_end from Stripe
+        let trialEnd: string | null = null;
+        if (subscription?.status === 'trialing' && subscription?.stripeSubscriptionId) {
+          try {
+            const Stripe = (await import('stripe')).default;
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+              apiVersion: '2025-12-15.clover',
+            });
+            const stripeSub = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+            if (stripeSub.trial_end) {
+              trialEnd = new Date(stripeSub.trial_end * 1000).toISOString();
+            }
+          } catch (e) {
+            console.warn('Could not fetch trial_end from Stripe:', e);
+          }
+        }
+
         return NextResponse.json({
           plan: dbUser.plan,
+          hasUsedTrial,
           subscription: subscription
             ? {
                 stripeCustomerId: subscription.stripeCustomerId,
@@ -55,6 +77,7 @@ export async function GET() {
                 currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() || null,
                 lastPaymentAt: subscription.lastPaymentAt?.toISOString() || null,
                 paymentFailed: subscription.paymentFailed,
+                trialEnd,
               }
             : null,
           enrollments: enrollmentsList.map((e) => ({
@@ -113,17 +136,38 @@ export async function GET() {
       };
     }
 
+    const clerkSubscriptionStatus = (meta.subscriptionStatus as string) || 'active';
+
+    // For Clerk fallback, fetch trial_end from Stripe if trialing
+    let clerkTrialEnd: string | null = null;
+    if (clerkSubscriptionStatus === 'trialing' && meta.stripeSubscriptionId) {
+      try {
+        const Stripe = (await import('stripe')).default;
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+          apiVersion: '2025-12-15.clover',
+        });
+        const stripeSub = await stripe.subscriptions.retrieve(meta.stripeSubscriptionId as string);
+        if (stripeSub.trial_end) {
+          clerkTrialEnd = new Date(stripeSub.trial_end * 1000).toISOString();
+        }
+      } catch (e) {
+        console.warn('Could not fetch trial_end from Stripe:', e);
+      }
+    }
+
     return NextResponse.json({
       plan: (meta.plan as string) || 'free',
+      hasUsedTrial: (meta.hasUsedTrial as boolean) || false,
       subscription: meta.stripeCustomerId
         ? {
             stripeCustomerId: meta.stripeCustomerId as string,
-            status: (meta.subscriptionStatus as string) || 'active',
+            status: clerkSubscriptionStatus,
             startedAt: (meta.subscribedAt as string) || null,
             canceledAt: (meta.canceledAt as string) || null,
             currentPeriodEnd: null,
             lastPaymentAt: (meta.lastPaymentAt as string) || null,
             paymentFailed: (meta.paymentFailed as boolean) || false,
+            trialEnd: clerkTrialEnd,
           }
         : null,
       enrollments: purchasedCourses.map((c) => ({

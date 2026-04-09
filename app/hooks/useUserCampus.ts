@@ -19,6 +19,7 @@ interface Subscription {
   currentPeriodEnd: string | null;
   lastPaymentAt: string | null;
   paymentFailed: boolean;
+  trialEnd: string | null;
 }
 
 interface CourseProgressData {
@@ -30,6 +31,7 @@ interface CourseProgressData {
 
 interface CampusProfile {
   plan: string;
+  hasUsedTrial: boolean;
   subscription: Subscription | null;
   enrollments: Enrollment[];
   courseProgress: Record<string, CourseProgressData>;
@@ -38,10 +40,13 @@ interface CampusProfile {
 interface UseUserCampusReturn {
   plan: string;
   hasPro: boolean;
+  isTrialing: boolean;
+  hasUsedTrial: boolean;
   subscription: Subscription | null;
   enrollments: Enrollment[];
   courseProgress: Record<string, CourseProgressData>;
   hasAccess: (programDocumentId: string) => boolean;
+  isEnrolled: (programDocumentId: string) => boolean;
   isLoading: boolean;
   refetch: () => Promise<void>;
 }
@@ -78,6 +83,8 @@ export function useUserCampus(): UseUserCampusReturn {
 
   const plan = profile?.plan || 'free';
   const hasPro = plan === 'pro';
+  const isTrialing = profile?.subscription?.status === 'trialing';
+  const hasUsedTrial = profile?.hasUsedTrial ?? false;
 
   const hasAccess = useCallback(
     (programDocumentId: string) => {
@@ -91,13 +98,27 @@ export function useUserCampus(): UseUserCampusReturn {
     [hasPro, profile?.enrollments]
   );
 
+  const isEnrolled = useCallback(
+    (programDocumentId: string) => {
+      return (
+        profile?.enrollments.some(
+          (e) => e.programDocumentId === programDocumentId
+        ) ?? false
+      );
+    },
+    [profile?.enrollments]
+  );
+
   return {
     plan,
     hasPro,
+    isTrialing,
+    hasUsedTrial,
     subscription: profile?.subscription ?? null,
     enrollments: profile?.enrollments ?? [],
     courseProgress: profile?.courseProgress ?? {},
     hasAccess,
+    isEnrolled,
     isLoading: !isLoaded || isLoading,
     refetch: fetchProfile,
   };

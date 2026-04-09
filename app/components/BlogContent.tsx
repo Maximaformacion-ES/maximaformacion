@@ -13,9 +13,10 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
   return (
     <>
       <style>{`
+        /* ── Mobile-first: base = sm (mobile) ── */
         .blog-html-content {
           color: var(--color-mx-text-muted);
-          font-size: 1rem;
+          font-size: var(--text-body-sm);       /* 14px */
           line-height: 1.7;
           overflow-wrap: break-word;
           word-break: break-word;
@@ -29,43 +30,43 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           scroll-margin-top: 7rem;
         }
 
-        /* Headings */
+        /* Headings — mobile sizes */
         .blog-html-content h1 {
-          font-size: 2.5rem;
+          font-size: var(--text-heading-md);    /* 28px */
           font-weight: 900;
           line-height: 1.1;
           letter-spacing: -0.02em;
           color: var(--color-mx-blue);
-          margin-top: 2.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .blog-html-content h2 {
-          font-size: 2rem;
-          font-weight: 900;
-          line-height: 1.2;
-          letter-spacing: -0.01em;
-          color: var(--color-mx-blue);
-          margin-top: 3rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .blog-html-content h3 {
-          font-size: 1.5rem;
-          font-weight: 800;
-          line-height: 1.3;
-          color: var(--color-mx-text);
           margin-top: 2rem;
           margin-bottom: 1rem;
         }
 
-        .blog-html-content h4 {
-          font-size: 1.25rem;
-          font-weight: 700;
-          line-height: 1.4;
+        .blog-html-content h2 {
+          font-size: var(--text-heading-sm);    /* 20px */
+          font-weight: 900;
+          line-height: 1.2;
+          letter-spacing: -0.01em;
+          color: var(--color-mx-blue);
+          margin-top: 2rem;
+          margin-bottom: 1rem;
+        }
+
+        .blog-html-content h3 {
+          font-size: var(--text-body-lg);       /* 20px → acts as sub-heading */
+          font-weight: 800;
+          line-height: 1.3;
           color: var(--color-mx-text);
           margin-top: 1.5rem;
           margin-bottom: 0.75rem;
+        }
+
+        .blog-html-content h4 {
+          font-size: var(--text-body-md);       /* 16px */
+          font-weight: 700;
+          line-height: 1.4;
+          color: var(--color-mx-text);
+          margin-top: 1.25rem;
+          margin-bottom: 0.5rem;
         }
 
         /* Paragraphs */
@@ -73,20 +74,20 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           color: var(--color-mx-text-muted);
           font-weight: 300;
           line-height: 1.75;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.25rem;
         }
 
         /* Lists */
         .blog-html-content ul,
         .blog-html-content ol {
           color: var(--color-mx-text-muted);
-          margin-top: 1.5rem;
-          margin-bottom: 1.5rem;
-          padding-left: 1.5rem;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+          padding-left: 1.25rem;
         }
 
         .blog-html-content li {
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.5rem;
           line-height: 1.75;
         }
 
@@ -122,9 +123,9 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
 
         /* Blockquotes */
         .blog-html-content blockquote {
-          border-left: 4px solid var(--color-mx-orange);
-          padding-left: 1.5rem;
-          margin: 2rem 0;
+          border-left: 3px solid var(--color-mx-orange);
+          padding-left: 1rem;
+          margin: 1.5rem 0;
           color: var(--color-mx-text-muted);
           font-style: italic;
         }
@@ -133,9 +134,9 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
         .blog-html-content code {
           background-color: var(--color-mx-card);
           color: var(--color-mx-orange);
-          padding: 0.25rem 0.5rem;
+          padding: 0.15rem 0.4rem;
           border-radius: 0.25rem;
-          font-size: 0.9em;
+          font-size: 0.85em;
           font-family: 'Courier New', monospace;
           border: 1px solid var(--color-mx-border);
         }
@@ -144,9 +145,10 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           background-color: var(--color-mx-card);
           border: 1px solid var(--color-mx-border);
           border-radius: 0.75rem;
-          padding: 1.5rem;
+          padding: 1rem;
           overflow-x: auto;
-          margin: 2rem 0;
+          margin: 1.5rem 0;
+          font-size: var(--text-body-sm);
         }
 
         .blog-html-content pre code {
@@ -160,23 +162,24 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
         .blog-html-content img {
           max-width: 100%;
           height: auto;
-          border-radius: 0.75rem;
-          margin: 2rem 0;
+          border-radius: 0.5rem;
+          margin: 1.5rem 0;
         }
 
         /* Tables - wrap in scrollable container */
         .blog-html-content table {
           width: 100%;
           border-collapse: collapse;
-          margin: 2rem 0;
+          margin: 1.5rem 0;
           display: block;
           overflow-x: auto;
+          font-size: var(--text-body-sm);
         }
 
         .blog-html-content th,
         .blog-html-content td {
           border: 1px solid var(--color-mx-border);
-          padding: 0.75rem;
+          padding: 0.5rem;
           text-align: left;
         }
 
@@ -190,7 +193,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
         .blog-html-content hr {
           border: none;
           border-top: 1px solid var(--color-mx-border);
-          margin: 3rem 0;
+          margin: 2rem 0;
         }
 
         /* First paragraph after heading */
@@ -200,23 +203,74 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           margin-top: 0.5rem;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
+        /* ── md (tablet ≥768px) ── */
+        @media (min-width: 768px) {
           .blog-html-content {
-            font-size: 1rem;
-            line-height: 1.625rem;
+            font-size: var(--text-body-md);     /* 16px */
           }
           .blog-html-content h1 {
-            font-size: 1.75rem;
+            font-size: var(--text-heading-lg);  /* 42px */
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
           }
           .blog-html-content h2 {
-            font-size: 1.5rem;
+            font-size: var(--text-heading-md);  /* 28px */
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
           }
           .blog-html-content h3 {
-            font-size: 1.125rem;
+            font-size: var(--text-heading-sm);  /* 20px */
+            margin-top: 2rem;
+            margin-bottom: 1rem;
           }
           .blog-html-content h4 {
-            font-size: 1.05rem;
+            font-size: var(--text-body-lg);     /* 20px */
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+          }
+          .blog-html-content p {
+            margin-bottom: 1.5rem;
+          }
+          .blog-html-content ul,
+          .blog-html-content ol {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+          }
+          .blog-html-content li {
+            margin-bottom: 0.75rem;
+          }
+          .blog-html-content blockquote {
+            border-left-width: 4px;
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+          }
+          .blog-html-content pre {
+            padding: 1.5rem;
+            margin: 2rem 0;
+            font-size: var(--text-body-sm);
+          }
+          .blog-html-content img {
+            border-radius: 0.75rem;
+            margin: 2rem 0;
+          }
+          .blog-html-content table {
+            margin: 2rem 0;
+            font-size: var(--text-body-md);
+          }
+          .blog-html-content th,
+          .blog-html-content td {
+            padding: 0.75rem;
+          }
+          .blog-html-content hr {
+            margin: 3rem 0;
+          }
+        }
+
+        /* ── xl (desktop ≥1280px) ── */
+        @media (min-width: 1280px) {
+          .blog-html-content {
+            font-size: var(--text-body-lg);     /* 20px */
           }
         }
       `}</style>

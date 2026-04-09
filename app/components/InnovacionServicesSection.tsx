@@ -73,13 +73,13 @@ export const InnovacionServicesSection: React.FC = () => {
           className="flex md:justify-end mb-12 md:mb-20"
         >
           <div className="max-w-lg md:text-right">
-            <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+            <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
               Nuestros servicios
             </span>
-            <h2 className="text-[#016157] text-heading-lg md:text-display-md font-black mb-6 leading-heading uppercase">
+            <h2 className="text-[#016157] text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6 leading-heading uppercase">
               Todo lo que debes saber
             </h2>
-            <p className="text-mx-text-muted text-body-lg font-light">
+            <p className="text-mx-text-muted text-body-sm md:text-body-md font-light">
               Desarrollamos aplicaciones inteligentes, brindamos asesoría estadística especializada
               y diseñamos soluciones funcionales con potencial patentable.
             </p>
@@ -87,7 +87,7 @@ export const InnovacionServicesSection: React.FC = () => {
         </m.div>
 
         {/* Staggered honeycomb grid — 7 cols so row 2 offsets by half without overflow */}
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-3 md:gap-6">
           {/* Row 1: cols 2-3, 4-5, 6-7 (col 1 empty — pushed right) */}
           {row1.map((service, idx) => {
             const colStartClass = ['md:[grid-column-start:2]', 'md:[grid-column-start:4]', 'md:[grid-column-start:6]'][idx];
@@ -154,7 +154,7 @@ function ServiceCell({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: idx * 0.08 }}
-      className={`relative overflow-hidden rounded-lg border border-mx-border p-6 md:p-8 md:min-h-[200px] cursor-default transition-all duration-300 ${
+      className={`relative overflow-hidden rounded-lg border border-mx-border p-4 md:p-8 md:min-h-[200px] cursor-default transition-all duration-300 ${
         bgVariant === 'card' ? 'bg-mx-card' : 'bg-[#016157]/5'
       } ${isHovered ? 'border-mx-orange/50' : ''}`}
       onMouseEnter={onHover}
@@ -166,13 +166,20 @@ function ServiceCell({
           isHovered ? 'md:opacity-0 md:-translate-y-4' : 'opacity-100 translate-y-0'
         }`}
       >
-        <service.icon className="text-mx-orange mb-5" size={40} />
-        <h3 className="text-heading-sm font-bold text-mx-text mb-2">{service.title}</h3>
-        <p className="text-body-sm text-mx-text-muted font-light">{service.tagline}</p>
-        {/* Description always visible on mobile */}
-        <p className="md:hidden text-body-sm text-mx-text-muted font-light leading-relaxed mt-3">
-          {service.description}
-        </p>
+        {/* Mobile: horizontal row */}
+        <div className="flex items-center gap-3 md:hidden">
+          <service.icon className="text-mx-orange shrink-0" size={20} />
+          <div>
+            <h3 className="text-body-sm font-bold text-mx-text">{service.title}</h3>
+            <p className="text-body-sm text-mx-text-muted font-light">{service.tagline}</p>
+          </div>
+        </div>
+        {/* Desktop: vertical layout */}
+        <div className="hidden md:block">
+          <service.icon className="text-mx-orange mb-5" size={40} />
+          <h3 className="text-heading-sm font-bold text-mx-text mb-2">{service.title}</h3>
+          <p className="text-body-sm text-mx-text-muted font-light">{service.tagline}</p>
+        </div>
       </div>
 
       {/* Hover-reveal overlay - desktop only */}
@@ -181,7 +188,7 @@ function ServiceCell({
           isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
-        <h3 className="text-body-lg font-bold text-mx-text mb-3">{service.title}</h3>
+        <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-3">{service.title}</h3>
         <p className="text-body-sm text-mx-text-muted font-light leading-relaxed">
           {service.description}
         </p>

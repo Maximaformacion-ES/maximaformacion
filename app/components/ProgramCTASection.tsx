@@ -19,10 +19,10 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-mx-blue text-display-sm md:text-display-md lg:text-display-md font-black tracking-tight mb-8">
+          <h2 className="text-mx-blue text-heading-md md:text-display-sm xl:text-display-md font-black tracking-tight mb-8">
             ¿LISTO PARA <span className="text-stroke text-mx-orange">COMENZAR?</span>
           </h2>
-          <p className="text-heading-sm text-mx-text-muted font-light mb-12 max-w-2xl mx-auto">
+          <p className="text-body-sm md:text-body-md xl:text-body-lg text-mx-text-muted font-light mb-12 max-w-2xl mx-auto">
             Únete a cientos de profesionales que ya están transformando su carrera con este programa.
           </p>
         </m.div>
@@ -33,7 +33,7 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-8 text-mx-text-muted"
+          className="flex flex-col md:flex-row items-center justify-center gap-8 text-body-sm md:text-body-md text-mx-text-muted"
         >
           <a href="mailto:cursos@maximaformacion.es" className="flex items-center gap-3 hover:text-mx-orange transition-colors">
             <Mail size={18} />

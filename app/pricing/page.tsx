@@ -5,7 +5,7 @@ import { m } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { Check, X, Crown, Sparkles, ArrowRight, Zap, Star, Loader2 } from 'lucide-react';
+import { Check, X, Crown, Sparkles, ArrowRight, Zap, Star, Loader2, Clock } from 'lucide-react';
 import { FAQSection } from '../components/FAQSection';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
@@ -127,15 +127,23 @@ function PlanCard({
   plan,
   billingPeriod,
   userHasPro,
+  isTrialing,
+  showTrial,
   loadingPlan,
+  loadingTrial,
   onSubscribe,
+  onTrial,
   index,
 }: {
   plan: Plan;
   billingPeriod: 'monthly' | 'yearly';
   userHasPro: boolean | undefined;
+  isTrialing: boolean;
+  showTrial: boolean;
   loadingPlan: string | null;
+  loadingTrial: boolean;
   onSubscribe: (planId: string) => void;
+  onTrial: () => void;
   index: number;
 }) {
   return (
@@ -192,7 +200,7 @@ function PlanCard({
         {plan.features.map((feature) => (
           <li key={feature} className="flex items-center gap-3">
             <Check className={plan.highlighted ? 'text-mx-orange' : 'text-mx-text-muted'} size={18} />
-            <span className="text-mx-text font-light">{feature}</span>
+            <span className="text-mx-text text-label-lg font-light">{feature}</span>
           </li>
         ))}
       </ul>
@@ -205,8 +213,35 @@ function PlanCard({
             className="w-full bg-green-50 text-green-600 border border-green-200 px-8 py-4 rounded-full font-bold cursor-default flex items-center justify-center gap-2"
           >
             <Check size={18} />
-            Plan Activo
+            {isTrialing ? 'Prueba Activa' : 'Plan Activo'}
           </button>
+        ) : showTrial ? (
+          <div className="space-y-3">
+            <button
+              onClick={onTrial}
+              disabled={loadingTrial}
+              className="w-full group flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-8 py-4 rounded-full font-bold transition-all duration-300 disabled:opacity-70 disabled:cursor-wait"
+            >
+              {loadingTrial ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <Clock size={18} />
+                  Empezar prueba por 1€
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+            <p className="text-mx-text-muted text-label-md text-center">
+              7 días de acceso completo. Después, {billingPeriod === 'yearly'
+                ? `${plan.price.yearly}€/año`
+                : `${plan.price.monthly}€/mes`
+              }. Cancela cuando quieras.
+            </p>
+          </div>
         ) : (
           <button
             onClick={() => onSubscribe(plan.id)}
@@ -344,11 +379,14 @@ function PricingContent() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const { isSignedIn } = useUser();
-  const { hasPro } = useUserCampus();
+  const { hasPro, isTrialing, hasUsedTrial, subscription } = useUserCampus();
   const searchParams = useSearchParams();
   const success = searchParams.get('success');
+  const isTrialSuccess = searchParams.get('trial') === 'true';
+  const [loadingTrial, setLoadingTrial] = useState(false);
 
   const userHasPro = isSignedIn && hasPro;
+  const showTrial = !userHasPro && !isTrialing && !hasUsedTrial;
 
   const handleSubscribe = async (planId: string) => {
     if (!isSignedIn) {
@@ -391,6 +429,37 @@ function PricingContent() {
     }
   };
 
+  const handleTrial = async () => {
+    if (!isSignedIn) {
+      window.location.href = '/sign-up?redirect_url=/pricing';
+      return;
+    }
+
+    setLoadingTrial(true);
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'trial', planPeriod: billingPeriod === 'yearly' ? 'year' : 'month' }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('No checkout URL received:', data);
+        alert('Error al crear la sesión de pago. Por favor, inténtalo de nuevo.');
+      }
+    } catch (error) {
+      console.error('Trial checkout error:', error);
+      alert('Error al procesar el pago. Por favor, inténtalo de nuevo.');
+    } finally {
+      setLoadingTrial(false);
+    }
+  };
+
   return (
     <div className="bg-mx-bg min-h-screen text-mx-text overflow-x-hidden">
       <FontStyles />
@@ -403,15 +472,19 @@ function PricingContent() {
           <m.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl flex items-center gap-3"
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl flex items-center gap-3 max-w-lg text-center"
           >
-            <Check size={20} />
-            <span>¡Suscripción completada con éxito!</span>
+            <Check size={20} className="shrink-0" />
+            <span>
+              {isTrialSuccess
+                ? '¡Tu prueba de 7 días ha comenzado! Ya tienes acceso a todo el contenido Pro. Puedes cancelar en cualquier momento desde tu perfil.'
+                : '¡Suscripción completada con éxito!'}
+            </span>
           </m.div>
         )}
 
         {/* Hero Section */}
-        <section className="px-6 md:px-12 py-20">
+        <section className="px-6 md:px-12 pt-20 pb-10">
           <div className="max-w-7xl mx-auto text-center">
             <m.div
               initial={{ opacity: 0, y: 30 }}
@@ -422,10 +495,10 @@ function PricingContent() {
                 <Sparkles size={16} />
                 Planes y Precios
               </span>
-              <h1 className="text-display-sm md:text-display-md lg:text-display-md font-black text-mx-blue mb-6">
+              <h1 className="text-display-sm md:text-display-md lg:text-display-md font-black text-mx-blue mb-6 leading-display">
                 <StyledTitle text="INVIERTE EN TU {FUTURO}" color="blue" />
               </h1>
-              <p className="text-mx-text-muted font-light text-body-lg md:text-heading-sm max-w-2xl mx-auto mb-10">
+              <p className="text-mx-text-muted font-light text-body-lg md:text-body-lg max-w-2xl mx-auto mb-10 text-balance">
                 Elige el plan que mejor se adapte a tus necesidades y comienza tu camino hacia la excelencia profesional
               </p>
 
@@ -435,7 +508,7 @@ function PricingContent() {
         </section>
 
         {/* Custom Pricing Cards */}
-        <section className="px-6 md:px-12 py-12">
+        <section className="px-6 md:px-12 pb-12">
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8">
               {PLANS.map((plan, idx) => (
@@ -444,8 +517,12 @@ function PricingContent() {
                   plan={plan}
                   billingPeriod={billingPeriod}
                   userHasPro={userHasPro}
+                  isTrialing={isTrialing}
+                  showTrial={showTrial}
                   loadingPlan={loadingPlan}
+                  loadingTrial={loadingTrial}
                   onSubscribe={handleSubscribe}
+                  onTrial={handleTrial}
                   index={idx}
                 />
               ))}

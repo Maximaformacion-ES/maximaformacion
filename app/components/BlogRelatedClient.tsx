@@ -25,10 +25,10 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
           viewport={{ once: true }}
           className="mb-12"
         >
-          <span className="text-mx-orange text-body-sm font-medium tracking-[0.5em] uppercase mb-4 block">
+          <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
             Sigue leyendo
           </span>
-          <h2 className="text-mx-blue text-heading-lg md:text-display-sm font-black">
+          <h2 className="text-mx-blue text-heading-sm md:text-heading-md xl:text-heading-lg font-black">
             Artículos relacionados
           </h2>
         </m.div>
@@ -54,14 +54,14 @@ export const BlogRelatedClient: React.FC<BlogRelatedClientProps> = ({ posts }) =
                   unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-mx-blue text-white text-label-md font-medium rounded-full">
+                <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-mx-blue text-white text-label-sm md:text-label-md font-medium rounded-full">
                   {post.category}
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6">
-                <h3 className="text-body-lg font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors line-clamp-2">
+                <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors line-clamp-2">
                   {post.title}
                 </h3>
                 <p className="text-mx-text-muted text-body-sm font-light mb-4 line-clamp-2">
