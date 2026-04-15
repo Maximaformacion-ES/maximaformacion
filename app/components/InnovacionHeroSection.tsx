@@ -5,7 +5,6 @@ import Image from "next/image";
 import { m, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { HeroSection } from "@/lib/strapi/types";
-import { INNOVACION_HERO_FALLBACK } from "@/app/data/hero-sections";
 
 interface InnovacionHeroSectionProps {
   data?: HeroSection;
@@ -15,10 +14,10 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
   const { scrollYProgress } = useScroll();
   const yRange = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
-  const heroImage = data?.heroImage || INNOVACION_HERO_FALLBACK.heroImage;
-  const heroOverline = data?.heroOverline || INNOVACION_HERO_FALLBACK.heroOverline;
-  const heroTitle = data?.heroTitle || INNOVACION_HERO_FALLBACK.heroTitle;
-  const heroDescription = data?.heroDescription || INNOVACION_HERO_FALLBACK.heroDescription;
+  const heroImage = data?.heroImage || '';
+  const heroOverline = data?.heroOverline || '';
+  const heroTitle = data?.heroTitle || '';
+  const heroDescription = data?.heroDescription || '';
 
   return (
     <section className="relative h-dvh flex items-center justify-center overflow-hidden">

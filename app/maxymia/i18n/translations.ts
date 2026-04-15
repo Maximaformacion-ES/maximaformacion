@@ -76,7 +76,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Footer
     'footer.campus': 'Campus',
     'footer.specialties': 'Especialidades',
-    'footer.company': 'Maxima Formacion',
+    'footer.company': 'Maxima Formación',
     'footer.allCourses': 'Todos los cursos',
     'footer.myProgress': 'Mi progreso',
     'footer.certificates': 'Certificados',
@@ -84,12 +84,12 @@ const translations: Record<Locale, Record<string, string>> = {
     'footer.dataScience': 'Data Science',
     'footer.machineLearning': 'Machine Learning',
     'footer.nlp': 'Procesamiento del Lenguaje',
-    'footer.cv': 'Vision por Computador',
+    'footer.cv': 'Visión por Computador',
     'footer.about': 'Sobre nosotros',
     'footer.contact': 'Contacto',
     'footer.privacy': 'Politica de privacidad',
-    'footer.terms': 'Terminos y condiciones',
-    'footer.description': 'Campus de IA aplicada a ciencias. Formacion de vanguardia en inteligencia artificial.',
+    'footer.terms': 'Términos y cóndiciones',
+    'footer.description': 'Campus de IA aplicada a ciencias. Formación de vanguardia en inteligencia artificial.',
     'footer.rights': 'Todos los derechos reservados.',
 
     // Notifications

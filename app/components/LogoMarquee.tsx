@@ -72,14 +72,14 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <p className="text-mx-orange text-body-sm tracking-[0.5em] uppercase mb-4">
+          <p className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg tracking-[0.5em] uppercase mb-4">
             {overline}
           </p>
-          <h2 className="text-mx-blue text-heading-lg md:text-display-sm font-black tracking-tight mb-6">
+          <h2 className="text-mx-blue text-heading-lg md:text-display-sm font-black tracking-display leading-display mb-6">
             {title}
           </h2>
           <div className="w-16 h-px bg-mx-orange mx-auto mb-6" />
-          <p className="text-mx-text-muted text-body-md md:text-body-lg font-light max-w-xl mx-auto">
+          <p className="text-mx-text-muted text-body-sm md:text-body-md font-light max-w-xl mx-auto">
             {description}
           </p>
         </m.div>

@@ -3,12 +3,84 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { clerkClient } from '@clerk/nextjs/server';
 import { isDbConfigured } from '@/lib/db/client';
+import { strapiRequest } from '@/lib/strapi/client';
+import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
+import { provisionMoodleAccess } from '@/lib/moodle/provision';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+/**
+ * Look up the program in Strapi and, if it has Moodle fields configured,
+ * create the Moodle user, enrol them in the course and email credentials.
+ *
+ * Errors are caught and logged so a Moodle/email failure does not cause
+ * Stripe to retry the webhook indefinitely. We still want the enrollment
+ * record in our DB to succeed.
+ */
+async function provisionMoodleForPurchase(params: {
+  documentId: string;
+  programTitle: string | undefined;
+  customerEmail: string | null;
+  customerName: string | null;
+}): Promise<void> {
+  const { documentId, programTitle, customerEmail, customerName } = params;
+
+  if (!customerEmail) {
+    console.warn('No customer email available for Moodle provisioning');
+    return;
+  }
+
+  let program: StrapiProgram | null = null;
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
+      `/api/programs/${documentId}?populate=*`,
+      { revalidate: 0 }
+    );
+    program = response.data;
+  } catch (error) {
+    console.error(`[moodle] Failed to fetch program ${documentId}:`, error);
+    return;
+  }
+
+  if (!program) {
+    console.warn(`[moodle] Program ${documentId} not found in Strapi`);
+    return;
+  }
+
+  if (!program.moodleCourseId || !program.moodle) {
+    console.log(
+      `[moodle] Program "${program.title}" has no moodleCourseId/moodle configured — skipping provisioning`
+    );
+    return;
+  }
+
+  const [firstname, ...rest] = (customerName ?? '').trim().split(/\s+/);
+  const lastname = rest.join(' ');
+
+  try {
+    await provisionMoodleAccess({
+      email: customerEmail,
+      firstname: firstname || 'Alumno',
+      lastname: lastname || 'Máxima',
+      programTitle: programTitle || program.title,
+      programType: program.type,
+      moodleInstance: program.moodle,
+      moodleCourseId: program.moodleCourseId,
+    });
+  } catch (error) {
+    console.error(
+      `[moodle] Provisioning failed for ${customerEmail} on program ${program.title}:`,
+      error
+    );
+    // Intentionally swallowed: enrollment in our DB still succeeds, and
+    // we don't want Stripe to retry forever. A monitoring/alert system
+    // should pick this up from logs and trigger a manual retry.
+  }
+}
 
 async function handleWithDb(event: Stripe.Event): Promise<boolean> {
   if (!isDbConfigured()) return false;
@@ -71,6 +143,17 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           }
 
           console.log(`User ${userId} purchased ${paymentType}: ${title} (${documentId})`);
+
+          // Provision Moodle access if the program is configured for it.
+          // Only for regular program purchases (not Maxymia courses).
+          if (paymentType === 'course') {
+            await provisionMoodleForPurchase({
+              documentId,
+              programTitle: title,
+              customerEmail: session.customer_email,
+              customerName: session.customer_details?.name ?? null,
+            });
+          }
         } else {
           const subscriptionId = session.subscription as string;
           const isTrial = paymentType === 'trial';
@@ -209,6 +292,16 @@ async function handleWithClerk(event: Stripe.Event) {
                 title,
               }],
             },
+          });
+        }
+
+        // Provision Moodle access if the program is configured for it.
+        if (paymentType === 'course') {
+          await provisionMoodleForPurchase({
+            documentId,
+            programTitle: title,
+            customerEmail: session.customer_email,
+            customerName: session.customer_details?.name ?? null,
           });
         }
       } else {

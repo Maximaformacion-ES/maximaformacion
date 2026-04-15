@@ -61,7 +61,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-orange text-body-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </m.p>
@@ -69,7 +69,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-blue text-display-sm md:text-display-md font-black tracking-tight mb-8"
+              className="text-mx-blue text-display-sm md:text-display-md font-black tracking-display leading-display mb-8"
             >
               <StyledTitle text={title} />
             </m.h2>
@@ -84,7 +84,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
           </div>
 
           {/* Right side - Testimonial */}
-          <div className="relative min-h-[400px]">
+          <div className="relative min-h-[400px] flex flex-col justify-center items-center">
             <AnimatePresence mode="wait">
               <m.div
                 key={current}
@@ -96,7 +96,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               >
                 <Quote size={48} className="text-mx-orange/30 mb-6" />
 
-                <p className="text-mx-text text-heading-sm md:text-heading-md font-light leading-relaxed mb-8">
+                <p className="text-mx-text text-body-md md:text-body-lg xl:text-heading-sm font-light leading-relaxed mb-8">
                   &ldquo;{displayTestimonials[current].text}&rdquo;
                 </p>
 

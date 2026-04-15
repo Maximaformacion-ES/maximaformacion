@@ -28,7 +28,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-orange text-label-lg leading-label tracking-[0.3em] uppercase mb-6"
+          className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-6"
         >
           {overline}
         </m.p>
@@ -37,7 +37,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-blue text-display-sm md:text-display-md lg:text-display-lg font-black tracking-display leading-[1] mb-8"
+          className="text-mx-blue text-heading-lg md:text-display-sm lg:text-display-md font-black tracking-display leading-[1] mb-8"
         >
           <StyledTitle text={title} />
         </m.h2>
@@ -47,7 +47,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="text-mx-text-muted text-body-lg md:text-heading-sm font-light max-w-2xl mx-auto mb-12 leading-body"
+          className="text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light max-w-2xl mx-auto mb-12 leading-body"
         >
           {description}
         </m.p>
@@ -61,7 +61,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
         >
           <m.a
             href="/contacto"
-            className="group flex items-center justify-center gap-3 bg-mx-orange text-white px-10 py-5 text-body-lg font-medium rounded-full hover:bg-mx-orange/90 transition duration-300"
+            className="group flex items-center justify-center gap-3 bg-mx-orange text-white px-6 py-3 text-label-sm md:text-label-md font-medium rounded-full hover:bg-mx-orange/90 transition duration-300"
             
             whileTap={{ scale: 0.98 }}
           >
@@ -70,7 +70,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
           </m.a>
           <m.a
             href="tel:+34635659391"
-            className="flex items-center justify-center gap-3 border border-mx-orange text-mx-orange px-10 py-5 text-body-lg font-light rounded-full hover:bg-mx-orange/10 hover:border-mx-orange transition duration-300"
+            className="flex items-center justify-center gap-3 border border-mx-orange text-mx-orange px-6 py-3 text-label-sm md:text-label-md font-light rounded-full hover:bg-mx-orange/10 hover:border-mx-orange transition duration-300"
             
             whileTap={{ scale: 0.98 }}
           >

@@ -75,6 +75,8 @@ function transformProgram(strapi: StrapiProgram): Program {
 - Desarrollar habilidades prácticas aplicables
 - Aplicar lo aprendido en proyectos reales`,
     isPro: strapi.isPro,
+    moodleCourseId: strapi.moodleCourseId ?? null,
+    moodle: strapi.moodle ?? null,
   };
 }
 

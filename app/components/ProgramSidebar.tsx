@@ -117,81 +117,102 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
         {/* Divider */}
         <div className="border-t border-mx-border" />
 
-        {/* Pricing */}
-        <div>
-          <div className="flex items-baseline gap-3">
-            {program.originalPrice && (
-              <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
-                {program.originalPrice}€
-              </span>
-            )}
-            <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
-              {program.price}€
-            </span>
-          </div>
-          {program.originalPrice && (
-            <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold">
-              Ahorra {program.originalPrice - program.price}€
+        {/* Pricing & CTA */}
+        {program.type === 'Master' ? (
+          <>
+            <div>
+              <p className="text-body-sm md:text-body-md text-mx-text-muted font-light">
+                El precio de este máster varía en función del país de residencia del alumno.
+              </p>
             </div>
-          )}
-          <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
-        </div>
 
-        {/* Guarantee badge */}
-        <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
-          <ShieldCheck size={18} className="text-mx-orange shrink-0" />
-          <span className="text-label-sm md:text-label-md text-mx-text-muted font-light">
-            <span className="font-semibold text-mx-orange">14 días de garantía</span> — Devolución del 100%
-          </span>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <p className="text-red-500 text-body-sm">{error}</p>
-        )}
-
-        {/* CTA Button */}
-        <div className="space-y-3">
-          {isLoaded && !campusLoading && hasAccess ? (
-            <Link
-              href={`/cursos/${program.documentId || program.id}`}
+            <a
+              href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
               className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
-              Acceder al Curso
+              <Mail size={18} />
+              Consultar precio
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          ) : (
-            <m.button
-              onClick={handlePurchaseCourse}
-              disabled={isLoading}
-              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              whileHover={{ scale: isLoading ? 1 : 1.02 }}
-              whileTap={{ scale: isLoading ? 1 : 0.98 }}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin" size={18} />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <ShoppingCart size={18} />
-                  {isSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
-                </>
+            </a>
+          </>
+        ) : (
+          <>
+            <div>
+              <div className="flex items-baseline gap-3">
+                {program.originalPrice && (
+                  <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                    {program.originalPrice}€
+                  </span>
+                )}
+                <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
+                  {program.price}€
+                </span>
+              </div>
+              {program.originalPrice && (
+                <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold">
+                  Ahorra {program.originalPrice - program.price}€
+                </div>
               )}
-            </m.button>
-          )}
+              <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
+            </div>
 
-          {isLoaded && !campusLoading && !userHasPro && (
-            <Link
-              href="/pricing"
-              className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
-            >
-              <Crown size={16} />
-              O hazte Pro por €18/mes
-            </Link>
-          )}
-        </div>
+            {/* Guarantee badge */}
+            <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
+              <ShieldCheck size={18} className="text-mx-orange shrink-0" />
+              <span className="text-label-sm md:text-label-md text-mx-text-muted font-light">
+                <span className="font-semibold text-mx-orange">14 días de garantía</span> — Devolución del 100%
+              </span>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <p className="text-red-500 text-body-sm">{error}</p>
+            )}
+
+            {/* CTA Button */}
+            <div className="space-y-3">
+              {isLoaded && !campusLoading && hasAccess ? (
+                <Link
+                  href={`/cursos/${program.documentId || program.id}`}
+                  className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
+                >
+                  Acceder al Curso
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              ) : (
+                <m.button
+                  onClick={handlePurchaseCourse}
+                  disabled={isLoading}
+                  className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart size={18} />
+                      {isSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
+                    </>
+                  )}
+                </m.button>
+              )}
+
+              {isLoaded && !campusLoading && !userHasPro && (
+                <Link
+                  href="/pricing"
+                  className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
+                >
+                  <Crown size={16} />
+                  O hazte Pro por €18/mes
+                </Link>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Divider */}
         <div className="border-t border-mx-border" />

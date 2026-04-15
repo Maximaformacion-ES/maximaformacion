@@ -90,7 +90,6 @@ export async function POST(request: Request) {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        payment_method_types: ['card'],
         line_items: [{ price: stripePrice.id, quantity: 1 }],
         success_url: `${baseUrl}/maxymia/campus/${course.slug}?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/maxymia/campus/${course.slug}?canceled=true`,
@@ -146,20 +145,37 @@ export async function POST(request: Request) {
         );
       }
 
-      if (!program.stripePriceId) {
+      if (!program.stripePriceId && (!program.price || program.price <= 0)) {
         return NextResponse.json(
           { error: 'This course is not available for purchase. Please contact support.' },
           { status: 400 }
         );
       }
 
+      // Use existing Stripe price or create one ad-hoc from the program price
+      let priceIdForCheckout = program.stripePriceId;
+      if (!priceIdForCheckout) {
+        const stripePrice = await stripe.prices.create({
+          currency: 'eur',
+          unit_amount: Math.round(program.price! * 100),
+          product_data: {
+            name: program.title,
+            metadata: {
+              programId: String(program.id),
+              documentId: program.documentId,
+              type: program.type,
+            },
+          },
+        });
+        priceIdForCheckout = stripePrice.id;
+      }
+
       // Create one-time payment checkout session
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        payment_method_types: ['card'],
         line_items: [
           {
-            price: program.stripePriceId,
+            price: priceIdForCheckout,
             quantity: 1,
           },
         ],
@@ -200,7 +216,6 @@ export async function POST(request: Request) {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
-        payment_method_types: ['card'],
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
         line_items: [
           {
@@ -259,7 +274,6 @@ export async function POST(request: Request) {
     // Create Stripe checkout session for subscription
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      payment_method_types: ['card'],
       line_items: [
         {
           price: priceId,

@@ -47,7 +47,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-orange text-label-lg leading-label tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </m.p>
@@ -55,7 +55,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-blue text-display-sm md:text-display-md lg:text-display-md font-black tracking-display leading-display"
+              className="text-mx-blue text-heading-md md:text-heading-md xl:text-display-md font-black tracking-display leading-display"
             >
               <StyledTitle text={title} color="blue" />
             </m.h2>
@@ -68,7 +68,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
           >
             <Link
               href="/programas"
-              className="mt-8 md:mt-0 flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors group"
+              className="mt-8 md:mt-0 flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors group text-body-sm md:text-body-md"
             >
               Ver todos los programas
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

@@ -4,7 +4,6 @@ import React from "react";
 import Image from "next/image";
 import { m, useScroll, useTransform } from "framer-motion";
 import type { HeroSection } from "@/lib/strapi/types";
-import { CONOCENOS_HERO_FALLBACK } from "@/app/data/hero-sections";
 
 interface AboutHeroSectionProps {
   data?: HeroSection;
@@ -14,9 +13,9 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
   const { scrollYProgress } = useScroll();
   const yRange = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
-  const heroImage = data?.heroImage || CONOCENOS_HERO_FALLBACK.heroImage;
-  const heroOverline = data?.heroOverline || CONOCENOS_HERO_FALLBACK.heroOverline;
-  const heroTitle = data?.heroTitle || CONOCENOS_HERO_FALLBACK.heroTitle;
+  const heroImage = data?.heroImage || '';
+  const heroOverline = data?.heroOverline || '';
+  const heroTitle = data?.heroTitle || '';
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">

@@ -132,6 +132,8 @@ export interface StrapiProgram {
   moduleRelations?: StrapiModule[] | null;
   stripeProductId: string | null;
   stripePriceId: string | null;
+  moodleCourseId: number | null;
+  moodle: 'data-science' | 'e-learning' | null;
   audience: string | null;
   careers: string | null;
   objectives: string | null;
@@ -207,6 +209,8 @@ export interface Program {
   careers: string;
   objectives: string;
   isPro: boolean;
+  moodleCourseId?: number | null;
+  moodle?: 'data-science' | 'e-learning' | null;
 }
 
 export interface BlogAuthor {

@@ -160,7 +160,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-orange text-body-sm tracking-[0.3em] uppercase mb-4"
+              className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg tracking-[0.3em] uppercase mb-4"
             >
               {overline}
             </m.p>
@@ -168,7 +168,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-mx-blue text-display-sm md:text-display-md font-black tracking-tight mb-8"
+              className="text-mx-blue text-display-sm md:text-display-md font-black tracking-display leading-display mb-8"
             >
               <StyledTitle text={title} />
             </m.h2>
@@ -177,7 +177,7 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-mx-text-muted text-body-md md:text-body-lg font-light max-w-md leading-relaxed"
+              className="text-mx-text-muted text-body-sm md:text-body-md font-light max-w-md leading-relaxed"
             >
               {description}
             </m.p>

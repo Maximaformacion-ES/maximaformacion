@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShoppingCart, Loader2, ArrowRight, Crown } from 'lucide-react';
+import { ShoppingCart, Loader2, ArrowRight, Crown, Mail } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
@@ -51,6 +51,20 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
       setIsLoading(false);
     }
   };
+
+  if (program.type === 'Master') {
+    return (
+      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 py-3 safe-bottom">
+        <a
+          href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-3 text-body-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+        >
+          <Mail size={16} />
+          Consultar precio
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 py-3 safe-bottom">

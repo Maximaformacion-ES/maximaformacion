@@ -5,69 +5,6 @@ import Image from 'next/image';
 import { m } from 'framer-motion';
 import type { TeamMember } from '@/lib/strapi/types';
 
-// Fallback data when Strapi is unavailable
-const FALLBACK_MEMBERS: TeamMember[] = [
-  {
-    id: 1,
-    name: 'Alfonso Lara',
-    role: 'CEO',
-    avatar:
-      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/32575bc7-df2f-45e7-99e1-c14d10c8b704.webp',
-    linkedin: '#',
-    email: '',
-  },
-  {
-    id: 2,
-    name: 'Rosana Ferrero',
-    role: 'Docencia',
-    avatar:
-      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/295ba03d-c8b5-46cd-8b73-11e3a4a37b14.webp',
-    linkedin: '#',
-    email: '',
-  },
-  {
-    id: 3,
-    name: 'Juan Luis López',
-    role: 'Docencia',
-    avatar:
-      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/6c438ef0-cd28-4a16-8280-ccee3c18ae6e.webp',
-    linkedin: '#',
-    email: '',
-  },
-  {
-    id: 4,
-    name: 'Ignacio García',
-    role: 'Docencia',
-    avatar: '/ignacio-garcia.jpg.webp',
-    linkedin: '#',
-    email: '',
-  },
-  {
-    id: 5,
-    name: 'Marcos Rodríguez',
-    role: 'Docencia',
-    avatar: '/marcos-rodriguez.jpeg',
-    linkedin: '#',
-    email: '',
-  },
-  {
-    id: 6,
-    name: 'José Ant. Lorente',
-    role: 'Docencia',
-    avatar: '/jose-antonio-lorente.png',
-    linkedin: '#',
-    email: '',
-  },
-  {
-    id: 7,
-    name: 'Joana Gorosito',
-    role: 'Comunicación',
-    avatar:
-      'https://pquxfbbxflqvtidtlrhl.supabase.co/storage/v1/object/public/hmac-uploads/brand/60f35268-7b36-455b-80c5-8c7f90d8f957/assets/8d8d9167-df39-4729-8560-88ef9e1d156d.webp',
-    linkedin: '#',
-    email: '',
-  },
-];
 
 const ROLE_ORDER: TeamMember['role'][] = ['CEO', 'Docencia', 'Comunicación'];
 
@@ -113,7 +50,7 @@ interface TeamSectionProps {
 }
 
 export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
-  const allMembers = members && members.length > 0 ? members : FALLBACK_MEMBERS;
+  const allMembers = members || [];
 
   const ceo = allMembers.find((m) => m.role === 'CEO');
   const departments = ROLE_ORDER

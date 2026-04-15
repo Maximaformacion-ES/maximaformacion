@@ -142,7 +142,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
 
           {/* Title & Description */}
           <div className="flex flex-col gap-2 mb-4">
-            <h3 className="text-mx-text-muted text-heading-sm font-medium line-clamp-2">
+            <h3 className="text-mx-text-muted text-heading-sm  font-medium line-clamp-2">
               {program.title}
             </h3>
             <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light line-clamp-3 leading-normal">

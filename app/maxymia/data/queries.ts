@@ -1,5 +1,4 @@
 import { MAXYMIA_COURSES } from './courses';
-import { isStrapiConfigured } from '@/lib/strapi/client';
 import {
   getMaxymiaCoursesFromStrapi,
   getMaxymiaCourseBySlugFromStrapi,
@@ -39,40 +38,19 @@ function applyFilters(courses: MaxymiaCourse[], filters?: MaxymiaCourseFilters):
   return result;
 }
 
-// ============ Async fetch with Strapi fallback ============
+// ============ Async fetch from Strapi ============
 
 export async function fetchMaxymiaCourses(
   filters?: MaxymiaCourseFilters
 ): Promise<MaxymiaCourse[]> {
-  let courses: MaxymiaCourse[];
-
-  if (isStrapiConfigured()) {
-    try {
-      courses = await getMaxymiaCoursesFromStrapi();
-    } catch (error) {
-      console.warn('Strapi fetch failed for Maxymia courses, using fallback:', error);
-      courses = MAXYMIA_COURSES;
-    }
-  } else {
-    courses = MAXYMIA_COURSES;
-  }
-
+  const courses = await getMaxymiaCoursesFromStrapi();
   return filters ? applyFilters(courses, filters) : courses;
 }
 
 export async function fetchMaxymiaCourseBySlug(
   slug: string
 ): Promise<MaxymiaCourse | null> {
-  if (isStrapiConfigured()) {
-    try {
-      const course = await getMaxymiaCourseBySlugFromStrapi(slug);
-      if (course) return course;
-    } catch (error) {
-      console.warn(`Strapi fetch failed for Maxymia course "${slug}", using fallback:`, error);
-    }
-  }
-
-  return MAXYMIA_COURSES.find((c) => c.slug === slug) ?? null;
+  return await getMaxymiaCourseBySlugFromStrapi(slug);
 }
 
 // ============ Sync helpers (operate on loaded data) ============
