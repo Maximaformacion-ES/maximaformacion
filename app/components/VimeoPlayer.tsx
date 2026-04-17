@@ -5,6 +5,7 @@ import { Play, Loader2 } from 'lucide-react';
 
 interface VimeoPlayerProps {
   vimeoId: string;
+  videoHash?: string;
   title?: string;
   onProgress?: (percent: number) => void;
   onComplete?: () => void;
@@ -13,6 +14,7 @@ interface VimeoPlayerProps {
 
 export default function VimeoPlayer({
   vimeoId,
+  videoHash,
   title,
   onProgress,
   onComplete,
@@ -107,10 +109,9 @@ export default function VimeoPlayer({
       )}
       <iframe
         ref={iframeRef}
-        src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&color=F7A000&title=0&byline=0&portrait=0&api=1`}
+        src={`https://player.vimeo.com/video/${vimeoId}?${videoHash ? `h=${videoHash}&` : ''}autoplay=1&color=F7A000&title=0&byline=0&portrait=0&api=1`}
         className="w-full h-full"
         allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
         title={title || 'Vimeo player'}
         onLoad={() => setLoading(false)}
       />

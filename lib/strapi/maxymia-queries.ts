@@ -94,6 +94,8 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
             id
             title_es
             title_en
+            content_es
+            content_en
             estimatedMinutes
             order
             topics {
@@ -104,7 +106,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
               content {
                 __typename
                 ... on ComponentMaxymiaTextBlock { html }
-                ... on ComponentMaxymiaVideoBlock { vimeoId, title }
+                ... on ComponentMaxymiaVideoBlock { vimeoId, videoHash, title }
                 ... on ComponentMaxymiaImageBlock { image { url }, alt, caption }
                 ... on ComponentMaxymiaCodeBlock { language, code, fileName }
                 ... on ComponentMaxymiaCalloutBlock { variant, title, content }
@@ -140,7 +142,7 @@ function transformContentBlock(block: StrapiMaxymiaContentBlock): ContentBlock {
     case 'ComponentMaxymiaTextBlock':
       return { type: 'text', html: block.html };
     case 'ComponentMaxymiaVideoBlock':
-      return { type: 'video', vimeoId: block.vimeoId, title: block.title ?? undefined };
+      return { type: 'video', vimeoId: block.vimeoId, videoHash: block.videoHash ?? undefined, title: block.title ?? undefined };
     case 'ComponentMaxymiaImageBlock':
       return {
         type: 'image',
@@ -243,6 +245,7 @@ function transformLesson(lesson: StrapiMaxymiaLesson): MaxymiaLesson {
   return {
     id: String(lesson.id),
     title: { es: lesson.title_es, en: lesson.title_en ?? lesson.title_es },
+    description: { es: lesson.content_es ?? '', en: lesson.content_en ?? lesson.content_es ?? '' },
     content: transformLocalizedContent(lesson.topics),
     estimatedMinutes: lesson.estimatedMinutes ?? 0,
     topics: (lesson.topics ?? []).map((t) => ({

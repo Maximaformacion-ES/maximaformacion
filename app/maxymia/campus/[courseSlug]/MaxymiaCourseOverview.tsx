@@ -30,7 +30,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
-import type { MaxymiaCourse, MaxymiaBlock, MaxymiaCourseProgress, Locale } from '../../types';
+import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   beginner: { es: 'Principiante', en: 'Beginner' },
@@ -143,7 +143,9 @@ export default function MaxymiaCourseOverview({ course }: Props) {
   ];
 
   return (
-    <div>
+    <div className="h-[calc(100dvh-65px)] md:h-[calc(100dvh-97px)] flex flex-col overflow-hidden">
+      {/* ─── Scrollable content ─── */}
+      <div className="flex-1 overflow-y-auto no-scrollbar">
       {/* ─── Hero Section (two-column) ─────────────────────── */}
       <m.section
         initial={{ opacity: 0 }}
@@ -156,7 +158,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
           <img
             src={course.image}
             alt=""
-            className="w-full h-full object-cover opacity-40"
+            className="w-full object-cover object-top opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0b1018]/95 via-[#0b1018]/85 to-[#0b1018]/60" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b1018] via-[#0b1018]/30 to-transparent" />
@@ -456,6 +458,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
           </div>
         </div>
       </m.section>
+      </div>{/* end scrollable content */}
     </div>
   );
 }
@@ -516,10 +519,20 @@ interface ModuleCardProps {
 
 function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncompleteLessonId, locale }: ModuleCardProps) {
   const [expanded, setExpanded] = useState(blockIndex === 0);
+  const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set());
   const total = block.lessons.length;
   const completedInBlock = block.lessons.filter((l) => completedSet.has(l.id)).length;
   const blockCompleted = completedInBlock === total && total > 0;
   const blockProgress = total > 0 ? Math.round((completedInBlock / total) * 100) : 0;
+
+  const toggleLesson = (lessonId: string) => {
+    setExpandedLessons((prev) => {
+      const next = new Set(prev);
+      if (next.has(lessonId)) next.delete(lessonId);
+      else next.add(lessonId);
+      return next;
+    });
+  };
 
   return (
     <div className={`overflow-hidden rounded-lg ${blockCompleted ? 'bg-amber-500/[0.03] border border-amber-500/20' : 'bg-white/[0.03] border border-white/10'}`}>
@@ -575,6 +588,8 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
               {block.lessons.map((lesson, lessonIndex) => {
                 const isCompleted = completedSet.has(lesson.id);
                 const isCurrent = lesson.id === firstIncompleteLessonId;
+                const hasTopics = lesson.topics && lesson.topics.length > 0;
+                const isLessonExpanded = expandedLessons.has(lesson.id);
 
                 return (
                   <m.div
@@ -583,9 +598,10 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: lessonIndex * 0.05 }}
                   >
-                    <Link
-                      href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}`}
-                      className={`flex items-center justify-between py-2.5 group -mx-3 px-3 rounded-lg ${
+                    {/* Lesson row — toggle only, not a link */}
+                    <button
+                      onClick={() => hasTopics ? toggleLesson(lesson.id) : undefined}
+                      className={`w-full flex items-center justify-between py-2.5 group -mx-3 px-3 rounded-lg text-left ${
                         isCurrent
                           ? 'bg-mx-orange/5'
                           : isCompleted
@@ -593,7 +609,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                           : 'hover:bg-white/[0.03]'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
                         {isCompleted ? (
                           <CheckCircle size={14} className="text-mx-orange shrink-0" />
                         ) : isCurrent ? (
@@ -611,12 +627,48 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                           {lesson.title[locale]}
                         </span>
                       </div>
-                      <span className={`text-label-md ml-4 shrink-0 ${
-                        isCurrent ? 'text-mx-orange' : isCompleted ? 'text-mx-orange/40' : 'text-white/30'
-                      }`}>
-                        {isCompleted ? '✓' : `${lesson.estimatedMinutes} min`}
-                      </span>
-                    </Link>
+                      <div className="flex items-center gap-2 ml-4 shrink-0">
+                        <span className={`text-label-md ${
+                          isCurrent ? 'text-mx-orange' : isCompleted ? 'text-mx-orange/40' : 'text-white/30'
+                        }`}>
+                          {isCompleted ? '✓' : `${lesson.estimatedMinutes} min`}
+                        </span>
+                        {hasTopics && (
+                          <m.div
+                            animate={{ rotate: isLessonExpanded ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronDown size={14} className="text-white/30" />
+                          </m.div>
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Topics (third level) — these are the links */}
+                    <AnimatePresence>
+                      {hasTopics && isLessonExpanded && (
+                        <m.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="ml-7 pl-4 border-l border-white/5 py-1 space-y-0.5">
+                            {lesson.topics!.map((topic, topicIdx) => (
+                              <Link
+                                key={topic.id}
+                                href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}#${topic.anchorId}`}
+                                className="flex items-center gap-2 py-1.5 px-2 rounded text-white/40 hover:text-white/70 hover:bg-white/[0.03] transition-colors"
+                              >
+                                <span className="text-[10px] text-white/20 shrink-0">{topicIdx + 1}.</span>
+                                <span className="text-label-md line-clamp-1">{topic.title[locale]}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </m.div>
+                      )}
+                    </AnimatePresence>
                   </m.div>
                 );
               })}

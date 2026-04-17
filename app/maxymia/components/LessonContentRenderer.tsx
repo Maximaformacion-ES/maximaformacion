@@ -2,10 +2,15 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
-import { marked } from 'marked';
+import { marked, Renderer } from 'marked';
 import { Info, AlertTriangle, Lightbulb } from 'lucide-react';
 import VimeoPlayer from '@/app/components/VimeoPlayer';
 import type { ContentBlock, Locale } from '../types';
+
+const renderer = new Renderer();
+renderer.link = ({ href, text }) => {
+  return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+};
 
 /**
  * Detect if a string is markdown (not already HTML).
@@ -19,7 +24,7 @@ function toHtml(input: string): string {
     return trimmed;
   }
   // Parse markdown to HTML
-  return marked.parse(trimmed, { async: false }) as string;
+  return marked.parse(trimmed, { async: false, renderer }) as string;
 }
 
 interface LessonContentRendererProps {
@@ -47,6 +52,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
         <div className="my-8">
           <VimeoPlayer
             vimeoId={block.vimeoId}
+            videoHash={block.videoHash}
             title={block.title}
           />
         </div>
@@ -138,7 +144,7 @@ function TextBlockRenderer({ html }: { html: string }) {
   const rendered = useMemo(() => toHtml(html), [html]);
   return (
     <div
-      className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-strong:text-white prose-a:text-mx-orange"
+      className="prose prose-invert prose-sm xl:prose-base 2xl:prose-lg max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-li:marker:text-mx-orange prose-strong:text-white prose-a:text-mx-blue prose-a:underline prose-a:decoration-mx-blue/40 hover:prose-a:decoration-mx-blue prose-em:text-mx-orange prose-em:font-medium prose-em:not-italic prose-img:rounded-xl prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-h4:text-mx-orange prose-h4:text-sm prose-h4:tracking-[0.15em] prose-h4:uppercase prose-h4:font-black prose-h4:border-l-2 prose-h4:border-mx-orange prose-h4:pl-3 prose-h4:mt-10 prose-h4:mb-4"
       dangerouslySetInnerHTML={{ __html: rendered }}
     />
   );

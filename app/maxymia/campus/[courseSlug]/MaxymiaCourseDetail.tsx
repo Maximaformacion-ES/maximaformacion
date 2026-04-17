@@ -182,22 +182,19 @@ interface HeroProps {
 
 function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar, mobileSidebar, tabs }: HeroProps) {
   return (
-    <section className="relative pt-12 pb-12 md:pt-16 md:pb-16 overflow-visible">
+    <section className="relative pt-0 pb-12 md:pb-16 overflow-hidden">
       {/* Background image with dark overlays */}
-      <div className="absolute inset-0 z-0 min-h-full">
+      <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0b1018]/95 via-[#0b1018]/85 to-[#0b1018]/60 z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0b1018] via-[#0b1018]/30 to-transparent z-10" />
-        <Image
+        <img
           src={course.image}
           alt={course.title[locale]}
-          className="w-full h-full object-contain opacity-40"
-          fill
-          sizes="100vw"
-          unoptimized
+          className="w-full  object-cover opacity-40"
         />
       </div>
 
-      <div className="relative z-20 max-w-[1800px] mx-auto px-6 md:px-[128px]">
+      <div className="relative z-20 max-w-[1800px] mx-auto px-6 md:px-[128px] pt-12 md:pt-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left: Hero content */}
           <div className="lg:col-span-2">

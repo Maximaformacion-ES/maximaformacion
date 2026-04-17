@@ -17,6 +17,7 @@ export interface TextBlock {
 export interface VideoBlock {
   type: 'video';
   vimeoId: string;
+  videoHash?: string;
   title?: string;
 }
 
@@ -67,6 +68,7 @@ export interface MaxymiaTopic {
 export interface MaxymiaLesson {
   id: string;
   title: LocalizedString;
+  description: LocalizedString;
   content: LocalizedContent;
   estimatedMinutes: number;
   topics: MaxymiaTopic[];

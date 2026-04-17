@@ -86,6 +86,31 @@ export const courseReviews = campusSchema.table('course_reviews', {
   index('idx_course_reviews_course').on(table.courseId),
 ]);
 
+// ─── Course Updates ────────────────────────────────────────────────────
+export const courseUpdates = campusSchema.table('course_updates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  programDocumentId: text('program_document_id').notNull(),
+  programTitle: text('program_title'),
+  moduleDocumentId: text('module_document_id'),
+  lessonDocumentId: text('lesson_document_id'),
+  changeType: text('change_type').notNull(), // 'new_lesson' | 'updated_lesson' | 'new_module' | 'updated_content' | 'new_resource'
+  title: text('title').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  index('idx_course_updates_program').on(table.programDocumentId),
+]);
+
+// ─── Course Update Reads ───────────────────────────────────────────────
+export const courseUpdateReads = campusSchema.table('course_update_reads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clerkId: text('clerk_id').notNull().references(() => users.clerkId),
+  courseUpdateId: uuid('course_update_id').notNull().references(() => courseUpdates.id),
+  readAt: timestamp('read_at', tz).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('idx_course_update_reads_unique').on(table.clerkId, table.courseUpdateId),
+]);
+
 // ─── Exam Results (Maxymia) ────────────────────────────────────────────
 export const examResults = campusSchema.table('exam_results', {
   id: uuid('id').primaryKey().defaultRandom(),

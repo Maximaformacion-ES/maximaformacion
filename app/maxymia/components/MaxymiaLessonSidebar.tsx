@@ -12,13 +12,16 @@ import {
   BookOpen,
   FileQuestion,
 } from 'lucide-react';
-import type { MaxymiaCourse, Locale } from '../types';
+import type { MaxymiaCourse, MaxymiaTopic, Locale } from '../types';
 
 interface MaxymiaLessonSidebarProps {
   course: MaxymiaCourse;
   currentLessonId: string;
   completedLessons: Set<string>;
   locale: Locale;
+  onSelectTopic?: (topic: MaxymiaTopic) => void;
+  onSelectLesson?: () => void;
+  selectedTopicId?: string | null;
 }
 
 export default function MaxymiaLessonSidebar({
@@ -26,6 +29,9 @@ export default function MaxymiaLessonSidebar({
   currentLessonId,
   completedLessons,
   locale,
+  onSelectTopic,
+  onSelectLesson,
+  selectedTopicId,
 }: MaxymiaLessonSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -62,6 +68,9 @@ export default function MaxymiaLessonSidebar({
             currentLessonId={currentLessonId}
             completedLessons={completedLessons}
             locale={locale}
+            onSelectTopic={onSelectTopic}
+            onSelectLesson={onSelectLesson}
+            selectedTopicId={selectedTopicId}
           />
         ))}
       </div>
@@ -71,7 +80,7 @@ export default function MaxymiaLessonSidebar({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-80 flex-shrink-0 border-r border-white/10 bg-white/[0.02] h-[calc(100vh-2rem)] overflow-hidden">
+      <aside className="hidden lg:block w-80 min-w-80 flex-shrink-0 border-r border-white/10 bg-white/[0.02] h-full overflow-hidden">
         {sidebarContent}
       </aside>
 
@@ -121,18 +130,33 @@ export default function MaxymiaLessonSidebar({
 // ─── Sidebar Block ───────────────────────────────────────────────────
 
 interface SidebarBlockProps {
-  block: { id: string; title: Record<Locale, string>; lessons: { id: string; title: Record<Locale, string>; estimatedMinutes: number }[]; exam?: { id: string } | null };
+  block: { id: string; title: Record<Locale, string>; lessons: { id: string; title: Record<Locale, string>; estimatedMinutes: number; topics?: MaxymiaTopic[] }[]; exam?: { id: string } | null };
   courseSlug: string;
   currentLessonId: string;
   completedLessons: Set<string>;
   locale: Locale;
+  onSelectTopic?: (topic: MaxymiaTopic) => void;
+  onSelectLesson?: () => void;
+  selectedTopicId?: string | null;
 }
 
-function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, locale }: SidebarBlockProps) {
+function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, locale, onSelectTopic, onSelectLesson, selectedTopicId }: SidebarBlockProps) {
   const hasCurrentLesson = block.lessons.some((l) => l.id === currentLessonId);
   const [open, setOpen] = useState(hasCurrentLesson);
+  const [expandedLessons, setExpandedLessons] = useState<Set<string>>(
+    () => new Set(hasCurrentLesson ? [currentLessonId] : [])
+  );
 
   const completedInBlock = block.lessons.filter((l) => completedLessons.has(l.id)).length;
+
+  const toggleLesson = (lessonId: string) => {
+    setExpandedLessons((prev) => {
+      const next = new Set(prev);
+      if (next.has(lessonId)) next.delete(lessonId);
+      else next.add(lessonId);
+      return next;
+    });
+  };
 
   return (
     <div className="border-b border-white/5">
@@ -159,24 +183,83 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
             {block.lessons.map((lesson) => {
               const isCurrent = lesson.id === currentLessonId;
               const isCompleted = completedLessons.has(lesson.id);
+              const hasTopics = lesson.topics && lesson.topics.length > 0;
+              const isLessonExpanded = expandedLessons.has(lesson.id);
 
               return (
-                <Link
-                  key={lesson.id}
-                  href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}`}
-                  className={`flex items-center gap-2.5 px-4 pl-8 py-2.5 text-label-md transition-colors ${
-                    isCurrent
+                <div key={lesson.id}>
+                  {/* Lesson row — link to lesson + chevron to expand topics */}
+                  <div className={`flex items-center gap-2.5 px-4 pl-8 py-2.5 text-label-md transition-colors ${
+                    isCurrent && !selectedTopicId
                       ? 'bg-mx-orange/10 text-mx-orange border-l-2 border-mx-orange'
+                      : isCurrent
+                      ? 'bg-mx-orange/5 text-mx-orange/70'
                       : 'text-white/50 hover:text-white/80 hover:bg-white/[0.03]'
-                  }`}
-                >
-                  {isCompleted ? (
-                    <CheckCircle size={13} className="text-mx-orange flex-shrink-0" />
-                  ) : (
-                    <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
-                  )}
-                  <span className="line-clamp-1 flex-1">{lesson.title[locale]}</span>
-                </Link>
+                  }`}>
+                    {isCompleted ? (
+                      <CheckCircle size={13} className="text-mx-orange flex-shrink-0" />
+                    ) : (
+                      <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
+                    )}
+                    <Link
+                      href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}`}
+                      onClick={isCurrent && onSelectLesson ? (e) => { e.preventDefault(); onSelectLesson(); } : undefined}
+                      className="line-clamp-1 flex-1"
+                    >
+                      {lesson.title[locale]}
+                    </Link>
+                    {hasTopics && (
+                      <button
+                        onClick={() => toggleLesson(lesson.id)}
+                        className="flex-shrink-0 p-0.5"
+                      >
+                        {isLessonExpanded
+                          ? <ChevronUp size={12} className="text-white/30" />
+                          : <ChevronDown size={12} className="text-white/30" />
+                        }
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Topics (third level) — these are the clickable items */}
+                  <AnimatePresence initial={false}>
+                    {hasTopics && isLessonExpanded && (
+                      <m.div
+                        initial={{ height: 0 }}
+                        animate={{ height: 'auto' }}
+                        exit={{ height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        {lesson.topics!.map((topic, topicIdx) => {
+                          const isSelected = selectedTopicId === topic.id;
+                          return isCurrent && onSelectTopic ? (
+                            <button
+                              key={topic.id}
+                              onClick={() => onSelectTopic(topic)}
+                              className={`w-full flex items-center gap-2 pl-14 pr-4 py-1.5 text-label-sm transition-colors text-left ${
+                                isSelected
+                                  ? 'text-mx-orange font-medium'
+                                  : 'text-mx-orange/60 hover:text-mx-orange'
+                              }`}
+                            >
+                              <span className={`text-[10px] flex-shrink-0 ${isSelected ? 'text-mx-orange' : 'text-white/20'}`}>{topicIdx + 1}.</span>
+                              <span className="line-clamp-1">{topic.title[locale]}</span>
+                            </button>
+                          ) : (
+                            <Link
+                              key={topic.id}
+                              href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}#${topic.anchorId}`}
+                              className="flex items-center gap-2 pl-14 pr-4 py-1.5 text-label-sm transition-colors text-white/35 hover:text-white/60"
+                            >
+                              <span className="text-[10px] text-white/20 flex-shrink-0">{topicIdx + 1}.</span>
+                              <span className="line-clamp-1">{topic.title[locale]}</span>
+                            </Link>
+                          );
+                        })}
+                      </m.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               );
             })}
             {block.exam && (

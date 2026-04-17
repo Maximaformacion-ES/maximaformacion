@@ -653,6 +653,7 @@ export interface StrapiMaxymiaTextBlock {
 export interface StrapiMaxymiaVideoBlock {
   __typename: 'ComponentMaxymiaVideoBlock';
   vimeoId: string;
+  videoHash: string | null;
   title: string | null;
 }
 
@@ -751,6 +752,8 @@ export interface StrapiMaxymiaLesson {
   id: string;
   title_es: string;
   title_en: string | null;
+  content_es: string | null;
+  content_en: string | null;
   estimatedMinutes: number | null;
   order: number;
   topics: StrapiMaxymiaTopic[] | null;

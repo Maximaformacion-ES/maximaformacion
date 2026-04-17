@@ -111,7 +111,7 @@ function DefaultCampusHeader() {
               <Search size={16} className="text-white/60" />
             </button>
             <NotificationBell courses={courses} />
-            <div className="rounded-full p-px hidden md:block">
+            <div className="rounded-full p-px hidden md:block" suppressHydrationWarning>
               <UserButton
                 afterSignOutUrl="/maxymia"
                 userProfileMode="navigation"
@@ -152,7 +152,7 @@ function DefaultCampusHeader() {
           {/* Menu panel */}
           <div className="absolute top-0 right-0 w-56 h-full bg-[#0f1520] border-l border-white/10 shadow-2xl shadow-black/50 flex flex-col">
             {/* Close + avatar */}
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5">
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5" suppressHydrationWarning>
               <UserButton
                 afterSignOutUrl="/maxymia"
                 userProfileMode="navigation"
@@ -257,7 +257,7 @@ function LessonHeader() {
 
         {/* Right: avatar */}
         <div className="flex items-center gap-3">
-          <div className="rounded-full p-px">
+          <div className="rounded-full p-px" suppressHydrationWarning>
             <UserButton
               afterSignOutUrl="/maxymia"
               userProfileMode="navigation"

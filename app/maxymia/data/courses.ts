@@ -46,6 +46,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: '¿Qué es la Inteligencia Artificial?',
               en: 'What is Artificial Intelligence?',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 25,
             content: {
@@ -111,6 +112,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Tipos de IA y Machine Learning',
               en: 'Types of AI and Machine Learning',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 30,
             content: {
@@ -282,6 +284,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Perceptrones y redes feedforward',
               en: 'Perceptrons and feedforward networks',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 35,
             content: {
@@ -347,6 +350,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Backpropagation y entrenamiento',
               en: 'Backpropagation and training',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 40,
             content: {
@@ -455,6 +459,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Tokenización y representación de texto',
               en: 'Tokenization and text representation',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 30,
             content: {
@@ -490,6 +495,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Modelos de secuencia: RNN y LSTM',
               en: 'Sequence models: RNN and LSTM',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 35,
             content: {
@@ -546,6 +552,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Atención es todo lo que necesitas',
               en: 'Attention is all you need',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 45,
             content: {
@@ -611,6 +618,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Usando Hugging Face Transformers',
               en: 'Using Hugging Face Transformers',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 40,
             content: {
@@ -759,6 +767,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Fundamentos de CNNs',
               en: 'CNN Fundamentals',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 35,
             content: {
@@ -903,6 +912,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: '¿Qué son los LLMs?',
               en: 'What are LLMs?',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 30,
             content: {
@@ -916,6 +926,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               es: 'Prompting para científicos',
               en: 'Prompting for scientists',
             },
+            description: { es: '', en: '' },
             topics: [],
             estimatedMinutes: 25,
             content: {
