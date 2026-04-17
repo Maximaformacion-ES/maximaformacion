@@ -144,7 +144,7 @@ function TextBlockRenderer({ html }: { html: string }) {
   const rendered = useMemo(() => toHtml(html), [html]);
   return (
     <div
-      className="prose prose-invert prose-sm xl:prose-base 2xl:prose-lg max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-li:marker:text-mx-orange prose-strong:text-white prose-a:text-mx-blue prose-a:underline prose-a:decoration-mx-blue/40 hover:prose-a:decoration-mx-blue prose-em:text-mx-orange prose-em:font-medium prose-em:not-italic prose-img:rounded-xl prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-h4:text-mx-orange prose-h4:text-sm prose-h4:tracking-[0.15em] prose-h4:uppercase prose-h4:font-black prose-h4:border-l-2 prose-h4:border-mx-orange prose-h4:pl-3 prose-h4:mt-10 prose-h4:mb-4"
+      className="prose prose-invert prose-sm xl:prose-base 2xl:prose-lg max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-li:marker:text-mx-orange prose-strong:text-white prose-a:text-mx-blue prose-a:underline prose-a:decoration-mx-blue/40 hover:prose-a:decoration-mx-blue prose-em:text-mx-orange prose-em:font-medium prose-em:not-italic prose-img:rounded-xl prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-h4:text-mx-orange prose-h4:text-sm prose-h4:tracking-[0.15em] prose-h4:uppercase prose-h4:font-black prose-h4:border-l-2 prose-h4:border-mx-orange prose-h4:pl-3 prose-h4:mt-10 prose-h4:mb-4 prose-h5:text-mx-orange/70 prose-h5:text-base prose-h5:font-bold prose-h5:tracking-wide prose-h5:mt-8 prose-h5:mb-3"
       dangerouslySetInnerHTML={{ __html: rendered }}
     />
   );
