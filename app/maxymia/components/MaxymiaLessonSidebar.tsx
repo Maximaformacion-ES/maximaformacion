@@ -13,6 +13,7 @@ import {
   FileQuestion,
 } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaTopic, Locale } from '../types';
+import { getCourseProgressStats } from '../data/queries';
 
 interface MaxymiaLessonSidebarProps {
   course: MaxymiaCourse;
@@ -35,10 +36,8 @@ export default function MaxymiaLessonSidebar({
 }: MaxymiaLessonSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const totalLessons = course.blocks.reduce((sum, b) => sum + b.lessons.length, 0);
-  const progressPercent = totalLessons > 0
-    ? Math.round((completedLessons.size / totalLessons) * 100)
-    : 0;
+  const { completed: completedCount, total: totalLessons, percent: progressPercent } =
+    getCourseProgressStats(course, completedLessons);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -46,7 +45,7 @@ export default function MaxymiaLessonSidebar({
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-2">
           <span className="text-white/60 text-label-md">
-            {completedLessons.size}/{totalLessons} {locale === 'es' ? 'completadas' : 'completed'}
+            {completedCount}/{totalLessons} {locale === 'es' ? 'completadas' : 'completed'}
           </span>
           <span className="text-mx-orange text-label-md font-semibold">{progressPercent}%</span>
         </div>
@@ -262,11 +261,14 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                 </div>
               );
             })}
-            {block.exam && (
-              <div className="flex items-center gap-2 px-4 pl-8 py-2.5 text-label-md text-purple-400/70">
+            {block.exam && block.lessons.length > 0 && (
+              <Link
+                href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam`}
+                className="flex items-center gap-2 px-4 pl-8 py-2.5 text-label-md text-purple-400/70 hover:text-purple-300 hover:bg-white/[0.03] transition-colors"
+              >
                 <FileQuestion size={11} className="flex-shrink-0" />
                 <span className="line-clamp-1">{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
-              </div>
+              </Link>
             )}
           </m.div>
         )}

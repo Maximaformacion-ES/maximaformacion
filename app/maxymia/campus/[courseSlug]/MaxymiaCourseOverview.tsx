@@ -27,8 +27,9 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
+import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
-import { getCourseMeta } from '../../data/queries';
+import { getCourseMeta, getCourseProgressStats } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
 
@@ -53,6 +54,7 @@ interface Props {
 export default function MaxymiaCourseOverview({ course }: Props) {
   const { locale } = useLocale();
   const { hasPro, hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
+  const { byBlockId: examResultsByBlock } = useExamResults(course.id);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>('objectives');
@@ -92,16 +94,16 @@ export default function MaxymiaCourseOverview({ course }: Props) {
     };
   }, [courseProgress, course.id]);
 
+  const { completed: completedValidCount, percent: progressPercent, isCompleted: isFullyCompleted } =
+    useMemo(
+      () => getCourseProgressStats(course, progress?.completedLessons),
+      [course, progress]
+    );
+
   const completedSet = useMemo(
     () => new Set(progress?.completedLessons ?? []),
     [progress]
   );
-
-  const progressPercent = totalLessons > 0
-    ? Math.round((completedSet.size / totalLessons) * 100)
-    : 0;
-
-  const isFullyCompleted = progressPercent === 100 && totalLessons > 0;
 
   // Find first incomplete lesson for CTA
   const firstIncompleteLessonId = useMemo(() => {
@@ -328,7 +330,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                           {locale === 'es' ? 'Tu progreso' : 'Your progress'}
                         </p>
                         <p className="text-white/40 text-xs">
-                          {completedSet.size} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones completadas' : 'lessons completed'}
+                          {completedValidCount} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones completadas' : 'lessons completed'}
                         </p>
                         <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
                           <div
@@ -428,7 +430,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
               />
             </div>
             <p className="text-mx-orange text-sm text-center mt-2">
-              {progressPercent}% {locale === 'es' ? 'completado' : 'completed'} · {completedSet.size} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
+              {progressPercent}% {locale === 'es' ? 'completado' : 'completed'} · {completedValidCount} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
             </p>
           </div>
 
@@ -443,6 +445,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                 completedSet={completedSet}
                 firstIncompleteLessonId={firstIncompleteLessonId}
                 locale={locale}
+                examResult={examResultsByBlock[block.id]}
               />
             ))}
           </div>
@@ -509,6 +512,7 @@ function MarkdownBlock({ content }: { content: string }) {
 // ─── Module Card (same accordion pattern as product page) ───────────
 
 interface ModuleCardProps {
+  examResult?: ExamResult;
   block: MaxymiaBlock;
   blockIndex: number;
   courseSlug: string;
@@ -517,7 +521,7 @@ interface ModuleCardProps {
   locale: Locale;
 }
 
-function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncompleteLessonId, locale }: ModuleCardProps) {
+function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncompleteLessonId, locale, examResult }: ModuleCardProps) {
   const [expanded, setExpanded] = useState(blockIndex === 0);
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set());
   const total = block.lessons.length;
@@ -672,11 +676,32 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                   </m.div>
                 );
               })}
-              {block.exam && (
-                <div className="flex items-center gap-3 py-3 text-purple-300/70">
-                  <FileQuestion size={14} className="shrink-0" />
-                  <span className="text-body-sm">{block.exam.title[locale]}</span>
-                </div>
+              {block.exam && block.lessons.length > 0 && (
+                <Link
+                  href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam`}
+                  className="flex items-center gap-3 py-3 -mx-3 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
+                >
+                  <FileQuestion size={14} className="shrink-0 text-purple-300/70" />
+                  <span className="text-body-sm text-purple-300/70 group-hover:text-purple-200 flex-1">
+                    {block.exam.title[locale]}
+                  </span>
+                  {examResult ? (
+                    <span
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold ${
+                        examResult.passed
+                          ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                          : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                      }`}
+                    >
+                      {examResult.passed ? <CheckCircle size={12} /> : null}
+                      {examResult.score}%
+                    </span>
+                  ) : (
+                    <span className="text-white/30 text-label-sm">
+                      {locale === 'es' ? 'Pendiente' : 'Pending'}
+                    </span>
+                  )}
+                </Link>
               )}
             </div>
           </m.div>

@@ -94,6 +94,11 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
 
   const isCompleted = completedSet.has(lesson.id);
 
+  const nextIsExam = useMemo(() => {
+    const lastLesson = block.lessons[block.lessons.length - 1];
+    return !!block.exam && lastLesson?.id === lesson.id;
+  }, [block, lesson.id]);
+
   const nav = useMemo((): LessonNavigation | null => {
     const allLessons: { blockId: string; lessonId: string; title: typeof course.title; blockTitle: typeof course.title }[] = [];
     for (const b of course.blocks) {
@@ -140,12 +145,14 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
       await handleMarkComplete();
       await refetch();
     }
-    if (nav?.next) {
+    if (nextIsExam) {
+      router.push(`/maxymia/campus/${course.slug}/lesson/${lesson.id}/exam`);
+    } else if (nav?.next) {
       router.push(`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`);
     } else {
       router.push(`/maxymia/campus/${course.slug}`);
     }
-  }, [nav, isCompleted, handleMarkComplete, refetch, router, course.slug]);
+  }, [nav, nextIsExam, lesson.id, isCompleted, handleMarkComplete, refetch, router, course.slug]);
 
   const handleSelectTopic = (topic: MaxymiaTopic) => {
     setSelectedTopicId(topic.id);
@@ -308,6 +315,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               prevLesson={nav.prev}
               courseSlug={course.slug}
               locale={locale}
+              nextIsExam={nextIsExam}
             />
           ) : nav && !selectedTopicId ? (
             /* ─── Lesson-level navigation ─── */
@@ -324,7 +332,15 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               ) : (
                 <div />
               )}
-              {nav.next ? (
+              {nextIsExam ? (
+                <button
+                  onClick={handleNext}
+                  className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
+                >
+                  <span>{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
+                  <ArrowRight size={16} />
+                </button>
+              ) : nav.next ? (
                 <button
                   onClick={handleNext}
                   className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
@@ -367,6 +383,7 @@ interface TopicNavigationProps {
   prevLesson: { blockId: string; lessonId: string; title: { es: string; en: string } } | null;
   courseSlug: string;
   locale: 'es' | 'en';
+  nextIsExam?: boolean;
 }
 
 function TopicNavigation({
@@ -378,6 +395,7 @@ function TopicNavigation({
   prevLesson,
   courseSlug,
   locale,
+  nextIsExam,
 }: TopicNavigationProps) {
   const currentIdx = topicSections.findIndex((s) => s.topic.id === selectedTopicId);
   const prevTopic = currentIdx > 0 ? topicSections[currentIdx - 1] : null;
@@ -431,9 +449,13 @@ function TopicNavigation({
       ) : isLast ? (
         <button
           onClick={onNextLesson}
-          className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange/90 transition-colors text-body-sm"
+          className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
         >
-          <span>{locale === 'es' ? 'Siguiente lección' : 'Next lesson'}</span>
+          <span>
+            {nextIsExam
+              ? (locale === 'es' ? 'Examen del bloque' : 'Block exam')
+              : (locale === 'es' ? 'Siguiente lección' : 'Next lesson')}
+          </span>
           <ArrowRight size={16} />
         </button>
       ) : (

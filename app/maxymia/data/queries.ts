@@ -193,6 +193,28 @@ export function getRecentCourses(courses: MaxymiaCourse[], limit = 10): MaxymiaC
     .slice(0, limit);
 }
 
+/**
+ * Compute valid progress stats for a course, ignoring orphan completed
+ * lesson IDs (lessons that were deleted or restructured in Strapi).
+ * Caps percent at 100.
+ */
+export function getCourseProgressStats(
+  course: MaxymiaCourse,
+  completedLessonIds: Iterable<string> | undefined
+) {
+  const validIds = new Set<string>();
+  for (const block of course.blocks) {
+    for (const lesson of block.lessons) validIds.add(lesson.id);
+  }
+  let completed = 0;
+  if (completedLessonIds) {
+    for (const id of completedLessonIds) if (validIds.has(id)) completed++;
+  }
+  const total = validIds.size;
+  const percent = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+  return { completed, total, percent, isCompleted: total > 0 && completed >= total };
+}
+
 /** Get total lessons and total duration for a course */
 export function getCourseMeta(course: MaxymiaCourse) {
   let totalLessons = 0;
@@ -235,3 +257,4 @@ export async function fetchLesson(courseSlug: string, lessonId: string) {
 
   return null;
 }
+

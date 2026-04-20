@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useReducer, useCallback } from 'react';
+import React, { useReducer, useCallback, useEffect, useRef } from 'react';
 import { FileQuestion, Send } from 'lucide-react';
-import type { MaxymiaExam, ExamQuestion, Locale } from '../../types';
+import type { MaxymiaExam, ExamQuestion, Locale, LocalizedString } from '../../types';
 import SingleChoiceQuestion from './SingleChoiceQuestion';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
 import OrderingQuestion from './OrderingQuestion';
@@ -80,6 +80,8 @@ interface ExamContainerProps {
   blockId: string;
   locale: Locale;
   onPass?: () => void;
+  nextLesson?: { lessonTitle: LocalizedString; blockTitle: LocalizedString; href: string } | null;
+  scrollContainerId?: string;
 }
 
 export default function ExamContainer({
@@ -88,6 +90,8 @@ export default function ExamContainer({
   blockId,
   locale,
   onPass,
+  nextLesson,
+  scrollContainerId,
 }: ExamContainerProps) {
   const [state, dispatch] = useReducer(examReducer, {
     answers: {},
@@ -95,6 +99,14 @@ export default function ExamContainer({
     score: 0,
     correctCount: 0,
   });
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!state.submitted) return;
+    const container = scrollContainerId ? document.getElementById(scrollContainerId) : null;
+    if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+    else rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [state.submitted, scrollContainerId]);
 
   const setAnswer = useCallback((questionId: string, value: unknown) => {
     dispatch({ type: 'SET_ANSWER', questionId, value });
@@ -143,7 +155,7 @@ export default function ExamContainer({
   }).length;
 
   return (
-    <div className="mt-16 border-t border-white/10 pt-12">
+    <div ref={rootRef}>
       {/* Exam header */}
       <div className="flex items-center gap-3 mb-8">
         <FileQuestion className="text-purple-400" size={24} />
@@ -165,6 +177,7 @@ export default function ExamContainer({
             correctCount={state.correctCount}
             locale={locale}
             onRetry={handleRetry}
+            nextLesson={nextLesson}
           />
         </div>
       )}
@@ -193,7 +206,7 @@ export default function ExamContainer({
           <button
             onClick={handleSubmit}
             disabled={answeredCount < exam.questions.length}
-            className="flex items-center gap-2 bg-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 bg-mx-orange text-white px-6 py-3 rounded-lg font-medium hover:bg-mx-orange/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <Send size={16} />
             {locale === 'es' ? 'Enviar examen' : 'Submit exam'}

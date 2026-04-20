@@ -19,6 +19,7 @@ const CAMPUS_NAV = [
   { name: 'Inicio', path: '/maxymia/campus' },
   { name: 'Cursos', path: '/maxymia/campus/cursos' },
   { name: 'Mis Cursos', path: '/maxymia/campus/mis-cursos' },
+  { name: 'Notas', path: '/maxymia/campus/notas' },
 ];
 
 function CampusHeader() {

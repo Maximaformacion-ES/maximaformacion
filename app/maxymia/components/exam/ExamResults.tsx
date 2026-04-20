@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Trophy, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
-import type { Locale } from '../../types';
+import Link from 'next/link';
+import { Trophy, RefreshCw, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
+import type { Locale, LocalizedString } from '../../types';
 
 interface ExamResultsProps {
   score: number;
@@ -11,6 +12,7 @@ interface ExamResultsProps {
   correctCount: number;
   locale: Locale;
   onRetry: () => void;
+  nextLesson?: { lessonTitle: LocalizedString; blockTitle: LocalizedString; href: string } | null;
 }
 
 export default function ExamResults({
@@ -20,6 +22,7 @@ export default function ExamResults({
   correctCount,
   locale,
   onRetry,
+  nextLesson,
 }: ExamResultsProps) {
   const passed = score >= passingScore;
 
@@ -56,16 +59,30 @@ export default function ExamResults({
       </p>
 
       {passed ? (
-        <div className="flex items-center justify-center gap-2 text-green-400">
-          <CheckCircle size={16} />
-          <span className="text-body-sm">
-            {locale === 'es' ? 'Resultado guardado' : 'Result saved'}
-          </span>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-2 text-green-400">
+            <CheckCircle size={16} />
+            <span className="text-body-sm">
+              {locale === 'es' ? 'Resultado guardado' : 'Result saved'}
+            </span>
+          </div>
+          {nextLesson && (
+            <Link
+              href={nextLesson.href}
+              className="inline-flex items-center gap-2 bg-mx-orange text-black px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange/90 transition-colors"
+            >
+              {locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
+              <span className="text-black/70 truncate max-w-[220px] hidden sm:inline">
+                · {nextLesson.lessonTitle[locale]}
+              </span>
+              <ArrowRight size={16} />
+            </Link>
+          )}
         </div>
       ) : (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
+          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange/90 transition-colors"
         >
           <RefreshCw size={16} />
           {locale === 'es' ? 'Intentar de nuevo' : 'Try again'}

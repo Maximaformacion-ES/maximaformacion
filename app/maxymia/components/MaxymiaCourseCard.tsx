@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { m } from 'framer-motion';
 import { Star, ArrowUpRight, Users, Calendar, User, Trophy } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
-import { getCourseMeta } from '../data/queries';
+import { getCourseMeta, getCourseProgressStats } from '../data/queries';
 
 interface MaxymiaCourseCardProps {
   course: MaxymiaCourse;
@@ -43,9 +43,11 @@ export default function MaxymiaCourseCard({
   index = 0,
 }: MaxymiaCourseCardProps) {
   const { totalLessons } = getCourseMeta(course);
-  const completedCount = progress?.completedLessons.length ?? 0;
-  const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
-  const isFullyCompleted = progressPercent === 100 && totalLessons > 0;
+  const {
+    percent: progressPercent,
+    isCompleted: isFullyCompleted,
+    completed: completedCount,
+  } = getCourseProgressStats(course, progress?.completedLessons);
 
   const rating = course.rating ?? 0;
   const studentCount = course.studentCount ?? 0;

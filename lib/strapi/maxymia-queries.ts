@@ -110,6 +110,15 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
                 ... on ComponentMaxymiaImageBlock { image { url }, alt, caption }
                 ... on ComponentMaxymiaCodeBlock { language, code, fileName }
                 ... on ComponentMaxymiaCalloutBlock { variant, title, content }
+                ... on ComponentMaxymiaDownloadBlock {
+                  title
+                  description
+                  files {
+                    label
+                    description
+                    file { url, name, mime, size }
+                  }
+                }
               }
             }
           }
@@ -163,6 +172,22 @@ function transformContentBlock(block: StrapiMaxymiaContentBlock): ContentBlock {
         variant: block.variant,
         title: block.title ?? undefined,
         content: block.content,
+      };
+    case 'ComponentMaxymiaDownloadBlock':
+      return {
+        type: 'download',
+        title: block.title ?? undefined,
+        description: block.description ?? undefined,
+        files: (block.files ?? [])
+          .filter((f) => f.file)
+          .map((f) => ({
+            label: f.label,
+            description: f.description ?? undefined,
+            url: getStrapiMediaUrl(f.file),
+            name: f.file!.name,
+            mime: f.file!.mime,
+            sizeKB: f.file!.size,
+          })),
       };
   }
 }

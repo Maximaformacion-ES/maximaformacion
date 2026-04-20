@@ -678,12 +678,26 @@ export interface StrapiMaxymiaCalloutBlock {
   content: string;
 }
 
+export interface StrapiMaxymiaDownloadFile {
+  label: string;
+  description: string | null;
+  file: { url: string; name: string; mime: string; size: number } | null;
+}
+
+export interface StrapiMaxymiaDownloadBlock {
+  __typename: 'ComponentMaxymiaDownloadBlock';
+  title: string | null;
+  description: string | null;
+  files: StrapiMaxymiaDownloadFile[];
+}
+
 export type StrapiMaxymiaContentBlock =
   | StrapiMaxymiaTextBlock
   | StrapiMaxymiaVideoBlock
   | StrapiMaxymiaImageBlock
   | StrapiMaxymiaCodeBlock
-  | StrapiMaxymiaCalloutBlock;
+  | StrapiMaxymiaCalloutBlock
+  | StrapiMaxymiaDownloadBlock;
 
 // Exam question types (dynamic zone)
 // Note: _en fields are nullable, JSON scalars come as parsed values

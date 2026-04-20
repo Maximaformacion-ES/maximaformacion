@@ -42,7 +42,29 @@ export interface CalloutBlock {
   content: string;
 }
 
-export type ContentBlock = TextBlock | VideoBlock | ImageBlock | CodeBlock | CalloutBlock;
+export interface DownloadFile {
+  label: string;
+  description?: string;
+  url: string;
+  name: string;
+  mime: string;
+  sizeKB: number;
+}
+
+export interface DownloadBlock {
+  type: 'download';
+  title?: string;
+  description?: string;
+  files: DownloadFile[];
+}
+
+export type ContentBlock =
+  | TextBlock
+  | VideoBlock
+  | ImageBlock
+  | CodeBlock
+  | CalloutBlock
+  | DownloadBlock;
 
 export type LocalizedContent = {
   es: ContentBlock[];

@@ -9,7 +9,8 @@ import { ServicesGridSection } from '../components/ServicesGridSection';
 import { FeaturesSection } from '../components/FeaturesSection';
 import { MethodologySection } from '../components/MethodologySection';
 import { ClientsSection } from '../components/ClientsSection';
-import { ConsultoriaCTASection } from '../components/ConsultoriaCTASection';
+import ConsultoriaFormSection from '../components/ConsultoriaFormSection';
+import FloatingConsultCTA from '../components/FloatingConsultCTA';
 import type { HeroSection } from '@/lib/strapi/types';
 
 interface ConsultoriaClientProps {
@@ -31,9 +32,10 @@ export default function ConsultoriaClient({ heroData }: ConsultoriaClientProps) 
         <FeaturesSection />
         <MethodologySection />
         <ClientsSection />
-        <ConsultoriaCTASection />
+        <ConsultoriaFormSection />
       </main>
 
+      <FloatingConsultCTA />
       <Footer />
     </div>
   );

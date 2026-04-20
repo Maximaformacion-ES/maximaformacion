@@ -16,7 +16,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getTranslation } from '../../i18n/translations';
-import { getCourseMeta, getRecommendedCourses } from '../../data/queries';
+import { getCourseMeta, getRecommendedCourses, getCourseProgressStats } from '../../data/queries';
 import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
 import type { MaxymiaCourse, MaxymiaCourseProgress } from '../../types';
 
@@ -61,12 +61,14 @@ export default function MyCourses({ courses }: MyCoursesProps) {
 
     for (const c of myCourses) {
       const p = progressMap[c.id];
-      if (!p || p.completedLessons.length === 0) {
+      if (!p) {
         notStarted.push(c);
         continue;
       }
-      const { totalLessons } = getCourseMeta(c);
-      if (totalLessons > 0 && p.completedLessons.length >= totalLessons) {
+      const { completed: validCompleted, isCompleted } = getCourseProgressStats(c, p.completedLessons);
+      if (validCompleted === 0) {
+        notStarted.push(c);
+      } else if (isCompleted) {
         completed.push(c);
       } else {
         inProgress.push(c);
@@ -90,7 +92,10 @@ export default function MyCourses({ courses }: MyCoursesProps) {
       const meta = getCourseMeta(c);
       totalLessons += meta.totalLessons;
       const p = progressMap[c.id];
-      if (p) totalLessonsCompleted += p.completedLessons.length;
+      if (p) {
+        const { completed } = getCourseProgressStats(c, p.completedLessons);
+        totalLessonsCompleted += completed;
+      }
     }
     const globalPercent = totalLessons > 0 ? Math.round((totalLessonsCompleted / totalLessons) * 100) : 0;
     return {

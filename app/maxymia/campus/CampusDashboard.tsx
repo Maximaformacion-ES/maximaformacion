@@ -8,7 +8,7 @@ import { useLocale } from '../i18n/LocaleProvider';
 import { getTranslation } from '../i18n/translations';
 import MaxymiaCourseCard from '../components/MaxymiaCourseCard';
 import SlideIndicator from '@/app/components/SlideIndicator';
-import { getBestRatedCourses, getLatestCourse, getRecommendedCourses, getRecentCourses, getCourseMeta } from '../data/queries';
+import { getBestRatedCourses, getLatestCourse, getRecommendedCourses, getRecentCourses, getCourseProgressStats } from '../data/queries';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
 
 // ─── Star Rating ─────────────────────────────────────────────────────
@@ -313,8 +313,8 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
     for (const c of courses) {
       const p = progressMap[c.id];
       if (!p) continue;
-      const { totalLessons } = getCourseMeta(c);
-      if (totalLessons > 0 && p.completedLessons.length >= totalLessons) {
+      const { isCompleted } = getCourseProgressStats(c, p.completedLessons);
+      if (isCompleted) {
         completed.push(c);
       } else {
         inProgress.push(c);
