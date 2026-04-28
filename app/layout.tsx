@@ -38,6 +38,13 @@ export async function generateMetadata(): Promise<Metadata> {
     ...(siteMetadata.canonicalUrl && {
       alternates: { canonical: siteMetadata.canonicalUrl },
     }),
+    ...(siteMetadata.favicon && {
+      icons: {
+        icon: siteMetadata.favicon,
+        shortcut: siteMetadata.favicon,
+        apple: siteMetadata.favicon,
+      },
+    }),
     robots: siteMetadata.noIndex
       ? { index: false, follow: false }
       : { index: true, follow: true },

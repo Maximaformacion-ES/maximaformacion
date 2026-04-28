@@ -31,7 +31,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
   };
 
   return (
-    <m.article
+    <m.a
+      href={`/blog/${post.slug}`}
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -131,17 +132,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
               </>
             )}
           </div>
-          <Link
-            href={`/blog/${post.slug}`}
-            className="w-10 h-10 rounded-full border border-mx-border flex items-center justify-center group-hover:bg-mx-orange group-hover:border-mx-orange transition-all duration-300"
-          >
-            <ArrowUpRight
-              size={16}
-              className="text-mx-text-muted group-hover:text-white transition-colors"
-            />
-          </Link>
         </div>
       </div>
-    </m.article>
+    </m.a>
   );
 };

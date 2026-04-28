@@ -74,6 +74,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   }, [lesson.id]);
 
   const hasTopics = lesson.topics && lesson.topics.length > 0;
+  const introBlocks: ContentBlock[] = lesson.intro ? lesson.intro[locale] : [];
 
   const topicSections = useMemo(
     () => (hasTopics ? distributeBlocks(lesson.topics, lesson.content[locale]) : []),
@@ -251,19 +252,16 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               <LessonContentRenderer content={selectedSection.blocks} locale={locale} />
             </>
           ) : hasTopics ? (
-            /* ─── Lesson index view (title + description + topic buttons) ─── */
+            /* ─── Lesson index view (title + intro blocks + topic buttons) ─── */
             <>
               <h1 className="text-white text-heading-md md:text-heading-lg font-bold mb-6">
                 {lesson.title[locale]}
               </h1>
 
-              {/* Lesson description (content_es) */}
-              {lesson.description[locale] && (
+              {/* Lesson intro (content_es dynamic zone) */}
+              {introBlocks.length > 0 && (
                 <div className="mb-8">
-                  <LessonContentRenderer
-                    content={[{ type: 'text', html: lesson.description[locale] }]}
-                    locale={locale}
-                  />
+                  <LessonContentRenderer content={introBlocks} locale={locale} />
                 </div>
               )}
 
@@ -284,17 +282,14 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               </div>
             </>
           ) : (
-            /* ─── No topics — description + flat content ─── */
+            /* ─── No topics — intro + flat content ─── */
             <>
               <h1 className="text-white text-heading-md md:text-heading-lg font-bold mb-6">
                 {lesson.title[locale]}
               </h1>
-              {lesson.description[locale] && (
+              {introBlocks.length > 0 && (
                 <div className="mb-8">
-                  <LessonContentRenderer
-                    content={[{ type: 'text', html: lesson.description[locale] }]}
-                    locale={locale}
-                  />
+                  <LessonContentRenderer content={introBlocks} locale={locale} />
                 </div>
               )}
               {lesson.content[locale].length > 0 && (

@@ -16,7 +16,9 @@ export interface TextBlock {
 
 export interface VideoBlock {
   type: 'video';
-  vimeoId: string;
+  provider?: 'vimeo' | 'youtube';
+  vimeoId?: string;
+  youtubeId?: string;
   videoHash?: string;
   title?: string;
 }
@@ -58,13 +60,20 @@ export interface DownloadBlock {
   files: DownloadFile[];
 }
 
+export interface EmbedBlock {
+  type: 'embed';
+  html: string;
+  provider?: string;
+}
+
 export type ContentBlock =
   | TextBlock
   | VideoBlock
   | ImageBlock
   | CodeBlock
   | CalloutBlock
-  | DownloadBlock;
+  | DownloadBlock
+  | EmbedBlock;
 
 export type LocalizedContent = {
   es: ContentBlock[];
@@ -91,6 +100,7 @@ export interface MaxymiaLesson {
   id: string;
   title: LocalizedString;
   description: LocalizedString;
+  intro?: LocalizedContent;
   content: LocalizedContent;
   estimatedMinutes: number;
   topics: MaxymiaTopic[];

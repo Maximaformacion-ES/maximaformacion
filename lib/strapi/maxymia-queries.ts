@@ -94,8 +94,40 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
             id
             title_es
             title_en
-            content_es
-            content_en
+            content_es {
+              __typename
+              ... on ComponentMaxymiaTextBlock { html }
+              ... on ComponentMaxymiaVideoBlock { vimeoId, videoHash, title }
+              ... on ComponentMaxymiaImageBlock { image { url }, alt, caption }
+              ... on ComponentMaxymiaCodeBlock { language, code, fileName }
+              ... on ComponentMaxymiaCalloutBlock { variant, title, content }
+              ... on ComponentMaxymiaDownloadBlock {
+                title
+                description
+                files {
+                  label
+                  description
+                  file { url, name, mime, size }
+                }
+              }
+            }
+            content_en {
+              __typename
+              ... on ComponentMaxymiaTextBlock { html }
+              ... on ComponentMaxymiaVideoBlock { vimeoId, videoHash, title }
+              ... on ComponentMaxymiaImageBlock { image { url }, alt, caption }
+              ... on ComponentMaxymiaCodeBlock { language, code, fileName }
+              ... on ComponentMaxymiaCalloutBlock { variant, title, content }
+              ... on ComponentMaxymiaDownloadBlock {
+                title
+                description
+                files {
+                  label
+                  description
+                  file { url, name, mime, size }
+                }
+              }
+            }
             estimatedMinutes
             order
             topics {
@@ -151,7 +183,14 @@ function transformContentBlock(block: StrapiMaxymiaContentBlock): ContentBlock {
     case 'ComponentMaxymiaTextBlock':
       return { type: 'text', html: block.html };
     case 'ComponentMaxymiaVideoBlock':
-      return { type: 'video', vimeoId: block.vimeoId, videoHash: block.videoHash ?? undefined, title: block.title ?? undefined };
+      return {
+        type: 'video',
+        provider: block.provider ?? (block.youtubeId ? 'youtube' : 'vimeo'),
+        vimeoId: block.vimeoId ?? undefined,
+        youtubeId: block.youtubeId ?? undefined,
+        videoHash: block.videoHash ?? undefined,
+        title: block.title ?? undefined,
+      };
     case 'ComponentMaxymiaImageBlock':
       return {
         type: 'image',
@@ -209,6 +248,17 @@ function transformLocalizedContent(
   }
 
   return { es: blocks, en: blocks };
+}
+
+/**
+ * Lesson intro blocks (lesson.content_es/_en dynamic zone).
+ */
+function transformLessonIntro(lesson: StrapiMaxymiaLesson): LocalizedContent {
+  const introEs = (lesson.content_es ?? []).map(transformContentBlock);
+  const introEn = (lesson.content_en ?? lesson.content_es ?? []).map(
+    transformContentBlock
+  );
+  return { es: introEs, en: introEn };
 }
 
 function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
@@ -270,7 +320,8 @@ function transformLesson(lesson: StrapiMaxymiaLesson): MaxymiaLesson {
   return {
     id: String(lesson.id),
     title: { es: lesson.title_es, en: lesson.title_en ?? lesson.title_es },
-    description: { es: lesson.content_es ?? '', en: lesson.content_en ?? lesson.content_es ?? '' },
+    description: { es: '', en: '' },
+    intro: transformLessonIntro(lesson),
     content: transformLocalizedContent(lesson.topics),
     estimatedMinutes: lesson.estimatedMinutes ?? 0,
     topics: (lesson.topics ?? []).map((t) => ({

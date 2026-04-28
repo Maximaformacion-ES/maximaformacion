@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { m } from 'framer-motion';
 import { List } from 'lucide-react';
+import type { ContentBlock } from '@/app/maxymia/types';
 
 interface TocItem {
   id: string;
@@ -11,7 +12,7 @@ interface TocItem {
 }
 
 interface BlogTableOfContentsProps {
-  contentHtml: string;
+  body: ContentBlock[];
 }
 
 function slugify(text: string): string {
@@ -23,15 +24,16 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ contentHtml }) => {
+export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ body }) => {
   const [activeId, setActiveId] = useState<string>('');
   const [isVisible, setIsVisible] = useState(false);
   const [headings, setHeadings] = useState<TocItem[]>([]);
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  // Add IDs to headings in the DOM and extract them for the TOC
+  // Add IDs to headings inside the rendered article and extract them for the TOC.
+  // The renderer outputs MarkdownIt's <h2>/<h3>; we tag them after mount.
   useEffect(() => {
-    const container = document.querySelector('.blog-html-content');
+    const container = document.querySelector('.blog-content-article');
     if (!container) return;
 
     const domHeadings = container.querySelectorAll('h2, h3');
@@ -48,7 +50,7 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ conten
       });
     });
     setHeadings(items);
-  }, [contentHtml]);
+  }, [body]);
 
   // Track visibility of blog content section and active heading
   useEffect(() => {

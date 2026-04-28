@@ -430,7 +430,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                   alt="Maxima Formacion"
                   width={200}
                   height={80}
-                  className="h-9 sm:h-12 md:h-14 w-auto"
+                  className="h-6 sm:h-12 w-auto"
                   priority
                 />
               )}

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getBlogPostBySlug, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
-import { markdownToHtml } from '@/lib/markdown';
 import BlogDetailClient from './BlogDetailClient';
 
 export const revalidate = 60;
@@ -59,14 +58,6 @@ export default async function BlogPage({ params }: BlogPageProps) {
     }
   } catch {
     // Strapi unavailable
-  }
-
-  // Parse markdown content to HTML
-  if (post) {
-    post = {
-      ...post,
-      content: await markdownToHtml(post.content),
-    };
   }
 
   return <BlogDetailClient post={post} relatedPosts={relatedPosts} />;

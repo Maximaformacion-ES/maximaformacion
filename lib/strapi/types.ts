@@ -43,6 +43,7 @@ export interface StrapiMedia {
   } | null;
   url: string;
   mime: string;
+  size: number;
 }
 
 // Strapi content types
@@ -153,16 +154,25 @@ export interface StrapiAuthor {
   linkedin: string | null;
 }
 
+export type BlogCategory =
+  | 'Estadística'
+  | 'Data Science'
+  | 'R Software'
+  | 'Formación'
+  | 'Casos de Éxito'
+  | 'Experiencias reales'
+  | 'General';
+
 export interface StrapiBlogPost {
   id: number;
   documentId: string;
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
+  body: StrapiBlogBodyBlock[] | null;
   image: StrapiMedia | null;
   imageUrl: string | null;
-  category: 'Estadística' | 'Data Science' | 'R Software' | 'Formación' | 'Casos de Éxito';
+  category: BlogCategory;
   author: StrapiAuthor | null;
   publishedAt: string | null;
   readTime: string | null;
@@ -228,9 +238,9 @@ export interface BlogPost {
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
+  body: import('@/app/maxymia/types').ContentBlock[];
   image: string;
-  category: 'Estadística' | 'Data Science' | 'R Software' | 'Formación' | 'Casos de Éxito';
+  category: BlogCategory;
   author: BlogAuthor;
   publishedAt: string;
   readTime: string;
@@ -627,6 +637,7 @@ export interface StrapiSiteMetadata {
   ogType: 'website' | 'article' | 'profile' | 'product' | null;
   twitterCard: 'summary' | 'summary_large_image' | null;
   noIndex: boolean;
+  favicon: StrapiMedia | null;
 }
 
 export interface SiteMetadata {
@@ -640,6 +651,7 @@ export interface SiteMetadata {
   ogType: string;
   twitterCard: string;
   noIndex: boolean;
+  favicon: string;
 }
 
 // ============ Maxymia Course Types (GraphQL) ============
@@ -652,7 +664,9 @@ export interface StrapiMaxymiaTextBlock {
 
 export interface StrapiMaxymiaVideoBlock {
   __typename: 'ComponentMaxymiaVideoBlock';
-  vimeoId: string;
+  vimeoId: string | null;
+  youtubeId: string | null;
+  provider: 'vimeo' | 'youtube' | null;
   videoHash: string | null;
   title: string | null;
 }
@@ -698,6 +712,69 @@ export type StrapiMaxymiaContentBlock =
   | StrapiMaxymiaCodeBlock
   | StrapiMaxymiaCalloutBlock
   | StrapiMaxymiaDownloadBlock;
+
+// Blog dynamic-zone components (REST shape — `__component` discriminator)
+export interface StrapiBlogTextBlockRest {
+  __component: 'maxymia.text-block';
+  id: number;
+  html: string;
+}
+export interface StrapiBlogImageBlockRest {
+  __component: 'maxymia.image-block';
+  id: number;
+  image: StrapiMedia | null;
+  alt: string;
+  caption: string | null;
+}
+export interface StrapiBlogVideoBlockRest {
+  __component: 'maxymia.video-block';
+  id: number;
+  vimeoId: string | null;
+  youtubeId: string | null;
+  provider: 'vimeo' | 'youtube' | null;
+  videoHash: string | null;
+  title: string | null;
+}
+export interface StrapiBlogCodeBlockRest {
+  __component: 'maxymia.code-block';
+  id: number;
+  language: string;
+  code: string;
+  fileName: string | null;
+}
+export interface StrapiBlogCalloutBlockRest {
+  __component: 'maxymia.callout-block';
+  id: number;
+  variant: 'info' | 'warning' | 'tip';
+  title: string | null;
+  content: string;
+}
+export interface StrapiBlogDownloadBlockRest {
+  __component: 'maxymia.download-block';
+  id: number;
+  title: string | null;
+  description: string | null;
+  files: {
+    label: string;
+    description: string | null;
+    file: StrapiMedia | null;
+  }[];
+}
+export interface StrapiBlogEmbedBlockRest {
+  __component: 'blog.embed-block';
+  id: number;
+  html: string;
+  provider: string | null;
+}
+
+export type StrapiBlogBodyBlock =
+  | StrapiBlogTextBlockRest
+  | StrapiBlogImageBlockRest
+  | StrapiBlogVideoBlockRest
+  | StrapiBlogCodeBlockRest
+  | StrapiBlogCalloutBlockRest
+  | StrapiBlogDownloadBlockRest
+  | StrapiBlogEmbedBlockRest;
 
 // Exam question types (dynamic zone)
 // Note: _en fields are nullable, JSON scalars come as parsed values
@@ -766,8 +843,8 @@ export interface StrapiMaxymiaLesson {
   id: string;
   title_es: string;
   title_en: string | null;
-  content_es: string | null;
-  content_en: string | null;
+  content_es: StrapiMaxymiaContentBlock[] | null;
+  content_en: StrapiMaxymiaContentBlock[] | null;
   estimatedMinutes: number | null;
   order: number;
   topics: StrapiMaxymiaTopic[] | null;

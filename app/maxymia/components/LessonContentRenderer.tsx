@@ -75,7 +75,21 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     case 'text':
       return <TextBlockRenderer html={block.html} />;
 
-    case 'video':
+    case 'video': {
+      if (block.provider === 'youtube' && block.youtubeId) {
+        return (
+          <div className="my-8 aspect-video rounded-xl overflow-hidden border border-white/10">
+            <iframe
+              src={`https://www.youtube.com/embed/${block.youtubeId}`}
+              title={block.title || 'Video'}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+        );
+      }
+      if (!block.vimeoId) return null;
       return (
         <div className="my-8">
           <VimeoPlayer
@@ -84,6 +98,15 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             title={block.title}
           />
         </div>
+      );
+    }
+
+    case 'embed':
+      return (
+        <div
+          className="my-8 [&_iframe]:w-full [&_iframe]:aspect-video [&_iframe]:rounded-xl [&_iframe]:border [&_iframe]:border-white/10"
+          dangerouslySetInnerHTML={{ __html: block.html }}
+        />
       );
 
     case 'image':

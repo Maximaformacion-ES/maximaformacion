@@ -5,6 +5,7 @@ import type {
   StrapiProgram,
   StrapiTopic,
   StrapiBlogPost,
+  StrapiBlogBodyBlock,
   StrapiHeroSection,
   StrapiSiteMetadata,
   StrapiLogo,
@@ -27,6 +28,7 @@ import type {
   ProgramModule,
   BlogAuthor,
 } from './types';
+import type { ContentBlock } from '@/app/maxymia/types';
 
 // Default values for missing program data
 const DEFAULT_PROGRAM_IMAGE = '/placeholder-course.svg';
@@ -80,6 +82,75 @@ function transformProgram(strapi: StrapiProgram): Program {
   };
 }
 
+function transformBlogBody(blocks: StrapiBlogBodyBlock[] | null | undefined): ContentBlock[] {
+  if (!blocks || !Array.isArray(blocks)) return [];
+  const out: ContentBlock[] = [];
+  for (const block of blocks) {
+    switch (block.__component) {
+      case 'maxymia.text-block':
+        out.push({ type: 'text', html: block.html });
+        break;
+      case 'maxymia.image-block':
+        if (block.image) {
+          out.push({
+            type: 'image',
+            src: getStrapiMediaUrl(block.image),
+            alt: block.alt,
+            caption: block.caption ?? undefined,
+          });
+        }
+        break;
+      case 'maxymia.video-block':
+        out.push({
+          type: 'video',
+          provider: block.provider ?? (block.youtubeId ? 'youtube' : 'vimeo'),
+          vimeoId: block.vimeoId ?? undefined,
+          youtubeId: block.youtubeId ?? undefined,
+          videoHash: block.videoHash ?? undefined,
+          title: block.title ?? undefined,
+        });
+        break;
+      case 'maxymia.code-block':
+        out.push({
+          type: 'code',
+          language: block.language,
+          code: block.code,
+          fileName: block.fileName ?? undefined,
+        });
+        break;
+      case 'maxymia.callout-block':
+        out.push({
+          type: 'callout',
+          variant: block.variant,
+          title: block.title ?? undefined,
+          content: block.content,
+        });
+        break;
+      case 'maxymia.download-block':
+        out.push({
+          type: 'download',
+          title: block.title ?? undefined,
+          description: block.description ?? undefined,
+          files: (block.files ?? [])
+            .filter((f) => f.file)
+            .map((f) => ({
+              label: f.label,
+              description: f.description ?? undefined,
+              url: getStrapiMediaUrl(f.file!),
+              name: f.file!.name,
+              mime: f.file!.mime,
+              sizeKB: f.file!.size,
+            })),
+        });
+        break;
+      case 'blog.embed-block':
+        out.push({ type: 'embed', html: block.html, provider: block.provider ?? undefined });
+        break;
+    }
+  }
+  return out;
+}
+
 // Transform Strapi BlogPost to frontend BlogPost
 function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
   const imageUrl = strapi.image
@@ -112,7 +183,7 @@ function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
     title: strapi.title,
     slug: strapi.slug,
     excerpt: strapi.excerpt,
-    content: strapi.content,
+    body: transformBlogBody(strapi.body),
     image: imageUrl,
     category: strapi.category,
     author,
@@ -167,6 +238,19 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
 
   return query;
 }
+
+// REST populate string for the blog-post `body` dynamic zone.
+// Using the `populate[body][on][<component>]` form so each block type
+// pulls its own nested relations (image, files, etc).
+const BLOG_BODY_POPULATE = [
+  'populate[body][on][maxymia.text-block][populate]=*',
+  'populate[body][on][maxymia.image-block][populate][image]=true',
+  'populate[body][on][maxymia.video-block][populate]=*',
+  'populate[body][on][maxymia.code-block][populate]=*',
+  'populate[body][on][maxymia.callout-block][populate]=*',
+  'populate[body][on][maxymia.download-block][populate][files][populate][file]=true',
+  'populate[body][on][blog.embed-block][populate]=*',
+].join('&');
 
 function buildBlogQuery(options: BlogQueryOptions = {}): string {
   const params = new URLSearchParams();
@@ -342,7 +426,7 @@ async function getBlogPostById(
 ): Promise<BlogPost | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiBlogPost>>(
-      `/api/blog-posts/${id}?populate[image]=true&populate[author][populate][avatar]=true`,
+      `/api/blog-posts/${id}?populate[image]=true&populate[author][populate][avatar]=true&${BLOG_BODY_POPULATE}`,
       {
         revalidate: 60,
         tags: ['blog-posts', `blog-post-${id}`],
@@ -367,7 +451,7 @@ export async function getBlogPostBySlug(
 ): Promise<BlogPost | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
-      `/api/blog-posts?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[author][populate][avatar]=true`,
+      `/api/blog-posts?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[author][populate][avatar]=true&${BLOG_BODY_POPULATE}`,
       {
         revalidate: 60,
         tags: ['blog-posts', `blog-post-slug-${slug}`],
@@ -537,6 +621,7 @@ function transformSiteMetadata(strapi: StrapiSiteMetadata): SiteMetadata {
     ogType: (strapi.ogType || 'website').toLowerCase(),
     twitterCard: (strapi.twitterCard || 'summary_large_image').toLowerCase(),
     noIndex: strapi.noIndex,
+    favicon: strapi.favicon ? getStrapiMediaUrl(strapi.favicon) : '',
   };
 }
 

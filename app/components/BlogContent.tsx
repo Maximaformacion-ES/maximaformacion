@@ -4,6 +4,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import type { BlogPost } from '@/lib/strapi/types';
 import { BlogTableOfContents } from './BlogTableOfContents';
+import LessonContentRenderer from '@/app/maxymia/components/LessonContentRenderer';
 
 interface BlogContentProps {
   post: BlogPost;
@@ -15,7 +16,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
       <style>{`
         /* ── Mobile-first: base = sm (mobile) ── */
         .blog-html-content {
-          color: var(--color-mx-text-muted);
+          color: var(--color-mx-text);
           font-size: var(--text-body-sm);       /* 14px */
           line-height: 1.7;
           overflow-wrap: break-word;
@@ -71,8 +72,8 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
 
         /* Paragraphs */
         .blog-html-content p {
-          color: var(--color-mx-text-muted);
-          font-weight: 300;
+          color: var(--color-mx-text);
+          font-weight: 400;
           line-height: 1.75;
           margin-bottom: 1.25rem;
         }
@@ -80,7 +81,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
         /* Lists */
         .blog-html-content ul,
         .blog-html-content ol {
-          color: var(--color-mx-text-muted);
+          color: var(--color-mx-text);
           margin-top: 1rem;
           margin-bottom: 1rem;
           padding-left: 1.25rem;
@@ -105,8 +106,11 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           font-weight: 700;
         }
 
-        .blog-html-content em {
+        .blog-html-content em,
+        .blog-html-content i {
           font-style: italic;
+          font-weight: 500;
+          color: var(--color-mx-text);
         }
 
         /* Links */
@@ -126,7 +130,7 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
           border-left: 3px solid var(--color-mx-orange);
           padding-left: 1rem;
           margin: 1.5rem 0;
-          color: var(--color-mx-text-muted);
+          color: var(--color-mx-text);
           font-style: italic;
         }
 
@@ -273,45 +277,87 @@ export const BlogContent: React.FC<BlogContentProps> = ({ post }) => {
             font-size: var(--text-body-lg);     /* 20px */
           }
         }
+
+        /* ── Overrides for LessonContentRenderer (designed for dark bg) on light blog bg ── */
+        .blog-content-article :where(p, li, ul, ol, blockquote, td, th, span):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+          color: var(--color-mx-text);
+        }
+        .blog-content-article :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+          color: var(--color-mx-text);
+          font-weight: 700;
+        }
+        .blog-content-article :where(h1, h2, h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+          color: var(--color-mx-blue);
+        }
+        .blog-content-article em,
+        .blog-content-article i {
+          color: var(--color-mx-text) !important;
+          font-style: italic !important;
+          font-weight: 600 !important;
+        }
+        .blog-content-article :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+          color: var(--color-mx-orange);
+          text-decoration: none;
+        }
+        .blog-content-article :where(a):hover:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+          color: var(--color-mx-blue);
+          text-decoration: underline;
+        }
+        .blog-content-article figcaption {
+          color: var(--color-mx-text-muted) !important;
+        }
+        .blog-content-article :not(pre) > code {
+          color: var(--color-mx-orange) !important;
+          background-color: var(--color-mx-card) !important;
+          border: 1px solid var(--color-mx-border);
+          padding: 0.15rem 0.4rem;
+          border-radius: 0.25rem;
+          font-size: 0.85em;
+          font-family: 'Courier New', monospace;
+          font-weight: 600;
+        }
+        .blog-content-article :not(pre) > code::before,
+        .blog-content-article :not(pre) > code::after {
+          content: none !important;
+        }
       `}</style>
-      <section id="blog-content-section" className="py-16 md:py-24 px-6 md:px-12 bg-mx-bg">
-        <div className="max-w-7xl mx-auto">
-          {/* Tags */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-wrap gap-3 mb-12 max-w-4xl"
-          >
-            {post.tags.map(tag => (
-              <span
-                key={tag}
-                className="px-4 py-2 bg-mx-card border border-mx-border text-body-sm text-mx-text-muted rounded-full hover:border-mx-orange/50 hover:text-mx-orange transition-colors"
-              >
-                {tag}
-              </span>
-            ))}
-          </m.div>
-
-          <div className="flex items-start gap-12 justify-between">
-            {/* Article Content */}
-            <m.article
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="max-w-4xl flex-1 min-w-0"
-            >
-              <div
-                dangerouslySetInnerHTML={{ __html: post.content }}
-                className="blog-html-content overflow-x-hidden"
-              />
-            </m.article>
-
-            {/* Table of Contents */}
-            <aside className="hidden xl:block w-64 flex-shrink-0 sticky top-28">
-              <BlogTableOfContents contentHtml={post.content} />
+      <section id="blog-content-section" className="py-16 md:py-24 bg-mx-bg">
+        <div className="px-4 sm:px-6 md:px-48">
+          <div className="xl:grid xl:grid-cols-[280px_minmax(0,1fr)] xl:gap-16">
+            <aside className="hidden xl:block xl:order-1">
+              <div className="sticky top-28">
+                <BlogTableOfContents body={post.body} />
+              </div>
             </aside>
+
+            <div className="min-w-0 xl:order-2 max-w-3xl">
+              {/* Tags */}
+              <m.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="flex flex-wrap gap-3 mb-12"
+              >
+                {post.tags.map(tag => (
+                  <span
+                    key={tag}
+                    className="px-4 py-2 bg-mx-card border border-mx-border text-body-sm text-mx-text-muted rounded-full hover:border-mx-orange/50 hover:text-mx-orange transition-colors"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </m.div>
+
+              <m.article
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="blog-content-article"
+              >
+                <LessonContentRenderer content={post.body} locale="es" />
+              </m.article>
+            </div>
           </div>
         </div>
       </section>
