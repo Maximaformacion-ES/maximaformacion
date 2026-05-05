@@ -110,6 +110,8 @@ function transformProgramWithLessons(strapi: StrapiProgram): ProgramWithLessons 
 - Aplicar lo aprendido en proyectos reales`,
     topics: (strapi.topics || []).map((t) => ({ id: t.id, documentId: t.documentId, name: t.name })),
     isPro: strapi.isPro,
+    moodle: strapi.moodle ?? null,
+    moodleCourseId: strapi.moodleCourseId ?? null,
     moduleRelations,
     totalLessons,
     totalDuration,

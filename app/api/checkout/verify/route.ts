@@ -37,9 +37,62 @@ export async function POST(request: Request) {
     }
 
     const paymentType = session.metadata?.type;
+
+    // Handle subscription / trial: update Clerk metadata to plan: 'pro'
+    if (paymentType === 'trial' || paymentType === 'subscription') {
+      const subscriptionId = session.subscription as string;
+      const customerId = session.customer as string;
+      const isTrial = paymentType === 'trial';
+
+      const stripeSubscription = subscriptionId
+        ? await stripe.subscriptions.retrieve(subscriptionId)
+        : null;
+
+      // Try DB first
+      if (isDbConfigured()) {
+        try {
+          const { upsertUser, upsertSubscription, updateUserPlan } = await import('@/lib/db/queries');
+          await upsertUser(userId, session.customer_email || undefined);
+          await upsertSubscription({
+            clerkId: userId,
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            status: stripeSubscription?.status || 'active',
+            plan: 'pro',
+            startedAt: new Date(),
+          });
+          await updateUserPlan(userId, 'pro');
+          return NextResponse.json({ success: true, upgraded: true });
+        } catch (dbError) {
+          console.warn('DB subscription update failed, falling back to Clerk:', dbError);
+        }
+      }
+
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      const currentMetadata = user.publicMetadata || {};
+
+      await client.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          ...currentMetadata,
+          plan: 'pro',
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscriptionId,
+          subscriptionStatus: stripeSubscription?.status || 'active',
+          subscribedAt: new Date().toISOString(),
+          ...(isTrial ? { hasUsedTrial: true } : {}),
+        },
+      });
+
+      return NextResponse.json({ success: true, upgraded: true });
+    }
+
     if (paymentType !== 'maxymia-course' && paymentType !== 'course') {
       return NextResponse.json({ error: 'Not a course purchase' }, { status: 400 });
     }
+
+    // For subscription/trial we also accept payment_status === 'no_payment_required' (free trials)
+    // but the early return above already handled them. Course flow requires actual payment.
 
     const documentId = session.metadata?.documentId || session.metadata?.courseId;
     const title = session.metadata?.programTitle || session.metadata?.courseTitle;

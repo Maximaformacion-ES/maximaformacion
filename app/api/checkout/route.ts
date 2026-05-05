@@ -88,6 +88,18 @@ export async function POST(request: Request) {
         },
       });
 
+      // Apply Pro discounts (100% if course.isPro, 20% otherwise — Maxymia courses always eligible)
+      const userPlanMaxymia = (user?.publicMetadata as { plan?: string } | undefined)?.plan;
+      const userIsProMaxymia = userPlanMaxymia === 'pro';
+      const proIncludedCouponMaxymia = process.env.STRIPE_PRO_INCLUDED_COUPON_ID;
+      const proCourseCouponMaxymia = process.env.STRIPE_PRO_COURSE_COUPON_ID;
+      const maxymiaCouponId =
+        userIsProMaxymia && course.isPro && proIncludedCouponMaxymia
+          ? proIncludedCouponMaxymia
+          : userIsProMaxymia && proCourseCouponMaxymia
+            ? proCourseCouponMaxymia
+            : null;
+
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [{ price: stripePrice.id, quantity: 1 }],
@@ -100,9 +112,17 @@ export async function POST(request: Request) {
           courseId: course.id,
           courseSlug: course.slug,
           courseTitle: course.title.es,
+          ...(maxymiaCouponId === proIncludedCouponMaxymia
+            ? { proDiscountApplied: 'included' }
+            : maxymiaCouponId === proCourseCouponMaxymia
+              ? { proDiscountApplied: 'course-20' }
+              : {}),
         },
-        allow_promotion_codes: true,
+        ...(maxymiaCouponId
+          ? { discounts: [{ coupon: maxymiaCouponId }] }
+          : { allow_promotion_codes: true }),
         billing_address_collection: 'auto',
+        locale: 'es',
       });
 
       return NextResponse.json({
@@ -170,6 +190,20 @@ export async function POST(request: Request) {
         priceIdForCheckout = stripePrice.id;
       }
 
+      // Apply Pro discounts:
+      //   - 100% if program.isPro (included in Pro)
+      //   - 20% if Curso (not Master) and user has Pro
+      const userPlan = (user?.publicMetadata as { plan?: string } | undefined)?.plan;
+      const userIsPro = userPlan === 'pro';
+      const proIncludedCouponId = process.env.STRIPE_PRO_INCLUDED_COUPON_ID;
+      const proCourseCouponId = process.env.STRIPE_PRO_COURSE_COUPON_ID;
+      const programCouponId =
+        userIsPro && program.isPro && proIncludedCouponId
+          ? proIncludedCouponId
+          : userIsPro && program.type === 'Curso' && proCourseCouponId
+            ? proCourseCouponId
+            : null;
+
       // Create one-time payment checkout session
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
@@ -188,9 +222,17 @@ export async function POST(request: Request) {
           programId: String(program.id),
           documentId: program.documentId,
           programTitle: program.title,
+          ...(programCouponId === proIncludedCouponId
+            ? { proDiscountApplied: 'included' }
+            : programCouponId === proCourseCouponId
+              ? { proDiscountApplied: 'course-20' }
+              : {}),
         },
-        allow_promotion_codes: true,
+        ...(programCouponId
+          ? { discounts: [{ coupon: programCouponId }] }
+          : { allow_promotion_codes: true }),
         billing_address_collection: 'auto',
+        locale: 'es',
       });
 
       return NextResponse.json({
@@ -243,7 +285,7 @@ export async function POST(request: Request) {
         },
         allow_promotion_codes: true,
         billing_address_collection: 'auto',
-        success_url: `${baseUrl}/pricing?success=true&trial=true`,
+        success_url: `${baseUrl}/pricing?success=true&trial=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing`,
       });
 

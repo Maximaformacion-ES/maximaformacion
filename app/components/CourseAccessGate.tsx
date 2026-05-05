@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { Program } from '@/lib/strapi/types';
+import { trackBeginCheckout } from '@/lib/analytics';
 
 interface CourseAccessGateProps {
   program: Program;
@@ -53,6 +54,15 @@ export default function CourseAccessGate({
 
     setIsLoading(true);
     setError(null);
+
+    trackBeginCheckout([
+      {
+        item_id: program.slug,
+        item_name: program.title,
+        item_category: program.type,
+        price: program.price,
+      },
+    ]);
 
     try {
       const response = await fetch('/api/checkout', {

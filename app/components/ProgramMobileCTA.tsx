@@ -6,6 +6,8 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
+import { trackBeginCheckout } from '@/lib/analytics';
 
 interface ProgramMobileCTAProps {
   program: Program;
@@ -16,8 +18,11 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
 
-  const userHasPro = isSignedIn && hasPro;
+  const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(program.documentId);
+  const includedInPro = isFreeWithPro(program, userHasPro);
+  const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
+  const effectivePrice = getEffectivePrice(program, userHasPro);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -26,6 +31,15 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
     }
 
     setIsLoading(true);
+
+    trackBeginCheckout([
+      {
+        item_id: program.slug,
+        item_name: program.title,
+        item_category: program.type,
+        price: effectivePrice,
+      },
+    ]);
 
     try {
       const response = await fetch('/api/checkout', {
@@ -71,18 +85,43 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
-          {program.originalPrice && (
-            <span className="text-mx-text-muted text-body-sm line-through">
-              {program.originalPrice}€
-            </span>
-          )}
-          <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-heading-sm font-black`}>
-            {program.price}€
-          </span>
-          {program.originalPrice && (
-            <span className="text-label-sm font-bold text-mx-orange">
-              -{Math.round(((program.originalPrice - program.price) / program.originalPrice) * 100)}%
-            </span>
+          {includedInPro ? (
+            <>
+              <span className="text-mx-text-muted text-body-sm line-through">
+                {program.price}€
+              </span>
+              <span className="flex items-center gap-1 text-mx-orange text-heading-sm font-black">
+                <Crown size={14} /> Incluido en Pro
+              </span>
+            </>
+          ) : proDiscount ? (
+            <>
+              <span className="text-mx-text-muted text-body-sm line-through">
+                {program.price}€
+              </span>
+              <span className="text-mx-orange text-heading-sm font-black">
+                {effectivePrice}€
+              </span>
+              <span className="flex items-center gap-1 text-label-sm font-bold text-mx-orange">
+                <Crown size={10} /> -20%
+              </span>
+            </>
+          ) : (
+            <>
+              {program.originalPrice && (
+                <span className="text-mx-text-muted text-body-sm line-through">
+                  {program.originalPrice}€
+                </span>
+              )}
+              <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-heading-sm font-black`}>
+                {program.price}€
+              </span>
+              {program.originalPrice && (
+                <span className="text-label-sm font-bold text-mx-orange">
+                  -{Math.round(((program.originalPrice - program.price) / program.originalPrice) * 100)}%
+                </span>
+              )}
+            </>
           )}
         </div>
         {!userHasPro && isLoaded && !campusLoading && (

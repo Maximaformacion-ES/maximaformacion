@@ -11,7 +11,7 @@ import { Footer } from '../../components/Footer';
 import {
   GraduationCap, BookOpen, Award, Crown, Check, ArrowRight, Sparkles,
   ExternalLink, Loader2, CreditCard, Play, Mail, AlertCircle, Pencil,
-  Save, Shield, User, Lock
+  Save, Shield, User, Lock, Calendar, Trophy, PlayCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import CourseProgressCard from '../../components/CourseProgressCard';
@@ -20,6 +20,7 @@ import type { UserCourseData } from '@/lib/strapi/types';
 // ─── User Info Section ───────────────────────────────────────────────
 const UserInfoSection = () => {
   const { user, isLoaded } = useUser();
+  const { hasPro, isTrialing, courseProgress, enrollments } = useUserCampus();
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -59,83 +60,107 @@ const UserInfoSection = () => {
   if (!user) return null;
 
   const hasFullName = user.firstName && user.lastName;
+  const memberSince = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('es-ES', {
+        month: 'long',
+        year: 'numeric',
+      })
+    : null;
+  const totalCompletedLessons = Object.values(courseProgress).reduce(
+    (sum, cp) => sum + (cp?.completedLessons?.length ?? 0),
+    0
+  );
+  const coursesInProgress = Object.values(courseProgress).filter(
+    (cp) => (cp?.completedLessons?.length ?? 0) > 0
+  ).length;
+  const ownedCourses = enrollments.length;
 
   return (
-    <>
+    <div className="space-y-6">
       {/* Alert: no name registered */}
-      {!hasFullName && (
+      {!hasFullName && !isEditing && (
         <m.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-mx-orange/5 border border-mx-orange/20 rounded-2xl p-5 flex items-start gap-4"
+          className="bg-mx-orange/5 border border-mx-orange/20 rounded-xl p-4 flex items-start gap-3"
         >
-          <AlertCircle className="text-mx-orange mt-0.5 shrink-0" size={20} />
+          <AlertCircle className="text-mx-orange mt-0.5 shrink-0" size={18} />
           <div className="flex-1">
-            <p className="font-semibold text-mx-text mb-1">
+            <p className="font-semibold text-mx-text text-body-sm mb-0.5">
               No has registrado tu nombre completo
             </p>
-            <p className="text-mx-text-muted text-body-sm mb-4">
-              Para generar tus certificados, necesitamos que registres tu nombre
-              completo. Asegúrate de ingresarlo correctamente, ya que aparecerá en ellos.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Nombre"
-                className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-4 py-2.5 rounded-xl focus:border-mx-orange focus:outline-none text-body-sm"
-              />
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Apellidos"
-                className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-4 py-2.5 rounded-xl focus:border-mx-orange focus:outline-none text-body-sm"
-              />
+            <p className="text-mx-text-muted text-label-md">
+              Lo necesitamos para emitir tus certificados.{' '}
               <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="inline-flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-6 py-2.5 rounded-xl text-body-sm font-semibold transition-colors disabled:opacity-50"
+                onClick={() => setIsEditing(true)}
+                className="text-mx-orange font-semibold hover:underline"
               >
-                {isSaving ? <Loader2 size={14} className="animate-spin" /> : null}
-                Guardar
+                Registrarlo ahora
               </button>
-            </div>
+            </p>
           </div>
         </m.div>
       )}
 
-      {/* User Info */}
-      <div className="space-y-6">
-        {/* Avatar + Name */}
-        <div className="flex items-start gap-5">
-          <Image
-            src={user.imageUrl}
-            alt={user.fullName || 'Avatar'}
-            className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-mx-orange/30 object-cover shrink-0"
-            width={80}
-            height={80}
-            unoptimized
-          />
+      {/* Hero card */}
+      <m.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-mx-orange/10 via-mx-bg to-white border border-mx-border p-5 sm:p-6"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="relative shrink-0">
+            {hasPro ? (
+              <div
+                className="p-[3px] rounded-full bg-[conic-gradient(from_140deg,#f59e0b,#fbbf24,#f59e0b,#fcd34d,#f59e0b)] shadow-[0_0_24px_rgba(245,158,11,0.35)]"
+                title={isTrialing ? 'Pro · Prueba activa' : 'Suscripción Pro activa'}
+              >
+                <Image
+                  src={user.imageUrl}
+                  alt={user.fullName || 'Avatar'}
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-white object-cover"
+                  width={96}
+                  height={96}
+                  unoptimized
+                />
+              </div>
+            ) : (
+              <Image
+                src={user.imageUrl}
+                alt={user.fullName || 'Avatar'}
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                width={96}
+                height={96}
+                unoptimized
+              />
+            )}
+            {hasPro && (
+              <span
+                className="absolute -top-1 -right-1 flex items-center justify-center w-7 h-7 bg-white text-mx-orange rounded-full shadow-md ring-2 ring-mx-orange"
+                aria-label={isTrialing ? 'Suscripción Pro en prueba' : 'Suscripción Pro'}
+              >
+                <Crown size={13} fill="currentColor" />
+              </span>
+            )}
+          </div>
+
           <div className="flex-1 min-w-0">
             {isEditing ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Nombre"
-                    className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-body-sm"
+                    className="flex-1 bg-white border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-body-sm"
                   />
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Apellidos"
-                    className="flex-1 bg-mx-bg border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-body-sm"
+                    className="flex-1 bg-white border-2 border-mx-border text-mx-text px-3 py-2 rounded-lg focus:border-mx-orange focus:outline-none text-body-sm"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -161,58 +186,109 @@ const UserInfoSection = () => {
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-body-lg font-bold text-mx-text">
-                    {user.fullName || 'Sin nombre asignado'}
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h3 className="text-heading-sm font-black text-mx-text">
+                    {user.fullName || 'Sin nombre'}
                   </h3>
                   <button
                     onClick={() => setIsEditing(true)}
                     className="text-mx-text-muted hover:text-mx-orange transition-colors p-1"
+                    aria-label="Editar nombre"
                   >
                     <Pencil size={14} />
                   </button>
                 </div>
-                <div className="flex items-center gap-2 text-mx-text-muted text-body-sm">
-                  <Mail size={14} className="shrink-0" />
+                <div className="flex items-center gap-2 text-mx-text-muted text-body-sm mb-1">
+                  <Mail size={13} className="shrink-0" />
                   <span className="truncate">{user.primaryEmailAddress?.emailAddress}</span>
                 </div>
+                {memberSince && (
+                  <div className="flex items-center gap-2 text-mx-text-muted text-label-md">
+                    <Calendar size={12} className="shrink-0" />
+                    <span>Miembro desde {memberSince}</span>
+                  </div>
+                )}
               </>
             )}
           </div>
         </div>
+      </m.div>
 
-        {/* Connected Accounts */}
-        {user.externalAccounts && user.externalAccounts.length > 0 && (
-          <div className="border-t border-mx-border pt-5">
-            <p className="text-label-md font-medium text-mx-text-muted uppercase tracking-wider mb-3">
-              Cuentas conectadas
-            </p>
-            <div className="space-y-2">
-              {user.externalAccounts.map((account) => (
-                <div key={account.id} className="flex items-center gap-3 p-3 bg-mx-bg border border-mx-border rounded-xl">
-                  {account.imageUrl ? (
-                    <Image src={account.imageUrl} alt={account.provider} className="w-7 h-7 rounded-full" width={28} height={28} unoptimized />
-                  ) : (
-                    <div className="w-7 h-7 bg-mx-border rounded-full flex items-center justify-center">
-                      <Shield size={12} className="text-mx-text-muted" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-body-sm font-medium text-mx-text capitalize">
-                      {account.provider === 'google' ? 'Google' : account.provider}
-                    </p>
-                    <p className="text-label-md text-mx-text-muted truncate">
-                      {account.emailAddress || 'Conectado'}
-                    </p>
-                  </div>
-                  <Check size={14} className="text-green-500 shrink-0" />
-                </div>
-              ))}
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          {
+            icon: BookOpen,
+            label: 'Cursos',
+            value: hasPro ? '∞' : ownedCourses.toString(),
+            sub: hasPro ? 'Acceso Pro' : ownedCourses === 1 ? 'comprado' : 'comprados',
+          },
+          {
+            icon: PlayCircle,
+            label: 'En progreso',
+            value: coursesInProgress.toString(),
+            sub: coursesInProgress === 1 ? 'curso' : 'cursos',
+          },
+          {
+            icon: Trophy,
+            label: 'Lecciones',
+            value: totalCompletedLessons.toString(),
+            sub: 'completadas',
+          },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            className="bg-white border border-mx-border rounded-xl p-3 sm:p-4 flex flex-col gap-1"
+          >
+            <div className="flex items-center gap-2 text-mx-text-muted">
+              <stat.icon size={14} className="text-mx-orange" />
+              <span className="text-label-md font-semibold uppercase tracking-wider truncate">
+                {stat.label}
+              </span>
+            </div>
+            <div className="flex items-baseline gap-1.5 mt-auto">
+              <span className="text-heading-md sm:text-display-sm font-black text-mx-text leading-none">
+                {stat.value}
+              </span>
+              <span className="text-label-md text-mx-text-muted font-light truncate">
+                {stat.sub}
+              </span>
             </div>
           </div>
-        )}
+        ))}
       </div>
-    </>
+
+      {/* Connected Accounts */}
+      {user.externalAccounts && user.externalAccounts.length > 0 && (
+        <div>
+          <p className="text-label-md font-semibold text-mx-text-muted uppercase tracking-wider mb-2">
+            Cuentas conectadas
+          </p>
+          <div className="space-y-2">
+            {user.externalAccounts.map((account) => (
+              <div key={account.id} className="flex items-center gap-3 p-3 bg-white border border-mx-border rounded-xl">
+                {account.imageUrl ? (
+                  <Image src={account.imageUrl} alt={account.provider} className="w-7 h-7 rounded-full" width={28} height={28} unoptimized />
+                ) : (
+                  <div className="w-7 h-7 bg-mx-border rounded-full flex items-center justify-center">
+                    <Shield size={12} className="text-mx-text-muted" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-body-sm font-medium text-mx-text capitalize">
+                    {account.provider === 'google' ? 'Google' : account.provider}
+                  </p>
+                  <p className="text-label-md text-mx-text-muted truncate">
+                    {account.emailAddress || 'Conectado'}
+                  </p>
+                </div>
+                <Check size={14} className="text-green-500 shrink-0" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -681,7 +757,7 @@ const MiPlanSection = () => {
               ))}
             </div>
             <p className="text-mx-orange text-body-sm mt-4 font-medium">
-              Desde €29/mes · Cancela cuando quieras
+              Desde €18/mes · Cancela cuando quieras
             </p>
           </div>
         )}

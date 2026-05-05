@@ -54,6 +54,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
       program={program}
       firstLessonId={firstLessonId}
       showSuccessMessage={resolvedSearchParams.success === 'true'}
+      checkoutSessionId={resolvedSearchParams.session_id}
     />
   );
 }

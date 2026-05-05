@@ -5,6 +5,9 @@ import { m } from "framer-motion";
 import { Star, ArrowUpRight, Crown } from "lucide-react";
 import Link from "next/link";
 import { Program } from "@/lib/strapi/types";
+import { useUser } from "@clerk/nextjs";
+import { useUserCampus } from "@/app/hooks/useUserCampus";
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from "@/lib/pricing";
 
 // Generate a consistent rating between 4 and 5 based on program id
 function generateRating(id: number): number {
@@ -32,11 +35,17 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   index = 0,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { isSignedIn } = useUser();
+  const { hasPro } = useUserCampus();
 
   const displayRating = rating ?? generateRating(program.id);
   const displayStudents = students ?? generateStudents(program.id);
 
   const isMaster = program.type === "Master";
+  const userHasPro = !!isSignedIn && hasPro;
+  const includedInPro = isFreeWithPro(program, userHasPro);
+  const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
+  const effectivePrice = getEffectivePrice(program, userHasPro);
 
   return (
     <m.div
@@ -153,16 +162,41 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Price section */}
           <div className="flex items-center justify-between pt-4 mt-auto border-t border-[#ddd]">
             <div className="flex items-center gap-2">
-              {program.originalPrice && (
-                <span className="text-mx-text-muted text-body-sm font-light line-through">
-                  {program.originalPrice}€
-                </span>
+              {includedInPro ? (
+                <>
+                  <span className="text-mx-text-muted text-body-sm font-light line-through">
+                    {program.price}€
+                  </span>
+                  <span className="flex items-center gap-1 text-mx-orange text-heading-sm font-medium">
+                    <Crown size={14} /> Incluido en Pro
+                  </span>
+                </>
+              ) : proDiscount ? (
+                <>
+                  <span className="text-mx-text-muted text-body-sm font-light line-through">
+                    {program.price}€
+                  </span>
+                  <span className="text-mx-orange text-heading-sm font-medium">
+                    {effectivePrice}€
+                  </span>
+                  <span className="flex items-center gap-1 text-label-sm font-bold text-mx-orange">
+                    <Crown size={10} /> -20%
+                  </span>
+                </>
+              ) : (
+                <>
+                  {program.originalPrice && (
+                    <span className="text-mx-text-muted text-body-sm font-light line-through">
+                      {program.originalPrice}€
+                    </span>
+                  )}
+                  <span
+                    className={`${program.originalPrice ? "text-mx-orange" : "text-mx-text"} text-heading-sm font-medium`}
+                  >
+                    {program.price}€
+                  </span>
+                </>
               )}
-              <span
-                className={`${program.originalPrice ? "text-mx-orange" : "text-mx-text"} text-heading-sm font-medium`}
-              >
-                {program.price}€
-              </span>
             </div>
 
             <m.div

@@ -22,6 +22,8 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
+import { trackBeginCheckout } from '@/lib/analytics';
 
 interface ProgramSidebarProps {
   program: Program;
@@ -33,8 +35,11 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userHasPro = isSignedIn && hasPro;
+  const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(program.documentId);
+  const includedInPro = isFreeWithPro(program, userHasPro);
+  const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
+  const effectivePrice = getEffectivePrice(program, userHasPro);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -44,6 +49,15 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
     setIsLoading(true);
     setError(null);
+
+    trackBeginCheckout([
+      {
+        item_id: program.slug,
+        item_name: program.title,
+        item_category: program.type,
+        price: effectivePrice,
+      },
+    ]);
 
     try {
       const response = await fetch('/api/checkout', {
@@ -139,19 +153,51 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           <>
             <div>
               <div className="flex items-baseline gap-3">
-                {program.originalPrice && (
-                  <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
-                    {program.originalPrice}€
-                  </span>
+                {includedInPro ? (
+                  <>
+                    <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                      {program.price}€
+                    </span>
+                    <span className="flex items-center gap-2 text-mx-orange text-heading-md md:text-heading-lg font-black">
+                      <Crown size={20} /> Incluido en Pro
+                    </span>
+                  </>
+                ) : proDiscount ? (
+                  <>
+                    <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                      {program.price}€
+                    </span>
+                    <span className="text-mx-orange text-display-sm font-black">
+                      {effectivePrice}€
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {program.originalPrice && (
+                      <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                        {program.originalPrice}€
+                      </span>
+                    )}
+                    <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
+                      {program.price}€
+                    </span>
+                  </>
                 )}
-                <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
-                  {program.price}€
-                </span>
               </div>
-              {program.originalPrice && (
-                <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold">
-                  Ahorra {program.originalPrice - program.price}€
+              {includedInPro ? (
+                <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold flex items-center gap-1">
+                  <Crown size={12} /> Tu suscripción Pro cubre este curso
                 </div>
+              ) : proDiscount ? (
+                <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold flex items-center gap-1">
+                  <Crown size={12} /> Descuento Pro -20% ({program.price - effectivePrice}€)
+                </div>
+              ) : (
+                program.originalPrice && (
+                  <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold">
+                    Ahorra {program.originalPrice - program.price}€
+                  </div>
+                )
               )}
               <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Menu, X, ChevronDown, User, Crown, Check } from 'lucide-react';
+import { ArrowUpRight, Menu, X, ChevronDown, User, Crown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -99,18 +99,25 @@ const USER_BUTTON_APPEARANCE = {
   },
 };
 
-// Mobile override: larger avatar, no transition
-const MOBILE_USER_BUTTON_APPEARANCE = {
-  ...USER_BUTTON_APPEARANCE,
-  elements: {
-    ...USER_BUTTON_APPEARANCE.elements,
-    avatarBox: {
-      width: '48px',
-      height: '48px',
-      border: '2px solid rgba(245, 158, 11, 0.5)',
+// Pro variant: avatar gets a layered golden ring + subtle halo (no Pro text needed).
+function getProUserButtonAppearance(
+  base: typeof USER_BUTTON_APPEARANCE,
+  size: '44px' | '48px',
+) {
+  return {
+    ...base,
+    elements: {
+      ...base.elements,
+      avatarBox: {
+        width: size,
+        height: size,
+        border: '2px solid #f59e0b',
+        boxShadow: '0 0 0 2px #fcd34d, 0 0 16px rgba(245, 158, 11, 0.55)',
+        transition: 'all 0.3s ease',
+      },
     },
-  },
-};
+  };
+}
 
 // --- Sub-components ---
 
@@ -146,18 +153,11 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
 
       <SignedIn>
         <div className="hidden xl:flex items-center gap-3">
-          {/* Pro Status / Upgrade CTA */}
-          {userHasPro ? (
-            <div className="flex items-center gap-2 bg-mx-orange/10 border border-mx-orange/30 text-mx-orange px-4 py-2 text-body-sm font-bold rounded-full">
-              <Crown size={14} />
-              Pro
-              <Check size={14} />
-            </div>
-          ) : (
+          {/* Upgrade CTA only for Free users — Pro is now signaled on the avatar */}
+          {!userHasPro && (
             <Link href="/pricing">
               <m.button
                 className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 text-body-sm font-bold rounded-full hover:bg-mx-orange-dark transition-all duration-300 shadow-lg shadow-mx-orange/20 whitespace-nowrap"
-
                 whileTap={{ scale: 0.98 }}
               >
                 <Crown size={14} />
@@ -165,12 +165,27 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
               </m.button>
             </Link>
           )}
-          <UserButton
-            afterSignOutUrl="/"
-            userProfileMode="navigation"
-            userProfileUrl="/perfil"
-            appearance={USER_BUTTON_APPEARANCE}
-          />
+          <div className="relative">
+            <UserButton
+              afterSignOutUrl="/"
+              userProfileMode="navigation"
+              userProfileUrl="/perfil"
+              appearance={
+                userHasPro
+                  ? getProUserButtonAppearance(USER_BUTTON_APPEARANCE, '44px')
+                  : USER_BUTTON_APPEARANCE
+              }
+            />
+            {userHasPro && (
+              <span
+                aria-label="Suscripción Pro"
+                title="Suscripción Pro"
+                className="absolute -top-1 -right-1 z-10 pointer-events-none flex items-center justify-center w-5 h-5 bg-white text-mx-orange rounded-full shadow ring-2 ring-mx-orange"
+              >
+                <Crown size={11} fill="currentColor" />
+              </span>
+            )}
+          </div>
         </div>
       </SignedIn>
     </>
@@ -459,16 +474,40 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
               {/* Mobile: user avatar + burger */}
               <div className="flex xl:hidden items-center gap-2">
                 <SignedIn>
-                  <UserButton
-                    afterSignOutUrl="/"
-                    userProfileMode="navigation"
-                    userProfileUrl="/perfil"
-                    appearance={{
-                      elements: {
-                        avatarBox: { width: '28px', height: '28px', border: isDark ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,0,0,0.15)' },
-                      },
-                    }}
-                  />
+                  <div className="relative">
+                    <UserButton
+                      afterSignOutUrl="/"
+                      userProfileMode="navigation"
+                      userProfileUrl="/perfil"
+                      appearance={{
+                        elements: {
+                          avatarBox: userHasPro
+                            ? {
+                                width: '28px',
+                                height: '28px',
+                                border: '1.5px solid #f59e0b',
+                                boxShadow: '0 0 0 1.5px #fcd34d, 0 0 10px rgba(245, 158, 11, 0.5)',
+                              }
+                            : {
+                                width: '28px',
+                                height: '28px',
+                                border: isDark
+                                  ? '1px solid rgba(255,255,255,0.2)'
+                                  : '1px solid rgba(0,0,0,0.15)',
+                              },
+                        },
+                      }}
+                    />
+                    {userHasPro && (
+                      <span
+                        aria-label="Suscripción Pro"
+                        title="Suscripción Pro"
+                        className="absolute -top-0.5 -right-0.5 z-10 pointer-events-none flex items-center justify-center w-3.5 h-3.5 bg-white text-mx-orange rounded-full ring-[1.5px] ring-mx-orange"
+                      >
+                        <Crown size={8} fill="currentColor" />
+                      </span>
+                    )}
+                  </div>
                 </SignedIn>
                 <m.button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}

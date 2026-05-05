@@ -26,6 +26,10 @@ import {
 } from '@/app/components/filters';
 import type { FilterOption, SortOption } from '@/app/components/filters';
 import type { Program, Topic } from '@/lib/strapi/types';
+import { trackViewItemList } from '@/lib/analytics';
+import { useUser } from '@clerk/nextjs';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
+import { getEffectivePrice } from '@/lib/pricing';
 
 type SortBy = 'relevance' | 'price-asc' | 'price-desc' | 'newest';
 
@@ -38,6 +42,9 @@ interface ProgramsClientProps {
 
 export default function ProgramsClient({ initialPrograms, availableTopics }: ProgramsClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isSignedIn } = useUser();
+  const { hasPro } = useUserCampus();
+  const userHasPro = !!isSignedIn && hasPro;
 
   // Filter state
   const [search, setSearch] = useState('');
@@ -137,6 +144,22 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+
+  // GA4 view_item_list — emits whenever the visible page of programs changes
+  useEffect(() => {
+    if (paginatedPrograms.length === 0) return;
+    trackViewItemList(
+      paginatedPrograms.map((p, idx) => ({
+        item_id: p.slug,
+        item_name: p.title,
+        item_category: p.type,
+        price: getEffectivePrice(p, userHasPro),
+        index: (currentPage - 1) * ITEMS_PER_PAGE + idx,
+      })),
+      'Catálogo de programas',
+      'programas'
+    );
+  }, [paginatedPrograms, currentPage, userHasPro]);
 
   // Options
   const typeOptions: FilterOption[] = [

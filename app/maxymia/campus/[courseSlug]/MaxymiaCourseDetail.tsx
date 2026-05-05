@@ -37,6 +37,8 @@ import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import type { MaxymiaCourse, Locale } from '../../types';
+import { getEffectivePrice, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
+import { trackBeginCheckout } from '@/lib/analytics';
 
 const CATEGORY_LABELS: Record<string, Record<Locale, string>> = {
   ia: { es: 'Inteligencia Artificial', en: 'Artificial Intelligence' },
@@ -354,8 +356,11 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userHasPro = isSignedIn && hasPro;
+  const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(course.id);
+  const includedInPro = isFreeWithPro(course, userHasPro);
+  const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
+  const effectivePrice = getEffectivePrice(course, userHasPro);
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
@@ -365,6 +370,15 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
 
     setIsLoading(true);
     setError(null);
+
+    trackBeginCheckout([
+      {
+        item_id: course.slug,
+        item_name: course.title.es,
+        item_category: 'maxymia-course',
+        price: effectivePrice,
+      },
+    ]);
 
     try {
       const response = await fetch('/api/checkout', {
@@ -426,17 +440,44 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
           {/* Pricing */}
           <div>
             <div className="flex items-baseline gap-3">
-              {course.originalPrice != null && (
-                <span className="text-white/40 text-body-lg line-through">{course.originalPrice}€</span>
+              {includedInPro ? (
+                <>
+                  <span className="text-white/40 text-body-lg line-through">{course.price}€</span>
+                  <span className="flex items-center gap-2 text-mx-orange text-heading-md font-black">
+                    <Crown size={20} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
+                  </span>
+                </>
+              ) : proDiscount ? (
+                <>
+                  <span className="text-white/40 text-body-lg line-through">{course.price}€</span>
+                  <span className="text-mx-orange text-display-sm font-black">{effectivePrice}€</span>
+                </>
+              ) : (
+                <>
+                  {course.originalPrice != null && (
+                    <span className="text-white/40 text-body-lg line-through">{course.originalPrice}€</span>
+                  )}
+                  <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-display-sm font-black`}>
+                    {course.price}€
+                  </span>
+                </>
               )}
-              <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-display-sm font-black`}>
-                {course.price}€
-              </span>
             </div>
-            {course.originalPrice != null && (
-              <div className="mt-1 text-mx-orange text-label-md font-bold">
-                {locale === 'es' ? 'Ahorra' : 'Save'} {course.originalPrice - course.price}€
+            {includedInPro ? (
+              <div className="mt-1 text-mx-orange text-label-md font-bold flex items-center gap-1">
+                <Crown size={12} />
+                {locale === 'es' ? 'Tu suscripción Pro cubre este curso' : 'Your Pro plan covers this course'}
               </div>
+            ) : proDiscount ? (
+              <div className="mt-1 text-mx-orange text-label-md font-bold flex items-center gap-1">
+                <Crown size={12} /> {locale === 'es' ? 'Descuento Pro -20%' : 'Pro discount -20%'} ({course.price - effectivePrice}€)
+              </div>
+            ) : (
+              course.originalPrice != null && (
+                <div className="mt-1 text-mx-orange text-label-md font-bold">
+                  {locale === 'es' ? 'Ahorra' : 'Save'} {course.originalPrice - course.price}€
+                </div>
+              )
             )}
             <p className="text-white/40 text-label-md mt-1">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
@@ -808,6 +849,15 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
 
     setIsLoading(true);
     setError(null);
+
+    trackBeginCheckout([
+      {
+        item_id: course.slug,
+        item_name: course.title.es,
+        item_category: 'maxymia-course',
+        price: course.price,
+      },
+    ]);
 
     try {
       const response = await fetch('/api/checkout', {

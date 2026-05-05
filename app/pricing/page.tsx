@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import { m } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
@@ -12,6 +12,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { StyledTitle } from '../components/StyledTitle';
+import { trackBeginCheckout, trackPurchaseOnce, type AnalyticsItem } from '@/lib/analytics';
 import type { LucideIcon } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -383,7 +384,46 @@ function PricingContent() {
   const searchParams = useSearchParams();
   const success = searchParams.get('success');
   const isTrialSuccess = searchParams.get('trial') === 'true';
+  const sessionId = searchParams.get('session_id');
   const [loadingTrial, setLoadingTrial] = useState(false);
+
+  useEffect(() => {
+    if (!success || !sessionId) return;
+    fetch('/api/checkout/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          const proPlan = PLANS.find((p) => p.id === 'pro');
+          if (proPlan) {
+            const isYearly = billingPeriod === 'yearly';
+            const fullPrice = isYearly ? proPlan.price.yearly : proPlan.price.monthly;
+            const item: AnalyticsItem = isTrialSuccess
+              ? {
+                  item_id: isYearly ? 'pro-trial-yearly' : 'pro-trial-monthly',
+                  item_name: 'Pro Trial',
+                  item_category: 'subscription-trial',
+                  price: 1,
+                }
+              : {
+                  item_id: isYearly ? 'pro-yearly' : 'pro-monthly',
+                  item_name: isYearly ? 'Pro Anual' : 'Pro Mensual',
+                  item_category: 'subscription',
+                  price: fullPrice,
+                };
+            trackPurchaseOnce(sessionId, {
+              items: [item],
+              value: item.price,
+            });
+          }
+          // Reload so Clerk metadata refreshes and the UI reflects Pro
+          setTimeout(() => window.location.replace('/pricing?success=true' + (isTrialSuccess ? '&trial=true' : '')), 800);
+        }
+      })
+      .catch((err) => console.error('Verify failed:', err));
+  }, [success, sessionId, isTrialSuccess, billingPeriod]);
 
   const userHasPro = isSignedIn && hasPro;
   const showTrial = !userHasPro && !isTrialing && !hasUsedTrial;
@@ -399,6 +439,19 @@ function PricingContent() {
 
     setLoadingPlan(planId);
 
+    const isYearly = billingPeriod === 'yearly';
+    const proPlan = PLANS.find((p) => p.id === planId);
+    if (proPlan && planId === 'pro') {
+      trackBeginCheckout([
+        {
+          item_id: isYearly ? 'pro-yearly' : 'pro-monthly',
+          item_name: isYearly ? 'Pro Anual' : 'Pro Mensual',
+          item_category: 'subscription',
+          price: isYearly ? proPlan.price.yearly : proPlan.price.monthly,
+        },
+      ]);
+    }
+
     try {
       // Create Stripe checkout session via our API
       const response = await fetch('/api/checkout', {
@@ -411,6 +464,13 @@ function PricingContent() {
           planPeriod: billingPeriod === 'yearly' ? 'year' : 'month',
         }),
       });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Checkout failed', response.status, text.slice(0, 200));
+        alert('Error al crear la sesión de pago. Por favor, inténtalo de nuevo.');
+        return;
+      }
 
       const data = await response.json();
 
@@ -437,12 +497,29 @@ function PricingContent() {
 
     setLoadingTrial(true);
 
+    const isYearly = billingPeriod === 'yearly';
+    trackBeginCheckout([
+      {
+        item_id: isYearly ? 'pro-trial-yearly' : 'pro-trial-monthly',
+        item_name: 'Pro Trial',
+        item_category: 'subscription-trial',
+        price: 1,
+      },
+    ]);
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'trial', planPeriod: billingPeriod === 'yearly' ? 'year' : 'month' }),
       });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Trial checkout failed', response.status, text.slice(0, 200));
+        alert('Error al crear la sesión de pago. Por favor, inténtalo de nuevo.');
+        return;
+      }
 
       const data = await response.json();
 

@@ -2,9 +2,15 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { getSiteMetadata } from "@/lib/strapi/queries";
 import { MotionProvider } from "./components/MotionProvider";
+import { Analytics } from "./components/Analytics";
 import "./globals.css";
+
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+const GTM_AUTH = process.env.NEXT_PUBLIC_GTM_AUTH;
+const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW;
 
 const ztNature = localFont({
   src: [
@@ -77,10 +83,18 @@ export default function RootLayout({
           <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
         </head>
+        {GTM_ID && (
+          <GoogleTagManager
+            gtmId={GTM_ID}
+            auth={GTM_AUTH}
+            preview={GTM_PREVIEW}
+          />
+        )}
         <body
           className={`${ztNature.variable} antialiased`}
           style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
         >
+          {GTM_ID && <Analytics />}
           <MotionProvider>{children}</MotionProvider>
         </body>
       </html>

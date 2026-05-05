@@ -7,6 +7,8 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../i18n/LocaleProvider';
 import Link from 'next/link';
 import type { MaxymiaCourse } from '../types';
+import { getEffectivePrice, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
+import { trackBeginCheckout } from '@/lib/analytics';
 
 interface MaxymiaMobileCTAProps {
   course: MaxymiaCourse;
@@ -18,8 +20,11 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
 
-  const userHasPro = isSignedIn && hasPro;
+  const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(course.id);
+  const includedInPro = isFreeWithPro(course, userHasPro);
+  const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
+  const effectivePrice = getEffectivePrice(course, userHasPro);
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
@@ -28,6 +33,15 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
     }
 
     setIsLoading(true);
+
+    trackBeginCheckout([
+      {
+        item_id: course.slug,
+        item_name: course.title.es,
+        item_category: 'maxymia-course',
+        price: effectivePrice,
+      },
+    ]);
 
     try {
       const response = await fetch('/api/checkout', {
@@ -59,18 +73,37 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
-          {course.originalPrice != null && (
-            <span className="text-white/40 text-body-sm line-through">
-              {course.originalPrice}€
-            </span>
-          )}
-          <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-heading-sm font-black`}>
-            {course.price}€
-          </span>
-          {course.originalPrice != null && (
-            <span className="text-label-sm font-bold text-mx-orange">
-              -{Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}%
-            </span>
+          {includedInPro ? (
+            <>
+              <span className="text-white/40 text-body-sm line-through">{course.price}€</span>
+              <span className="flex items-center gap-1 text-mx-orange text-heading-sm font-black">
+                <Crown size={14} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
+              </span>
+            </>
+          ) : proDiscount ? (
+            <>
+              <span className="text-white/40 text-body-sm line-through">{course.price}€</span>
+              <span className="text-mx-orange text-heading-sm font-black">{effectivePrice}€</span>
+              <span className="flex items-center gap-1 text-label-sm font-bold text-mx-orange">
+                <Crown size={10} /> -20%
+              </span>
+            </>
+          ) : (
+            <>
+              {course.originalPrice != null && (
+                <span className="text-white/40 text-body-sm line-through">
+                  {course.originalPrice}€
+                </span>
+              )}
+              <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-heading-sm font-black`}>
+                {course.price}€
+              </span>
+              {course.originalPrice != null && (
+                <span className="text-label-sm font-bold text-mx-orange">
+                  -{Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}%
+                </span>
+              )}
+            </>
           )}
         </div>
         {!userHasPro && isLoaded && !campusLoading && (
