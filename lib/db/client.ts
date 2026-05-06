@@ -2,11 +2,9 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required');
-}
+const DATABASE_URL = process.env.DATABASE_URL || 'postgres://strapi:strapi_password@localhost:5432/strapi';
 
-const queryClient = postgres(process.env.DATABASE_URL);
+const queryClient = postgres(DATABASE_URL);
 
 export const db = drizzle(queryClient, { schema });
 
