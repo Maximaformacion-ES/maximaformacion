@@ -191,7 +191,7 @@ function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
     image: imageUrl,
     category: strapi.category,
     author,
-    publishedAt: strapi.publishedAt || strapi.createdAt,
+    publishedAt: strapi.originalPostDate || strapi.publishedAt || strapi.createdAt,
     readTime: strapi.readTime || '5 min',
     tags: strapi.tags || [],
     featured: strapi.featured,

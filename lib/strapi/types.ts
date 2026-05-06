@@ -174,6 +174,7 @@ export interface StrapiBlogPost {
   imageUrl: string | null;
   category: BlogCategory;
   author: StrapiAuthor | null;
+  originalPostDate: string | null;
   publishedAt: string | null;
   readTime: string | null;
   tags: string[] | null;
