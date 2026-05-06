@@ -711,6 +711,9 @@ export interface StrapiSiteMetadata {
   twitterCard: 'summary' | 'summary_large_image' | null;
   noIndex: boolean;
   favicon: StrapiMedia | null;
+  headerLogo: StrapiMedia | null;
+  footerLogo: StrapiMedia | null;
+  maxymiaLogo: StrapiMedia | null;
 }
 
 export interface SiteMetadata {
@@ -725,6 +728,9 @@ export interface SiteMetadata {
   twitterCard: string;
   noIndex: boolean;
   favicon: string;
+  headerLogo: string;
+  footerLogo: string;
+  maxymiaLogo: string;
 }
 
 // ============ Maxymia Course Types (GraphQL) ============

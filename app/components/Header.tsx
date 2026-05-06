@@ -13,6 +13,7 @@ import {
   useUser,
 } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
+import { useSiteBranding } from './SiteBrandingProvider';
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -412,9 +413,11 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
   const pathname = usePathname();
   const { isSignedIn } = useUser();
   const { hasPro } = useUserCampus();
+  const branding = useSiteBranding();
 
   const userHasPro = isSignedIn && hasPro;
   const items = navItems ?? NAV_ITEMS;
+  const logoSrc = isDark ? branding.maxymiaLogo : branding.headerLogo;
 
   return (
     <>
@@ -431,22 +434,13 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
               className="flex items-center"
               whileHover={{ scale: 1.02 }}
             >
-              {isDark ? (
+              {logoSrc && (
                 <Image
-                  src="/logo-completo.webp"
-                  alt="Maxymia"
+                  src={logoSrc}
+                  alt={isDark ? 'Maxymia' : 'Máxima Formación'}
                   width={200}
                   height={80}
-                  className="h-8 sm:h-10 md:h-12 w-auto"
-                  priority
-                />
-              ) : (
-                <Image
-                  src="/newLogo.png"
-                  alt="Maxima Formacion"
-                  width={200}
-                  height={80}
-                  className="h-6 sm:h-12 w-auto"
+                  className={isDark ? 'h-8 sm:h-10 md:h-12 w-auto' : 'h-6 sm:h-12 w-auto'}
                   priority
                 />
               )}

@@ -6,6 +6,7 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import { getSiteMetadata } from "@/lib/strapi/queries";
 import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
+import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
 import "./globals.css";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
@@ -71,11 +72,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteMetadata = await getSiteMetadata();
+  const branding = {
+    headerLogo: siteMetadata?.headerLogo || '',
+    footerLogo: siteMetadata?.footerLogo || '',
+    maxymiaLogo: siteMetadata?.maxymiaLogo || '',
+  };
+
   return (
     <ClerkProvider localization={esES}>
       <html lang="es">
@@ -95,7 +103,9 @@ export default function RootLayout({
           style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
         >
           {GTM_ID && <Analytics />}
-          <MotionProvider>{children}</MotionProvider>
+          <SiteBrandingProvider value={branding}>
+            <MotionProvider>{children}</MotionProvider>
+          </SiteBrandingProvider>
         </body>
       </html>
     </ClerkProvider>

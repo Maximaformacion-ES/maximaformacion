@@ -3,8 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSiteBranding } from "./SiteBrandingProvider";
 
 export const Footer: React.FC = () => {
+  const branding = useSiteBranding();
   const footerLinks = {
     Formación: [
       { label: "Programas", href: "/programas" },
@@ -29,13 +31,15 @@ export const Footer: React.FC = () => {
           {/* Brand */}
           <div className="lg:flex-1">
             <Link href="/" className="inline-block">
-              <Image
-                src="/newLogo.png"
-                alt="Maxima Formación"
-                width={200}
-                height={66}
-                className="h-10 md:h-12 w-auto"
-              />
+              {branding.footerLogo && (
+                <Image
+                  src={branding.footerLogo}
+                  alt="Máxima Formación"
+                  width={200}
+                  height={66}
+                  className="h-10 md:h-12 w-auto"
+                />
+              )}
             </Link>
             <p className="text-mx-text-muted text-body-sm font-light mt-4 max-w-xs leading-relaxed">
               Formación profesional experta para impulsar tu carrera al
