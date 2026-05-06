@@ -10,6 +10,7 @@ import { LocaleProvider, useLocale } from '../i18n/LocaleProvider';
 
 import NotificationBell from '../components/NotificationBell';
 import { MaxymiaFooter } from '../../components/MaxymiaFooter';
+import { useSiteBranding } from '../../components/SiteBrandingProvider';
 import type { MaxymiaCourse } from '../types';
 
 const CampusCoursesContext = createContext<MaxymiaCourse[]>([]);
@@ -40,6 +41,7 @@ function DefaultCampusHeader() {
   const pathname = usePathname();
   const courses = useCampusCourses();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { logoMaxymia } = useSiteBranding();
 
   // Close menu on route change
   useEffect(() => {
@@ -63,14 +65,16 @@ function DefaultCampusHeader() {
           {/* Logo + Nav */}
           <div className="flex items-center gap-16">
             <Link href="/maxymia" className="flex items-center shrink-0">
-              <Image
-                src="/logo-completo.webp"
-                alt="Maxymia"
-                width={128}
-                height={48}
-                className="h-8 sm:h-10 md:h-12 w-auto"
-                priority
-              />
+              {logoMaxymia && (
+                <Image
+                  src={logoMaxymia}
+                  alt="Maxymia"
+                  width={128}
+                  height={48}
+                  className="h-8 sm:h-10 md:h-12 w-auto"
+                  priority
+                />
+              )}
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">
@@ -213,6 +217,7 @@ function LessonHeader() {
   const pathname = usePathname();
   const { locale } = useLocale();
   const courses = useCampusCourses();
+  const { logoMaxymia } = useSiteBranding();
 
   // Extract courseSlug from path: /maxymia/campus/:courseSlug/lesson/:lessonId
   const segments = pathname.split('/');
@@ -234,13 +239,15 @@ function LessonHeader() {
           </Link>
 
           <Link href="/maxymia" className="shrink-0 hidden md:block">
-            <Image
-              src="/logo-completo.webp"
-              alt="Maxymia"
-              width={96}
-              height={36}
-              className="h-8 w-auto"
-            />
+            {logoMaxymia && (
+              <Image
+                src={logoMaxymia}
+                alt="Maxymia"
+                width={96}
+                height={36}
+                className="h-8 w-auto"
+              />
+            )}
           </Link>
 
           {courseTitle && (

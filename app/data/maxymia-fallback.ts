@@ -81,6 +81,6 @@ export const MAXYMIA_HOME_FALLBACK: MaxymiaHomeData = {
     title: '¿LISTO PARA TRANSFORMAR <br /> <span class="text-mx-orange">TU INVESTIGACIÓN</span> <br /> CON IA?',
     description:
       'Accede ahora al campus virtual. Explora nuestro catálogo completo de cursos, inscríbete en una ruta de aprendizaje y únete a una comunidad de científicos que ya están aplicando inteligencia artificial.',
-    logo: '/logo-completo.webp',
+    logo: '',
   },
 };

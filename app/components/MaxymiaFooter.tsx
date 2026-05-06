@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
+import { useSiteBranding } from './SiteBrandingProvider';
 
 const footerLinks = {
   Campus: [
@@ -27,6 +28,7 @@ const externalLinks = [
 ];
 
 export const MaxymiaFooter: React.FC = () => {
+  const { logoMaxymia } = useSiteBranding();
   return (
     <footer className="bg-[#0b1018] border-t border-white/10 py-16 md:py-20">
       <div className="max-w-[1800px] mx-auto px-6 md:px-28">
@@ -34,7 +36,9 @@ export const MaxymiaFooter: React.FC = () => {
           {/* Brand */}
           <div className="lg:flex-1">
             <Link href="/maxymia" className="inline-block mb-5">
-              <Image src="/logo-completo.webp" alt="Maxymia" className="h-10" style={{ width: 'auto' }} width={200} height={40} />
+              {logoMaxymia && (
+                <Image src={logoMaxymia} alt="Maxymia" className="h-10" style={{ width: 'auto' }} width={200} height={40} />
+              )}
             </Link>
             <p className="text-white/50 text-body-sm font-light leading-relaxed max-w-[268px]">
               El campus virtual de IA aplicada a ciencias de Máxima Formación. Formación especializada para investigadores y profesionales.

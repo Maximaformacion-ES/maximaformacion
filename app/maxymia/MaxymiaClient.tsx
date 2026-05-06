@@ -19,6 +19,7 @@ import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Header } from '../components/Header';
 import { MaxymiaFooter } from '../components/MaxymiaFooter';
+import { useSiteBranding } from '../components/SiteBrandingProvider';
 import { FontStyles } from '../components/FontStyles';
 import { ColoredTitle, StyledTitle } from '../components/StyledTitle';
 import type { MaxymiaHomeData, MaxymiaCard } from '../../lib/strapi/types';
@@ -470,6 +471,8 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
 
 function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
   const { handleCampusClick } = useCampusLink();
+  const { logoMaxymia } = useSiteBranding();
+  const ctaLogo = section.logo || logoMaxymia;
 
   return (
     <section className="py-32 md:py-40 relative overflow-hidden border-t border-white/5 border-b border-b-white/5">
@@ -485,7 +488,9 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           transition={{ duration: 0.6 }}
           className="flex justify-center mb-6"
         >
-          <Image src={section.logo || '/logo-completo.webp'} alt="Maxymia" className="h-12 w-auto" width={240} height={48} unoptimized />
+          {ctaLogo && (
+            <Image src={ctaLogo} alt="Maxymia" className="h-12 w-auto" width={240} height={48} unoptimized />
+          )}
         </m.div>
 
         <m.h2
