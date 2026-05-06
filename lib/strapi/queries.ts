@@ -777,7 +777,7 @@ export async function getSiteMetadata(): Promise<SiteMetadata | null> {
     const response = await strapiRequest<StrapiSingleResponse<StrapiSiteMetadata>>(
       '/api/metadata?populate=*',
       {
-        revalidate: 3600,
+        revalidate: false,
         tags: ['site-metadata'],
       }
     );

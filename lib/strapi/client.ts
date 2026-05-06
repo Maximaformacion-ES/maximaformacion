@@ -8,7 +8,7 @@ export function isStrapiConfigured(): boolean {
 
 interface FetchOptions {
   cache?: RequestCache;
-  revalidate?: number;
+  revalidate?: number | false;
   tags?: string[];
   draft?: boolean;
 }
@@ -26,7 +26,7 @@ export async function strapiRequest<T>(
     url.searchParams.set('publicationState', 'preview');
   }
 
-  const fetchOptions: RequestInit & { next?: { revalidate?: number; tags?: string[] } } = {
+  const fetchOptions: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } = {
     headers: {
       'Content-Type': 'application/json',
       ...(STRAPI_API_TOKEN && { Authorization: `Bearer ${STRAPI_API_TOKEN}` }),
@@ -66,7 +66,7 @@ export async function strapiGraphQL<T>(
   options: { revalidate?: number; tags?: string[] } = {}
 ): Promise<T> {
   const url = `${STRAPI_URL}/graphql`;
-  const fetchOptions: RequestInit & { next?: { revalidate?: number; tags?: string[] } } = {
+  const fetchOptions: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -20,6 +20,7 @@ const MODEL_TAG_MAP: Record<string, string[]> = {
   'blog-post': ['blog-posts'],
   logo: ['logos'],
   badge: ['badges'],
+  metadata: ['site-metadata'],
 };
 
 interface StrapiWebhookPayload {
