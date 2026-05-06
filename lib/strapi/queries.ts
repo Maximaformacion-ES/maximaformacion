@@ -767,9 +767,8 @@ function transformSiteMetadata(strapi: StrapiSiteMetadata): SiteMetadata {
     twitterCard: (strapi.twitterCard || 'summary_large_image').toLowerCase(),
     noIndex: strapi.noIndex,
     favicon: strapi.favicon ? getStrapiMediaUrl(strapi.favicon) : '',
-    headerLogo: strapi.headerLogo ? getStrapiMediaUrl(strapi.headerLogo) : '',
-    footerLogo: strapi.footerLogo ? getStrapiMediaUrl(strapi.footerLogo) : '',
-    maxymiaLogo: strapi.maxymiaLogo ? getStrapiMediaUrl(strapi.maxymiaLogo) : '',
+    logoMaximaformacion: strapi.logoMaximaformacion ? getStrapiMediaUrl(strapi.logoMaximaformacion) : '',
+    logoMaxymia: strapi.logoMaxymia ? getStrapiMediaUrl(strapi.logoMaxymia) : '',
   };
 }
 

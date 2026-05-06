@@ -3,15 +3,13 @@
 import { createContext, useContext } from 'react';
 
 export type SiteBranding = {
-  headerLogo: string;
-  footerLogo: string;
-  maxymiaLogo: string;
+  logoMaximaformacion: string;
+  logoMaxymia: string;
 };
 
 const Ctx = createContext<SiteBranding>({
-  headerLogo: '',
-  footerLogo: '',
-  maxymiaLogo: '',
+  logoMaximaformacion: '',
+  logoMaxymia: '',
 });
 
 export function SiteBrandingProvider({

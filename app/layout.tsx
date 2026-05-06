@@ -79,9 +79,8 @@ export default async function RootLayout({
 }>) {
   const siteMetadata = await getSiteMetadata();
   const branding = {
-    headerLogo: siteMetadata?.headerLogo || '',
-    footerLogo: siteMetadata?.footerLogo || '',
-    maxymiaLogo: siteMetadata?.maxymiaLogo || '',
+    logoMaximaformacion: siteMetadata?.logoMaximaformacion || '',
+    logoMaxymia: siteMetadata?.logoMaxymia || '',
   };
 
   return (

@@ -417,7 +417,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
 
   const userHasPro = isSignedIn && hasPro;
   const items = navItems ?? NAV_ITEMS;
-  const logoSrc = isDark ? branding.maxymiaLogo : branding.headerLogo;
+  const logoSrc = isDark ? branding.logoMaxymia : branding.logoMaximaformacion;
 
   return (
     <>

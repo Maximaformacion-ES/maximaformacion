@@ -3,10 +3,16 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useSiteBranding } from "./SiteBrandingProvider";
 
 export const Footer: React.FC = () => {
   const branding = useSiteBranding();
+  const pathname = usePathname();
+  const isMaxymia = pathname?.startsWith("/maxymia") ?? false;
+  const logoSrc = isMaxymia ? branding.logoMaxymia : branding.logoMaximaformacion;
+  const logoAlt = isMaxymia ? "Maxymia" : "Máxima Formación";
+  const homeHref = isMaxymia ? "/maxymia" : "/";
   const footerLinks = {
     Formación: [
       { label: "Programas", href: "/programas" },
@@ -30,11 +36,11 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-12 mb-16">
           {/* Brand */}
           <div className="lg:flex-1">
-            <Link href="/" className="inline-block">
-              {branding.footerLogo && (
+            <Link href={homeHref} className="inline-block">
+              {logoSrc && (
                 <Image
-                  src={branding.footerLogo}
-                  alt="Máxima Formación"
+                  src={logoSrc}
+                  alt={logoAlt}
                   width={200}
                   height={66}
                   className="h-10 md:h-12 w-auto"
