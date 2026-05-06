@@ -25,10 +25,15 @@ import {
 } from '../lib/db/queries';
 
 const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
-const DATABASE_URL = process.env.DATABASE_URL || 'postgres://strapi:strapi_password@localhost:5432/strapi';
+const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!CLERK_SECRET_KEY) {
   console.error('CLERK_SECRET_KEY is required');
+  process.exit(1);
+}
+
+if (!DATABASE_URL) {
+  console.error('DATABASE_URL is required');
   process.exit(1);
 }
 
