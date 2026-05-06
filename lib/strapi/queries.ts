@@ -6,6 +6,10 @@ import type {
   StrapiTopic,
   StrapiBlogPost,
   StrapiBlogBodyBlock,
+  StrapiResource,
+  Resource,
+  ResourceDownload,
+  ResourceQueryOptions,
   StrapiHeroSection,
   StrapiSiteMetadata,
   StrapiLogo,
@@ -526,6 +530,147 @@ export async function getAllBlogSlugs(): Promise<string[]> {
   );
 
   return response.data.map((p) => p.slug);
+}
+
+// ============ Resource Queries ============
+
+function transformResource(strapi: StrapiResource): Resource {
+  const imageUrl = strapi.image
+    ? getStrapiMediaUrl(strapi.image)
+    : strapi.imageUrl || '/placeholder-course.svg';
+
+  const author: BlogAuthor = strapi.author
+    ? {
+        name: strapi.author.name,
+        role: strapi.author.role,
+        roleDescription: strapi.author.roleDescription || '',
+        avatar: strapi.author.avatar
+          ? getStrapiMediaUrl(strapi.author.avatar)
+          : '',
+        email: strapi.author.email || '',
+        linkedin: strapi.author.linkedin || '',
+      }
+    : { name: '', role: '', roleDescription: '', avatar: '', email: '', linkedin: '' };
+
+  const downloads: ResourceDownload[] = (strapi.downloads || []).map((d) => ({
+    id: d.id,
+    url: getStrapiMediaUrl(d),
+    name: d.name,
+    mime: d.mime,
+    sizeKB: Math.round(d.size),
+  }));
+
+  return {
+    id: strapi.id,
+    documentId: strapi.documentId,
+    title: strapi.title,
+    slug: strapi.slug,
+    excerpt: strapi.excerpt || '',
+    body: strapi.body || '',
+    category: strapi.category,
+    topic: strapi.topic || 'R-Software',
+    image: imageUrl,
+    downloads,
+    externalUrl: strapi.externalUrl,
+    publishedAt: strapi.originalPostDate || strapi.publishedAt || strapi.createdAt,
+    tags: strapi.tags || [],
+    featured: strapi.featured,
+    license: strapi.license || 'CC BY-NC-ND',
+    author,
+  };
+}
+
+function buildResourceQuery(options: ResourceQueryOptions = {}): string {
+  const params = new URLSearchParams();
+
+  params.set('populate[image]', 'true');
+  params.set('populate[downloads]', 'true');
+  params.set('populate[author][populate][avatar]', 'true');
+
+  const filters: string[] = [];
+  if (options.category) {
+    filters.push(`filters[category][$eq]=${encodeURIComponent(options.category)}`);
+  }
+  if (options.featured !== undefined) {
+    filters.push(`filters[featured][$eq]=${options.featured}`);
+  }
+
+  if (options.limit) params.set('pagination[pageSize]', options.limit.toString());
+  if (options.page) params.set('pagination[page]', options.page.toString());
+  params.set('sort', options.sort || 'publishedAt:desc');
+
+  let query = params.toString();
+  if (filters.length > 0) query += '&' + filters.join('&');
+  return query;
+}
+
+export async function getResources(
+  options: ResourceQueryOptions = {}
+): Promise<{ resources: Resource[]; total: number; pageCount: number }> {
+  try {
+    const query = buildResourceQuery(options);
+    const response = await strapiRequest<StrapiResponse<StrapiResource[]>>(
+      `/api/resources?${query}`,
+      { revalidate: 60, tags: ['resources'], draft: options.draft }
+    );
+    return {
+      resources: response.data.map(transformResource),
+      total: response.meta.pagination?.total || 0,
+      pageCount: response.meta.pagination?.pageCount || 1,
+    };
+  } catch (error) {
+    console.error('Error fetching resources:', error);
+    return { resources: [], total: 0, pageCount: 0 };
+  }
+}
+
+export async function getResourceBySlug(
+  slug: string,
+  draft = false
+): Promise<Resource | null> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiResource[]>>(
+      `/api/resources?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[downloads]=true&populate[author][populate][avatar]=true`,
+      {
+        revalidate: 60,
+        tags: ['resources', `resource-slug-${slug}`],
+        draft,
+      }
+    );
+    if (!response.data || response.data.length === 0) return null;
+    return transformResource(response.data[0]);
+  } catch (error) {
+    console.error(`Error fetching resource by slug ${slug}:`, error);
+    return null;
+  }
+}
+
+export async function getRelatedResources(
+  current: Resource,
+  limit = 3
+): Promise<Resource[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiResource[]>>(
+      `/api/resources?filters[documentId][$ne]=${current.documentId}&filters[category][$eq]=${encodeURIComponent(current.category)}&populate[image]=true&populate[downloads]=true&populate[author][populate][avatar]=true&pagination[pageSize]=${limit}&sort=publishedAt:desc`,
+      { revalidate: 60, tags: ['resources', 'related-resources'] }
+    );
+    return response.data.map(transformResource);
+  } catch (error) {
+    console.error(`Error fetching related resources for ${current.documentId}:`, error);
+    return [];
+  }
+}
+
+export async function getAllResourceSlugs(): Promise<string[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiResource[]>>(
+      '/api/resources?fields[0]=slug&pagination[pageSize]=200',
+      { revalidate: 3600, tags: ['resources'] }
+    );
+    return response.data.map((p) => p.slug);
+  } catch {
+    return [];
+  }
 }
 
 // ============ Hero Section Queries (Single Types) ============

@@ -32,6 +32,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Consultoría', path: '/consultoria' },
   { name: 'Innovación', path: '/innovacion' },
   { name: 'Blog', path: '/blog' },
+  { name: 'Recursos', path: '/recursos' },
   { name: 'Contacto', path: '/contacto' },
   { name: 'Maxymia', path: '/maxymia' },
 ];

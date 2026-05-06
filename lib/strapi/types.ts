@@ -325,6 +325,78 @@ export interface BlogQueryOptions {
   draft?: boolean;
 }
 
+// ============ Resource Types ============
+
+export type ResourceCategory =
+  | 'Guías rápidas'
+  | 'TFM'
+  | 'Tutoriales'
+  | 'Infografías'
+  | 'E-books'
+  | 'Casos de éxito'
+  | 'Otros';
+
+export type ResourceTopic = 'R-Software' | 'Formación online';
+
+export interface StrapiResource {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  body: string | null;
+  category: ResourceCategory;
+  topic: ResourceTopic;
+  image: StrapiMedia | null;
+  imageUrl: string | null;
+  downloads: StrapiMedia[] | null;
+  externalUrl: string | null;
+  originalPostDate: string | null;
+  tags: string[] | null;
+  featured: boolean;
+  license: string | null;
+  author: StrapiAuthor | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResourceDownload {
+  id: number;
+  url: string;
+  name: string;
+  mime: string;
+  sizeKB: number;
+}
+
+export interface Resource {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  body: string;
+  category: ResourceCategory;
+  topic: ResourceTopic;
+  image: string;
+  downloads: ResourceDownload[];
+  externalUrl: string | null;
+  publishedAt: string;
+  tags: string[];
+  featured: boolean;
+  license: string;
+  author: BlogAuthor;
+}
+
+export interface ResourceQueryOptions {
+  category?: string;
+  featured?: boolean;
+  limit?: number;
+  page?: number;
+  sort?: string;
+  draft?: boolean;
+}
+
 // ============ Lesson System Types ============
 
 // Frontend Lesson type
