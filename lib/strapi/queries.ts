@@ -795,7 +795,7 @@ export async function getSiteMetadata(): Promise<SiteMetadata | null> {
 
 // ============ Logo Queries ============
 
-async function getLogos(): Promise<Logo[]> {
+export async function getLogos(): Promise<Logo[]> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiLogo[]>>(
       '/api/logos?populate[image]=true&pagination[pageSize]=100&sort=companyName:asc',

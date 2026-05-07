@@ -4,6 +4,7 @@ import React from 'react';
 import { Search } from 'lucide-react';
 
 interface BlogFilterBarProps {
+  categories: string[];
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
   searchQuery: string;
@@ -11,9 +12,8 @@ interface BlogFilterBarProps {
   resultsCount: number;
 }
 
-const categories = ['Todos', 'Estadística', 'Data Science', 'R Software', 'Formación', 'Casos de Éxito'];
-
 export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
+  categories,
   activeFilter,
   setActiveFilter,
   searchQuery,

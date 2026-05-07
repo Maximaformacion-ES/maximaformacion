@@ -35,7 +35,7 @@ const OUTPUTS = [
 
 type OutputValue = (typeof OUTPUTS)[number]['value'];
 
-export default function ConsultoriaFormSection() {
+export default function ConsultoriaForm() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +96,7 @@ export default function ConsultoriaFormSection() {
 
   if (success) {
     return (
-      <section id="consultoria-form" className="px-6 md:px-12 py-24 max-w-3xl mx-auto text-center">
+      <div className="text-center py-8">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-mx-orange/10 border border-mx-orange/30 mb-6">
           <CheckCircle size={28} className="text-mx-orange" />
         </div>
@@ -106,12 +106,12 @@ export default function ConsultoriaFormSection() {
         <p className="text-mx-text/60 text-body-md">
           Te contactaremos en las próximas 24–48 horas al email que nos has facilitado.
         </p>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section id="consultoria-form" className="px-6 md:px-12 py-24 max-w-3xl mx-auto">
+    <>
       <header className="mb-10 text-center">
         <p className="text-mx-orange text-label-md tracking-[0.3em] uppercase font-semibold mb-3">
           Consulta gratuita
@@ -284,7 +284,7 @@ export default function ConsultoriaFormSection() {
           {submitting ? 'Enviando…' : 'Enviar consulta'}
         </button>
       </form>
-    </section>
+    </>
   );
 }
 

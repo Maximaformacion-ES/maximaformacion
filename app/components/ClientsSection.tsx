@@ -1,18 +1,15 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { m } from 'framer-motion';
+import type { Logo } from '@/lib/strapi/types';
 
-const clients = [
-  { name: 'CSIC', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=CSIC' },
-  { name: 'Mapfre', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=MAPFRE' },
-  { name: 'Asebio', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=ASEBIO' },
-  { name: 'Abbott', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=ABBOTT' },
-  { name: 'RTVE', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=RTVE' },
-  { name: 'Tuenti', logo: 'https://via.placeholder.com/150x80/ffffff/000000?text=TUENTI' }
-];
+interface ClientsSectionProps {
+  logos?: Logo[];
+}
 
-export const ClientsSection: React.FC = () => {
+export const ClientsSection: React.FC<ClientsSectionProps> = ({ logos = [] }) => {
   return (
     <section className="py-20 md:py-0 md:h-[70dvh] flex flex-col justify-center px-6 md:px-12 bg-mx-bg">
       <div className="max-w-7xl mx-auto w-full">
@@ -57,22 +54,28 @@ export const ClientsSection: React.FC = () => {
               </p>
             </m.div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {clients.map((client, idx) => (
-                <m.div
-                  key={client.name}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.06 }}
-                  className="group flex items-center justify-center p-6 border border-mx-border bg-mx-card rounded-xl hover:border-mx-orange/30 hover:-translate-y-0.5 transition-all duration-400"
-                >
-                  <span className="text-mx-text-muted group-hover:text-mx-blue text-body-sm md:text-body-md font-bold tracking-wide transition-colors duration-300">
-                    {client.name}
-                  </span>
-                </m.div>
-              ))}
-            </div>
+            {logos.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {logos.map((logo, idx) => (
+                  <m.div
+                    key={logo.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.06 }}
+                    className="group flex items-center justify-center p-6 border border-mx-border bg-mx-card rounded-xl hover:border-mx-orange/30 hover:-translate-y-0.5 transition-all duration-400"
+                  >
+                    <Image
+                      src={logo.imageUrl}
+                      alt={logo.companyName}
+                      width={120}
+                      height={48}
+                      className="max-h-10 w-auto object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                    />
+                  </m.div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

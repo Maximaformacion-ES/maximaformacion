@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getConsultoriaSection } from '@/lib/strapi/queries';
+import { getConsultoriaSection, getLogos } from '@/lib/strapi/queries';
 import ConsultoriaClient from './ConsultoriaClient';
 
 export const metadata: Metadata = {
@@ -11,7 +11,10 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function ConsultoriaPage() {
-  const heroData = await getConsultoriaSection();
+  const [heroData, logos] = await Promise.all([
+    getConsultoriaSection(),
+    getLogos(),
+  ]);
 
-  return <ConsultoriaClient heroData={heroData} />;
+  return <ConsultoriaClient heroData={heroData} logos={logos} />;
 }

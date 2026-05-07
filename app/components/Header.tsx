@@ -453,7 +453,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                   <Link
                     key={item.name}
                     href={item.path}
-                    className={`text-body-sm font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white font-medium' : 'text-white/80') : (isActive ? 'text-mx-orange' : 'text-mx-text')}`}
+                    className={`text-[14px] font-light tracking-wide relative group hover:text-mx-orange transition-colors duration-300 ${isDark ? (isActive ? 'text-white font-medium' : 'text-white/80') : (isActive ? 'text-mx-orange' : 'text-mx-text')}`}
                   >
                     {item.name}
                     <span className={`absolute -bottom-1 left-0 h-px bg-mx-orange transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />

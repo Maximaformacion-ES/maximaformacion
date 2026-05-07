@@ -8,9 +8,11 @@ import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogGridProps {
   posts: BlogPost[];
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }
 
-export const BlogGrid: React.FC<BlogGridProps> = ({ posts }) => {
+export const BlogGrid: React.FC<BlogGridProps> = ({ posts, hasMore = false, onLoadMore }) => {
   return (
     <>
       {/* Blog Posts Grid */}
@@ -36,9 +38,13 @@ export const BlogGrid: React.FC<BlogGridProps> = ({ posts }) => {
       </div>
 
       {/* Load More */}
-      {posts.length > 0 && (
+      {hasMore && (
         <div className="mt-16 flex justify-center">
-          <button className="group flex items-center gap-2 px-8 py-4 border border-mx-border rounded-full hover:border-mx-orange hover:bg-mx-orange/5 transition-all duration-300 cursor-pointer">
+          <button
+            type="button"
+            onClick={onLoadMore}
+            className="group flex items-center gap-2 px-8 py-4 border border-mx-border rounded-full hover:border-mx-orange hover:bg-mx-orange/5 transition-all duration-300 cursor-pointer"
+          >
             <span className="text-body-sm font-medium text-mx-text-muted group-hover:text-mx-orange tracking-wide">
               Cargar más artículos
             </span>

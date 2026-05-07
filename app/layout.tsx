@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
+import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { getSiteMetadata } from "@/lib/strapi/queries";
 import { MotionProvider } from "./components/MotionProvider";
@@ -12,6 +13,7 @@ import "./globals.css";
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 const GTM_AUTH = process.env.NEXT_PUBLIC_GTM_AUTH;
 const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW;
+const COOKIEBOT_ID = process.env.NEXT_PUBLIC_COOKIEBOT_ID;
 
 const ztNature = localFont({
   src: [
@@ -90,6 +92,32 @@ export default async function RootLayout({
           <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
         </head>
+        {COOKIEBOT_ID && (
+          <>
+            <Script id="consent-mode-default" strategy="beforeInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  'ad_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+  'analytics_storage': 'denied',
+  'functionality_storage': 'denied',
+  'personalization_storage': 'denied',
+  'security_storage': 'granted',
+  'wait_for_update': 500
+});`}
+            </Script>
+            <Script
+              id="Cookiebot"
+              src="https://consent.cookiebot.com/uc.js"
+              data-cbid={COOKIEBOT_ID}
+              data-blockingmode="auto"
+              data-culture="ES"
+              strategy="beforeInteractive"
+            />
+          </>
+        )}
         {GTM_ID && (
           <GoogleTagManager
             gtmId={GTM_ID}
