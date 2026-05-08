@@ -14,13 +14,13 @@ interface BlogClientProps {
   initialPosts: BlogPost[];
 }
 
-const PAGE_SIZE = 9;
+const ITEMS_PER_PAGE = 9;
 
 export default function BlogClient({ initialPosts }: BlogClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categories = useMemo(() => {
     const unique = new Set<string>();
@@ -49,13 +49,16 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
     return result;
   }, [initialPosts, activeFilter, searchQuery]);
 
-  // Reset pagination whenever the filtered set changes
+  // Reset to page 1 whenever the filtered set changes
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    setCurrentPage(1);
   }, [activeFilter, searchQuery]);
 
-  const displayedPosts = filteredPosts.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredPosts.length;
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / ITEMS_PER_PAGE));
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
@@ -78,6 +81,9 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             resultsCount={filteredPosts.length}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
         </m.div>
 
@@ -87,9 +93,10 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
           transition={{ duration: 0.8, delay: 0.7 }}
         >
           <BlogGrid
-            posts={displayedPosts}
-            hasMore={hasMore}
-            onLoadMore={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            posts={paginatedPosts}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
         </m.div>
       </main>

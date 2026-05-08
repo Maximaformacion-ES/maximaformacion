@@ -92,10 +92,14 @@ export default async function RootLayout({
           <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
         </head>
-        {COOKIEBOT_ID && (
-          <>
-            <Script id="consent-mode-default" strategy="beforeInteractive">
-              {`window.dataLayer = window.dataLayer || [];
+        <body
+          className={`${ztNature.variable} antialiased`}
+          style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
+        >
+          {COOKIEBOT_ID && (
+            <>
+              <Script id="consent-mode-default" strategy="afterInteractive">
+                {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', {
   'ad_storage': 'denied',
@@ -107,28 +111,24 @@ gtag('consent', 'default', {
   'security_storage': 'granted',
   'wait_for_update': 500
 });`}
-            </Script>
-            <Script
-              id="Cookiebot"
-              src="https://consent.cookiebot.com/uc.js"
-              data-cbid={COOKIEBOT_ID}
-              data-blockingmode="auto"
-              data-culture="ES"
-              strategy="beforeInteractive"
+              </Script>
+              <Script
+                id="Cookiebot"
+                src="https://consent.cookiebot.com/uc.js"
+                data-cbid={COOKIEBOT_ID}
+                data-blockingmode="auto"
+                data-culture="ES"
+                strategy="afterInteractive"
+              />
+            </>
+          )}
+          {GTM_ID && (
+            <GoogleTagManager
+              gtmId={GTM_ID}
+              auth={GTM_AUTH}
+              preview={GTM_PREVIEW}
             />
-          </>
-        )}
-        {GTM_ID && (
-          <GoogleTagManager
-            gtmId={GTM_ID}
-            auth={GTM_AUTH}
-            preview={GTM_PREVIEW}
-          />
-        )}
-        <body
-          className={`${ztNature.variable} antialiased`}
-          style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
-        >
+          )}
           {GTM_ID && <Analytics />}
           <SiteBrandingProvider value={branding}>
             <MotionProvider>{children}</MotionProvider>

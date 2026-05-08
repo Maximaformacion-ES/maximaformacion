@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,12 +26,16 @@ import {
   Lock,
   Trophy,
   RotateCcw,
+  Award,
+  X,
 } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta, getCourseProgressStats } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
+import Certificate from '../../components/Certificate';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
@@ -53,11 +58,27 @@ interface Props {
 
 export default function MaxymiaCourseOverview({ course }: Props) {
   const { locale } = useLocale();
+  const { user } = useUser();
   const { hasPro, hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
   const { byBlockId: examResultsByBlock } = useExamResults(course.id);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>('objectives');
+  const [showCertificate, setShowCertificate] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!showCertificate) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showCertificate]);
 
   // Verify purchase after Stripe redirect
   useEffect(() => {
@@ -313,6 +334,15 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                         </p>
                       </div>
 
+                      {/* View certificate button */}
+                      <button
+                        onClick={() => setShowCertificate(true)}
+                        className="flex items-center justify-center gap-2 bg-mx-orange text-white px-6 py-3.5 rounded-[10px] font-medium text-sm hover:bg-mx-orange/90 transition-colors"
+                      >
+                        <Award size={16} />
+                        {locale === 'es' ? 'Ver certificado' : 'View certificate'}
+                      </button>
+
                       {/* Review button */}
                       <Link
                         href={`/maxymia/campus/${course.slug}/lesson/${course.blocks[0]?.lessons[0]?.id}`}
@@ -462,6 +492,48 @@ export default function MaxymiaCourseOverview({ course }: Props) {
         </div>
       </m.section>
       </div>{/* end scrollable content */}
+
+      {/* Certificate modal — portaled to body to escape any transformed ancestor */}
+      {portalReady && createPortal(
+        <AnimatePresence>
+          {showCertificate && isFullyCompleted && (
+            <m.div
+              data-cert-portal="true"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-start md:items-center justify-center p-4 md:p-8 overflow-y-auto"
+              onClick={() => setShowCertificate(false)}
+            >
+              <m.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="relative w-full max-w-4xl my-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setShowCertificate(false)}
+                  aria-label={locale === 'es' ? 'Cerrar' : 'Close'}
+                  className="absolute -top-12 right-0 text-white/70 hover:text-white p-2 print:hidden"
+                >
+                  <X size={24} />
+                </button>
+                <Certificate
+                  studentName={user?.fullName || (locale === 'es' ? 'Alumno' : 'Student')}
+                  courseTitle={course.title[locale]}
+                  instructor={course.instructor.name}
+                  completedAt={progress?.lastAccessedAt || new Date().toISOString()}
+                  locale={locale}
+                />
+              </m.div>
+            </m.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }

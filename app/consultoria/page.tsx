@@ -13,7 +13,7 @@ export const revalidate = 3600;
 export default async function ConsultoriaPage() {
   const [heroData, logos] = await Promise.all([
     getConsultoriaSection(),
-    getLogos(),
+    getLogos(6),
   ]);
 
   return <ConsultoriaClient heroData={heroData} logos={logos} />;

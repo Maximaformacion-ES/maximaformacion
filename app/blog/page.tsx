@@ -17,7 +17,7 @@ export default async function BlogPage() {
   let posts: BlogPost[] = [];
 
   try {
-    const { posts: strapiPosts } = await getBlogPosts({ draft: isDraft, limit: 100 });
+    const { posts: strapiPosts } = await getBlogPosts({ draft: isDraft, limit: 150 });
     posts = strapiPosts;
   } catch {
     // Strapi unavailable

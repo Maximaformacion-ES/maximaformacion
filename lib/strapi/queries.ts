@@ -50,6 +50,10 @@ function transformProgram(strapi: StrapiProgram): Program {
     units: (m.units || []).map((u) => ({ title: u.title })),
   }));
 
+  const brochurePdfUrl = strapi.brochurePdf
+    ? getStrapiMediaUrl(strapi.brochurePdf)
+    : null;
+
   return {
     id: strapi.id,
     documentId: strapi.documentId,
@@ -57,6 +61,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     title: strapi.title,
     slug: strapi.slug,
     duration: strapi.duration,
+    durationLabel: strapi.durationLabel ?? null,
     ects: strapi.ects,
     tags: strapi.tags || [],
     topics: (strapi.topics || []).map((t) => ({ id: t.id, documentId: t.documentId, name: t.name })),
@@ -69,17 +74,13 @@ function transformProgram(strapi: StrapiProgram): Program {
     startDate: strapi.startDate || 'Próximamente',
     certification: strapi.certification || (strapi.type === 'Master' ? 'Título Propio Universidad' : 'Certificado de Experto'),
     price: strapi.price || 1499,
+    priceLabel: strapi.priceLabel ?? null,
+    brochurePdfUrl,
     originalPrice: strapi.originalPrice || undefined,
-    modules: modules.length > 0 ? modules : [{ title: 'Módulo 1', description: 'Contenido del módulo', hours: 100, units: [{ title: 'Tema 1' }, { title: 'Tema 2' }, { title: 'Tema 3' }] }],
-    audience: strapi.audience || `- Profesionales del sector que buscan especialización
-- Recién graduados que quieren impulsar su carrera
-- Personas en transición profesional`,
-    careers: strapi.careers || `- Especialista en el área
-- Consultor independiente
-- Manager de equipos`,
-    objectives: strapi.objectives || `- Adquirir conocimientos especializados y actualizados
-- Desarrollar habilidades prácticas aplicables
-- Aplicar lo aprendido en proyectos reales`,
+    modules: modules.length > 0 ? modules : [],
+    audience: strapi.audiences || '',
+    careers: strapi.careers || '',
+    objectives: strapi.objectives || '',
     isPro: strapi.isPro,
     moodleCourseId: strapi.moodleCourseId ?? null,
     moodle: strapi.moodle ?? null,
@@ -204,6 +205,7 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
 
   // Populate relations
   params.set('populate[image]', 'true');
+  params.set('populate[brochurePdf]', 'true');
   params.set('populate[modules][populate][units]', 'true');
   params.set('populate[topics][fields][0]', 'name');
   params.set('populate[topics][fields][1]', 'documentId');
@@ -323,7 +325,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -348,7 +350,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],
@@ -795,10 +797,10 @@ export async function getSiteMetadata(): Promise<SiteMetadata | null> {
 
 // ============ Logo Queries ============
 
-export async function getLogos(): Promise<Logo[]> {
+export async function getLogos(limit = 100): Promise<Logo[]> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiLogo[]>>(
-      '/api/logos?populate[image]=true&pagination[pageSize]=100&sort=companyName:asc',
+      `/api/logos?populate[image]=true&pagination[pageSize]=${limit}&sort=companyName:asc`,
       {
         revalidate: 3600,
         tags: ['logos'],

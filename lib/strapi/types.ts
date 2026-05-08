@@ -114,6 +114,7 @@ export interface StrapiProgram {
   slug: string;
   type: 'Master' | 'Curso';
   duration: number;
+  durationLabel: string | null;
   ects: number;
   tags: string[] | null;
   featured: boolean;
@@ -122,12 +123,14 @@ export interface StrapiProgram {
   longDescription: string | null;
   image: StrapiMedia | null;
   imageUrl: string | null;
+  brochurePdf: StrapiMedia | null;
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
   startDate: string | null;
   topics: StrapiTopic[] | null;
   certification: string | null;
   price: number | null;
+  priceLabel: string | null;
   originalPrice: number | null;
   modules: StrapiModuleComponent[] | null;
   moduleRelations?: StrapiModule[] | null;
@@ -135,7 +138,7 @@ export interface StrapiProgram {
   stripePriceId: string | null;
   moodleCourseId: number | null;
   moodle: 'data-science' | 'e-learning' | null;
-  audience: string | null;
+  audiences: string | null;
   careers: string | null;
   objectives: string | null;
   createdAt: string;
@@ -202,6 +205,7 @@ export interface Program {
   title: string;
   slug: string;
   duration: number;
+  durationLabel?: string | null;
   ects: number;
   tags: string[];
   topics: Topic[];
@@ -214,7 +218,9 @@ export interface Program {
   startDate: string;
   certification: string;
   price: number;
+  priceLabel?: string | null;
   originalPrice?: number;
+  brochurePdfUrl?: string | null;
   modules: ProgramModule[];
   audience: string;
   careers: string;

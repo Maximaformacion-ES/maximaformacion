@@ -105,18 +105,26 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               transition={{ delay: 0.3, duration: 0.6 }}
               className="flex flex-wrap items-center gap-6 mb-8"
             >
-              <div className="flex items-center gap-2 text-mx-text">
-                <Clock size={16} className="text-mx-orange" />
-                <span className="text-body-sm font-medium">{program.duration} horas</span>
-              </div>
-              <div className="flex items-center gap-2 text-mx-text">
-                <BookOpen size={16} className="text-mx-orange" />
-                <span className="text-body-sm font-medium">{program.ects} créditos</span>
-              </div>
-              <div className="flex items-center gap-2 text-mx-text">
-                <Award size={16} className="text-mx-orange" />
-                <span className="text-body-sm font-medium">{program.modules.length} módulos</span>
-              </div>
+              {(program.durationLabel || program.duration) && (
+                <div className="flex items-center gap-2 text-mx-text">
+                  <Clock size={16} className="text-mx-orange" />
+                  <span className="text-body-sm font-medium">
+                    {program.durationLabel || `${program.duration} horas`}
+                  </span>
+                </div>
+              )}
+              {program.ects > 0 && (
+                <div className="flex items-center gap-2 text-mx-text">
+                  <BookOpen size={16} className="text-mx-orange" />
+                  <span className="text-body-sm font-medium">{program.ects} créditos</span>
+                </div>
+              )}
+              {program.modules.length > 0 && (
+                <div className="flex items-center gap-2 text-mx-text">
+                  <Award size={16} className="text-mx-orange" />
+                  <span className="text-body-sm font-medium">{program.modules.length} módulos</span>
+                </div>
+              )}
             </m.div>
 
             {/* Tabs below hero text */}

@@ -6,6 +6,7 @@ import { m } from "framer-motion";
 import { Clock, Calendar, ArrowUpRight, Award } from "lucide-react";
 import Link from "next/link";
 import type { BlogPost } from "@/lib/strapi/types";
+import { getCategoryStyle } from "@/lib/blog-categories";
 
 interface BlogCardProps {
   post: BlogPost;
@@ -30,6 +31,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
       .slice(0, 2);
   };
 
+  const style = getCategoryStyle(post.category);
+
   return (
     <m.a
       href={`/blog/${post.slug}`}
@@ -37,8 +40,11 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="group relative bg-mx-bg rounded-xl overflow-hidden border border-mx-border hover:border-mx-orange/50 transition-all duration-300 flex flex-col"
+      className={`group relative bg-mx-bg rounded-xl overflow-hidden border border-mx-border ${style.hoverBorder} transition-all duration-300 flex flex-col`}
     >
+      {/* Category accent bar */}
+      <div className={`absolute top-0 left-0 right-0 h-1 ${style.accentBg} z-30`} />
+
       {/* Featured Image */}
       <div className="relative h-56 overflow-hidden">
         <Image
@@ -57,7 +63,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
             <Award size={12} /> Destacado
           </div>
         )}
-        <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 bg-mx-blue text-white text-label-sm md:text-label-md font-medium rounded-full">
+        <div className={`absolute bottom-4 left-4 z-20 px-3 py-1.5 ${style.badgeBg} ${style.badgeText} text-label-sm md:text-label-md font-medium rounded-full shadow-lg`}>
           {post.category}
         </div>
       </div>
@@ -77,7 +83,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
         </div>
 
         {/* Title */}
-        <h3 className="text-body-sm md:text-body-md font-bold text-mx-text mb-3 group-hover:text-mx-blue transition-colors duration-300 leading-tight line-clamp-2">
+        <h3 className={`text-body-sm md:text-body-md font-bold text-mx-text mb-3 ${style.hoverText} transition-colors duration-300 leading-tight line-clamp-2`}>
           {post.title}
         </h3>
 

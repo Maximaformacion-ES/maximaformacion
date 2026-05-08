@@ -17,6 +17,7 @@ import {
   GraduationCap,
   Mail,
   Phone,
+  Download,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
@@ -85,12 +86,18 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
     }
   };
 
+  const durationDisplay = program.durationLabel
+    ? program.durationLabel
+    : program.duration
+    ? `${program.duration} horas`
+    : null;
+
   const infoItems = [
     { icon: Monitor, label: 'Modalidad', value: program.format },
     { icon: Globe, label: 'Idioma', value: program.language },
     { icon: Calendar, label: 'Inicio', value: program.startDate },
     { icon: Award, label: 'Certificación', value: program.certification },
-    { icon: Clock, label: 'Duración', value: program.duration },
+    { icon: Clock, label: 'Duración', value: durationDisplay },
     { icon: GraduationCap, label: 'Créditos', value: program.ects },
   ].filter((item) => item.value);
 
@@ -122,7 +129,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                 <div className="text-label-sm text-mx-text-muted uppercase tracking-widest">
                   {item.label}
                 </div>
-                <div className="text-mx-text text-body-sm font-medium">{item.value} {item.label === 'Duración' ? 'horas' : ''}</div>
+                <div className="text-mx-text text-body-sm font-medium">{item.value}</div>
               </div>
             </div>
           ))}
@@ -136,7 +143,9 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
           <>
             <div>
               <p className="text-body-sm md:text-body-md text-mx-text-muted font-light">
-                El precio de este máster varía en función del país de residencia del alumno.
+                {program.priceLabel
+                  ? `Precio: ${program.priceLabel}. Solicita información detallada por email.`
+                  : 'El precio de este máster varía en función del país de residencia del alumno.'}
               </p>
             </div>
 
@@ -148,6 +157,19 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
               Consultar precio
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </a>
+
+            {program.brochurePdfUrl && (
+              <a
+                href={program.brochurePdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="flex items-center justify-center gap-2 w-full border border-mx-border text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/40 px-6 py-3 text-body-sm font-light rounded-lg transition-colors"
+              >
+                <Download size={16} />
+                Descarga el temario (PDF)
+              </a>
+            )}
           </>
         ) : (
           <>
@@ -255,6 +277,19 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                   <Crown size={16} />
                   O hazte Pro por €18/mes
                 </Link>
+              )}
+
+              {program.brochurePdfUrl && (
+                <a
+                  href={program.brochurePdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="flex items-center justify-center gap-2 w-full border border-mx-border text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/40 px-6 py-3 text-body-sm font-light rounded-lg transition-colors"
+                >
+                  <Download size={16} />
+                  Descarga el temario (PDF)
+                </a>
               )}
             </div>
           </>
