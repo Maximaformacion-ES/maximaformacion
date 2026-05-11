@@ -168,7 +168,7 @@ export function LeadFormModal({
                 Acepto recibir comunicaciones comerciales de Máxima Formación. Puedo darme de baja
                 en cualquier momento. Consulta nuestra{' '}
                 <Link
-                  href="/privacidad"
+                  href="/politica-de-privacidad"
                   target="_blank"
                   className="underline hover:text-mx-orange transition-colors"
                 >

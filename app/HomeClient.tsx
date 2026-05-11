@@ -1,40 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import { FontStyles } from "./components/FontStyles";
 import { Header } from "./components/Header";
 import FloatingConsultCTA from "./components/FloatingConsultCTA";
 import { HeroSection } from "./components/HeroSection";
 import { StatsSection } from "./components/StatsSection";
 import { CoursesSection } from "./components/CoursesSection";
+import { TestimonialsSection } from "./components/TestimonialsSection";
+import { LogoMarquee } from "./components/LogoMarquee";
+import { BadgesSection } from "./components/BadgesSection";
+import { FAQSection } from "./components/FAQSection";
+import { CTASection } from "./components/CTASection";
+import { Footer } from "./components/Footer";
 import type { Program, Badge, HomeData } from "@/lib/strapi/types";
-
-// Below-the-fold sections loaded lazily to reduce initial JS
-const TestimonialsSection = dynamic(
-  () => import("./components/TestimonialsSection").then((mod) => ({ default: mod.TestimonialsSection })),
-  { ssr: false }
-);
-const LogoMarquee = dynamic(
-  () => import("./components/LogoMarquee").then((mod) => ({ default: mod.LogoMarquee })),
-  { ssr: false }
-);
-const BadgesSection = dynamic(
-  () => import("./components/BadgesSection").then((mod) => ({ default: mod.BadgesSection })),
-  { ssr: false }
-);
-const FAQSection = dynamic(
-  () => import("./components/FAQSection").then((mod) => ({ default: mod.FAQSection })),
-  { ssr: false }
-);
-const CTASection = dynamic(
-  () => import("./components/CTASection").then((mod) => ({ default: mod.CTASection })),
-  { ssr: false }
-);
-const Footer = dynamic(
-  () => import("./components/Footer").then((mod) => ({ default: mod.Footer })),
-  { ssr: false }
-);
 
 interface HomeClientProps {
   programs: Program[];

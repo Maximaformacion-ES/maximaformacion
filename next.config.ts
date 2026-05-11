@@ -70,9 +70,31 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Headers para mejorar caché
-  async headers() {
+  // Redirects para URLs legacy de páginas legales (mantener compatibilidad
+  // con cualquier link externo / cache que apunte a los slugs antiguos).
+  async redirects() {
     return [
+      { source: '/privacidad', destination: '/politica-de-privacidad', permanent: true },
+      { source: '/terminos', destination: '/aviso-legal', permanent: true },
+      { source: '/cookies', destination: '/politica-de-cookies', permanent: true },
+    ];
+  },
+  // Headers para mejorar caché + noindex en entornos preview/desarrollo.
+  async headers() {
+    const isProduction = process.env.VERCEL_ENV === 'production';
+    const noindexHeader = !isProduction
+      ? [
+          {
+            source: '/:path*',
+            headers: [
+              { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+            ],
+          },
+        ]
+      : [];
+
+    return [
+      ...noindexHeader,
       {
         // Caché largo para assets estáticos
         source: '/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2|otf|ttf)',

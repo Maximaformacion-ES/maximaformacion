@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import {
   Search,
@@ -37,28 +38,101 @@ const ITEMS_PER_PAGE = 9;
 interface ProgramsClientProps {
   initialPrograms: Program[];
   availableTopics: Topic[];
+  /** Initial page number from URL ?page=N (server-rendered). */
+  initialPage?: number;
 }
 
-export default function ProgramsClient({ initialPrograms, availableTopics }: ProgramsClientProps) {
+// Mapeo de valores de URL → valor real del filtro. URLSearchParams decodifica
+// los `+` como espacios al leer, así que las keys aceptadas son el nombre
+// completo en minúsculas (con espacios) o un slug corto.
+const AREA_FROM_URL: Record<string, string> = {
+  // forma canónica (espacios)
+  'inteligencia artificial': 'Inteligencia Artificial',
+  'ciencia de datos': 'Ciencia de Datos',
+  'salud basada en datos': 'Salud basada en datos',
+  'moodle / exelearning / h5p': 'Moodle / Exelearning / H5P',
+  // aliases cortos
+  'ia': 'Inteligencia Artificial',
+  'datos': 'Ciencia de Datos',
+  'salud': 'Salud basada en datos',
+  'moodle': 'Moodle / Exelearning / H5P',
+  'elearning': 'Moodle / Exelearning / H5P',
+  'e-learning': 'Moodle / Exelearning / H5P',
+};
+
+function resolveArea(raw: string | null): string | null {
+  if (!raw) return null;
+  return AREA_FROM_URL[raw.trim().toLowerCase()] ?? null;
+}
+
+function resolveType(raw: string | null): 'all' | 'Curso' | 'Master' {
+  if (!raw) return 'all';
+  const k = raw.trim().toLowerCase();
+  if (k === 'master' || k === 'masters' || k === 'máster' || k === 'másteres') return 'Master';
+  if (k === 'curso' || k === 'cursos') return 'Curso';
+  return 'all';
+}
+
+export default function ProgramsClient({ initialPrograms, availableTopics, initialPage = 1 }: ProgramsClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isSignedIn } = useUser();
   const { hasPro } = useUserCampus();
   const userHasPro = !!isSignedIn && hasPro;
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Read URL params on first render to seed filters (mega-menu links land here).
+  const initialArea = resolveArea(searchParams.get('area'));
+  const initialType = resolveType(searchParams.get('type'));
 
   // Filter state
   const [search, setSearch] = useState('');
-  const [activeTypeTab, setActiveTypeTab] = useState<'all' | 'Curso' | 'Master'>('all');
-  const [subjectAreaFilter, setSubjectAreaFilter] = useState<string | null>(null);
+  const [activeTypeTab, setActiveTypeTab] = useState<'all' | 'Curso' | 'Master'>(initialType);
+  const [subjectAreaFilter, setSubjectAreaFilter] = useState<string | null>(initialArea);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [formatFilter, setFormatFilter] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [durationRange, setDurationRange] = useState<[number, number]>([0, 2000]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>('relevance');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // URL-aware page navigation — keeps URL in sync with currentPage so Google
+  // sees real ?page=N URLs and users can share/bookmark deep pages.
+  const goToPage = useCallback((page: number) => {
+    setCurrentPage(page);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (page <= 1) sp.delete('page'); else sp.set('page', String(page));
+    const qs = sp.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [pathname, router, searchParams]);
+
+  // Filter handlers that ALSO update URL so chip state, mega-menu links and
+  // browser back/forward all stay in sync.
+  const handleSubjectAreaClick = useCallback((key: string | null) => {
+    setSubjectAreaFilter(key);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (key) sp.set('area', key); else sp.delete('area');
+    sp.delete('page');
+    const qs = sp.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  const handleTypeTabClick = useCallback((key: 'all' | 'Curso' | 'Master') => {
+    setActiveTypeTab(key);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (key === 'all') sp.delete('type'); else sp.set('type', key);
+    sp.delete('page');
+    const qs = sp.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams]);
 
   // Click outside
   const filtersRef = useRef<HTMLDivElement>(null);
@@ -72,10 +146,28 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Reset page when filters change
+  // Reset page when filters change. Only strip `?page=` from URL; keep
+  // `?area=` y `?type=` para que coincidan con los chips visibles.
   useEffect(() => {
     setCurrentPage(1);
+    if (typeof window !== 'undefined' && window.location.search.includes('page=')) {
+      const sp = new URLSearchParams(window.location.search);
+      sp.delete('page');
+      const qs = sp.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, activeTypeTab, subjectAreaFilter, typeFilter, formatFilter, priceRange, durationRange, selectedTopics, sortBy]);
+
+  // Sync filters when the URL params change (e.g., user clicks a mega-menu
+  // link while already on /programas — SPA navigation doesn't remount the
+  // component, so useState initializers don't re-run).
+  useEffect(() => {
+    const urlArea = resolveArea(searchParams.get('area'));
+    const urlType = resolveType(searchParams.get('type'));
+    setSubjectAreaFilter(urlArea);
+    setActiveTypeTab(urlType);
+  }, [searchParams]);
 
   // Filter & sort
   const filteredPrograms = useMemo(() => {
@@ -228,7 +320,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
                 <button
                   key={key}
                   type="button"
-                  onClick={() => setActiveTypeTab(key)}
+                  onClick={() => handleTypeTabClick(key)}
                   className={`px-5 py-2 rounded-full text-body-sm font-medium transition-all ${
                     active
                       ? 'bg-mx-orange text-white shadow-sm'
@@ -259,7 +351,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
               <button
                 key={key ?? 'all'}
                 type="button"
-                onClick={() => setSubjectAreaFilter(key)}
+                onClick={() => handleSubjectAreaClick(key)}
                 className={`px-4 py-2 rounded-full text-label-sm md:text-label-md font-medium border transition-colors ${
                   active
                     ? 'bg-mx-blue text-white border-mx-blue'
@@ -307,7 +399,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
                 totalPages > 1 ? (
                   <div className="hidden md:flex items-center gap-1">
                     <button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      onClick={() => goToPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
                       className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-blue/50 hover:text-mx-text disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
@@ -317,7 +409,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
                       {currentPage}/{totalPages}
                     </span>
                     <button
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
                       className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-blue/50 hover:text-mx-text disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
@@ -424,7 +516,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
             programs={paginatedPrograms}
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={goToPage}
           />
         </m.div>
       </main>

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getProgramBySlug, getAllProgramSlugs } from '@/lib/strapi/queries';
+import { JsonLd } from '@/app/components/JsonLd';
+import { breadcrumbSchema, courseSchema, faqSchema } from '@/lib/seo/jsonld';
 import ProgramDetailClient from './ProgramDetailClient';
 
 export const revalidate = 60;
@@ -42,5 +44,22 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
 
   const program = await getProgramBySlug(slug, isDraft);
 
-  return <ProgramDetailClient program={program} />;
+  const schemas = program
+    ? [
+        courseSchema(program),
+        breadcrumbSchema([
+          { name: 'Inicio', url: '/' },
+          { name: 'Programas', url: '/programas' },
+          { name: program.title, url: `/programas/${program.slug}` },
+        ]),
+        ...(program.faqs && program.faqs.length > 0 ? [faqSchema(program.faqs)] : []),
+      ]
+    : [];
+
+  return (
+    <>
+      {schemas.length > 0 && <JsonLd data={schemas} />}
+      <ProgramDetailClient program={program} />
+    </>
+  );
 }

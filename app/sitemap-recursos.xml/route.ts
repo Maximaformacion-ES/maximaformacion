@@ -1,0 +1,20 @@
+import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
+import { getResources } from '@/lib/strapi/queries';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
+  if (!isProductionEnv()) return emptyForPreview('urlset');
+
+  const { resources } = await getResources({ limit: 500 }).catch(() => ({ resources: [], total: 0, pageCount: 0 }));
+  const entries: SitemapEntry[] = resources
+    .filter((r) => r.slug)
+    .map((r) => ({
+      loc: `${SITE_URL}/recursos/${r.slug}`,
+      lastmod: r.publishedAt ? new Date(r.publishedAt).toISOString() : undefined,
+      changefreq: 'monthly',
+      priority: 0.6,
+    }));
+
+  return xmlResponse(renderUrlSet(entries));
+}

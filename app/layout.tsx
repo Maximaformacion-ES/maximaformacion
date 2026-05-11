@@ -8,6 +8,8 @@ import { getSiteMetadata } from "@/lib/strapi/queries";
 import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
 import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
+import { JsonLd } from "./components/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/seo/jsonld";
 import "./globals.css";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
@@ -32,11 +34,16 @@ const ztNature = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteMetadata = await getSiteMetadata();
+  // En previews y desarrollo (Vercel preview, vercel.app, local) → noindex global.
+  // Solo dejamos indexar cuando VERCEL_ENV === 'production'.
+  const isProduction = process.env.VERCEL_ENV === 'production';
+  const noIndex = !isProduction || siteMetadata?.noIndex === true;
 
   if (!siteMetadata) {
     return {
       title: "Maximaformación - Formación Profesional experta",
       description: "Lleva tu carrera al siguiente nivel con nuestra formación especializada. Másters, cursos y programas ejecutivos de élite.",
+      robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     };
   }
 
@@ -54,9 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
         apple: siteMetadata.favicon,
       },
     }),
-    robots: siteMetadata.noIndex
-      ? { index: false, follow: false }
-      : { index: true, follow: true },
+    robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
       title: siteMetadata.ogTitle,
       description: siteMetadata.ogDescription,
@@ -91,6 +96,7 @@ export default async function RootLayout({
         <head>
           <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
+          <JsonLd data={[organizationSchema(), websiteSchema()]} />
         </head>
         <body
           className={`${ztNature.variable} antialiased`}

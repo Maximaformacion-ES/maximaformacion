@@ -155,6 +155,70 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/*
+ * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
+ * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
+ * inlinea los hex en las utilidades, así que un simple override de la
+ * variable CSS no surte efecto. Sobrescribimos directamente las utilidades
+ * de Tailwind dentro del wrapper. El azul (`mx-blue`) se mantiene porque
+ * ya coincide con el del logo nuevo.
+ *
+ * Verde: #16A34A (sólido) · #15803D (hover/dark).
+ */
+.theme-consultoria { color-scheme: light; }
+
+/* Backgrounds */
+.theme-consultoria .bg-mx-orange { background-color: #16A34A; }
+.theme-consultoria .bg-mx-orange-dark { background-color: #15803D; }
+.theme-consultoria .bg-mx-orange\/5    { background-color: color-mix(in srgb, #16A34A 5%,  transparent); }
+.theme-consultoria .bg-mx-orange\/10   { background-color: color-mix(in srgb, #16A34A 10%, transparent); }
+.theme-consultoria .bg-mx-orange\/15   { background-color: color-mix(in srgb, #16A34A 15%, transparent); }
+.theme-consultoria .bg-mx-orange\/20   { background-color: color-mix(in srgb, #16A34A 20%, transparent); }
+.theme-consultoria .bg-mx-orange\/30   { background-color: color-mix(in srgb, #16A34A 30%, transparent); }
+
+/* Text */
+.theme-consultoria .text-mx-orange      { color: #16A34A; }
+.theme-consultoria .text-mx-orange-dark { color: #15803D; }
+
+/* Borders */
+.theme-consultoria .border-mx-orange       { border-color: #16A34A; }
+.theme-consultoria .border-mx-orange\/20   { border-color: color-mix(in srgb, #16A34A 20%, transparent); }
+.theme-consultoria .border-mx-orange\/30   { border-color: color-mix(in srgb, #16A34A 30%, transparent); }
+.theme-consultoria .border-mx-orange\/40   { border-color: color-mix(in srgb, #16A34A 40%, transparent); }
+.theme-consultoria .border-mx-orange\/50   { border-color: color-mix(in srgb, #16A34A 50%, transparent); }
+
+/* Hover variants */
+.theme-consultoria .hover\:bg-mx-orange:hover       { background-color: #16A34A; }
+.theme-consultoria .hover\:bg-mx-orange-dark:hover  { background-color: #15803D; }
+.theme-consultoria .hover\:bg-mx-orange\/5:hover    { background-color: color-mix(in srgb, #16A34A 5%, transparent); }
+.theme-consultoria .hover\:bg-mx-orange\/10:hover   { background-color: color-mix(in srgb, #16A34A 10%, transparent); }
+.theme-consultoria .hover\:text-mx-orange:hover     { color: #16A34A; }
+.theme-consultoria .hover\:text-mx-orange-dark:hover{ color: #15803D; }
+.theme-consultoria .hover\:border-mx-orange:hover         { border-color: #16A34A; }
+.theme-consultoria .hover\:border-mx-orange\/40:hover     { border-color: color-mix(in srgb, #16A34A 40%, transparent); }
+.theme-consultoria .hover\:border-mx-orange\/50:hover     { border-color: color-mix(in srgb, #16A34A 50%, transparent); }
+
+/* Group hover variants */
+.theme-consultoria .group:hover .group-hover\:text-mx-orange     { color: #16A34A; }
+.theme-consultoria .group:hover .group-hover\:bg-mx-orange       { background-color: #16A34A; }
+.theme-consultoria .group:hover .group-hover\:border-mx-orange   { border-color: #16A34A; }
+
+/* Selection */
+.theme-consultoria .selection\:bg-mx-orange\/30 ::selection { background-color: color-mix(in srgb, #16A34A 30%, transparent); }
+.theme-consultoria ::selection { background-color: color-mix(in srgb, #16A34A 30%, transparent); }
+
+/* Text stroke (StyledTitle) — usa la variable, sobrescribimos por si acaso */
+.theme-consultoria { --color-mx-orange: #16A34A; --color-mx-orange-dark: #15803D; }
+.theme-consultoria .text-stroke { -webkit-text-stroke-color: #16A34A; }
+
+/* Gradient stops */
+.theme-consultoria .from-mx-orange { --tw-gradient-from: #16A34A; }
+.theme-consultoria .to-mx-orange   { --tw-gradient-to: #16A34A; }
+.theme-consultoria .from-mx-orange-dark { --tw-gradient-from: #15803D; }
+
+/* Decorative dotted backgrounds (used in /consultoria) que llevan rgba inline
+   con el naranja del brand: las dejamos como están porque son sutiles. */
+
 /* Film grain overlay effect */
 .grain {
   display: none;

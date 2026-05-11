@@ -153,11 +153,41 @@ export interface StrapiAuthor {
   id: number;
   documentId: string;
   name: string;
+  slug?: string | null;
   role: string;
   roleDescription: string | null;
   avatar: StrapiMedia | null;
+  avatarUrl?: string | null;
   email: string | null;
   linkedin: string | null;
+  bio?: string | null;
+  isTeacher?: boolean;
+  featured?: boolean;
+  expertiseAreas?: string[] | null;
+  websiteUrl?: string | null;
+  twitter?: string | null;
+  orcid?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+}
+
+export interface TeacherProfile {
+  id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  role: string;
+  bio: string;
+  avatarUrl: string;
+  email: string | null;
+  linkedin: string | null;
+  twitter: string | null;
+  websiteUrl: string | null;
+  orcid: string | null;
+  expertiseAreas: string[];
+  featured: boolean;
+  seoTitle: string | null;
+  seoDescription: string | null;
 }
 
 export type BlogCategory =

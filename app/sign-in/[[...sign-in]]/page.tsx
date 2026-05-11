@@ -113,11 +113,11 @@ export default function SignInPage() {
             className="text-center text-mx-text-muted text-body-sm mt-8"
           >
             Al iniciar sesión, aceptas nuestros{' '}
-            <Link href="/terminos" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
+            <Link href="/aviso-legal" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
               Términos de Servicio
             </Link>{' '}
             y{' '}
-            <Link href="/privacidad" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
+            <Link href="/politica-de-privacidad" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
               Política de Privacidad
             </Link>
           </m.p>

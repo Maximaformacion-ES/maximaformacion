@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getBlogPostBySlug, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
+import { JsonLd } from '@/app/components/JsonLd';
+import { blogPostSchema, breadcrumbSchema } from '@/lib/seo/jsonld';
 import BlogDetailClient from './BlogDetailClient';
 
 export const revalidate = 60;
@@ -60,5 +62,21 @@ export default async function BlogPage({ params }: BlogPageProps) {
     // Strapi unavailable
   }
 
-  return <BlogDetailClient post={post} relatedPosts={relatedPosts} />;
+  const schemas = post
+    ? [
+        blogPostSchema(post),
+        breadcrumbSchema([
+          { name: 'Inicio', url: '/' },
+          { name: 'Blog', url: '/blog' },
+          { name: post.title, url: `/blog/${post.slug}` },
+        ]),
+      ]
+    : [];
+
+  return (
+    <>
+      {schemas.length > 0 && <JsonLd data={schemas} />}
+      <BlogDetailClient post={post} relatedPosts={relatedPosts} />
+    </>
+  );
 }

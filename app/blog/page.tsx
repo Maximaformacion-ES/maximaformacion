@@ -4,15 +4,32 @@ import { getBlogPosts } from '@/lib/strapi/queries';
 import type { BlogPost } from '@/lib/strapi/types';
 import BlogClient from './BlogClient';
 
-export const metadata: Metadata = {
-  title: 'Blog | Máxima Formación',
-  description: 'Artículos, guías y recursos sobre estadística, ciencia de datos, formación profesional e innovación. Mantente al día con las últimas tendencias del sector.',
-};
+interface BlogPageProps {
+  searchParams: Promise<{ page?: string }>;
+}
+
+export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
+  const { page } = await searchParams;
+  const parsed = Math.max(1, parseInt(page || '1', 10) || 1);
+  const isFirst = parsed === 1;
+  return {
+    title: isFirst
+      ? 'Blog | Máxima Formación'
+      : `Blog – Página ${parsed} | Máxima Formación`,
+    description:
+      'Artículos, guías y recursos sobre estadística, ciencia de datos, formación profesional e innovación.',
+    alternates: {
+      canonical: isFirst ? '/blog' : `/blog?page=${parsed}`,
+    },
+  };
+}
 
 export const revalidate = 60;
 
-export default async function BlogPage() {
+export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { isEnabled: isDraft } = await draftMode();
+  const { page } = await searchParams;
+  const initialPage = Math.max(1, parseInt(page || '1', 10) || 1);
 
   let posts: BlogPost[] = [];
 
@@ -23,5 +40,5 @@ export default async function BlogPage() {
     // Strapi unavailable
   }
 
-  return <BlogClient initialPosts={posts} />;
+  return <BlogClient initialPosts={posts} initialPage={initialPage} />;
 }

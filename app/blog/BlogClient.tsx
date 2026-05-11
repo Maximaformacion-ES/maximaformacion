@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
@@ -12,15 +13,27 @@ import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogClientProps {
   initialPosts: BlogPost[];
+  initialPage?: number;
 }
 
 const ITEMS_PER_PAGE = 9;
 
-export default function BlogClient({ initialPosts }: BlogClientProps) {
+export default function BlogClient({ initialPosts, initialPage = 1 }: BlogClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const goToPage = useCallback((page: number) => {
+    setCurrentPage(page);
+    const url = page <= 1 ? pathname : `${pathname}?page=${page}`;
+    router.push(url, { scroll: false });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [pathname, router]);
 
   const categories = useMemo(() => {
     const unique = new Set<string>();
@@ -49,9 +62,13 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
     return result;
   }, [initialPosts, activeFilter, searchQuery]);
 
-  // Reset to page 1 whenever the filtered set changes
+  // Reset to page 1 whenever the filtered set changes — clear ?page= from URL too.
   useEffect(() => {
     setCurrentPage(1);
+    if (typeof window !== 'undefined' && window.location.search.includes('page=')) {
+      router.replace(pathname, { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFilter, searchQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / ITEMS_PER_PAGE));
@@ -83,7 +100,7 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
             resultsCount={filteredPosts.length}
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={goToPage}
           />
         </m.div>
 
@@ -96,7 +113,7 @@ export default function BlogClient({ initialPosts }: BlogClientProps) {
             posts={paginatedPosts}
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={goToPage}
           />
         </m.div>
       </main>

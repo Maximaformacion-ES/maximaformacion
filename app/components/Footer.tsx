@@ -25,6 +25,8 @@ export const Footer: React.FC = () => {
     ],
     Empresa: [
       { label: "Conócenos", href: "/conocenos" },
+      { label: "Profesorado", href: "/profesorado" },
+      { label: "Autores", href: "/autores" },
       { label: "Blog", href: "/blog" },
       { label: "Contacto", href: "/contacto" },
     ],
@@ -141,6 +143,34 @@ export const Footer: React.FC = () => {
           <p className="text-mx-text-muted text-body-sm">
             © 2026 Maximaformación. Todos los derechos reservados.
           </p>
+          <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-body-sm">
+            <li>
+              <Link
+                href="/aviso-legal"
+                className="text-mx-text-muted hover:text-mx-orange transition-colors"
+              >
+                Aviso legal
+              </Link>
+            </li>
+            <li aria-hidden className="text-mx-border">·</li>
+            <li>
+              <Link
+                href="/politica-de-privacidad"
+                className="text-mx-text-muted hover:text-mx-orange transition-colors"
+              >
+                Política de privacidad
+              </Link>
+            </li>
+            <li aria-hidden className="text-mx-border">·</li>
+            <li>
+              <Link
+                href="/politica-de-cookies"
+                className="text-mx-text-muted hover:text-mx-orange transition-colors"
+              >
+                Política de cookies
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

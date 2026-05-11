@@ -68,7 +68,7 @@ export default function ConsultoriaClient() {
   const openForm = () => setIsFormOpen(true);
 
   return (
-    <div className="bg-mx-bg min-h-screen text-mx-text selection:bg-mx-orange/30 overflow-x-hidden">
+    <div className="theme-consultoria bg-mx-bg min-h-screen text-mx-text selection:bg-mx-orange/30 overflow-x-hidden">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />

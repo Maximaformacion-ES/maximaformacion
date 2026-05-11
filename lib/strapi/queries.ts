@@ -20,6 +20,8 @@ import type {
   Program,
   Topic,
   BlogPost,
+  StrapiAuthor,
+  TeacherProfile,
   HeroSection,
   SiteMetadata,
   Logo,
@@ -383,6 +385,111 @@ export async function getAllProgramSlugs(): Promise<string[]> {
   );
 
   return response.data.map((p) => p.slug);
+}
+
+// ============ Teacher (profesorado) Queries ============
+
+function transformTeacher(strapi: StrapiAuthor): TeacherProfile {
+  const avatar = strapi.avatar ? getStrapiMediaUrl(strapi.avatar) : strapi.avatarUrl || '';
+  return {
+    id: strapi.id,
+    documentId: strapi.documentId,
+    name: strapi.name,
+    slug: strapi.slug || '',
+    role: strapi.role,
+    bio: strapi.bio || strapi.roleDescription || '',
+    avatarUrl: avatar,
+    email: strapi.email || null,
+    linkedin: strapi.linkedin || null,
+    twitter: strapi.twitter || null,
+    websiteUrl: strapi.websiteUrl || null,
+    orcid: strapi.orcid || null,
+    expertiseAreas: Array.isArray(strapi.expertiseAreas) ? strapi.expertiseAreas : [],
+    featured: !!strapi.featured,
+    seoTitle: strapi.seoTitle || null,
+    seoDescription: strapi.seoDescription || null,
+  };
+}
+
+export async function getTeachers(): Promise<TeacherProfile[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
+      '/api/authors?filters[isTeacher][$eq]=true&populate[avatar]=true&pagination[pageSize]=100&sort=featured:desc,name:asc',
+      { revalidate: 60, tags: ['authors', 'teachers'] },
+    );
+    return response.data.map(transformTeacher).filter((t) => t.slug);
+  } catch (error) {
+    console.error('Error fetching teachers:', error);
+    return [];
+  }
+}
+
+export async function getTeacherBySlug(slug: string): Promise<TeacherProfile | null> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
+      `/api/authors?filters[slug][$eq]=${encodeURIComponent(slug)}&filters[isTeacher][$eq]=true&populate[avatar]=true`,
+      { revalidate: 60, tags: ['authors', `author-${slug}`] },
+    );
+    if (!response.data || response.data.length === 0) return null;
+    return transformTeacher(response.data[0]);
+  } catch (error) {
+    console.error(`Error fetching teacher ${slug}:`, error);
+    return null;
+  }
+}
+
+export async function getAllTeacherSlugs(): Promise<string[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
+      '/api/authors?filters[isTeacher][$eq]=true&fields[0]=slug&pagination[pageSize]=100',
+      { revalidate: 3600, tags: ['authors'] },
+    );
+    return response.data.map((a) => a.slug || '').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+// ============ Author (firmantes / colaboradores no-docentes) Queries ============
+
+/** Authors that are NOT teachers — used for /autores/[slug] pages. */
+export async function getNonTeacherAuthors(): Promise<TeacherProfile[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
+      '/api/authors?filters[isTeacher][$ne]=true&populate[avatar]=true&pagination[pageSize]=200&sort=name:asc',
+      { revalidate: 60, tags: ['authors'] },
+    );
+    return response.data.map(transformTeacher).filter((t) => t.slug);
+  } catch (error) {
+    console.error('Error fetching authors:', error);
+    return [];
+  }
+}
+
+export async function getAuthorBySlug(slug: string): Promise<TeacherProfile | null> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
+      `/api/authors?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[avatar]=true`,
+      { revalidate: 60, tags: ['authors', `author-${slug}`] },
+    );
+    if (!response.data || response.data.length === 0) return null;
+    return transformTeacher(response.data[0]);
+  } catch (error) {
+    console.error(`Error fetching author ${slug}:`, error);
+    return null;
+  }
+}
+
+export async function getAllAuthorSlugs(): Promise<string[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
+      '/api/authors?fields[0]=slug&pagination[pageSize]=200',
+      { revalidate: 3600, tags: ['authors'] },
+    );
+    return response.data.map((a) => a.slug || '').filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 // ============ Topic Queries ============
