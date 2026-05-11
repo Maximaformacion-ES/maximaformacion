@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { Download, Linkedin } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useSiteBranding } from '@/app/components/SiteBrandingProvider';
 import type { Locale } from '../types';
 
@@ -235,6 +236,31 @@ export default function Certificate({
             Campus de IA Aplicada a Ciencias — maxymia.com
           </p>
         </div>
+
+        {/* QR verification — bottom right */}
+        {certificateUrl && (
+          <div className="absolute bottom-[2.5cqw] right-[2.5cqw] flex flex-col items-center gap-[0.4cqw]">
+            <div className="bg-white p-[0.4cqw] rounded-[0.6cqw] border border-[#F7A000]/30">
+              <QRCodeSVG
+                value={certificateUrl}
+                size={64}
+                level="M"
+                marginSize={0}
+                fgColor="#1a1a1a"
+                bgColor="#ffffff"
+                className="w-[8cqw] h-[8cqw]"
+              />
+            </div>
+            <p className="text-[#999] text-[0.9cqw] tracking-widest uppercase">
+              {locale === 'es' ? 'Verificar' : 'Verify'}
+            </p>
+            {certificateId && (
+              <p className="text-[#bbb] text-[0.75cqw] font-mono">
+                {certificateId.slice(0, 8)}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

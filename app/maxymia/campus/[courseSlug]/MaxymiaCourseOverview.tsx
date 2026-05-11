@@ -66,6 +66,12 @@ export default function MaxymiaCourseOverview({ course }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('objectives');
   const [showCertificate, setShowCertificate] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const [issuedCertificate, setIssuedCertificate] = useState<{
+    id: string;
+    verifyUrl: string;
+    issuedAt: string;
+    completedAt: string;
+  } | null>(null);
 
   useEffect(() => {
     setPortalReady(true);
@@ -125,6 +131,43 @@ export default function MaxymiaCourseOverview({ course }: Props) {
     () => new Set(progress?.completedLessons ?? []),
     [progress]
   );
+
+  // Issue (or fetch existing) certificate when the modal opens and the course is fully completed.
+  useEffect(() => {
+    if (!showCertificate || !isFullyCompleted || issuedCertificate) return;
+    let cancelled = false;
+    fetch('/api/maxymia/certificate/issue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courseId: course.id,
+        courseTitle: course.title[locale],
+        instructor: course.instructor.name,
+        completedAt: progress?.lastAccessedAt || new Date().toISOString(),
+      }),
+    })
+      .then(async (res) => {
+        if (res.ok) return res.json();
+        const errorBody = await res.json().catch(() => ({}));
+        console.warn('[certificate/issue] failed', res.status, errorBody);
+        return null;
+      })
+      .then((data) => {
+        if (cancelled || !data) return;
+        setIssuedCertificate({
+          id: data.id,
+          verifyUrl: data.verifyUrl,
+          issuedAt: data.issuedAt,
+          completedAt: data.completedAt,
+        });
+      })
+      .catch((err) => {
+        console.warn('[certificate/issue] network error', err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showCertificate, isFullyCompleted, issuedCertificate, course.id, course.title, course.instructor.name, locale, progress?.lastAccessedAt]);
 
   // Find first incomplete lesson for CTA
   const firstIncompleteLessonId = useMemo(() => {
@@ -525,8 +568,10 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                   studentName={user?.fullName || (locale === 'es' ? 'Alumno' : 'Student')}
                   courseTitle={course.title[locale]}
                   instructor={course.instructor.name}
-                  completedAt={progress?.lastAccessedAt || new Date().toISOString()}
+                  completedAt={issuedCertificate?.completedAt || progress?.lastAccessedAt || new Date().toISOString()}
                   locale={locale}
+                  certificateId={issuedCertificate?.id}
+                  certificateUrl={issuedCertificate?.verifyUrl}
                 />
               </m.div>
             </m.div>

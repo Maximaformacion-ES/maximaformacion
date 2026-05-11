@@ -15,6 +15,12 @@ import { StyledTitle } from '../components/StyledTitle';
 import { trackBeginCheckout, trackPurchaseOnce, type AnalyticsItem } from '@/lib/analytics';
 import type { LucideIcon } from 'lucide-react';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatPrice(value: number): string {
+  return Number.isInteger(value) ? String(value) : value.toFixed(2).replace('.', ',');
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Plan {
@@ -66,7 +72,7 @@ const PLANS: Plan[] = [
     id: 'pro', // This should match your Clerk plan ID
     name: 'Pro',
     description: 'Todo lo que necesitas para dominar la estadística profesional',
-    price: { monthly: 18, yearly: 216 },
+    price: { monthly: 18, yearly: 172.80 },
     icon: Crown,
     features: [
       'Todo lo del plan Free',
@@ -182,7 +188,7 @@ function PlanCard({
       <div className="mb-6">
         <div className="flex items-baseline gap-1">
           <span className="text-display-sm md:text-display-sm font-black text-mx-text">
-            €{billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly}
+            €{formatPrice(billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly)}
           </span>
           <span className="text-mx-text-muted font-light">
             {plan.price.monthly === 0 ? '' : billingPeriod === 'yearly' ? '/año' : '/mes'}
@@ -190,7 +196,7 @@ function PlanCard({
         </div>
         {billingPeriod === 'yearly' && plan.price.monthly > 0 && (
           <p className="text-mx-orange text-body-sm mt-2">
-            Equivalente a €{Math.round(plan.price.yearly / 12)}/mes
+            Equivalente a €{formatPrice(plan.price.yearly / 12)}/mes
           </p>
         )}
         <p className="text-mx-text-muted font-light mt-2">{plan.description}</p>
@@ -238,8 +244,8 @@ function PlanCard({
             </button>
             <p className="text-mx-text-muted text-label-md text-center">
               7 días de acceso completo. Después, {billingPeriod === 'yearly'
-                ? `${plan.price.yearly}€/año`
-                : `${plan.price.monthly}€/mes`
+                ? `${formatPrice(plan.price.yearly)}€/año`
+                : `${formatPrice(plan.price.monthly)}€/mes`
               }. Cancela cuando quieras.
             </p>
           </div>

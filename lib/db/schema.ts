@@ -111,6 +111,51 @@ export const courseUpdateReads = campusSchema.table('course_update_reads', {
   uniqueIndex('idx_course_update_reads_unique').on(table.clerkId, table.courseUpdateId),
 ]);
 
+// ─── Lead Capture Log ──────────────────────────────────────────────────
+// Resilience layer: every lead capture (resource download form, newsletter, …)
+// gets a row here BEFORE Klaviyo is contacted. If Klaviyo sync fails we still
+// have the lead and can resync via cron. Klaviyo is the marketing source of
+// truth — this is just an append-only safety net.
+export const leadCaptureLog = campusSchema.table('lead_capture_log', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  source: text('source').notNull(), // 'resource_download' | 'newsletter' | …
+  email: text('email').notNull(),
+  name: text('name'),
+  resourceSlug: text('resource_slug'),
+  resourceTitle: text('resource_title'),
+  consent: boolean('consent').notNull(),
+  utmSource: text('utm_source'),
+  referer: text('referer'),
+  ipPrefix: text('ip_prefix'), // first 3 octets of IPv4 (RGPD)
+  userAgent: text('user_agent'),
+  payload: jsonb('payload'), // raw request body for debugging/replay
+  klaviyoSyncedAt: timestamp('klaviyo_synced_at', tz),
+  klaviyoError: text('klaviyo_error'),
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  index('idx_lead_capture_email').on(table.email),
+  index('idx_lead_capture_unsynced').on(table.klaviyoSyncedAt),
+  index('idx_lead_capture_source').on(table.source),
+]);
+
+// ─── Certificates ──────────────────────────────────────────────────────
+// Public verification: /verificar/{id} returns this row (no auth).
+// One certificate per (clerkId, courseId).
+export const certificates = campusSchema.table('certificates', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clerkId: text('clerk_id').notNull().references(() => users.clerkId),
+  courseId: text('course_id').notNull(),
+  courseTitle: text('course_title').notNull(),
+  studentName: text('student_name').notNull(),
+  instructor: text('instructor'),
+  issuedAt: timestamp('issued_at', tz).defaultNow().notNull(),
+  completedAt: timestamp('completed_at', tz).notNull(),
+  revokedAt: timestamp('revoked_at', tz),
+}, (table) => [
+  uniqueIndex('idx_certificates_unique').on(table.clerkId, table.courseId),
+  index('idx_certificates_course').on(table.courseId),
+]);
+
 // ─── Exam Results (Maxymia) ────────────────────────────────────────────
 export const examResults = campusSchema.table('exam_results', {
   id: uuid('id').primaryKey().defaultRandom(),

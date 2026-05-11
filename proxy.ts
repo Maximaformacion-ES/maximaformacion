@@ -14,6 +14,9 @@ const isPublicRoute = createRouteMatcher([
   '/contacto(.*)',
   '/pricing(.*)',
   '/maxymia(.*)',
+  '/verificar(.*)',
+  '/recursos(.*)',
+  '/api/leads(.*)',
 ]);
 
 // Define routes that should bypass Clerk auth (they use their own verification)

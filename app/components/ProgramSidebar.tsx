@@ -23,7 +23,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
-import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
 interface ProgramSidebarProps {
@@ -41,6 +41,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
+  const proSavings = getProSavings(program, userHasPro);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -222,6 +223,22 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                 )
               )}
               <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
+
+              {/* Pro savings hint for non-Pro users */}
+              {proSavings > 0 && (
+                <Link
+                  href="/pricing"
+                  className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-mx-orange/30 bg-mx-orange/5 px-3 py-2.5 hover:bg-mx-orange/10 hover:border-mx-orange/50 transition-colors group"
+                >
+                  <span className="flex items-center gap-2 text-mx-orange text-label-md font-medium">
+                    <Crown size={14} />
+                    {program.isPro
+                      ? `Sería gratis con Pro · ahorras ${proSavings}€`
+                      : `Con Pro pagarías ${program.price - proSavings}€ · ahorras ${proSavings}€`}
+                  </span>
+                  <ArrowRight size={14} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              )}
             </div>
 
             {/* Guarantee badge */}

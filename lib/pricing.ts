@@ -39,3 +39,15 @@ export function getEffectivePrice(
   if (!shouldApplyProDiscount(product, hasPro)) return product.price;
   return Math.round(product.price * (1 - PRO_COURSE_DISCOUNT));
 }
+
+/**
+ * How much a non-Pro user would save on this product by upgrading to Pro.
+ * Returns 0 if user is already Pro or if Pro confers no discount on the product.
+ */
+export function getProSavings(
+  product: DiscountableProduct,
+  hasPro: boolean | undefined,
+): number {
+  if (hasPro) return 0;
+  return product.price - getEffectivePrice(product, true);
+}

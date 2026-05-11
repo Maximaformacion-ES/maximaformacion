@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Program } from "@/lib/strapi/types";
 import { useUser } from "@clerk/nextjs";
 import { useUserCampus } from "@/app/hooks/useUserCampus";
-import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from "@/lib/pricing";
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from "@/lib/pricing";
 
 interface ProgramCardProps {
   program: Program;
@@ -27,6 +27,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
+  const proSavings = getProSavings(program, userHasPro);
 
   return (
     <m.div
@@ -159,6 +160,14 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               <ArrowUpRight size={24} />
             </m.div>
           </div>
+
+          {/* Pro savings hint for non-Pro users */}
+          {proSavings > 0 && (
+            <p className="mt-2 flex items-center gap-1.5 text-mx-orange text-label-md font-medium">
+              <Crown size={11} />
+              Ahorra {proSavings}€ con Pro
+            </p>
+          )}
         </div>
       </Link>
     </m.div>
