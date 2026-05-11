@@ -8,6 +8,7 @@ import { Footer } from '../../components/Footer';
 import { ProgramHeroSection } from '../../components/ProgramHeroSection';
 import { ProgramTabs } from '../../components/ProgramTabs';
 import { ProgramSidebar } from '../../components/ProgramSidebar';
+import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import ProGateWrapper from './ProGateWrapper';
@@ -72,6 +73,7 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
               <ProgramSidebar program={program} />
             </div>
           </section>
+          <ProgramFAQSection program={program} />
           <ProgramCTASection program={program} />
         </ProGateWrapper>
       </main>

@@ -31,21 +31,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   });
 
   return (
-    <section ref={containerRef} className="relative h-[120dvh]">
-      <div className="sticky top-0 h-screen overflow-hidden">
+    <section ref={containerRef} className="relative min-h-[100svh] lg:h-[120dvh]">
+      <div className="lg:sticky lg:top-0 min-h-[100svh] lg:h-screen lg:overflow-hidden">
         {/* Background */}
         <m.div style={{ y }} className="absolute inset-0 bg-mx-bg" />
 
         {/* Content */}
         <m.div
           style={{ scale, opacity }}
-          className="relative h-full flex flex-col items-center justify-center px-6 pt-20"
+          className="relative min-h-[100svh] lg:h-full flex flex-col items-center justify-center px-6 pt-24 pb-12 lg:pt-20 lg:pb-0"
         >
           <m.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-mx-blue text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-8"
+            className="text-mx-blue text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-4 md:mb-8"
           >
             {overline}
           </m.p>
@@ -79,7 +79,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="mt-8 md:mt-12 text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light text-center max-w-2xl leading-body"
+            className="mt-5 md:mt-12 text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light text-center max-w-2xl leading-body"
             >
             {description}
           </m.p>
@@ -88,7 +88,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 my-12"
+            className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-8 md:my-12 mb-4 md:mb-12"
           >
             <m.a
               href="/programas"
@@ -117,7 +117,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+            className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-2"
           >
             <span className="text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
               Scroll

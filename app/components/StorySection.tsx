@@ -24,7 +24,7 @@ export const StorySection: React.FC = () => {
             <span className="text-label-sm md:text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Años de experiencia</span>
           </div>
           <div>
-            <span className="text-mx-orange text-heading-sm md:text-heading-md xl:text-heading-lg font-bold block">10k+</span>
+            <span className="text-mx-orange text-heading-sm md:text-heading-md xl:text-heading-lg font-bold block">40k+</span>
             <span className="text-label-sm md:text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Alumnos formados</span>
           </div>
         </div>

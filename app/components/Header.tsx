@@ -440,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                   alt={isDark ? 'Maxymia' : 'Máxima Formación'}
                   width={200}
                   height={80}
-                  className={isDark ? 'h-8 sm:h-10 md:h-12 w-auto' : 'h-6 sm:h-12 w-auto'}
+                  className={isDark ? 'h-8 sm:h-10 md:h-12 w-auto' : 'h-9 sm:h-10 md:h-12 w-auto'}
                   priority
                 />
               )}

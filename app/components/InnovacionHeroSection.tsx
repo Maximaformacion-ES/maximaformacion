@@ -67,7 +67,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-display-sm md:text-display-md font-black mb-6 text-[#016157] uppercase text-balance"
+          className="text-display-sm md:text-display-md font-black mb-6 text-[#016157] uppercase text-balance drop-shadow-lg"
         >
           {heroTitle}
         </m.h1>
@@ -75,7 +75,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-mx-text-muted text-body-sm md:text-body-md xl:text-body-lg font-light mb-10 max-w-2xl mx-auto"
+          className="text-white/90 text-body-sm md:text-body-md xl:text-body-lg font-light mb-10 max-w-2xl mx-auto drop-shadow"
         >
           {heroDescription}
         </m.p>

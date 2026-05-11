@@ -10,7 +10,6 @@ import {
   Tag,
   Monitor,
   Hourglass,
-  Star,
 } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
@@ -48,9 +47,10 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
 
   // Filter state
   const [search, setSearch] = useState('');
+  const [activeTypeTab, setActiveTypeTab] = useState<'all' | 'Curso' | 'Master'>('all');
+  const [subjectAreaFilter, setSubjectAreaFilter] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [formatFilter, setFormatFilter] = useState<string | null>(null);
-  const [ratingFilter, setRatingFilter] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [durationRange, setDurationRange] = useState<[number, number]>([0, 2000]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -75,7 +75,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, typeFilter, formatFilter, ratingFilter, priceRange, durationRange, selectedTopics, sortBy]);
+  }, [search, activeTypeTab, subjectAreaFilter, typeFilter, formatFilter, priceRange, durationRange, selectedTopics, sortBy]);
 
   // Filter & sort
   const filteredPrograms = useMemo(() => {
@@ -91,7 +91,17 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
       );
     }
 
-    // Type
+    // Type tab (Master vs Curso)
+    if (activeTypeTab !== 'all') {
+      result = result.filter(p => p.type === activeTypeTab);
+    }
+
+    // Subject area
+    if (subjectAreaFilter) {
+      result = result.filter(p => p.subjectArea === subjectAreaFilter);
+    }
+
+    // Type (legacy filter — kept for backwards compat)
     if (typeFilter) {
       result = result.filter(p => p.type === typeFilter);
     }
@@ -99,12 +109,6 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
     // Format
     if (formatFilter) {
       result = result.filter(p => p.format === formatFilter);
-    }
-
-    // Rating
-    if (ratingFilter) {
-      const minRating = parseInt(ratingFilter);
-      result = result.filter(p => (p.price ?? 0) >= 0 && minRating >= 0); // Programs don't have ratings yet, pass through
     }
 
     // Price range
@@ -137,7 +141,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
     });
 
     return result;
-  }, [initialPrograms, search, typeFilter, formatFilter, ratingFilter, priceRange, durationRange, selectedTopics, sortBy]);
+  }, [initialPrograms, search, activeTypeTab, subjectAreaFilter, typeFilter, formatFilter, priceRange, durationRange, selectedTopics, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filteredPrograms.length / ITEMS_PER_PAGE));
   const paginatedPrograms = filteredPrograms.slice(
@@ -175,12 +179,6 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
     { value: 'Híbrido', label: 'Híbrido' },
   ];
 
-  const ratingOptions: FilterOption[] = [
-    { value: 'all', label: 'Todas' },
-    { value: '4', label: '4+ estrellas' },
-    { value: '3', label: '3+ estrellas' },
-  ];
-
   const sortOptions: SortOption<SortBy>[] = [
     { value: 'relevance', label: 'Relevancia' },
     { value: 'price-asc', label: 'Precio: menor a mayor' },
@@ -199,7 +197,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
   }
 
   const hasActiveFilters = !!(
-    typeFilter || formatFilter || ratingFilter || selectedTopics.length > 0 ||
+    typeFilter || formatFilter || selectedTopics.length > 0 ||
     priceRange[0] !== 0 || priceRange[1] !== 5000 ||
     durationRange[0] !== 0 || durationRange[1] !== 2000
   );
@@ -212,6 +210,67 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
 
       <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10">
         <CatalogHeader />
+
+        {/* Type tabs (Másteres / Cursos) */}
+        <div className="mb-6 flex justify-center">
+          <div className="inline-flex items-center gap-1 p-1 rounded-full border border-mx-border bg-mx-card">
+            {([
+              { key: 'all', label: 'Todos' },
+              { key: 'Master', label: 'Másteres' },
+              { key: 'Curso', label: 'Cursos' },
+            ] as const).map(({ key, label }) => {
+              const count =
+                key === 'all'
+                  ? initialPrograms.length
+                  : initialPrograms.filter((p) => p.type === key).length;
+              const active = activeTypeTab === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActiveTypeTab(key)}
+                  className={`px-5 py-2 rounded-full text-body-sm font-medium transition-all ${
+                    active
+                      ? 'bg-mx-orange text-white shadow-sm'
+                      : 'text-mx-text-muted hover:text-mx-text'
+                  }`}
+                >
+                  {label}{' '}
+                  <span className={active ? 'text-white/70' : 'text-mx-text-muted/60'}>
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Subject area filter chips */}
+        <div className="mb-10 flex flex-wrap justify-center gap-2">
+          {([
+            { key: null, label: 'Todas las áreas' },
+            { key: 'Inteligencia Artificial', label: 'Inteligencia Artificial' },
+            { key: 'Ciencia de Datos', label: 'Ciencia de Datos' },
+            { key: 'Moodle / Exelearning / H5P', label: 'Moodle / Exelearning / H5P' },
+            { key: 'Salud basada en datos', label: 'Salud basada en datos' },
+          ] as const).map(({ key, label }) => {
+            const active = subjectAreaFilter === key;
+            return (
+              <button
+                key={key ?? 'all'}
+                type="button"
+                onClick={() => setSubjectAreaFilter(key)}
+                className={`px-4 py-2 rounded-full text-label-sm md:text-label-md font-medium border transition-colors ${
+                  active
+                    ? 'bg-mx-blue text-white border-mx-blue'
+                    : 'bg-mx-card text-mx-text-muted border-mx-border hover:border-mx-blue/40 hover:text-mx-text'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
 
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -333,18 +392,6 @@ export default function ProgramsClient({ initialPrograms, availableTopics }: Pro
                 onToggle={() => toggleDropdown('duration')}
                 variant="light"
               />
-              <FilterDropdown
-                id="rating"
-                icon={<Star size={14} />}
-                label="Valoración"
-                options={ratingOptions}
-                value={ratingFilter}
-                onChange={setRatingFilter}
-                isOpen={openDropdown === 'rating'}
-                onToggle={() => toggleDropdown('rating')}
-                variant="light"
-              />
-
               {availableTopics.length > 0 && (
                 <>
                   <div className="w-px h-6 bg-mx-border mx-1" />

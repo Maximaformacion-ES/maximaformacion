@@ -33,18 +33,6 @@ export const InnovacionCTASection: React.FC = () => {
                 className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
               />
             </Link>
-            <a
-              href="https://biomaximainnovacion.es/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group border border-white/20 text-white px-10 py-5 rounded-full text-label-sm md:text-label-md font-light tracking-wide hover:bg-white/10 hover:border-white/40 transition-all duration-300 flex items-center gap-3"
-            >
-              Visitar Biomáxima
-              <ArrowUpRight
-                size={20}
-                className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-              />
-            </a>
           </div>
         </m.div>
       </div>

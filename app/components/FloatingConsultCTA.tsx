@@ -23,7 +23,12 @@ export default function FloatingConsultCTA() {
   const scrollToForm = () => {
     setOpen(false);
     const el = document.getElementById('consultoria-form');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // Fallback for pages that don't host the form (e.g. home): go to /contacto
+      window.location.href = '/contacto';
+    }
   };
 
   return (

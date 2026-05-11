@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/client';
 import { examResults } from '@/lib/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
@@ -18,6 +18,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Best-score wins: only overwrite when the new attempt scores strictly
+    // higher than the previously stored result. A 0% retry never replaces
+    // a higher previous score, but a 0% first-attempt is still recorded.
     await db
       .insert(examResults)
       .values({
@@ -33,10 +36,10 @@ export async function POST(request: NextRequest) {
       .onConflictDoUpdate({
         target: [examResults.clerkId, examResults.examId],
         set: {
-          score,
-          passed: !!passed,
-          answers,
-          completedAt: new Date(),
+          score: sql`GREATEST(${examResults.score}, EXCLUDED.score)`,
+          passed: sql`CASE WHEN EXCLUDED.score > ${examResults.score} THEN EXCLUDED.passed ELSE ${examResults.passed} END`,
+          answers: sql`CASE WHEN EXCLUDED.score > ${examResults.score} THEN EXCLUDED.answers ELSE ${examResults.answers} END`,
+          completedAt: sql`CASE WHEN EXCLUDED.score > ${examResults.score} THEN EXCLUDED.completed_at ELSE ${examResults.completedAt} END`,
         },
       });
 

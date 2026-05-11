@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SignUp } from '@clerk/nextjs';
 import { m } from 'framer-motion';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import { FontStyles } from '../../components/FontStyles';
 import { Header } from '@/app/components/Header';
 
 export default function SignUpPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-hidden">
       <FontStyles />
@@ -26,7 +27,7 @@ export default function SignUpPage() {
       </div>
 
       {/* Header */}
-      <Header isMenuOpen={false} setIsMenuOpen={() => {}} />
+      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       {/* Main Content */}
       <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-32 pb-16">

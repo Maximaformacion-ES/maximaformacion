@@ -9,6 +9,7 @@ import {
   ArrowRight,
   CheckCircle,
   ChevronLeft,
+  ChevronRight,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react';
@@ -228,11 +229,33 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               </p>
             </div>
           </div>
-          {nav && (
-            <span className="text-white/30 text-label-md shrink-0">
-              {nav.currentIndex + 1}/{nav.totalLessons}
-            </span>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {nav && (
+              <span className="text-white/30 text-label-md hidden sm:inline">
+                {nav.currentIndex + 1}/{nav.totalLessons}
+              </span>
+            )}
+            {nav?.prev && (
+              <Link
+                href={`/maxymia/campus/${course.slug}/lesson/${nav.prev.lessonId}`}
+                title={locale === 'es' ? 'Lección anterior' : 'Previous lesson'}
+                aria-label={locale === 'es' ? 'Lección anterior' : 'Previous lesson'}
+                className="w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-white/60 hover:text-mx-orange hover:border-mx-orange/30 active:scale-90 active:bg-mx-orange/10 transition-all duration-150"
+              >
+                <ChevronLeft size={16} />
+              </Link>
+            )}
+            {nav?.next && (
+              <Link
+                href={`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`}
+                title={locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
+                aria-label={locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-mx-orange/10 border border-mx-orange/30 text-mx-orange hover:bg-mx-orange hover:text-white active:scale-90 active:brightness-110 transition-all duration-150"
+              >
+                <ChevronRight size={16} />
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Content */}
@@ -318,7 +341,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               {nav.prev ? (
                 <Link
                   href={`/maxymia/campus/${course.slug}/lesson/${nav.prev.lessonId}`}
-                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
+                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
                 >
                   <ArrowLeft size={16} />
                   <span className="hidden sm:inline">{nav.prev.title[locale]}</span>
@@ -330,7 +353,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               {nextIsExam ? (
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
+                  className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
                 >
                   <span>{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
                   <ArrowRight size={16} />
@@ -338,7 +361,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               ) : nav.next ? (
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
+                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
                 >
                   <span className="hidden sm:inline">{nav.next.title[locale]}</span>
                   <span className="sm:hidden">{locale === 'es' ? 'Siguiente' : 'Next'}</span>
@@ -347,10 +370,10 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               ) : (
                 <button
                   onClick={handleNext}
-                  className={`flex items-center gap-2 transition-colors text-body-sm ${
+                  className={`flex items-center gap-2 active:scale-95 transition-all duration-150 text-body-sm ${
                     isCompleted
                       ? 'text-green-400 hover:text-green-300'
-                      : 'bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange/90'
+                      : 'bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:brightness-110'
                   }`}
                 >
                   {isCompleted

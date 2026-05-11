@@ -29,7 +29,7 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Par
       style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
     >
       <m.div
-        className="flex items-center gap-12 md:gap-16 w-max"
+        className="flex items-center gap-8 md:gap-16 w-max"
         animate={{ x: [`${from}%`, `${to}%`] }}
         transition={{ duration: 200, ease: 'linear', repeat: Infinity }}
       >
@@ -37,7 +37,7 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Par
           ordered.map((logo, logoIndex) => (
             <div
               key={`${logo.alt}-${logoIndex}-copy${copyIndex}`}
-              className="flex-shrink-0 h-12 md:h-16 w-36 md:w-48 relative opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
+              className="flex-shrink-0 h-8 md:h-16 w-24 md:w-48 relative opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-[1.01] transition-all duration-300"
             >
               <Image
                 src={logo.url}

@@ -159,16 +159,6 @@ const ContactPage = () => {
                 </div>
               </a>
 
-              <div className="flex items-center gap-4 p-5 bg-mx-bg rounded-xl border border-mx-border">
-                <div className="w-10 h-10 rounded-lg bg-mx-orange/10 flex items-center justify-center shrink-0 text-mx-orange">
-                  <Clock size={18} />
-                </div>
-                <div>
-                  <p className="font-bold text-mx-text text-body-sm">Horario</p>
-                  <p className="text-mx-text-muted text-body-sm">Lunes a Viernes, 9:00 — 18:00</p>
-                </div>
-              </div>
-
               <div className="p-5 bg-mx-bg rounded-xl border border-mx-border mt-2">
                 <p className="font-bold text-mx-text text-body-sm mb-3 flex items-center gap-2">
                   <MessageSquare className="text-mx-orange" size={16} />

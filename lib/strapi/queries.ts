@@ -76,6 +76,9 @@ function transformProgram(strapi: StrapiProgram): Program {
     price: strapi.price || 1499,
     priceLabel: strapi.priceLabel ?? null,
     brochurePdfUrl,
+    videoUrl: strapi.videoUrl ?? null,
+    faqs: (strapi.faqs ?? []).map((f) => ({ question: f.question, answer: f.answer })),
+    subjectArea: strapi.subjectArea ?? null,
     originalPrice: strapi.originalPrice || undefined,
     modules: modules.length > 0 ? modules : [],
     audience: strapi.audiences || '',
@@ -207,6 +210,7 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
   params.set('populate[image]', 'true');
   params.set('populate[brochurePdf]', 'true');
   params.set('populate[modules][populate][units]', 'true');
+  params.set('populate[faqs]', 'true');
   params.set('populate[topics][fields][0]', 'name');
   params.set('populate[topics][fields][1]', 'documentId');
 
@@ -325,7 +329,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -350,7 +354,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

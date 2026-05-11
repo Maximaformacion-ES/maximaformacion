@@ -17,7 +17,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
   description = 'Habla con nuestro equipo de asesores académicos y encuentra el programa perfecto para tus objetivos profesionales.',
 }) => {
   return (
-    <section className="relative py-32 md:py-48 bg-mx-bg overflow-hidden">
+    <section className="relative py-16 md:py-48 bg-mx-bg overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-mx-orange/5 rounded-full blur-[200px]" />

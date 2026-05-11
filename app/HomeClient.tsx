@@ -4,6 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { FontStyles } from "./components/FontStyles";
 import { Header } from "./components/Header";
+import FloatingConsultCTA from "./components/FloatingConsultCTA";
 import { HeroSection } from "./components/HeroSection";
 import { StatsSection } from "./components/StatsSection";
 import { CoursesSection } from "./components/CoursesSection";
@@ -93,6 +94,7 @@ export default function HomeClient({ programs, badges, homeData }: HomeClientPro
         description={homeData.ctaSection.ctaDescription}
       />
       <Footer />
+      <FloatingConsultCTA />
     </div>
   );
 }

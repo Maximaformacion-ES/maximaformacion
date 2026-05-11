@@ -38,10 +38,10 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
     .slice(0, 6);
 
   return (
-    <section id="masters" className="relative py-24 md:py-32 bg-mx-bg">
+    <section id="masters" className="relative py-16 md:py-32 bg-mx-bg">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16">
           <div>
             <m.p
               initial={{ opacity: 0, y: 20 }}
@@ -82,8 +82,6 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
             <ProgramCard
               key={item.program.id}
               program={item.program}
-              rating={item.rating}
-              students={generateStudents(item.program.id)}
               index={i}
             />
           ))}

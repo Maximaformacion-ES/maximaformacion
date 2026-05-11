@@ -2,44 +2,25 @@
 
 import React, { useState } from "react";
 import { m } from "framer-motion";
-import { Star, ArrowUpRight, Crown } from "lucide-react";
+import { ArrowUpRight, Crown } from "lucide-react";
 import Link from "next/link";
 import { Program } from "@/lib/strapi/types";
 import { useUser } from "@clerk/nextjs";
 import { useUserCampus } from "@/app/hooks/useUserCampus";
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from "@/lib/pricing";
 
-// Generate a consistent rating between 4 and 5 based on program id
-function generateRating(id: number): number {
-  const seed = (id * 7919) % 100;
-  return 4 + seed / 100;
-}
-
-// Generate consistent student count
-function generateStudents(id: number): string {
-  const seed = ((id * 3571) % 30) + 10;
-  return `${(seed / 10).toFixed(1)}K`;
-}
-
 interface ProgramCardProps {
   program: Program;
-  rating?: number;
-  students?: string;
   index?: number;
 }
 
 export const ProgramCard: React.FC<ProgramCardProps> = ({
   program,
-  rating,
-  students,
   index = 0,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { isSignedIn } = useUser();
   const { hasPro } = useUserCampus();
-
-  const displayRating = rating ?? generateRating(program.id);
-  const displayStudents = students ?? generateStudents(program.id);
 
   const isMaster = program.type === "Master";
   const userHasPro = !!isSignedIn && hasPro;
@@ -121,34 +102,6 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
 
         {/* Content */}
         <div className="bg-mx-bg px-4 xl:px-5 2xl:px-6 py-3 flex flex-col flex-grow rounded-b-lg">
-          {/* Rating */}
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  size={16}
-                  className={
-                    star <= Math.floor(displayRating)
-                      ? "text-mx-orange"
-                      : "text-[#ddd]"
-                  }
-                  fill={
-                    star <= Math.floor(displayRating)
-                      ? "var(--color-mx-orange)"
-                      : "transparent"
-                  }
-                />
-              ))}
-            </div>
-            <span className="text-mx-text-muted text-body-sm">
-              {displayRating.toFixed(1)}
-            </span>
-            <span className="text-mx-text-muted text-body-sm">
-              ({displayStudents} estudiantes)
-            </span>
-          </div>
-
           {/* Title & Description */}
           <div className="flex flex-col gap-2 mb-4">
             <h3 className="text-mx-text-muted text-heading-sm  font-medium line-clamp-2">

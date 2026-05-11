@@ -11,6 +11,7 @@ import {
   Target,
   BookOpen,
   ListOrdered,
+  PlayCircle,
 } from "lucide-react";
 import type { Program } from "@/lib/strapi/types";
 import type { LucideIcon } from "lucide-react";
@@ -85,8 +86,10 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
         label: "Salidas profesionales",
         icon: Briefcase,
       });
+    if (program.videoUrl)
+      t.push({ value: "video", label: "Vídeo", icon: PlayCircle });
     return t;
-  }, [program.objectives, program.audience, program.careers]);
+  }, [program.objectives, program.audience, program.careers, program.videoUrl]);
 
   return (
     <div>
@@ -110,6 +113,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                 {tab.value === "objetivos" && "Objetivos"}
                 {tab.value === "audiencia" && "Audiencia"}
                 {tab.value === "salidas" && "Salidas"}
+                {tab.value === "video" && "Vídeo"}
               </span>
               <span className="hidden md:inline">{tab.label}</span>
             </span>
@@ -276,8 +280,97 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
               />
             </m.div>
           )}
+
+          {activeTab === "video" && program.videoUrl && (
+            <m.div
+              key="video"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+            >
+              <VideoEmbed url={program.videoUrl} title={program.title} />
+            </m.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
   );
 };
+
+// ─── FAQ accordion item ─────────────────────────────────────────────────────
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-mx-card border border-mx-border rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full p-5 md:p-6 flex items-start justify-between gap-4 text-left hover:bg-mx-orange/5 transition-colors"
+      >
+        <span className="text-body-sm md:text-body-md font-bold text-mx-text">
+          {question}
+        </span>
+        <m.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+          className="shrink-0 mt-0.5 text-mx-text-muted"
+        >
+          <ChevronDown size={20} />
+        </m.span>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <m.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="px-5 md:px-6 pb-5 md:pb-6 pt-1 text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed border-t border-mx-border whitespace-pre-line">
+              {answer}
+            </div>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Video embed ────────────────────────────────────────────────────────────
+
+function VideoEmbed({ url, title }: { url: string; title: string }) {
+  const ytMatch = url.match(/(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w-]{6,})/i);
+  const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+  let embedSrc: string | null = null;
+  if (ytMatch) embedSrc = `https://www.youtube.com/embed/${ytMatch[1]}`;
+  else if (vimeoMatch) embedSrc = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  if (embedSrc) {
+    return (
+      <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
+        <iframe
+          src={embedSrc}
+          title={`Vídeo de ${title}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full border-0"
+        />
+      </div>
+    );
+  }
+  // Direct mp4 fallback
+  return (
+    <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
+      <video
+        controls
+        className="w-full h-full"
+        preload="metadata"
+        title={`Vídeo de ${title}`}
+      >
+        <source src={url} />
+      </video>
+    </div>
+  );
+}

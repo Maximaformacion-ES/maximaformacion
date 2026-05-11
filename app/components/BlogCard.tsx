@@ -78,7 +78,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
           </span>
           <span className="flex items-center gap-1.5">
             <Clock size={14} />
-            {post.readTime + ' minutos'}
+            {post.readTime}
           </span>
         </div>
 
