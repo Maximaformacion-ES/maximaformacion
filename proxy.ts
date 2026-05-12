@@ -1,6 +1,24 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { lookupRedirect } from "@/lib/seo/redirects";
+
+// Search-engine crawlers, link previewers, and SEO/AI agents. With Clerk
+// development keys (pk_test_*) every request whose Accept advertises HTML
+// gets a 307 to *.clerk.accounts.dev for the "dev-browser-missing"
+// handshake — a redirect that crawlers cannot follow, which means
+// Googlebot et al. can't index any page. Skipping Clerk's wrapper for
+// these UAs lets crawlers see the same SSR HTML that real users get.
+// Protected routes stay protected because /maxymia/campus/layout.tsx
+// (and similar) redirect on null userId regardless of middleware. The
+// guard is harmless once production keys land (Clerk stops doing the
+// dev handshake), so it can stay as defence in depth.
+const BOT_UA_RX =
+  /Googlebot|Bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|Pinterestbot|Discordbot|WhatsApp|TelegramBot|Applebot|AhrefsBot|SemrushBot|MJ12bot|DotBot|Screaming Frog|GPTBot|ChatGPT-User|anthropic-ai|Claude-Web|PerplexityBot|Bytespider/i;
+
+function isBot(req: NextRequest): boolean {
+  const ua = req.headers.get("user-agent") ?? "";
+  return BOT_UA_RX.test(ua);
+}
 
 // Define public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
@@ -54,7 +72,7 @@ function shouldSkipRedirectLookup(pathname: string): boolean {
   );
 }
 
-export default clerkMiddleware(async (auth, req) => {
+const handleClerk = clerkMiddleware(async (auth, req) => {
   // Skip authentication for webhook routes (they use Stripe signature verification)
   if (isWebhookRoute(req)) {
     return;
@@ -79,6 +97,25 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect();
   }
 });
+
+export default async function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (isBot(req)) {
+    // Bots still need to honour CMS-managed 301/302 redirects so ranking
+    // signals consolidate properly on moved URLs.
+    const pathname = req.nextUrl.pathname;
+    if (!shouldSkipRedirectLookup(pathname)) {
+      const rule = await lookupRedirect(pathname);
+      if (rule) {
+        const dest = rule.destination.startsWith("http")
+          ? new URL(rule.destination)
+          : new URL(rule.destination, req.url);
+        return NextResponse.redirect(dest, rule.statusCode);
+      }
+    }
+    return NextResponse.next();
+  }
+  return handleClerk(req, event);
+}
 
 export const config = {
   matcher: [
