@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { FontStyles } from '../../components/FontStyles';
 import { Header } from '../../components/Header';
@@ -8,6 +8,7 @@ import { Footer } from '../../components/Footer';
 import { ResourceHeroSection } from '../../components/ResourceHeroSection';
 import { ResourceContent } from '../../components/ResourceContent';
 import { ResourceRelatedClient } from '../../components/ResourceRelatedClient';
+import { LeadFormModal, hasLeadCookie, type LeadFormResult } from '../../components/LeadFormModal';
 import type { Resource } from '@/lib/strapi/types';
 
 interface RecursoDetailClientProps {
@@ -22,6 +23,45 @@ export default function RecursoDetailClient({
   relatedResources,
 }: RecursoDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pendingDownload, setPendingDownload] = useState<{ url: string; filename: string } | null>(null);
+
+  const triggerDownload = useCallback((url: string, filename: string) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.rel = 'noopener noreferrer';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }, []);
+
+  const handleDownloadClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, url: string, filename: string) => {
+      if (hasLeadCookie()) return;
+      e.preventDefault();
+      setPendingDownload({ url, filename });
+      setModalOpen(true);
+    },
+    [],
+  );
+
+  const handleLeadSuccess = useCallback(
+    (result: LeadFormResult) => {
+      setModalOpen(false);
+      const target =
+        pendingDownload ??
+        (result.downloads[0]
+          ? { url: result.downloads[0].url, filename: result.downloads[0].name }
+          : result.externalUrl
+            ? { url: result.externalUrl, filename: resource?.title ?? 'recurso' }
+            : null);
+      if (target) triggerDownload(target.url, target.filename);
+      setPendingDownload(null);
+    },
+    [pendingDownload, resource?.title, triggerDownload],
+  );
 
   if (!resource) {
     return (
@@ -62,12 +102,20 @@ export default function RecursoDetailClient({
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
-        <ResourceHeroSection resource={resource} />
-        <ResourceContent resource={resource} bodyHtml={bodyHtml} />
+        <ResourceHeroSection resource={resource} onDownloadClick={handleDownloadClick} />
+        <ResourceContent resource={resource} bodyHtml={bodyHtml} onDownloadClick={handleDownloadClick} />
         <ResourceRelatedClient resources={relatedResources} />
       </main>
 
       <Footer />
+
+      <LeadFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        resourceSlug={resource.slug}
+        resourceTitle={resource.title}
+        onSuccess={handleLeadSuccess}
+      />
     </div>
   );
 }

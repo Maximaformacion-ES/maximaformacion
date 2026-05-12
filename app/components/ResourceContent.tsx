@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { m } from 'framer-motion';
 import { Download, FileText } from 'lucide-react';
 import type { Resource } from '@/lib/strapi/types';
-import { LeadFormModal, hasLeadCookie, type LeadFormResult } from './LeadFormModal';
 
 interface ResourceContentProps {
   resource: Resource;
   bodyHtml: string;
+  onDownloadClick: (e: React.MouseEvent<HTMLAnchorElement>, url: string, filename: string) => void;
 }
 
 const formatSize = (kb: number) => {
@@ -16,50 +16,7 @@ const formatSize = (kb: number) => {
   return `${(kb / 1024).toFixed(1)} MB`;
 };
 
-export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, bodyHtml }) => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [pendingDownload, setPendingDownload] = useState<{ url: string; filename: string } | null>(null);
-
-  const triggerDownload = useCallback((url: string, filename: string) => {
-    // Force download via a programmatic anchor — works for same-origin and CORS-friendly hosts.
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.rel = 'noopener noreferrer';
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }, []);
-
-  const handleDownloadClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, url: string, filename: string) => {
-      // Already submitted before → let the browser follow the link normally.
-      if (hasLeadCookie()) return;
-      e.preventDefault();
-      setPendingDownload({ url, filename });
-      setModalOpen(true);
-    },
-    [],
-  );
-
-  const handleLeadSuccess = useCallback(
-    (result: LeadFormResult) => {
-      setModalOpen(false);
-      // Prefer the URL the user clicked on; fall back to the first download returned.
-      const target =
-        pendingDownload ??
-        (result.downloads[0]
-          ? { url: result.downloads[0].url, filename: result.downloads[0].name }
-          : result.externalUrl
-            ? { url: result.externalUrl, filename: resource.title }
-            : null);
-      if (target) triggerDownload(target.url, target.filename);
-      setPendingDownload(null);
-    },
-    [pendingDownload, resource.title, triggerDownload],
-  );
-
+export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, bodyHtml, onDownloadClick }) => {
   return (
     <section className="relative py-12 md:py-16 px-4 sm:px-6 md:px-24">
       <div className="max-w-3xl mx-auto">
@@ -136,7 +93,7 @@ export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, body
                     target="_blank"
                     rel="noopener noreferrer"
                     download
-                    onClick={(e) => handleDownloadClick(e, d.url, d.name)}
+                    onClick={(e) => onDownloadClick(e, d.url, d.name)}
                     className="group flex items-center gap-4 p-4 bg-mx-bg border border-mx-border rounded-xl hover:border-mx-orange/50 transition-colors duration-300"
                   >
                     <div className="w-10 h-10 rounded-lg bg-mx-orange/10 border border-mx-orange/30 flex items-center justify-center shrink-0">
@@ -165,7 +122,7 @@ export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, body
                     rel="noopener noreferrer"
                     download
                     onClick={(e) =>
-                      handleDownloadClick(
+                      onDownloadClick(
                         e,
                         resource.externalUrl as string,
                         resource.externalUrl!.split('/').pop() || resource.title,
@@ -213,14 +170,6 @@ export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, body
           {resource.author.name || 'Máxima Formación'}
         </p>
       </div>
-
-      <LeadFormModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        resourceSlug={resource.slug}
-        resourceTitle={resource.title}
-        onSuccess={handleLeadSuccess}
-      />
     </section>
   );
 };

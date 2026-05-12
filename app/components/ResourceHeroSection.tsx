@@ -8,9 +8,10 @@ import type { Resource } from '@/lib/strapi/types';
 
 interface ResourceHeroSectionProps {
   resource: Resource;
+  onDownloadClick: (e: React.MouseEvent<HTMLAnchorElement>, url: string, filename: string) => void;
 }
 
-export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({ resource }) => {
+export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({ resource, onDownloadClick }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -114,6 +115,7 @@ export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({ resour
                     target="_blank"
                     rel="noopener noreferrer"
                     download
+                    onClick={(e) => onDownloadClick(e, primaryDownload.url, primaryDownload.name)}
                     className="inline-flex items-center justify-center gap-3 bg-mx-orange text-white px-6 py-3.5 text-label-md font-bold rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
                   >
                     <Download size={18} />
@@ -130,6 +132,13 @@ export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({ resour
                     href={resource.externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) =>
+                      onDownloadClick(
+                        e,
+                        resource.externalUrl as string,
+                        resource.externalUrl!.split('/').pop() || resource.title,
+                      )
+                    }
                     className="inline-flex items-center justify-center gap-3 border border-mx-border text-mx-text px-6 py-3.5 text-label-md font-bold rounded-full hover:border-mx-orange hover:text-mx-orange transition-colors duration-300"
                   >
                     <ExternalLink size={18} />
