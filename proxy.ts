@@ -13,7 +13,7 @@ import { lookupRedirect } from "@/lib/seo/redirects";
 // guard is harmless once production keys land (Clerk stops doing the
 // dev handshake), so it can stay as defence in depth.
 const BOT_UA_RX =
-  /Googlebot|Bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|Pinterestbot|Discordbot|WhatsApp|TelegramBot|Applebot|AhrefsBot|SemrushBot|MJ12bot|DotBot|Screaming Frog|GPTBot|ChatGPT-User|anthropic-ai|Claude-Web|PerplexityBot|Bytespider/i;
+  /Googlebot|Google-InspectionTool|Google-Read-Aloud|Google-Site-Verification|Google-Other|Storebot-Google|Mediapartners-Google|AdsBot-Google|Bingbot|BingPreview|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|Pinterestbot|Discordbot|WhatsApp|TelegramBot|Applebot|AhrefsBot|SemrushBot|MJ12bot|DotBot|Screaming Frog|GPTBot|ChatGPT-User|OAI-SearchBot|anthropic-ai|Claude-Web|ClaudeBot|PerplexityBot|Bytespider|Amazonbot/i;
 
 function isBot(req: NextRequest): boolean {
   const ua = req.headers.get("user-agent") ?? "";
