@@ -6,14 +6,22 @@ import React from 'react';
  * without executing JS).
  */
 export function JsonLd({ data }: { data: object | object[] }) {
-  const payload = Array.isArray(data)
-    ? data.map((d) => JSON.stringify(d)).join('\n')
-    : JSON.stringify(data);
+  // Each <script type="application/ld+json"> must contain exactly one JSON
+  // value. Concatenating multiple objects in one tag produces invalid JSON
+  // and crawlers (Google's Rich Results Test included) drop everything past
+  // the first object — that's why e.g. BreadcrumbList wasn't being detected
+  // when paired with Course/BlogPosting/Person.
+  const items = Array.isArray(data) ? data : [data];
   return (
-    <script
-      type="application/ld+json"
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: payload }}
-    />
+    <>
+      {items.map((d, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(d) }}
+        />
+      ))}
+    </>
   );
 }
