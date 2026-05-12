@@ -142,7 +142,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     }
   }, [course.id, lesson.id]);
 
-  const handleNext = useCallback(async () => {
+  const handleAdvanceLesson = useCallback(async () => {
     if (!isCompleted) {
       await handleMarkComplete();
       await refetch();
@@ -156,17 +156,38 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     }
   }, [nav, nextIsExam, lesson.id, isCompleted, handleMarkComplete, refetch, router, course.slug]);
 
-  const handleSelectTopic = (topic: MaxymiaTopic) => {
+  const handleSelectTopic = useCallback((topic: MaxymiaTopic) => {
     setSelectedTopicId(topic.id);
     window.history.replaceState(null, '', `#${topic.anchorId}`);
-    // Scroll main content to top
     document.getElementById('lesson-content-area')?.scrollTo({ top: 0 });
-  };
+  }, []);
 
   const handleBackToIndex = () => {
     setSelectedTopicId(null);
     window.history.replaceState(null, '', window.location.pathname);
   };
+
+  // Advances through topics within the lesson before jumping to the next lesson.
+  // On the lesson index view with topics, "Next" opens the first topic; on a
+  // topic, it walks to the next one; on the last topic (or when the lesson has
+  // no topics), it marks the lesson complete and advances to the next lesson/exam.
+  const handleNextStep = useCallback(async () => {
+    if (selectedTopicId) {
+      const idx = topicSections.findIndex((s) => s.topic.id === selectedTopicId);
+      const nextTopic = idx >= 0 ? topicSections[idx + 1] : null;
+      if (nextTopic) {
+        handleSelectTopic(nextTopic.topic);
+        return;
+      }
+      await handleAdvanceLesson();
+      return;
+    }
+    if (hasTopics && topicSections.length > 0) {
+      handleSelectTopic(topicSections[0].topic);
+      return;
+    }
+    await handleAdvanceLesson();
+  }, [selectedTopicId, topicSections, hasTopics, handleSelectTopic, handleAdvanceLesson]);
 
   return (
     <div className="flex h-[calc(100dvh-57px)] overflow-hidden">
@@ -245,15 +266,15 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
                 <ChevronLeft size={16} />
               </Link>
             )}
-            {nav?.next && (
-              <Link
-                href={`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`}
-                title={locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
-                aria-label={locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
+            {(nav?.next || nextIsExam || hasTopics) && (
+              <button
+                onClick={handleNextStep}
+                title={locale === 'es' ? 'Siguiente' : 'Next'}
+                aria-label={locale === 'es' ? 'Siguiente' : 'Next'}
                 className="w-9 h-9 rounded-full flex items-center justify-center bg-mx-orange/10 border border-mx-orange/30 text-mx-orange hover:bg-mx-orange hover:text-white active:scale-90 active:brightness-110 transition-all duration-150"
               >
                 <ChevronRight size={16} />
-              </Link>
+              </button>
             )}
           </div>
         </div>
@@ -329,7 +350,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               selectedTopicId={selectedTopicId!}
               onSelectTopic={handleSelectTopic}
               onBackToIndex={handleBackToIndex}
-              onNextLesson={handleNext}
+              onNextLesson={handleAdvanceLesson}
               prevLesson={nav.prev}
               courseSlug={course.slug}
               locale={locale}
@@ -350,9 +371,18 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               ) : (
                 <div />
               )}
-              {nextIsExam ? (
+              {hasTopics && topicSections.length > 0 ? (
                 <button
-                  onClick={handleNext}
+                  onClick={handleNextStep}
+                  className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
+                >
+                  <span className="hidden sm:inline">{topicSections[0].topic.title[locale]}</span>
+                  <span className="sm:hidden">{locale === 'es' ? 'Empezar' : 'Start'}</span>
+                  <ArrowRight size={16} />
+                </button>
+              ) : nextIsExam ? (
+                <button
+                  onClick={handleNextStep}
                   className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
                 >
                   <span>{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
@@ -360,7 +390,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
                 </button>
               ) : nav.next ? (
                 <button
-                  onClick={handleNext}
+                  onClick={handleNextStep}
                   className="flex items-center gap-2 text-white/50 hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
                 >
                   <span className="hidden sm:inline">{nav.next.title[locale]}</span>
@@ -369,7 +399,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
                 </button>
               ) : (
                 <button
-                  onClick={handleNext}
+                  onClick={handleNextStep}
                   className={`flex items-center gap-2 active:scale-95 transition-all duration-150 text-body-sm ${
                     isCompleted
                       ? 'text-green-400 hover:text-green-300'
