@@ -27,6 +27,7 @@ import type { MaxymiaCourse } from './types';
 import MaxymiaCourseCard from './components/MaxymiaCourseCard';
 
 const CAMPUS_URL = '/maxymia/campus';
+const CAMPUS_PUBLIC_HREF = '/sign-in?redirect_url=/maxymia/campus';
 
 // Icon/gradient maps for cards that don't have images from Strapi
 const FEATURE_VISUALS = [
@@ -43,16 +44,18 @@ const WHY_VISUALS = [
   { icon: FlaskConical, gradient: 'from-purple-600/20 via-violet-500/10 to-transparent', accent: 'text-purple-400/10' },
 ];
 
+// The `href` is intentionally set to the sign-in route so server-rendered
+// HTML (and SEO crawlers) never see a link into the protected /maxymia/campus
+// area. `handleCampusClick` then intercepts on the client so already
+// signed-in visitors get routed straight to the campus.
 function useCampusLink() {
   const { isSignedIn } = useUser();
   const router = useRouter();
 
   const handleCampusClick = useCallback(
     (e: React.MouseEvent) => {
-      if (!isSignedIn) {
-        e.preventDefault();
-        router.push('/sign-in?redirect_url=/maxymia/campus');
-      }
+      e.preventDefault();
+      router.push(isSignedIn ? CAMPUS_URL : CAMPUS_PUBLIC_HREF);
     },
     [isSignedIn, router],
   );
@@ -114,7 +117,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               className="flex flex-wrap gap-4 mb-12"
             >
               <Link
-                href={CAMPUS_URL}
+                href={CAMPUS_PUBLIC_HREF}
                 onClick={handleCampusClick}
                 className="inline-flex items-center gap-2 bg-mx-orange text-white px-7 py-3.5 rounded-full text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
               >
@@ -329,7 +332,7 @@ function CoursesSection({
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Link
-              href={CAMPUS_URL}
+              href={CAMPUS_PUBLIC_HREF}
               onClick={handleCampusClick}
               className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-label-lg font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
             >
@@ -521,7 +524,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           className="mb-8"
         >
           <Link
-            href={CAMPUS_URL}
+            href={CAMPUS_PUBLIC_HREF}
             onClick={handleCampusClick}
             className="inline-flex items-center gap-2.5 bg-mx-orange text-white px-10 py-4.5 rounded-full text-body-md font-medium hover:bg-mx-orange-dark transition-colors"
           >

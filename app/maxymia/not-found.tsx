@@ -31,10 +31,10 @@ export default function MaxymiaNotFound() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/maxymia/campus"
+              href="/maxymia"
               className="inline-flex items-center gap-3 bg-mx-blue text-white px-8 py-4 text-body-md font-medium rounded-full hover:bg-mx-blue/80 transition-colors duration-300"
             >
-              Ir al campus
+              Volver a Maxymia
             </Link>
             <Link
               href="/maxymia"
