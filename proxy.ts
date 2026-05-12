@@ -58,6 +58,23 @@ const isWebhookRoute = createRouteMatcher([
   '/api/preview(.*)',
 ]);
 
+// Routes that call auth() server-side (page layouts or route handlers) and
+// would 500 on a bot request whose Clerk middleware wrapper was bypassed —
+// auth() reads context that only the wrapper sets up. For these the bot
+// branch returns 404 directly. They're also disallowed in robots.txt so
+// well-behaved crawlers won't reach them.
+const isAuthRequiredRoute = createRouteMatcher([
+  '/maxymia/campus/(.*)',
+  '/maxymia/campus',
+  '/perfil(.*)',
+  '/api/checkout(.*)',
+  '/api/billing-portal(.*)',
+  '/api/progress(.*)',
+  '/api/stream(.*)',
+  '/api/user(.*)',
+  '/api/maxymia/(.*)',
+]);
+
 // API/_next paths that should never go through the CMS-redirect lookup —
 // would be wasted Strapi calls. Anything under these prefixes is skipped.
 function shouldSkipRedirectLookup(pathname: string): boolean {
@@ -117,7 +134,7 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     // Bots that ignore robots.txt and try to enter authenticated areas:
     // short-circuit with a 404 rather than rendering the page (which would
     // call auth() without the Clerk context the wrapper sets up and 500).
-    if (!isPublicRoute(req) && !isWebhookRoute(req)) {
+    if (isAuthRequiredRoute(req)) {
       return new NextResponse(null, { status: 404 });
     }
 
