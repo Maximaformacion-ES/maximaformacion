@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { FreeTextQuestion as FreeTextType, Locale } from '../../types';
+import ExamExplanation from './ExamExplanation';
 
 interface Props {
   question: FreeTextType;
@@ -37,6 +38,7 @@ export default function FreeTextQuestion({
           <p className="text-white/60 text-body-sm">{question.sampleAnswer[locale]}</p>
         </div>
       )}
+      <ExamExplanation explanation={question.explanation} locale={locale} submitted={submitted} />
     </div>
   );
 }

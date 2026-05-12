@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import type { FillBlankQuestion as FillBlankType, Locale } from '../../types';
+import ExamExplanation from './ExamExplanation';
 
 interface Props {
   question: FillBlankType;
@@ -61,6 +62,7 @@ export default function FillBlankQuestion({
           );
         })}
       </div>
+      <ExamExplanation explanation={question.explanation} locale={locale} submitted={submitted} />
     </div>
   );
 }

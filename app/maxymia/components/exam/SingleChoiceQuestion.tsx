@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import type { SingleChoiceQuestion as SingleChoiceType, Locale } from '../../types';
+import ExamExplanation from './ExamExplanation';
 
 interface Props {
   question: SingleChoiceType;
@@ -63,6 +64,7 @@ export default function SingleChoiceQuestion({
           );
         })}
       </div>
+      <ExamExplanation explanation={question.explanation} locale={locale} submitted={submitted} />
     </div>
   );
 }

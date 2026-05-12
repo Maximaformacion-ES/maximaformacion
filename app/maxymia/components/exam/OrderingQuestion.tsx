@@ -21,6 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, CheckCircle, XCircle, ArrowUp, ArrowDown } from 'lucide-react';
 import type { OrderingQuestion as OrderingType, Locale } from '../../types';
+import ExamExplanation from './ExamExplanation';
 
 interface Props {
   question: OrderingType;
@@ -89,6 +90,7 @@ export default function OrderingQuestion({
           </div>
         </SortableContext>
       </DndContext>
+      <ExamExplanation explanation={question.explanation} locale={locale} submitted={submitted} />
     </div>
   );
 }

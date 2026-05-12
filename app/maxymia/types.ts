@@ -155,6 +155,7 @@ export interface SingleChoiceQuestion {
   question: LocalizedString;
   options: LocalizedString[];
   correctIndex: number;
+  explanation?: LocalizedString | null;
 }
 
 export interface MultipleChoiceQuestion {
@@ -163,6 +164,7 @@ export interface MultipleChoiceQuestion {
   question: LocalizedString;
   options: LocalizedString[];
   correctIndices: number[];
+  explanation?: LocalizedString | null;
 }
 
 export interface OrderingQuestion {
@@ -171,6 +173,7 @@ export interface OrderingQuestion {
   question: LocalizedString;
   items: LocalizedString[];
   correctOrder: number[];
+  explanation?: LocalizedString | null;
 }
 
 export interface FillBlankQuestion {
@@ -178,6 +181,7 @@ export interface FillBlankQuestion {
   id: string;
   question: LocalizedString;
   blanks: { acceptedAnswers: string[] }[];
+  explanation?: LocalizedString | null;
 }
 
 export interface FreeTextQuestion {
@@ -185,6 +189,7 @@ export interface FreeTextQuestion {
   id: string;
   question: LocalizedString;
   sampleAnswer: LocalizedString;
+  explanation?: LocalizedString | null;
 }
 
 export type ExamQuestion =

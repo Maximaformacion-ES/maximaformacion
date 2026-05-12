@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle, XCircle, Square, CheckSquare } from 'lucide-react';
 import type { MultipleChoiceQuestion as MultipleChoiceType, Locale } from '../../types';
+import ExamExplanation from './ExamExplanation';
 
 interface Props {
   question: MultipleChoiceType;
@@ -69,6 +70,7 @@ export default function MultipleChoiceQuestion({
           );
         })}
       </div>
+      <ExamExplanation explanation={question.explanation} locale={locale} submitted={submitted} />
     </div>
   );
 }

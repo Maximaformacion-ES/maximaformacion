@@ -163,11 +163,11 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
             passingScore
             questions {
               __typename
-              ... on ComponentMaxymiaSingleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndex }
-              ... on ComponentMaxymiaMultipleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndices }
-              ... on ComponentMaxymiaOrdering { id, question_es, question_en, items { id, text_es, text_en }, correctOrder }
-              ... on ComponentMaxymiaFillBlank { id, question_es, question_en, acceptedAnswers }
-              ... on ComponentMaxymiaFreeText { id, question_es, question_en, sampleAnswer_es, sampleAnswer_en }
+              ... on ComponentMaxymiaSingleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndex, explanation_es, explanation_en }
+              ... on ComponentMaxymiaMultipleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndices, explanation_es, explanation_en }
+              ... on ComponentMaxymiaOrdering { id, question_es, question_en, items { id, text_es, text_en }, correctOrder, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFillBlank { id, question_es, question_en, acceptedAnswers, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFreeText { id, question_es, question_en, sampleAnswer_es, sampleAnswer_en, explanation_es, explanation_en }
             }
           }
         }
@@ -261,6 +261,14 @@ function transformLessonIntro(lesson: StrapiMaxymiaLesson): LocalizedContent {
   return { es: introEs, en: introEn };
 }
 
+function transformExplanation(
+  es: string | null,
+  en: string | null
+): { es: string; en: string } | null {
+  if (!es && !en) return null;
+  return { es: es ?? en ?? '', en: en ?? es ?? '' };
+}
+
 function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
   switch (q.__typename) {
     case 'ComponentMaxymiaSingleChoice':
@@ -270,6 +278,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
         options: q.options.map((o) => ({ es: o.text_es, en: o.text_en ?? o.text_es })),
         correctIndex: q.correctIndex,
+        explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaMultipleChoice':
       return {
@@ -278,6 +287,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
         options: q.options.map((o) => ({ es: o.text_es, en: o.text_en ?? o.text_es })),
         correctIndices: q.correctIndices,
+        explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaOrdering':
       return {
@@ -286,6 +296,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
         items: q.items.map((i) => ({ es: i.text_es, en: i.text_en ?? i.text_es })),
         correctOrder: q.correctOrder,
+        explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaFillBlank':
       return {
@@ -293,6 +304,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         id: q.id,
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
         blanks: [{ acceptedAnswers: q.acceptedAnswers }],
+        explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaFreeText':
       return {
@@ -300,6 +312,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         id: q.id,
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
         sampleAnswer: { es: q.sampleAnswer_es ?? '', en: q.sampleAnswer_en ?? '' },
+        explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
   }
 }

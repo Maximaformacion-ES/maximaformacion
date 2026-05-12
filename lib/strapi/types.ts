@@ -904,6 +904,8 @@ export interface StrapiMaxymiaSingleChoice {
   question_en: string | null;
   options: { id: string; text_es: string; text_en: string | null }[];
   correctIndex: number;
+  explanation_es: string | null;
+  explanation_en: string | null;
 }
 
 export interface StrapiMaxymiaMultipleChoice {
@@ -913,6 +915,8 @@ export interface StrapiMaxymiaMultipleChoice {
   question_en: string | null;
   options: { id: string; text_es: string; text_en: string | null }[];
   correctIndices: number[]; // JSON scalar
+  explanation_es: string | null;
+  explanation_en: string | null;
 }
 
 export interface StrapiMaxymiaOrdering {
@@ -922,6 +926,8 @@ export interface StrapiMaxymiaOrdering {
   question_en: string | null;
   items: { id: string; text_es: string; text_en: string | null }[];
   correctOrder: number[]; // JSON scalar
+  explanation_es: string | null;
+  explanation_en: string | null;
 }
 
 export interface StrapiMaxymiaFillBlank {
@@ -930,6 +936,8 @@ export interface StrapiMaxymiaFillBlank {
   question_es: string;
   question_en: string | null;
   acceptedAnswers: string[]; // JSON scalar
+  explanation_es: string | null;
+  explanation_en: string | null;
 }
 
 export interface StrapiMaxymiaFreeText {
@@ -939,6 +947,8 @@ export interface StrapiMaxymiaFreeText {
   question_en: string | null;
   sampleAnswer_es: string | null;
   sampleAnswer_en: string | null;
+  explanation_es: string | null;
+  explanation_en: string | null;
 }
 
 export type StrapiMaxymiaExamQuestion =
