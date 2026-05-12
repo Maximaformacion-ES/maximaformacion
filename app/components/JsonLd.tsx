@@ -6,22 +6,30 @@ import React from 'react';
  * without executing JS).
  */
 export function JsonLd({ data }: { data: object | object[] }) {
-  // Each <script type="application/ld+json"> must contain exactly one JSON
-  // value. Concatenating multiple objects in one tag produces invalid JSON
-  // and crawlers (Google's Rich Results Test included) drop everything past
-  // the first object — that's why e.g. BreadcrumbList wasn't being detected
-  // when paired with Course/BlogPosting/Person.
-  const items = Array.isArray(data) ? data : [data];
+  // Multiple related schemas are wrapped in @graph under a single @context
+  // and emitted as one <script type="application/ld+json">. This is the
+  // pattern Google recommends for connected entities (it also lets us link
+  // items together by @id later without duplicating organization data
+  // across every Course/BlogPosting/Person). Strip @context from individual
+  // items so the outer wrapper is the single source of truth.
+  const payload = Array.isArray(data)
+    ? {
+        '@context': 'https://schema.org',
+        '@graph': data.map((d) => {
+          const obj = d as Record<string, unknown>;
+          if ('@context' in obj) {
+            const { ['@context']: _, ...rest } = obj;
+            return rest;
+          }
+          return obj;
+        }),
+      }
+    : data;
   return (
-    <>
-      {items.map((d, i) => (
-        <script
-          key={i}
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(d) }}
-        />
-      ))}
-    </>
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }}
+    />
   );
 }
