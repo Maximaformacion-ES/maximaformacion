@@ -100,9 +100,10 @@ const handleClerk = clerkMiddleware(async (auth, req) => {
 
 export default async function middleware(req: NextRequest, event: NextFetchEvent) {
   if (isBot(req)) {
+    const pathname = req.nextUrl.pathname;
+
     // Bots still need to honour CMS-managed 301/302 redirects so ranking
     // signals consolidate properly on moved URLs.
-    const pathname = req.nextUrl.pathname;
     if (!shouldSkipRedirectLookup(pathname)) {
       const rule = await lookupRedirect(pathname);
       if (rule) {
@@ -112,6 +113,14 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
         return NextResponse.redirect(dest, rule.statusCode);
       }
     }
+
+    // Bots that ignore robots.txt and try to enter authenticated areas:
+    // short-circuit with a 404 rather than rendering the page (which would
+    // call auth() without the Clerk context the wrapper sets up and 500).
+    if (!isPublicRoute(req) && !isWebhookRoute(req)) {
+      return new NextResponse(null, { status: 404 });
+    }
+
     return NextResponse.next();
   }
   return handleClerk(req, event);
