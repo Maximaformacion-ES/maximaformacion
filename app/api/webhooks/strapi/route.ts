@@ -18,6 +18,7 @@ const MODEL_TAG_MAP: Record<string, string[]> = {
   module: ['programs', 'lessons'], // Modules affect program and lesson views
   lesson: ['lessons', 'programs'], // Lessons affect lesson views and program course content
   'blog-post': ['blog-posts'],
+  'maxymia-course': ['maxymia-courses'],
   logo: ['logos'],
   badge: ['badges'],
   metadata: ['site-metadata'],

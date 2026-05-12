@@ -24,6 +24,12 @@ type ExamAction =
   | { type: 'SUBMIT'; score: number; correctCount: number }
   | { type: 'RESET' };
 
+// Component IDs in Strapi are per-table auto-increments, so a SingleChoice
+// id=4 and a MultipleChoice id=4 collide in answer state. Namespace by type.
+function questionKey(q: ExamQuestion): string {
+  return `${q.type}:${q.id}`;
+}
+
 function examReducer(state: ExamState, action: ExamAction): ExamState {
   switch (action.type) {
     case 'SET_ANSWER':
@@ -115,7 +121,7 @@ export default function ExamContainer({
   const handleSubmit = useCallback(async () => {
     let correct = 0;
     for (const q of exam.questions) {
-      if (gradeQuestion(q, state.answers[q.id])) correct++;
+      if (gradeQuestion(q, state.answers[questionKey(q)])) correct++;
     }
     const score = Math.round((correct / exam.questions.length) * 100);
     dispatch({ type: 'SUBMIT', score, correctCount: correct });
@@ -147,7 +153,7 @@ export default function ExamContainer({
 
   // Count answered questions (for submit button enablement)
   const answeredCount = exam.questions.filter((q) => {
-    const answer = state.answers[q.id];
+    const answer = state.answers[questionKey(q)];
     if (answer === undefined || answer === null) return false;
     if (Array.isArray(answer)) return answer.length > 0;
     if (typeof answer === 'string') return answer.trim().length > 0;
@@ -184,20 +190,23 @@ export default function ExamContainer({
 
       {/* Questions */}
       <div className="space-y-8">
-        {exam.questions.map((q, i) => (
-          <div key={q.id} className="p-5 rounded-xl border border-white/10 bg-white/[0.02]">
-            <span className="text-white/30 text-label-md mb-3 block">
-              {locale === 'es' ? 'Pregunta' : 'Question'} {i + 1}/{exam.questions.length}
-            </span>
-            <QuestionRenderer
-              question={q}
-              locale={locale}
-              answer={state.answers[q.id]}
-              onAnswer={(val) => setAnswer(q.id, val)}
-              submitted={state.submitted}
-            />
-          </div>
-        ))}
+        {exam.questions.map((q, i) => {
+          const key = questionKey(q);
+          return (
+            <div key={key} className="p-5 rounded-xl border border-white/10 bg-white/[0.02]">
+              <span className="text-white/30 text-label-md mb-3 block">
+                {locale === 'es' ? 'Pregunta' : 'Question'} {i + 1}/{exam.questions.length}
+              </span>
+              <QuestionRenderer
+                question={q}
+                locale={locale}
+                answer={state.answers[key]}
+                onAnswer={(val) => setAnswer(key, val)}
+                submitted={state.submitted}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Submit button */}

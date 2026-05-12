@@ -276,7 +276,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         type: 'single_choice',
         id: q.id,
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
-        options: q.options.map((o) => ({ es: o.text_es, en: o.text_en ?? o.text_es })),
+        options: (q.options ?? []).map((o) => ({ es: o.text_es, en: o.text_en ?? o.text_es })),
         correctIndex: q.correctIndex,
         explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
@@ -285,8 +285,8 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         type: 'multiple_choice',
         id: q.id,
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
-        options: q.options.map((o) => ({ es: o.text_es, en: o.text_en ?? o.text_es })),
-        correctIndices: q.correctIndices,
+        options: (q.options ?? []).map((o) => ({ es: o.text_es, en: o.text_en ?? o.text_es })),
+        correctIndices: Array.isArray(q.correctIndices) ? q.correctIndices : [],
         explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaOrdering':
@@ -294,8 +294,8 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         type: 'ordering',
         id: q.id,
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
-        items: q.items.map((i) => ({ es: i.text_es, en: i.text_en ?? i.text_es })),
-        correctOrder: q.correctOrder,
+        items: (q.items ?? []).map((i) => ({ es: i.text_es, en: i.text_en ?? i.text_es })),
+        correctOrder: Array.isArray(q.correctOrder) ? q.correctOrder : [],
         explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaFillBlank':
@@ -303,7 +303,7 @@ function transformExamQuestion(q: StrapiMaxymiaExamQuestion): ExamQuestion {
         type: 'fill_blank',
         id: q.id,
         question: { es: q.question_es, en: q.question_en ?? q.question_es },
-        blanks: [{ acceptedAnswers: q.acceptedAnswers }],
+        blanks: [{ acceptedAnswers: Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers : [] }],
         explanation: transformExplanation(q.explanation_es, q.explanation_en),
       };
     case 'ComponentMaxymiaFreeText':
