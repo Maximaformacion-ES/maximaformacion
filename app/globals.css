@@ -4,6 +4,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* SEO / no-JS visibility fallback.
+ *
+ * Framer Motion emits inline `style="opacity:0; transform:..."` on SSR for
+ * any element with `initial={{ opacity: 0, ... }}`. Real users hydrate and
+ * see the fade-in. Crawlers that don't run JS (or run it but screenshot
+ * before hydration finishes) keep seeing opacity:0 — that's why GSC and
+ * Screaming Frog were getting blank previews.
+ *
+ * `prefers-reduced-motion: reduce` also catches users who explicitly opt
+ * out of animations — they get the content instantly, no animation.
+ *
+ * `scripting: none` matches rendering contexts without scripting
+ * available (some headless crawlers).
+ */
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  [style*="opacity:0"],
+  [style*="opacity: 0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @keyframes accordion-down {
   from {
     height: 0;

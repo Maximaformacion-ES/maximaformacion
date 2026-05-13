@@ -57,7 +57,10 @@ function gradeQuestion(question: ExamQuestion, answer: unknown): boolean {
     }
 
     case 'ordering': {
-      const order = (answer as number[]) ?? [];
+      // No interaction → grade against the default order shown in the UI
+      // (items.map((_, i) => i)). This matters when the default already
+      // matches correctOrder: the student doesn't need to drag anything.
+      const order = (answer as number[]) ?? question.items.map((_, i) => i);
       return question.correctOrder.every((val, i) => val === order[i]);
     }
 
@@ -153,6 +156,11 @@ export default function ExamContainer({
 
   // Count answered questions (for submit button enablement)
   const answeredCount = exam.questions.filter((q) => {
+    // Ordering questions display a default order on render, which IS the
+    // student's answer until they drag something. Count them as always
+    // answered so the Submit button enables even if the default already
+    // matches the correct order.
+    if (q.type === 'ordering') return true;
     const answer = state.answers[questionKey(q)];
     if (answer === undefined || answer === null) return false;
     if (Array.isArray(answer)) return answer.length > 0;

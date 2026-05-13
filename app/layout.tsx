@@ -97,6 +97,18 @@ export default async function RootLayout({
           <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
           <JsonLd data={[organizationSchema(), websiteSchema()]} />
+          {/* Safety net for Framer Motion's SSR-emitted opacity:0 — if
+              hydration hasn't completed within 2.5s (slow headless renderers,
+              crawler WRS taking screenshots before hydration), force every
+              element still at opacity:0 to be visible. Real-user hydration
+              completes in ~100-300ms so this never fires for them. Inline
+              <script> placed in <head> so it parses before the body renders. */}
+          <script
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: `setTimeout(function(){try{document.querySelectorAll('[style*="opacity:0"],[style*="opacity: 0"]').forEach(function(el){el.style.opacity='1';el.style.transform='none'})}catch(e){}},2500);`,
+            }}
+          />
         </head>
         <body
           className={`${ztNature.variable} antialiased`}
