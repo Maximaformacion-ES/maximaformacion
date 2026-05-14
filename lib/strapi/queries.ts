@@ -177,6 +177,8 @@ function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
           : '',
         email: strapi.author.email || '',
         linkedin: strapi.author.linkedin || '',
+        slug: strapi.author.slug ?? null,
+        isTeacher: !!strapi.author.isTeacher,
       }
     : {
         name: '',
@@ -185,6 +187,8 @@ function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
         avatar: '',
         email: '',
         linkedin: '',
+        slug: null,
+        isTeacher: false,
       };
 
   return {
@@ -662,8 +666,19 @@ function transformResource(strapi: StrapiResource): Resource {
           : '',
         email: strapi.author.email || '',
         linkedin: strapi.author.linkedin || '',
+        slug: strapi.author.slug ?? null,
+        isTeacher: !!strapi.author.isTeacher,
       }
-    : { name: '', role: '', roleDescription: '', avatar: '', email: '', linkedin: '' };
+    : {
+        name: '',
+        role: '',
+        roleDescription: '',
+        avatar: '',
+        email: '',
+        linkedin: '',
+        slug: null,
+        isTeacher: false,
+      };
 
   const downloads: ResourceDownload[] = (strapi.downloads || []).map((d) => ({
     id: d.id,

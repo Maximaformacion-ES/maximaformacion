@@ -280,6 +280,8 @@ export interface BlogAuthor {
   avatar: string;
   email: string;
   linkedin: string;
+  slug: string | null;
+  isTeacher: boolean;
 }
 
 export interface BlogPost {

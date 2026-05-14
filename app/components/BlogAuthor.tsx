@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { m } from 'framer-motion';
 import { Mail, Linkedin } from 'lucide-react';
 import type { BlogPost } from '@/lib/strapi/types';
@@ -50,7 +51,18 @@ export const BlogAuthor: React.FC<BlogAuthorProps> = ({ post }) => {
             </div>
           )}
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-heading-sm md:text-heading-md font-bold text-mx-text mb-2">{post.author.name}</h3>
+            <h3 className="text-heading-sm md:text-heading-md font-bold text-mx-text mb-2">
+              {post.author.slug ? (
+                <Link
+                  href={`${post.author.isTeacher ? '/profesorado' : '/autores'}/${post.author.slug}`}
+                  className="hover:text-mx-orange transition-colors"
+                >
+                  {post.author.name}
+                </Link>
+              ) : (
+                post.author.name
+              )}
+            </h3>
             {post.author.role && (
               <p className="text-mx-orange text-body-sm md:text-body-md mb-4 font-medium">{post.author.role}</p>
             )}
