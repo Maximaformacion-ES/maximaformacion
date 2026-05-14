@@ -5,7 +5,7 @@ import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { FAQSection } from '../components/FAQSection';
-import ConsultoriaFormModal from '../components/ConsultoriaFormModal';
+import ConsultaGratuitaChooser from '../components/ConsultaGratuitaChooser';
 import FloatingConsultCTA from '../components/FloatingConsultCTA';
 import {
   HeroConsultoria,
@@ -64,8 +64,12 @@ const CONSULTORIA_FAQS = [
 
 export default function ConsultoriaClient() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const openForm = () => setIsFormOpen(true);
+  // Every "Consulta gratuita" CTA on this page opens the shared chooser so
+  // visitors can pick between filling the form or scheduling a call directly,
+  // matching the floating CTA's behaviour. Previously these PrimaryCTAs
+  // jumped straight to the form modal and skipped the scheduling option.
+  const [isChooserOpen, setIsChooserOpen] = useState(false);
+  const openForm = () => setIsChooserOpen(true);
 
   return (
     <div className="theme-consultoria bg-mx-bg min-h-screen text-mx-text selection:bg-mx-orange/30 overflow-x-hidden">
@@ -93,7 +97,7 @@ export default function ConsultoriaClient() {
       <FloatingConsultCTA />
       <Footer />
 
-      <ConsultoriaFormModal open={isFormOpen} onClose={() => setIsFormOpen(false)} />
+      <ConsultaGratuitaChooser open={isChooserOpen} onClose={() => setIsChooserOpen(false)} />
     </div>
   );
 }
