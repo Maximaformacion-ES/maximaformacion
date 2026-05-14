@@ -3,8 +3,20 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { getPrograms } from '@/lib/strapi/queries';
 import { getProgramWithLessons } from '@/lib/strapi/lesson-queries';
+import { getMaxymiaCoursesFromStrapi } from '@/lib/strapi/maxymia-queries';
+import { maxymiaCourseAsProgram } from '@/app/maxymia/data/adapters';
 import { isDbConfigured } from '@/lib/db/client';
 import type { PurchasedCourse, CourseProgress, UserCourseData } from '@/lib/strapi/types';
+import type { MaxymiaCourse } from '@/app/maxymia/types';
+
+async function safeFetchMaxymiaCourseMap(): Promise<Map<string, MaxymiaCourse>> {
+  try {
+    const list = await getMaxymiaCoursesFromStrapi();
+    return new Map(list.map((c) => [c.id, c]));
+  } catch {
+    return new Map();
+  }
+}
 
 async function safeFetchPrograms(isPro: boolean) {
   try {
@@ -128,6 +140,12 @@ export async function GET() {
       }
     }
 
+    // Maxymia courses live in a separate Strapi collection. Fetch them once
+    // so purchases whose programDocumentId belongs to a Maxymia course (not a
+    // regular Program) still surface in "Mis Cursos". Without this fallback
+    // those rows silently disappeared from the user's list.
+    const maxymiaById = await safeFetchMaxymiaCourseMap();
+
     // Add purchased courses
     for (const purchase of purchasedList) {
       const alreadyInList = userCourses.some(
@@ -164,6 +182,37 @@ export async function GET() {
               : undefined,
             accessType: 'purchased',
           });
+        } else {
+          // Not a regular program — try Maxymia.
+          const maxymiaCourse = maxymiaById.get(purchase.programDocumentId);
+          if (maxymiaCourse) {
+            const progress = courseProgressMap[purchase.programDocumentId];
+            const totalLessons = maxymiaCourse.blocks.reduce(
+              (sum, b) => sum + b.lessons.length,
+              0
+            );
+            let progressPercent = 0;
+            if (progress && totalLessons > 0) {
+              progressPercent = Math.round(
+                (progress.completedLessons.length / totalLessons) * 100
+              );
+            }
+            userCourses.push({
+              program: maxymiaCourseAsProgram(maxymiaCourse),
+              purchased: true,
+              purchasedAt: purchase.purchasedAt,
+              progress: progress
+                ? {
+                    startedAt: progress.startedAt || new Date().toISOString(),
+                    lastAccessedAt: progress.lastAccessedAt || new Date().toISOString(),
+                    completedLessons: progress.completedLessons,
+                    currentLessonId: progress.currentLessonId || undefined,
+                    progressPercent,
+                  }
+                : undefined,
+              accessType: 'purchased',
+            });
+          }
         }
       } else {
         const existingIndex = userCourses.findIndex(

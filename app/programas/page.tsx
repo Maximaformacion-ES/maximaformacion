@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getPrograms, getTopics } from '@/lib/strapi/queries';
 import { fetchMaxymiaCourses } from '@/app/maxymia/data/queries';
-import { getCourseMeta } from '@/app/maxymia/data/queries';
+import { maxymiaCourseAsProgram } from '@/app/maxymia/data/adapters';
 import type { MaxymiaCourse } from '@/app/maxymia/types';
 import ProgramsClient from './ProgramsClient';
 import type { Program, Topic } from '@/lib/strapi/types';
@@ -28,52 +28,6 @@ export async function generateMetadata({ searchParams }: CursosPageProps): Promi
     },
     // Para páginas 2+, dejamos que Google las indexe (cada slice tiene contenido único)
     // pero no son tan importantes como la primera.
-  };
-}
-
-// Maxymia courses live in their own Strapi collection but the catalog should
-// surface them alongside regular programs so visitors landing on /programas
-// see the whole offering (Másters + cursos + Maxymia). The card uses an
-// `href` override so clicks route to /maxymia/campus/[slug] (the canonical
-// Maxymia detail page) instead of /programas/[slug] which doesn't know
-// about Maxymia rows. Filters that don't apply (format, modules, ects, ...)
-// get neutral defaults so they neither match nor break range queries.
-function maxymiaCourseAsProgram(c: MaxymiaCourse): Program {
-  const meta = getCourseMeta(c);
-  const totalHours = Math.max(1, Math.round(meta.totalMinutes / 60));
-  const subjectArea: Program['subjectArea'] =
-    c.category === 'data-science' ? 'Ciencia de Datos'
-    : 'Inteligencia Artificial';
-  return {
-    id: 0,
-    documentId: `maxymia-${c.id}`,
-    type: 'Curso',
-    title: c.title.es,
-    slug: c.slug,
-    duration: totalHours,
-    ects: 0,
-    tags: c.tags ?? [],
-    topics: [],
-    featured: false,
-    description: c.description?.es ?? '',
-    longDescription: c.description?.es ?? '',
-    image: c.image,
-    format: 'Online',
-    language: c.language === 'en' ? 'Inglés' : c.language === 'bilingual' ? 'Bilingüe' : 'Español',
-    startDate: c.createdAt ?? '',
-    certification: '',
-    price: c.price,
-    originalPrice: c.originalPrice,
-    faqs: [],
-    subjectArea,
-    modules: [],
-    audience: c.audiences ?? '',
-    careers: c.careers ?? '',
-    objectives: c.objectives ?? '',
-    isPro: c.isPro,
-    moodleCourseId: null,
-    moodle: null,
-    href: `/maxymia/campus/${c.slug}`,
   };
 }
 
