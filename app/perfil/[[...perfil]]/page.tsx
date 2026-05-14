@@ -930,16 +930,14 @@ export default function PerfilPage() {
                       </button>
                     ))}
 
-                    {/* External link: Campus */}
+                    {/* Internal link: Maxymia campus */}
                     <div className="border-t border-mx-border mt-2 pt-2">
                       <Link
-                        href="https://maximaformacion.com.es/"
-                        target="_blank"
+                        href="/maxymia/campus"
                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-body-sm font-medium text-mx-text-muted hover:text-mx-text hover:bg-mx-border/30 transition-colors"
                       >
                         <BookOpen size={18} />
                         Ir al Campus
-                        <ExternalLink size={12} className="ml-auto opacity-50" />
                       </Link>
                     </div>
                   </div>
