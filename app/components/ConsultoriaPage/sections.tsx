@@ -1040,7 +1040,7 @@ export function FreeConsultHighlight({ onOpenForm }: SectionProps) {
 
 export function FormSection() {
   return (
-    <section id="formulario" className={`${SECTION_CLS} bg-mx-blue/[0.03]`}>
+    <section id="consultoria-form" className={`${SECTION_CLS} bg-mx-blue/[0.03]`}>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10 md:mb-12">
           <span className={`${OVERLINE_CLS} mb-4 inline-block`}>Formulario</span>
