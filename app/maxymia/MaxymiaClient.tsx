@@ -330,17 +330,35 @@ function CoursesSection({
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-col sm:flex-row gap-3"
           >
             <Link
               href={CAMPUS_PUBLIC_HREF}
               onClick={handleCampusClick}
               className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-label-lg font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
             >
-              Ver todos los cursos
+              Ver cursos del campus
+              <ArrowRight size={14} />
+            </Link>
+            <Link
+              href="/programas"
+              className="md:mt-0 inline-flex items-center gap-2 text-white hover:text-mx-orange text-label-lg font-medium transition-colors border border-mx-orange/40 bg-mx-orange/10 hover:border-mx-orange px-5 py-2.5 rounded-full"
+            >
+              Catálogo completo de formaciones
               <ArrowRight size={14} />
             </Link>
           </m.div>
         </div>
+
+        {/* Disclaimer to clarify these are campus-specific courses */}
+        <p className="text-white/40 text-body-sm font-light mb-8 -mt-4">
+          Estos son los cursos que se imparten dentro del campus Maxymia (IA aplicada a ciencias).
+          Si buscas másters, otros cursos especializados o formación en consultoría, explora el{' '}
+          <Link href="/programas" className="text-mx-orange hover:underline">
+            catálogo completo
+          </Link>
+          .
+        </p>
 
         {/* Course Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-3 md:gap-5">
