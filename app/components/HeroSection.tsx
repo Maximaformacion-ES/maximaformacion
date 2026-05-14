@@ -91,9 +91,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-8 md:my-12 mb-4 md:mb-12"
           >
             <m.a
-              href="/programas"
+              href="/programas?type=master"
               className="group flex items-center justify-center gap-3 bg-mx-orange text-white px-8 py-4 text-label-sm md:text-label-md font-medium rounded-full hover:bg-mx-orange-dark transition-colors duration-300"
-              
+
               whileTap={{ scale: 0.98 }}
             >
               Explorar Másters
@@ -103,9 +103,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               />
             </m.a>
             <m.a
-              href="/programas"
+              href="/programas?type=cursos"
               className="flex items-center justify-center gap-3 border border-mx-orange text-mx-orange px-8 py-4 text-label-sm md:text-label-md font-light rounded-full hover:bg-mx-orange/10 hover:border-mx-orange transition-colors"
-              
+
               whileTap={{ scale: 0.98 }}
             >
               Ver Cursos
