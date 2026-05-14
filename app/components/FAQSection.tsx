@@ -88,7 +88,14 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Accordion type="single" collapsible className="w-full">
+          {/* suppressHydrationWarning: Radix Accordion uses useId() for
+              aria-controls/id pairs, and those identifiers can drift between
+              SSR and the first client paint when something upstream renders
+              an extra node on one side (Clerk's user hook, Framer Motion's
+              LazyMotion, etc.). Content is identical on both sides — only
+              the auto-generated a11y identifiers differ — so let React
+              patch them up without warning. */}
+          <Accordion type="single" collapsible className="w-full" suppressHydrationWarning>
             {displayFaqs.map((faq, index) => (
               <AccordionItem key={faq.question} value={`faq-${index}`}>
                 <AccordionTrigger>{faq.question}</AccordionTrigger>

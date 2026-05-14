@@ -99,7 +99,9 @@ export default function ConsultaGratuitaChooser({ open, onClose }: Props) {
           </div>
         </div>
       )}
-      <ConsultoriaFormModal open={formOpen} onClose={() => setFormOpen(false)} />
+      {formOpen && (
+        <ConsultoriaFormModal open={formOpen} onClose={() => setFormOpen(false)} />
+      )}
     </>
   );
 }
