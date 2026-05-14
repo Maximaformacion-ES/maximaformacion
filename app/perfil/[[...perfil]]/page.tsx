@@ -16,6 +16,7 @@ import {
 import Link from 'next/link';
 import CourseProgressCard from '../../components/CourseProgressCard';
 import type { UserCourseData } from '@/lib/strapi/types';
+import { getMaxymiaCourses, getCourseMeta } from '@/app/maxymia/data/queries';
 
 // ─── User Info Section ───────────────────────────────────────────────
 const UserInfoSection = () => {
@@ -460,26 +461,23 @@ const MisCursosSection = () => {
 // ─── Certificados Section ────────────────────────────────────────────
 // ─── Maxymia Section ─────────────────────────────────────────────────
 const MaxymiaSection = () => {
-  const { courseProgress } = useUserCampus();
-  const maxymiaCoursesModule = React.useMemo(() => {
-    try {
-      // Dynamic import of maxymia courses
-      const { getMaxymiaCourses, getCourseMeta } = require('@/app/maxymia/data/queries');
-      const courses = getMaxymiaCourses() as { id: string; slug: string; title: { es: string }; category: string }[];
-      return courses.map((course) => ({
-        ...course,
-        meta: getCourseMeta(course) as { totalLessons: number; totalMinutes: number },
-      }));
-    } catch {
-      return [];
-    }
+  const { courseProgress, enrollments } = useUserCampus();
+  const maxymiaCourses = React.useMemo(() => {
+    const courses = getMaxymiaCourses();
+    return courses.map((course) => ({
+      ...course,
+      meta: getCourseMeta(course),
+    }));
   }, []);
 
-  const coursesWithProgress = maxymiaCoursesModule.filter(
-    (c: { id: string }) => courseProgress[c.id]
-  );
+  // Show every Maxymia course the user has actually purchased. Progress
+  // (courseProgress) is informational — appears as % filled when present —
+  // but presence in this list is decided by enrollment, not progress, so a
+  // freshly-bought course shows up even before the user opens it.
+  const enrolledIds = new Set(enrollments.map((e) => e.programDocumentId));
+  const ownedMaxymiaCourses = maxymiaCourses.filter((c) => enrolledIds.has(c.id));
 
-  if (coursesWithProgress.length === 0) {
+  if (ownedMaxymiaCourses.length === 0) {
     return (
       <div className="text-center py-8">
         <Sparkles className="text-mx-orange mx-auto mb-3" size={32} />
@@ -500,7 +498,7 @@ const MaxymiaSection = () => {
 
   return (
     <div className="space-y-4">
-      {coursesWithProgress.map((course: { id: string; slug: string; title: { es: string }; category: string; meta: { totalLessons: number } }) => {
+      {ownedMaxymiaCourses.map((course) => {
         const progress = courseProgress[course.id];
         const completedCount = progress?.completedLessons.length ?? 0;
         const pct = course.meta.totalLessons > 0

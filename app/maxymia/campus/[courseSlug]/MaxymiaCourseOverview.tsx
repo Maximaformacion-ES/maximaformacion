@@ -194,8 +194,11 @@ export default function MaxymiaCourseOverview({ course }: Props) {
     return course.blocks[0]?.lessons[0]?.id;
   }, [course, completedSet]);
 
-  const enrolled = !!progress;
-  const hasAccess = hasPro || checkAccess(course.id) || enrolled;
+  // Access must come from a current enrollment (or pro plan). courseProgress
+  // is sticky — once a user has started a course, the row stays in their
+  // progress even after enrollment expires/is revoked, so deriving `enrolled`
+  // from it gave permanent access to anyone who ever opened the course.
+  const hasAccess = hasPro || checkAccess(course.id);
 
   // Show product/detail page if user doesn't have access
   if (!isLoading && !hasAccess) {
@@ -423,7 +426,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                           className="flex items-center justify-center gap-3 bg-mx-orange text-white px-6 py-4 rounded-[10px] font-medium text-base hover:bg-mx-orange/90 transition-colors"
                         >
                           <Play size={18} fill="currentColor" />
-                          {enrolled
+                          {progress
                             ? (locale === 'es' ? 'Continuar curso' : 'Continue course')
                             : (locale === 'es' ? 'Comenzar curso' : 'Start course')
                           }
