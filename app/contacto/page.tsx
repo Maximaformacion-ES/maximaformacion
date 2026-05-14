@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, Globe } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -198,10 +198,6 @@ const ContactPage = () => {
                       Av. de la Innovación, 1, <br />
                       18016 Granada <br />
                     </p>
-                  </div>
-                  <div className="flex gap-4">
-                    <Clock className="shrink-0 text-mx-orange" />
-                    <p className="text-body-sm">9:00 AM — 6:00 PM (GMT+1)</p>
                   </div>
                   <div className="flex gap-4">
                     <Globe className="shrink-0 text-mx-orange" />
