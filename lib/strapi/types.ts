@@ -264,6 +264,13 @@ export interface Program {
   isPro: boolean;
   moodleCourseId?: number | null;
   moodle?: 'data-science' | 'e-learning' | null;
+  /**
+   * Optional override for the card's detail link. When the catalog includes
+   * adapter rows from other content types (e.g. Maxymia courses surfaced via
+   * mergeMaxymiaIntoPrograms), the click should land on that type's own
+   * detail page, not /programas/[slug] which only knows about Program rows.
+   */
+  href?: string;
 }
 
 export interface BlogAuthor {

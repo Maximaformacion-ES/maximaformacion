@@ -28,6 +28,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
   const proSavings = getProSavings(program, userHasPro);
+  const detailHref = program.href || `/programas/${program.slug}`;
 
   return (
     <m.div
@@ -42,7 +43,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
       className="group relative bg-mx-bg rounded-lg overflow-hidden cursor-pointer border border-[#ddd] hover:border-mx-orange/50 transition-all duration-300"
     >
       <Link
-        href={`/programas/${program.slug}`}
+        href={detailHref}
         className="flex flex-col h-full"
       >
         {/* Image area */}
