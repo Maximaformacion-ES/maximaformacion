@@ -80,7 +80,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {sortedPrograms.map((item, i) => (
             <ProgramCard
-              key={item.program.id}
+              key={item.program.documentId}
               program={item.program}
               index={i}
             />

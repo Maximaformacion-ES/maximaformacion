@@ -57,7 +57,7 @@ export const CatalogGrid: React.FC<CatalogGridProps> = ({
           {programs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 xl:gap-10">
               {programs.map((program) => (
-                <ProgramCard key={program.id} program={program} />
+                <ProgramCard key={program.documentId} program={program} />
               ))}
             </div>
           ) : (
