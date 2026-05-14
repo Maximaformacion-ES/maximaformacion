@@ -320,24 +320,26 @@ function CampusDropdown({ isDark }: CampusDropdownProps) {
             transition={{ duration: 0.2 }}
             className={`absolute right-0 mt-2 w-48 rounded-lg overflow-hidden shadow-xl ${isDark ? 'bg-[#0d1025] border border-white/10' : 'bg-mx-card border border-mx-border'}`}
           >
-            {CAMPUS_OPTIONS.map((option, index) => (
-              <m.a
-                key={option.name}
-                href={option.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className={`block px-4 py-3 text-body-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 last:border-b-0 ${isDark ? 'text-white/80 border-b border-white/10' : 'text-mx-text border-b border-mx-border'}`}
-                onClick={() => setIsCampusDropdownOpen(false)}
-              >
-                <div className="flex items-center justify-between">
-                  <span>{option.name}</span>
-                  <ArrowUpRight size={14} className="opacity-50" />
-                </div>
-              </m.a>
-            ))}
+            {CAMPUS_OPTIONS.map((option, index) => {
+              const isExternal = option.url.startsWith('http');
+              return (
+                <m.a
+                  key={option.name}
+                  href={option.url}
+                  {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`block px-4 py-3 text-body-sm font-light hover:bg-mx-orange/10 hover:text-mx-orange transition-colors duration-200 last:border-b-0 ${isDark ? 'text-white/80 border-b border-white/10' : 'text-mx-text border-b border-mx-border'}`}
+                  onClick={() => setIsCampusDropdownOpen(false)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{option.name}</span>
+                    <ArrowUpRight size={14} className="opacity-50" />
+                  </div>
+                </m.a>
+              );
+            })}
           </m.div>
         )}
       </AnimatePresence>
@@ -463,19 +465,21 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark, pathname }: MobileMenuP
             >
               <span className={`${sectionLabel} text-label-sm font-semibold uppercase tracking-widest`}>Campus</span>
               <div className="mt-2 flex flex-col gap-1">
-                {CAMPUS_OPTIONS.map((option) => (
-                  <a
-                    key={option.name}
-                    href={option.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center justify-between px-3 py-2 text-label-md font-medium rounded-lg ${textMuted} ${linkHoverBg} transition-colors`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <span>{option.name}</span>
-                    <ArrowUpRight size={11} className="opacity-50" />
-                  </a>
-                ))}
+                {CAMPUS_OPTIONS.map((option) => {
+                  const isExternal = option.url.startsWith('http');
+                  return (
+                    <a
+                      key={option.name}
+                      href={option.url}
+                      {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+                      className={`flex items-center justify-between px-3 py-2 text-label-md font-medium rounded-lg ${textMuted} ${linkHoverBg} transition-colors`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span>{option.name}</span>
+                      <ArrowUpRight size={11} className="opacity-50" />
+                    </a>
+                  );
+                })}
               </div>
             </m.div>
           </m.div>
