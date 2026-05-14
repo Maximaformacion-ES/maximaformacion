@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
@@ -34,10 +35,17 @@ const ztNature = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteMetadata = await getSiteMetadata();
-  // En previews y desarrollo (Vercel preview, vercel.app, local) → noindex global.
-  // Solo dejamos indexar cuando VERCEL_ENV === 'production'.
+  // Noindex policy:
+  //   - any non-production VERCEL_ENV (preview, development),
+  //   - any deploy served from a *.vercel.app host (Vercel marks the
+  //     project alias maximaformacion.vercel.app as VERCEL_ENV=production
+  //     even before custom DNS is cut over, so this is the only reliable
+  //     way to keep the temporary URL out of Google),
+  //   - or an explicit `noIndex` flag in the Strapi site metadata.
   const isProduction = process.env.VERCEL_ENV === 'production';
-  const noIndex = !isProduction || siteMetadata?.noIndex === true;
+  const host = (await headers()).get('host') ?? '';
+  const isVercelHost = host.endsWith('.vercel.app');
+  const noIndex = !isProduction || isVercelHost || siteMetadata?.noIndex === true;
 
   if (!siteMetadata) {
     return {

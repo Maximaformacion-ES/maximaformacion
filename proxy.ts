@@ -115,6 +115,19 @@ const handleClerk = clerkMiddleware(async (auth, req) => {
   }
 });
 
+// Stamp a noindex header on any response served from a *.vercel.app host.
+// Vercel marks the project alias (maximaformacion.vercel.app) as
+// VERCEL_ENV=production before custom DNS is cut over, so noindex-by-env
+// alone leaves the preview URL crawlable. Doing it at the edge means it
+// covers every response — pages, redirects, and the bot 404 branch.
+function applyVercelHostNoindex(req: NextRequest, res: NextResponse): NextResponse {
+  const host = req.headers.get("host") ?? "";
+  if (host.endsWith(".vercel.app")) {
+    res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+  return res;
+}
+
 export default async function middleware(req: NextRequest, event: NextFetchEvent) {
   if (isBot(req)) {
     const pathname = req.nextUrl.pathname;
@@ -127,7 +140,7 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
         const dest = rule.destination.startsWith("http")
           ? new URL(rule.destination)
           : new URL(rule.destination, req.url);
-        return NextResponse.redirect(dest, rule.statusCode);
+        return applyVercelHostNoindex(req, NextResponse.redirect(dest, rule.statusCode));
       }
     }
 
@@ -135,12 +148,19 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     // short-circuit with a 404 rather than rendering the page (which would
     // call auth() without the Clerk context the wrapper sets up and 500).
     if (isAuthRequiredRoute(req)) {
-      return new NextResponse(null, { status: 404 });
+      return applyVercelHostNoindex(req, new NextResponse(null, { status: 404 }));
     }
 
-    return NextResponse.next();
+    return applyVercelHostNoindex(req, NextResponse.next());
   }
-  return handleClerk(req, event);
+  const response = await handleClerk(req, event);
+  // handleClerk may return undefined when it lets the request pass through;
+  // in that case we still want the noindex header for vercel.app hosts.
+  if (response instanceof NextResponse) {
+    return applyVercelHostNoindex(req, response);
+  }
+  const passthrough = NextResponse.next();
+  return applyVercelHostNoindex(req, passthrough);
 }
 
 export const config = {
