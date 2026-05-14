@@ -48,7 +48,7 @@ export default function CourseAccessGate({
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
       // Redirect to sign in with return URL
-      window.location.href = `/sign-in?redirect_url=/programas/${program.documentId}`;
+      window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
       return;
     }
 

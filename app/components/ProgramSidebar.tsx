@@ -45,7 +45,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect_url=/programas/${program.documentId || program.id}`;
+      window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
       return;
     }
 
