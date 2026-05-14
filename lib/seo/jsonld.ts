@@ -9,7 +9,7 @@
 
 import type { Program, BlogPost } from '@/lib/strapi/types';
 
-const SITE_URL = (
+export const SITE_URL = (
   process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es'
 ).replace(/\/$/, '');
 const ORG_NAME = 'Máxima Formación';

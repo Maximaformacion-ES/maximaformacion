@@ -5,6 +5,7 @@ import InnovacionClient from './InnovacionClient';
 export const metadata: Metadata = {
   title: 'Innovación | Biomáxima | Máxima Formación',
   description: 'Descubre Biomáxima, nuestra división de innovación. Soluciones biotecnológicas y proyectos de investigación aplicada al servicio de la sociedad.',
+  alternates: { canonical: '/innovacion' },
 };
 
 // ISR: Revalidar cada hora

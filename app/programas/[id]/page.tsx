@@ -23,12 +23,14 @@ export async function generateMetadata({ params }: ProgramPageProps): Promise<Me
     return {
       title: `${program.title} | Máxima Formación`,
       description: program.description,
+      alternates: { canonical: `/programas/${program.slug}` },
     };
   }
 
   return {
     title: 'Programa | Máxima Formación',
     description: 'Descubre este programa formativo de Máxima Formación. Formación de calidad en estadística, ciencia de datos e innovación.',
+    alternates: { canonical: `/programas/${slug}` },
   };
 }
 

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Política de Cookies | Máxima Formación',
   description:
     'Información sobre el uso de cookies en el sitio web de Máxima Formación, S.L.U., conforme a la LSSI y al RGPD.',
+  alternates: { canonical: '/politica-de-cookies' },
 };
 
 const bodyHtml = readFileSync(

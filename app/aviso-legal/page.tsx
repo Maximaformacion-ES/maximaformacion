@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Aviso Legal | Máxima Formación',
   description:
     'Aviso legal y condiciones generales de uso del sitio web de Máxima Formación, S.L.U.',
+  alternates: { canonical: '/aviso-legal' },
 };
 
 const bodyHtml = readFileSync(

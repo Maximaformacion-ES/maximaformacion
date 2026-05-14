@@ -10,7 +10,7 @@ import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
 import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
 import { JsonLd } from "./components/JsonLd";
-import { organizationSchema, websiteSchema } from "@/lib/seo/jsonld";
+import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo/jsonld";
 import "./globals.css";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
@@ -47,21 +47,29 @@ export async function generateMetadata(): Promise<Metadata> {
   const isVercelHost = host.endsWith('.vercel.app');
   const noIndex = !isProduction || isVercelHost || siteMetadata?.noIndex === true;
 
+  // metadataBase tells Next.js how to resolve any relative URLs that
+  // child pages use in their own metadata (alternates.canonical, og.url,
+  // etc.). Without this every page would have to repeat the absolute URL.
+  const metadataBase = new URL(SITE_URL);
+
   if (!siteMetadata) {
     return {
+      metadataBase,
       title: "Maximaformación - Formación Profesional experta",
       description: "Lleva tu carrera al siguiente nivel con nuestra formación especializada. Másters, cursos y programas ejecutivos de élite.",
+      alternates: { canonical: '/' },
       robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     };
   }
 
   return {
+    metadataBase,
     title: siteMetadata.metaTitle,
     description: siteMetadata.metaDescription,
     keywords: siteMetadata.keywords,
-    ...(siteMetadata.canonicalUrl && {
-      alternates: { canonical: siteMetadata.canonicalUrl },
-    }),
+    alternates: {
+      canonical: siteMetadata.canonicalUrl ?? '/',
+    },
     ...(siteMetadata.favicon && {
       icons: {
         icon: siteMetadata.favicon,

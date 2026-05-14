@@ -30,7 +30,11 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
     // Strapi unavailable
   }
 
-  return { title, description };
+  return {
+    title,
+    description,
+    alternates: { canonical: `/recursos/${slug}` },
+  };
 }
 
 export async function generateStaticParams() {

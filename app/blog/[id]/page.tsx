@@ -31,7 +31,11 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
     // Strapi unavailable
   }
 
-  return { title, description };
+  return {
+    title,
+    description,
+    alternates: { canonical: `/blog/${slug}` },
+  };
 }
 
 // Generate static params for SSG

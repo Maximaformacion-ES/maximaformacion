@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Recursos | Máxima Formación',
   description:
     'Guías rápidas, infografías, trabajos de investigación y videotutoriales en estadística, R, ciencia de datos y formación online. Descárgalos gratis.',
+  alternates: { canonical: '/recursos' },
 };
 
 export const revalidate = 60;

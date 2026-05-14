@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'Política de Privacidad | Máxima Formación',
   description:
     'Información sobre el tratamiento de datos personales que realiza Máxima Formación, S.L.U. conforme al RGPD y a la LOPDGDD.',
+  alternates: { canonical: '/politica-de-privacidad' },
 };
 
 const bodyHtml = readFileSync(

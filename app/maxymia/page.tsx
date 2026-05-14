@@ -6,6 +6,7 @@ import MaxymiaClient from './MaxymiaClient';
 export const metadata: Metadata = {
   title: 'Maxymia | Campus IA Aplicada a Ciencias',
   description: 'Maxymia es el campus de inteligencia artificial aplicada a ciencias de Máxima Formación. Formación avanzada en IA, machine learning y ciencia de datos.',
+  alternates: { canonical: '/maxymia' },
 };
 
 export default async function MaxymiaPage() {

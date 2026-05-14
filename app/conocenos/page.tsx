@@ -5,6 +5,7 @@ import ConocenosClient from './ConocenosClient';
 export const metadata: Metadata = {
   title: 'Conócenos | Máxima Formación',
   description: 'Conoce al equipo de Máxima Formación. Profesionales apasionados por la educación, la ciencia de datos y la innovación al servicio de tu desarrollo profesional.',
+  alternates: { canonical: '/conocenos' },
 };
 
 // ISR: Revalidar cada hora
