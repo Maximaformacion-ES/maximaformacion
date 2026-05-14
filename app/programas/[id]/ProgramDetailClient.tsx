@@ -11,6 +11,7 @@ import { ProgramSidebar } from '../../components/ProgramSidebar';
 import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
+import { ProgramTeachers } from '../../components/ProgramTeachers';
 import ProGateWrapper from './ProGateWrapper';
 import type { Program } from '@/lib/strapi/types';
 
@@ -73,6 +74,7 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
               <ProgramSidebar program={program} />
             </div>
           </section>
+          <ProgramTeachers program={program} />
           <ProgramFAQSection program={program} />
           <ProgramCTASection program={program} />
         </ProGateWrapper>

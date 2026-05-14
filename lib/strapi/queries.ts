@@ -89,6 +89,13 @@ function transformProgram(strapi: StrapiProgram): Program {
     isPro: strapi.isPro,
     moodleCourseId: strapi.moodleCourseId ?? null,
     moodle: strapi.moodle ?? null,
+    docentes: (strapi.docentes ?? []).map((d) => ({
+      documentId: d.documentId,
+      name: d.name,
+      slug: d.slug ?? null,
+      role: d.role,
+      avatar: d.avatar ? getStrapiMediaUrl(d.avatar) : d.avatarUrl ?? '',
+    })),
   };
 }
 
@@ -360,7 +367,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

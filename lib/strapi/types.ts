@@ -144,6 +144,7 @@ export interface StrapiProgram {
   audiences: string | null;
   careers: string | null;
   objectives: string | null;
+  docentes?: StrapiAuthor[] | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -271,6 +272,20 @@ export interface Program {
    * detail page, not /programas/[slug] which only knows about Program rows.
    */
   href?: string;
+  /**
+   * Teachers assigned to this program via Strapi's `docentes` relation.
+   * Used by the program detail page to link out to each teacher's profile
+   * page (internal linking for EEAT / authority signals).
+   */
+  docentes?: ProgramTeacher[];
+}
+
+export interface ProgramTeacher {
+  documentId: string;
+  name: string;
+  slug: string | null;
+  role: string;
+  avatar: string;
 }
 
 export interface BlogAuthor {
