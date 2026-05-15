@@ -20,12 +20,14 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
   let title = 'Blog | Máxima Formación';
   let description = 'Lee este artículo en el blog de Máxima Formación. Contenido especializado en estadística, ciencia de datos y formación profesional.';
+  let noIndex = false;
 
   try {
     const post = await getBlogPostBySlug(slug, false);
     if (post) {
       title = `${post.title} | Blog | Máxima Formación`;
       description = post.excerpt || description;
+      noIndex = !!post.noIndex;
     }
   } catch {
     // Strapi unavailable
@@ -35,6 +37,7 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
     title,
     description,
     alternates: { canonical: `/blog/${slug}` },
+    ...(noIndex && { robots: { index: false, follow: false } }),
   };
 }
 

@@ -96,6 +96,7 @@ function transformProgram(strapi: StrapiProgram): Program {
       role: d.role,
       avatar: d.avatar ? getStrapiMediaUrl(d.avatar) : d.avatarUrl ?? '',
     })),
+    noIndex: !!strapi.noIndex,
   };
 }
 
@@ -212,6 +213,7 @@ function transformBlogPost(strapi: StrapiBlogPost): BlogPost {
     readTime: strapi.readTime || '5 min',
     tags: strapi.tags || [],
     featured: strapi.featured,
+    noIndex: !!strapi.noIndex,
   };
 }
 
@@ -757,6 +759,7 @@ function transformResource(strapi: StrapiResource): Resource {
     featured: strapi.featured,
     license: strapi.license || 'CC BY-NC-ND',
     author,
+    noIndex: !!strapi.noIndex,
   };
 }
 

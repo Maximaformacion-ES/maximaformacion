@@ -19,12 +19,14 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
   let title = 'Recurso | Máxima Formación';
   let description =
     'Descarga este recurso de Máxima Formación: estadística, ciencia de datos, R y formación online.';
+  let noIndex = false;
 
   try {
     const r = await getResourceBySlug(slug, false);
     if (r) {
       title = `${r.title} | Recursos | Máxima Formación`;
       description = r.excerpt || description;
+      noIndex = !!r.noIndex;
     }
   } catch {
     // Strapi unavailable
@@ -34,6 +36,7 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
     title,
     description,
     alternates: { canonical: `/recursos/${slug}` },
+    ...(noIndex && { robots: { index: false, follow: false } }),
   };
 }
 

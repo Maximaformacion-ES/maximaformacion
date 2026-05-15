@@ -145,6 +145,7 @@ export interface StrapiProgram {
   careers: string | null;
   objectives: string | null;
   docentes?: StrapiAuthor[] | null;
+  noIndex?: boolean | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -216,6 +217,7 @@ export interface StrapiBlogPost {
   readTime: string | null;
   tags: string[] | null;
   featured: boolean;
+  noIndex?: boolean | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -278,6 +280,8 @@ export interface Program {
    * page (internal linking for EEAT / authority signals).
    */
   docentes?: ProgramTeacher[];
+  /** Per-entry SEO noindex toggle from Strapi. */
+  noIndex?: boolean;
 }
 
 export interface ProgramTeacher {
@@ -313,6 +317,7 @@ export interface BlogPost {
   readTime: string;
   tags: string[];
   featured: boolean;
+  noIndex?: boolean;
 }
 
 // ============ Logo Types ============
@@ -423,6 +428,7 @@ export interface StrapiResource {
   featured: boolean;
   license: string | null;
   author: StrapiAuthor | null;
+  noIndex?: boolean | null;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -453,6 +459,7 @@ export interface Resource {
   featured: boolean;
   license: string;
   author: BlogAuthor;
+  noIndex?: boolean;
 }
 
 export interface ResourceQueryOptions {

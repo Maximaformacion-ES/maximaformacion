@@ -24,6 +24,9 @@ export async function generateMetadata({ params }: ProgramPageProps): Promise<Me
       title: `${program.title} | Máxima Formación`,
       description: program.description,
       alternates: { canonical: `/programas/${program.slug}` },
+      ...(program.noIndex && {
+        robots: { index: false, follow: false },
+      }),
     };
   }
 
