@@ -1,8 +1,15 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getAllTeacherSlugs, getTeacherBySlug } from '@/lib/strapi/queries';
+import {
+  getAllTeacherSlugs,
+  getTeacherBySlug,
+  getProgramsByTeacher,
+  getBlogPostsByAuthor,
+} from '@/lib/strapi/queries';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema } from '@/lib/seo/jsonld';
+import { TeacherProgramsList } from '@/app/components/TeacherProgramsList';
+import { AuthorArticlesList } from '@/app/components/AuthorArticlesList';
 import TeacherDetailClient from './TeacherDetailClient';
 
 export const revalidate = 3600;
@@ -48,6 +55,12 @@ export default async function TeacherDetailPage({ params }: PageProps) {
   const teacher = await getTeacherBySlug(slug);
   if (!teacher) notFound();
 
+  // Surface what this teacher actually teaches + writes (EEAT / authority).
+  const [programs, posts] = await Promise.all([
+    getProgramsByTeacher(teacher.documentId),
+    getBlogPostsByAuthor(teacher.documentId),
+  ]);
+
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -71,6 +84,14 @@ export default async function TeacherDetailPage({ params }: PageProps) {
     <>
       <JsonLd data={[personSchema, breadcrumb]} />
       <TeacherDetailClient teacher={teacher} />
+      <TeacherProgramsList
+        programs={programs}
+        heading={`Programas que imparte ${teacher.name}`}
+      />
+      <AuthorArticlesList
+        posts={posts}
+        heading={`Artículos de ${teacher.name}`}
+      />
     </>
   );
 }

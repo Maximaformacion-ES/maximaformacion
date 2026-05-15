@@ -503,6 +503,51 @@ export async function getAllAuthorSlugs(): Promise<string[]> {
   }
 }
 
+// ============ Author cross-references (EEAT internal linking) ============
+
+/**
+ * Posts written by a given author (matched by Author.documentId). Used on
+ * /autores/[slug] and /profesorado/[slug] to surface the author/teacher's
+ * own catalog of articles — gives Google a strong author entity and shows
+ * EEAT credentials in the profile.
+ */
+export async function getBlogPostsByAuthor(
+  authorDocumentId: string,
+  limit = 12
+): Promise<BlogPost[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiBlogPost[]>>(
+      `/api/blog-posts?filters[author][documentId][$eq]=${encodeURIComponent(authorDocumentId)}&populate[image]=true&populate[author][populate][avatar]=true&sort=publishedAt:desc&pagination[pageSize]=${limit}`,
+      { revalidate: 60, tags: ['blog-posts', `author-posts-${authorDocumentId}`] }
+    );
+    return response.data.map(transformBlogPost);
+  } catch (error) {
+    console.error(`Error fetching posts for author ${authorDocumentId}:`, error);
+    return [];
+  }
+}
+
+/**
+ * Programs the given Author teaches (via the program.docentes m2m relation).
+ * Used on /profesorado/[slug] to list the courses a teacher is responsible
+ * for and let visitors click straight into them — internal authority signal.
+ */
+export async function getProgramsByTeacher(
+  teacherDocumentId: string,
+  limit = 24
+): Promise<Program[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
+      `/api/programs?filters[docentes][documentId][$eq]=${encodeURIComponent(teacherDocumentId)}&populate[image]=true&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&sort=featured:desc,createdAt:desc&pagination[pageSize]=${limit}`,
+      { revalidate: 60, tags: ['programs', `teacher-programs-${teacherDocumentId}`] }
+    );
+    return response.data.map(transformProgram);
+  } catch (error) {
+    console.error(`Error fetching programs for teacher ${teacherDocumentId}:`, error);
+    return [];
+  }
+}
+
 // ============ Topic Queries ============
 
 export async function getTopics(): Promise<Topic[]> {

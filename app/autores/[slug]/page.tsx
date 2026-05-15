@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getAllAuthorSlugs, getAuthorBySlug } from '@/lib/strapi/queries';
+import {
+  getAllAuthorSlugs,
+  getAuthorBySlug,
+  getBlogPostsByAuthor,
+} from '@/lib/strapi/queries';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema } from '@/lib/seo/jsonld';
+import { AuthorArticlesList } from '@/app/components/AuthorArticlesList';
 import TeacherDetailClient from '@/app/profesorado/[slug]/TeacherDetailClient';
 
 export const revalidate = 3600;
@@ -48,6 +53,8 @@ export default async function AuthorDetailPage({ params }: PageProps) {
   const author = await getAuthorBySlug(slug);
   if (!author) notFound();
 
+  const posts = await getBlogPostsByAuthor(author.documentId);
+
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -70,6 +77,10 @@ export default async function AuthorDetailPage({ params }: PageProps) {
     <>
       <JsonLd data={[personSchema, breadcrumb]} />
       <TeacherDetailClient teacher={author} />
+      <AuthorArticlesList
+        posts={posts}
+        heading={`Artículos de ${author.name}`}
+      />
     </>
   );
 }
