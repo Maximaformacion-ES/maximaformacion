@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getCategoryStyle } from '@/lib/blog-categories';
 
@@ -27,6 +29,14 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
   totalPages,
   onPageChange,
 }) => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const hrefForPage = (page: number) => {
+    const sp = new URLSearchParams(searchParams?.toString() ?? '');
+    if (page <= 1) sp.delete('page'); else sp.set('page', String(page));
+    const qs = sp.toString();
+    return qs ? `${pathname}?${qs}` : pathname;
+  };
   return (
     <div className="sticky top-20 z-30 bg-mx-bg/80 backdrop-blur-md py-6 mb-10 border-b border-mx-border">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -63,30 +73,43 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
 
         {/* Right cluster: compact pagination + search */}
         <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Compact pagination (desktop only) */}
+          {/* Compact pagination (desktop only) — real <Link> hrefs so
+              Googlebot can follow paginated URLs from the initial HTML. */}
           {totalPages > 1 && (
             <div className="hidden md:flex items-center gap-1 shrink-0">
-              <button
-                type="button"
-                onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                aria-label="Página anterior"
-                className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-orange hover:text-mx-orange disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              >
-                <ChevronLeft size={14} />
-              </button>
+              {currentPage > 1 ? (
+                <Link
+                  href={hrefForPage(currentPage - 1)}
+                  aria-label="Página anterior"
+                  rel="prev"
+                  onClick={(e) => { e.preventDefault(); onPageChange(currentPage - 1); }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-orange hover:text-mx-orange transition-all"
+                >
+                  <ChevronLeft size={14} />
+                </Link>
+              ) : (
+                <span className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted opacity-30">
+                  <ChevronLeft size={14} />
+                </span>
+              )}
               <span className="text-mx-text-muted text-body-sm px-2 tabular-nums whitespace-nowrap">
                 {currentPage}/{totalPages}
               </span>
-              <button
-                type="button"
-                onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                aria-label="Página siguiente"
-                className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-orange hover:text-mx-orange disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              >
-                <ChevronRight size={14} />
-              </button>
+              {currentPage < totalPages ? (
+                <Link
+                  href={hrefForPage(currentPage + 1)}
+                  aria-label="Página siguiente"
+                  rel="next"
+                  onClick={(e) => { e.preventDefault(); onPageChange(currentPage + 1); }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-orange hover:text-mx-orange transition-all"
+                >
+                  <ChevronRight size={14} />
+                </Link>
+              ) : (
+                <span className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted opacity-30">
+                  <ChevronRight size={14} />
+                </span>
+              )}
             </div>
           )}
 

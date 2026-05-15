@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import {
@@ -396,27 +397,57 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
                 />
               }
               paginationSlot={
-                totalPages > 1 ? (
-                  <div className="hidden md:flex items-center gap-1">
-                    <button
-                      onClick={() => goToPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-blue/50 hover:text-mx-text disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                    <span className="text-mx-text-muted text-body-sm px-2 tabular-nums">
-                      {currentPage}/{totalPages}
-                    </span>
-                    <button
-                      onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-blue/50 hover:text-mx-text disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                ) : null
+                totalPages > 1 ? (() => {
+                  // Build href for a given page number, preserving current
+                  // search params except the new page. Real <Link href>
+                  // elements so Googlebot can follow paginated URLs from
+                  // the initial HTML (SEO audit requirement).
+                  const hrefForPage = (n: number) => {
+                    const sp = new URLSearchParams(searchParams.toString());
+                    if (n <= 1) sp.delete('page'); else sp.set('page', String(n));
+                    const qs = sp.toString();
+                    return qs ? `${pathname}?${qs}` : pathname;
+                  };
+                  const prevPage = Math.max(1, currentPage - 1);
+                  const nextPage = Math.min(totalPages, currentPage + 1);
+                  return (
+                    <div className="hidden md:flex items-center gap-1">
+                      {currentPage > 1 ? (
+                        <Link
+                          href={hrefForPage(prevPage)}
+                          aria-label="Página anterior"
+                          rel="prev"
+                          onClick={(e) => { e.preventDefault(); goToPage(prevPage); }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-blue/50 hover:text-mx-text transition-all"
+                        >
+                          <ChevronLeft size={14} />
+                        </Link>
+                      ) : (
+                        <span className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted opacity-30">
+                          <ChevronLeft size={14} />
+                        </span>
+                      )}
+                      <span className="text-mx-text-muted text-body-sm px-2 tabular-nums">
+                        {currentPage}/{totalPages}
+                      </span>
+                      {currentPage < totalPages ? (
+                        <Link
+                          href={hrefForPage(nextPage)}
+                          aria-label="Página siguiente"
+                          rel="next"
+                          onClick={(e) => { e.preventDefault(); goToPage(nextPage); }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:border-mx-blue/50 hover:text-mx-text transition-all"
+                        >
+                          <ChevronRight size={14} />
+                        </Link>
+                      ) : (
+                        <span className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted opacity-30">
+                          <ChevronRight size={14} />
+                        </span>
+                      )}
+                    </div>
+                  );
+                })() : null
               }
               searchSlot={
                 <div className="relative w-full">
