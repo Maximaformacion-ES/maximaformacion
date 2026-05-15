@@ -42,6 +42,8 @@ export const ConsultoriaHeroSection: React.FC<ConsultoriaHeroSectionProps> = ({ 
             fill
             sizes="100vw"
             unoptimized
+            priority
+            fetchPriority="high"
           />
           {/* Color tint overlay */}
           <div className="absolute inset-0 mix-blend-color" style={{ backgroundColor: 'var(--color-mx-blue)', opacity: 0.1 }} />

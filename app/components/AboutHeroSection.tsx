@@ -54,6 +54,8 @@ export const AboutHeroSection: React.FC<AboutHeroSectionProps> = ({ data }) => {
             fill
             sizes="100vw"
             unoptimized
+            priority
+            fetchPriority="high"
           />
           <div
             className="absolute inset-0 mix-blend-color"

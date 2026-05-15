@@ -46,6 +46,8 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
             fill
             sizes="100vw"
             unoptimized
+            priority
+            fetchPriority="high"
           />
           {/* Color tint overlay */}
           <div

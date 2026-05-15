@@ -26,6 +26,8 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
           fill
           sizes="100vw"
           unoptimized
+          priority
+          fetchPriority="high"
         />
       </div>
 
