@@ -1,9 +1,17 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getProgramBySlug, getAllProgramSlugs } from '@/lib/strapi/queries';
+import { markdownToHtml } from '@/lib/markdown';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema, courseSchema, faqSchema } from '@/lib/seo/jsonld';
 import ProgramDetailClient from './ProgramDetailClient';
+
+export interface ProgramRichHtml {
+  longDescription: string;
+  objectives: string;
+  audience: string;
+  careers: string;
+}
 
 export const revalidate = 60;
 
@@ -61,10 +69,26 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
       ]
     : [];
 
+  // Pre-render the long-form markdown server-side so the bot sees the
+  // full body of the program in the initial HTML. Without this each
+  // markdown field stayed empty until JS hydration finished (the old
+  // MarkdownContent client component returned null on first paint),
+  // burying 500-1000 words per page from the SEO crawler.
+  const richHtml: ProgramRichHtml = program
+    ? {
+        longDescription: program.longDescription
+          ? await markdownToHtml(program.longDescription)
+          : '',
+        objectives: program.objectives ? await markdownToHtml(program.objectives) : '',
+        audience: program.audience ? await markdownToHtml(program.audience) : '',
+        careers: program.careers ? await markdownToHtml(program.careers) : '',
+      }
+    : { longDescription: '', objectives: '', audience: '', careers: '' };
+
   return (
     <>
       {schemas.length > 0 && <JsonLd data={schemas} />}
-      <ProgramDetailClient program={program} />
+      <ProgramDetailClient program={program} richHtml={richHtml} />
     </>
   );
 }

@@ -14,12 +14,14 @@ import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import { ProgramTeachers } from '../../components/ProgramTeachers';
 import ProGateWrapper from './ProGateWrapper';
 import type { Program } from '@/lib/strapi/types';
+import type { ProgramRichHtml } from './page';
 
 interface ProgramDetailClientProps {
   program: Program | null;
+  richHtml: ProgramRichHtml;
 }
 
-export default function ProgramDetailClient({ program }: ProgramDetailClientProps) {
+export default function ProgramDetailClient({ program, richHtml }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   if (!program) {
@@ -64,7 +66,7 @@ export default function ProgramDetailClient({ program }: ProgramDetailClientProp
         <ProgramHeroSection 
           program={program}
           sidebar={<ProgramSidebar program={program} />}
-          tabs={<ProgramTabs program={program} />}
+          tabs={<ProgramTabs program={program} richHtml={richHtml} />}
         />
 
         <ProGateWrapper program={program}>

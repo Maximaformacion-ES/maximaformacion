@@ -210,6 +210,7 @@ interface CourseOverviewClientProps {
   firstLessonId: string | null;
   showSuccessMessage: boolean;
   checkoutSessionId?: string;
+  richHtml: import('@/app/programas/[id]/page').ProgramRichHtml;
 }
 
 export default function CourseOverviewClient({
@@ -217,6 +218,7 @@ export default function CourseOverviewClient({
   firstLessonId,
   showSuccessMessage,
   checkoutSessionId,
+  richHtml,
 }: CourseOverviewClientProps) {
   const { isSignedIn, isLoaded } = useUser();
   const {
@@ -345,7 +347,7 @@ export default function CourseOverviewClient({
               hasProgress={!!progress}
             />
           }
-          tabs={<ProgramTabs program={program} />}
+          tabs={<ProgramTabs program={program} richHtml={richHtml} />}
         />
 
         {/* Mobile sidebar — desktop already shows it inside the hero */}

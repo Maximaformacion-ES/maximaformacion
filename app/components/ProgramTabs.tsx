@@ -15,33 +15,25 @@ import {
 } from "lucide-react";
 import type { Program } from "@/lib/strapi/types";
 import type { LucideIcon } from "lucide-react";
-import { markdownToHtml } from "@/lib/markdown";
+import type { ProgramRichHtml } from "@/app/programas/[id]/page";
 
-// Component to render markdown content with consistent styling
-function MarkdownContent({
-  content,
+// Renders pre-rendered markdown HTML produced server-side. Previously this
+// did the markdown conversion in a useEffect, which meant SSR emitted
+// nothing and the long-form copy stayed invisible to crawlers until JS
+// hydration. Now the parent page passes already-converted HTML strings via
+// the `richHtml` prop, so the body is in the initial HTML.
+function MarkdownHtml({
+  html,
   className = "",
 }: {
-  content: string;
+  html: string;
   className?: string;
 }) {
-  const [html, setHtml] = useState<string>("");
-
-  useEffect(() => {
-    let cancelled = false;
-    if (content) {
-      markdownToHtml(content).then((result) => {
-        if (!cancelled) setHtml(result);
-      });
-    }
-    return () => { cancelled = true; };
-  }, [content]);
-
   if (!html) return null;
-
   return (
     <div
       className={`markdown-content ${className}`}
+      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -49,6 +41,7 @@ function MarkdownContent({
 
 interface ProgramTabsProps {
   program: Program;
+  richHtml: ProgramRichHtml;
 }
 
 interface TabDef {
@@ -57,7 +50,7 @@ interface TabDef {
   icon?: LucideIcon;
 }
 
-export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
+export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) => {
   const [expandedModule, setExpandedModule] = useState<number | null>(0);
   const [activeTab, setActiveTab] = useState("descripcion");
 
@@ -128,32 +121,27 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
         ))}
       </div>
 
-      {/* Tab content */}
+      {/* Tab content — all panels rendered always with `hidden` toggling
+          the inactive ones. This keeps every panel in the initial HTML so
+          crawlers see the full body of the program in SSR, while the user
+          UX still only shows one panel at a time. */}
       <div className="pt-10 md:pt-4">
-        <AnimatePresence mode="wait">
-          {activeTab === "descripcion" && (
-            <m.div
-              key="descripcion"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <MarkdownContent
-                content={program.longDescription}
-                className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed"
-              />
-            </m.div>
-          )}
+          <div
+            role="tabpanel"
+            id="panel-descripcion"
+            hidden={activeTab !== "descripcion"}
+          >
+            <MarkdownHtml
+              html={richHtml.longDescription}
+              className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed"
+            />
+          </div>
 
-          {activeTab === "temario" && (
-            <m.div
-              key="temario"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
+          <div
+            role="tabpanel"
+            id="panel-temario"
+            hidden={activeTab !== "temario"}
+          >
               <div className="mb-4 text-mx-text-muted text-body-sm">
                 {program.modules.length} módulos especializados
               </div>
@@ -233,66 +221,50 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program }) => {
                   </div>
                 ))}
               </div>
-            </m.div>
-          )}
+          </div>
 
-          {activeTab === "objetivos" && (
-            <m.div
-              key="objetivos"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <MarkdownContent
-                content={program.objectives}
-                className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
-              />
-            </m.div>
-          )}
+          <div
+            role="tabpanel"
+            id="panel-objetivos"
+            hidden={activeTab !== "objetivos"}
+          >
+            <MarkdownHtml
+              html={richHtml.objectives}
+              className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
+            />
+          </div>
 
-          {activeTab === "audiencia" && (
-            <m.div
-              key="audiencia"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <MarkdownContent
-                content={program.audience}
-                className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
-              />
-            </m.div>
-          )}
+          <div
+            role="tabpanel"
+            id="panel-audiencia"
+            hidden={activeTab !== "audiencia"}
+          >
+            <MarkdownHtml
+              html={richHtml.audience}
+              className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
+            />
+          </div>
 
-          {activeTab === "salidas" && (
-            <m.div
-              key="salidas"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <MarkdownContent
-                content={program.careers}
-                className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
-              />
-            </m.div>
-          )}
+          <div
+            role="tabpanel"
+            id="panel-salidas"
+            hidden={activeTab !== "salidas"}
+          >
+            <MarkdownHtml
+              html={richHtml.careers}
+              className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
+            />
+          </div>
 
-          {activeTab === "video" && program.videoUrl && (
-            <m.div
-              key="video"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
+          {program.videoUrl && (
+            <div
+              role="tabpanel"
+              id="panel-video"
+              hidden={activeTab !== "video"}
             >
               <VideoEmbed url={program.videoUrl} title={program.title} />
-            </m.div>
+            </div>
           )}
-        </AnimatePresence>
       </div>
     </div>
   );

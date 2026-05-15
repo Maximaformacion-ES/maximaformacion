@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getProgramWithLessons, getFirstLessonOfProgram } from '@/lib/strapi/lesson-queries';
 import { getProgramById } from '@/lib/strapi/queries';
+import { markdownToHtml } from '@/lib/markdown';
+import type { ProgramRichHtml } from '@/app/programas/[id]/page';
 import CourseOverviewClient from './CourseOverviewClient';
 
 // ISR: Revalidar cada hora
@@ -49,12 +51,20 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
     firstLessonId = program.moduleRelations[0].lessons[0].documentId;
   }
 
+  const richHtml: ProgramRichHtml = {
+    longDescription: program.longDescription ? await markdownToHtml(program.longDescription) : '',
+    objectives: program.objectives ? await markdownToHtml(program.objectives) : '',
+    audience: program.audience ? await markdownToHtml(program.audience) : '',
+    careers: program.careers ? await markdownToHtml(program.careers) : '',
+  };
+
   return (
     <CourseOverviewClient
       program={program}
       firstLessonId={firstLessonId}
       showSuccessMessage={resolvedSearchParams.success === 'true'}
       checkoutSessionId={resolvedSearchParams.session_id}
+      richHtml={richHtml}
     />
   );
 }
