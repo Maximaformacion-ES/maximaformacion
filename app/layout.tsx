@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
@@ -35,17 +34,18 @@ const ztNature = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteMetadata = await getSiteMetadata();
-  // Noindex policy:
+  // Noindex policy at the layout level:
   //   - any non-production VERCEL_ENV (preview, development),
-  //   - any deploy served from a *.vercel.app host (Vercel marks the
-  //     project alias maximaformacion.vercel.app as VERCEL_ENV=production
-  //     even before custom DNS is cut over, so this is the only reliable
-  //     way to keep the temporary URL out of Google),
   //   - or an explicit `noIndex` flag in the Strapi site metadata.
+  //
+  // The *.vercel.app alias is handled at the edge by proxy.ts which
+  // stamps X-Robots-Tag: noindex on every response from that host.
+  // Reading the request headers here would force every page into
+  // dynamic rendering even though almost nothing on layout depends on
+  // the request, so we keep this metadata static-rendering-friendly
+  // and let the middleware own host-based noindex.
   const isProduction = process.env.VERCEL_ENV === 'production';
-  const host = (await headers()).get('host') ?? '';
-  const isVercelHost = host.endsWith('.vercel.app');
-  const noIndex = !isProduction || isVercelHost || siteMetadata?.noIndex === true;
+  const noIndex = !isProduction || siteMetadata?.noIndex === true;
 
   // metadataBase tells Next.js how to resolve any relative URLs that
   // child pages use in their own metadata (alternates.canonical, og.url,
