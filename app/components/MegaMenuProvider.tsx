@@ -7,6 +7,8 @@ export type MegaMenuArea = {
   key: string;
   /** Display label in the menu column header */
   label: string;
+  /** URL slug for /programas/area/[slug] */
+  slug: string;
   programs: { title: string; slug: string }[];
 };
 

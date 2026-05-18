@@ -788,10 +788,13 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
           ...item.megaMenu,
           columns: dynamicAreas.map((area) => ({
             title: area.label,
-            links: area.programs.map((p) => ({
-              label: p.title,
-              href: `/programas/${p.slug}`,
-            })),
+            links: [
+              { label: 'Ver toda el área', href: `/programas/area/${area.slug}` },
+              ...area.programs.map((p) => ({
+                label: p.title,
+                href: `/programas/${p.slug}`,
+              })),
+            ],
           })),
         },
       };

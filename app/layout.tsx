@@ -9,6 +9,7 @@ import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
 import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
 import { MegaMenuProvider, type MegaMenuArea } from "./components/MegaMenuProvider";
+import { SUBJECT_AREAS } from "@/lib/subject-areas";
 import { JsonLd } from "./components/JsonLd";
 import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo/jsonld";
 import "./globals.css";
@@ -110,24 +111,20 @@ export default async function RootLayout({
     logoMaxymia: siteMetadata?.logoMaxymia || '',
   };
 
-  // Group programs by subjectArea for the desktop megamenu. Ordered the same
-  // way as the four columns in the SEO audit reference image.
-  const AREA_ORDER: { key: string; label: string }[] = [
-    { key: 'Inteligencia Artificial', label: 'Cursos de IA' },
-    { key: 'Ciencia de Datos', label: 'Ciencia de Datos' },
-    { key: 'Moodle / Exelearning / H5P', label: 'Moodle — eXeLearning — H5P' },
-    { key: 'Salud basada en datos', label: 'Salud basada en datos' },
-  ];
+  // Group programs by subjectArea for the desktop megamenu. Ordering and
+  // labels come from the shared SUBJECT_AREAS table so /programas/area/[slug]
+  // landings and the header stay in sync.
   const grouped = new Map<string, { title: string; slug: string }[]>();
   for (const p of programsResult.programs) {
     if (!p.subjectArea || !p.slug) continue;
     if (!grouped.has(p.subjectArea)) grouped.set(p.subjectArea, []);
     grouped.get(p.subjectArea)!.push({ title: p.title, slug: p.slug });
   }
-  const megaMenuAreas: MegaMenuArea[] = AREA_ORDER.map(({ key, label }) => ({
-    key,
-    label,
-    programs: (grouped.get(key) ?? []).sort((a, b) => a.title.localeCompare(b.title, 'es')),
+  const megaMenuAreas: MegaMenuArea[] = SUBJECT_AREAS.map((a) => ({
+    key: a.key,
+    label: a.label,
+    slug: a.slug,
+    programs: (grouped.get(a.key) ?? []).sort((x, y) => x.title.localeCompare(y.title, 'es')),
   }));
 
   return (
