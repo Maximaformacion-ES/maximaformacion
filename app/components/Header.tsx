@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Menu, X, ChevronDown, User, Crown } from 'lucide-react';
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import {
 } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useSiteBranding } from './SiteBrandingProvider';
+import { useMegaMenu } from './MegaMenuProvider';
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -664,14 +665,18 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
             className="absolute left-1/2 -translate-x-1/2 top-full pt-4 z-50"
           >
             <div
-              className={`min-w-[640px] rounded-2xl shadow-xl border ${
+              className={`min-w-[640px] max-w-[min(96vw,1200px)] rounded-2xl shadow-xl border ${
                 isDark
                   ? 'bg-[#0f1520] border-white/10'
                   : 'bg-mx-card border-mx-border'
               }`}
             >
               <div className="grid grid-cols-[1fr_auto] gap-0">
-                <div className="grid grid-cols-3 gap-6 p-6 md:p-7">
+                <div
+                  className={`grid gap-6 p-6 md:p-7 ${
+                    item.megaMenu.columns.length >= 4 ? 'grid-cols-4' : 'grid-cols-3'
+                  }`}
+                >
                   {item.megaMenu.columns.map((col) => (
                     <div key={col.title}>
                       <p
@@ -766,7 +771,32 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
   const branding = useSiteBranding();
 
   const userHasPro = isSignedIn && hasPro;
-  const items = navItems ?? NAV_ITEMS;
+  const megaMenu = useMegaMenu();
+
+  // Replace the static "Formación" megamenu columns with one column per
+  // subject area, each listing the actual programs in that area. Falls back
+  // to the static columns when Strapi is unavailable at build time.
+  const items = useMemo(() => {
+    const base = navItems ?? NAV_ITEMS;
+    const dynamicAreas = megaMenu.areas.filter((a) => a.programs.length > 0);
+    if (dynamicAreas.length === 0) return base;
+    return base.map((item) => {
+      if (item.name !== 'Formación' || !item.megaMenu) return item;
+      return {
+        ...item,
+        megaMenu: {
+          ...item.megaMenu,
+          columns: dynamicAreas.map((area) => ({
+            title: area.label,
+            links: area.programs.map((p) => ({
+              label: p.title,
+              href: `/programas/${p.slug}`,
+            })),
+          })),
+        },
+      };
+    });
+  }, [navItems, megaMenu]);
   // En /consultoria usamos un logo y nombre diferenciados (Maxima Consultoria,
   // brand verde-azul). En Maxymia mantenemos el logo oscuro de la marca. En el
   // resto, el logo estándar de Máxima Formación.

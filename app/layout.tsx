@@ -4,10 +4,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { getSiteMetadata } from "@/lib/strapi/queries";
+import { getSiteMetadata, getPrograms } from "@/lib/strapi/queries";
 import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
 import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
+import { MegaMenuProvider, type MegaMenuArea } from "./components/MegaMenuProvider";
 import { JsonLd } from "./components/JsonLd";
 import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo/jsonld";
 import "./globals.css";
@@ -100,11 +101,34 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const siteMetadata = await getSiteMetadata();
+  const [siteMetadata, programsResult] = await Promise.all([
+    getSiteMetadata(),
+    getPrograms({ limit: 200 }).catch(() => ({ programs: [], total: 0, pageCount: 0 })),
+  ]);
   const branding = {
     logoMaximaformacion: siteMetadata?.logoMaximaformacion || '',
     logoMaxymia: siteMetadata?.logoMaxymia || '',
   };
+
+  // Group programs by subjectArea for the desktop megamenu. Ordered the same
+  // way as the four columns in the SEO audit reference image.
+  const AREA_ORDER: { key: string; label: string }[] = [
+    { key: 'Inteligencia Artificial', label: 'Cursos de IA' },
+    { key: 'Ciencia de Datos', label: 'Ciencia de Datos' },
+    { key: 'Moodle / Exelearning / H5P', label: 'Moodle — eXeLearning — H5P' },
+    { key: 'Salud basada en datos', label: 'Salud basada en datos' },
+  ];
+  const grouped = new Map<string, { title: string; slug: string }[]>();
+  for (const p of programsResult.programs) {
+    if (!p.subjectArea || !p.slug) continue;
+    if (!grouped.has(p.subjectArea)) grouped.set(p.subjectArea, []);
+    grouped.get(p.subjectArea)!.push({ title: p.title, slug: p.slug });
+  }
+  const megaMenuAreas: MegaMenuArea[] = AREA_ORDER.map(({ key, label }) => ({
+    key,
+    label,
+    programs: (grouped.get(key) ?? []).sort((a, b) => a.title.localeCompare(b.title, 'es')),
+  }));
 
   return (
     <ClerkProvider localization={esES}>
@@ -165,7 +189,9 @@ gtag('consent', 'default', {
           )}
           {GTM_ID && <Analytics />}
           <SiteBrandingProvider value={branding}>
-            <MotionProvider>{children}</MotionProvider>
+            <MegaMenuProvider value={{ areas: megaMenuAreas }}>
+              <MotionProvider>{children}</MotionProvider>
+            </MegaMenuProvider>
           </SiteBrandingProvider>
         </body>
       </html>
