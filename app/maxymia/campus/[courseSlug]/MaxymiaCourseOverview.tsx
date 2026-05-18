@@ -60,7 +60,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
   const { hasPro, hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
-  const { byBlockId: examResultsByBlock } = useExamResults(course.id);
+  const { byExamId: examResultsByExamId } = useExamResults(course.id);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>('objectives');
@@ -521,7 +521,7 @@ export default function MaxymiaCourseOverview({ course }: Props) {
                 completedSet={completedSet}
                 firstIncompleteLessonId={firstIncompleteLessonId}
                 locale={locale}
-                examResult={examResultsByBlock[block.id]}
+                examResultsByExamId={examResultsByExamId}
               />
             ))}
           </div>
@@ -632,7 +632,7 @@ function MarkdownBlock({ content }: { content: string }) {
 // ─── Module Card (same accordion pattern as product page) ───────────
 
 interface ModuleCardProps {
-  examResult?: ExamResult;
+  examResultsByExamId: Record<string, ExamResult>;
   block: MaxymiaBlock;
   blockIndex: number;
   courseSlug: string;
@@ -641,7 +641,7 @@ interface ModuleCardProps {
   locale: Locale;
 }
 
-function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncompleteLessonId, locale, examResult }: ModuleCardProps) {
+function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncompleteLessonId, locale, examResultsByExamId }: ModuleCardProps) {
   const [expanded, setExpanded] = useState(blockIndex === 0);
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set());
   const total = block.lessons.length;
@@ -796,33 +796,37 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                   </m.div>
                 );
               })}
-              {block.exam && block.lessons.length > 0 && (
-                <Link
-                  href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam`}
-                  className="flex items-center gap-3 py-3 -mx-3 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
-                >
-                  <FileQuestion size={14} className="shrink-0 text-purple-300/70" />
-                  <span className="text-body-sm text-purple-300/70 group-hover:text-purple-200 flex-1">
-                    {block.exam.title[locale]}
-                  </span>
-                  {examResult ? (
-                    <span
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold ${
-                        examResult.passed
-                          ? 'bg-green-500/10 text-green-400 border border-green-500/30'
-                          : 'bg-red-500/10 text-red-400 border border-red-500/30'
-                      }`}
-                    >
-                      {examResult.passed ? <CheckCircle size={12} /> : null}
-                      {examResult.score}%
+              {block.lessons.length > 0 && block.exams.map((exam, examIdx) => {
+                const examResult = examResultsByExamId[exam.id];
+                return (
+                  <Link
+                    key={exam.id}
+                    href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam?index=${examIdx}`}
+                    className="flex items-center gap-3 py-3 -mx-3 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
+                  >
+                    <FileQuestion size={14} className="shrink-0 text-purple-300/70" />
+                    <span className="text-body-sm text-purple-300/70 group-hover:text-purple-200 flex-1">
+                      {exam.title[locale]}
                     </span>
-                  ) : (
-                    <span className="text-white/30 text-label-sm">
-                      {locale === 'es' ? 'Pendiente' : 'Pending'}
-                    </span>
-                  )}
-                </Link>
-              )}
+                    {examResult ? (
+                      <span
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold ${
+                          examResult.passed
+                            ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                        }`}
+                      >
+                        {examResult.passed ? <CheckCircle size={12} /> : null}
+                        {examResult.score}%
+                      </span>
+                    ) : (
+                      <span className="text-white/30 text-label-sm">
+                        {locale === 'es' ? 'Pendiente' : 'Pending'}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           </m.div>
         )}

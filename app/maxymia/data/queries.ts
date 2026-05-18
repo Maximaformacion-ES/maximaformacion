@@ -222,7 +222,7 @@ export function getCourseMeta(course: MaxymiaCourse) {
   let totalExams = 0;
 
   for (const block of course.blocks) {
-    if (block.exam) totalExams++;
+    totalExams += block.exams.length;
     for (const lesson of block.lessons) {
       totalLessons++;
       totalMinutes += lesson.estimatedMinutes;

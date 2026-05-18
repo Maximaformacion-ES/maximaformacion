@@ -111,7 +111,7 @@ export interface MaxymiaBlock {
   title: LocalizedString;
   content: LocalizedContent;
   lessons: MaxymiaLesson[];
-  exam?: MaxymiaExam;
+  exams: MaxymiaExam[];
 }
 
 export type MaxymiaCategory = 'ia' | 'data-science' | 'machine-learning' | 'nlp' | 'computer-vision';

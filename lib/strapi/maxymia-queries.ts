@@ -56,6 +56,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
             order
           }
           exam { id }
+          exams { id }
         }
       }
     }
@@ -155,6 +156,22 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
             }
           }
           exam {
+            id
+            title_es
+            title_en
+            description_es
+            description_en
+            passingScore
+            questions {
+              __typename
+              ... on ComponentMaxymiaSingleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndex, explanation_es, explanation_en }
+              ... on ComponentMaxymiaMultipleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndices, explanation_es, explanation_en }
+              ... on ComponentMaxymiaOrdering { id, question_es, question_en, items { id, text_es, text_en }, correctOrder, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFillBlank { id, question_es, question_en, acceptedAnswers, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFreeText { id, question_es, question_en, sampleAnswer_es, sampleAnswer_en, explanation_es, explanation_en }
+            }
+          }
+          exams {
             id
             title_es
             title_en
@@ -347,12 +364,18 @@ function transformLesson(lesson: StrapiMaxymiaLesson): MaxymiaLesson {
 
 function transformBlock(block: StrapiMaxymiaBlock): MaxymiaBlock {
   const sortedLessons = [...(block.lessons ?? [])].sort((a, b) => a.order - b.order);
+  const examsArray =
+    block.exams && block.exams.length > 0
+      ? block.exams
+      : block.exam
+        ? [block.exam]
+        : [];
   return {
     id: String(block.id),
     title: { es: block.title_es, en: block.title_en ?? block.title_es },
     content: transformLocalizedContent(),
     lessons: sortedLessons.map(transformLesson),
-    exam: block.exam ? transformExam(block.exam) : undefined,
+    exams: examsArray.map(transformExam),
   };
 }
 

@@ -163,7 +163,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
             },
           },
         ],
-        exam: {
+        exams: [{
           id: 'exam-block-1',
           title: {
             es: 'Examen: Introducción a la IA',
@@ -255,7 +255,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               },
             },
           ],
-        },
+        }],
       },
       {
         id: 'block-2-neural',
@@ -381,6 +381,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
             },
           },
         ],
+        exams: [],
       },
     ],
     price: 49,
@@ -524,6 +525,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
             },
           },
         ],
+        exams: [],
       },
       {
         id: 'block-nlp-2',
@@ -649,7 +651,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
             },
           },
         ],
-        exam: {
+        exams: [{
           id: 'exam-block-nlp-2',
           title: {
             es: 'Examen: Transformer',
@@ -688,7 +690,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               correctOrder: [0, 1, 2, 3],
             },
           ],
-        },
+        }],
       },
     ],
     price: 79,
@@ -808,7 +810,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
             },
           },
         ],
-        exam: {
+        exams: [{
           id: 'exam-block-cv-1',
           title: {
             es: 'Examen: Fundamentos de CNNs',
@@ -843,7 +845,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
               ],
             },
           ],
-        },
+        }],
       },
     ],
     price: 69,
@@ -935,6 +937,7 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
             },
           },
         ],
+        exams: [],
       },
     ],
     price: 59,

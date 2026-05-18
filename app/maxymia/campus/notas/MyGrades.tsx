@@ -18,6 +18,7 @@ interface GradeRow {
   blockTitle: string;
   examTitle: string;
   lastLessonId: string | null;
+  examIndex: number;
   score: number;
   passed: boolean;
   completedAt: string;
@@ -30,10 +31,15 @@ export default function MyGrades({ courses }: Props) {
   const [filterStatus, setFilterStatus] = useState<'all' | 'passed' | 'failed'>('all');
 
   const lookup = useMemo(() => {
-    const byExamId = new Map<string, { course: MaxymiaCourse; block: MaxymiaCourse['blocks'][number] }>();
+    const byExamId = new Map<
+      string,
+      { course: MaxymiaCourse; block: MaxymiaCourse['blocks'][number]; exam: MaxymiaCourse['blocks'][number]['exams'][number]; examIndex: number }
+    >();
     for (const course of courses) {
       for (const block of course.blocks) {
-        if (block.exam) byExamId.set(block.exam.id, { course, block });
+        block.exams.forEach((exam, examIndex) => {
+          byExamId.set(exam.id, { course, block, exam, examIndex });
+        });
       }
     }
     return byExamId;
@@ -50,8 +56,9 @@ export default function MyGrades({ courses }: Props) {
         courseSlug: ref.course.slug,
         courseTitle: ref.course.title[locale],
         blockTitle: ref.block.title[locale],
-        examTitle: ref.block.exam!.title[locale],
+        examTitle: ref.exam.title[locale],
         lastLessonId: lastLesson?.id ?? null,
+        examIndex: ref.examIndex,
         score: r.score,
         passed: r.passed,
         completedAt: r.completedAt,
@@ -195,7 +202,7 @@ export default function MyGrades({ courses }: Props) {
                   <td className="px-4 py-3 text-right">
                     {r.lastLessonId && (
                       <Link
-                        href={`/maxymia/campus/${r.courseSlug}/lesson/${r.lastLessonId}/exam`}
+                        href={`/maxymia/campus/${r.courseSlug}/lesson/${r.lastLessonId}/exam?index=${r.examIndex}`}
                         className="inline-flex items-center gap-1 text-mx-orange hover:text-mx-orange/80 text-label-md"
                       >
                         {locale === 'es' ? 'Reintentar' : 'Retry'}

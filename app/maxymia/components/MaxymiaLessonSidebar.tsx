@@ -129,7 +129,7 @@ export default function MaxymiaLessonSidebar({
 // ─── Sidebar Block ───────────────────────────────────────────────────
 
 interface SidebarBlockProps {
-  block: { id: string; title: Record<Locale, string>; lessons: { id: string; title: Record<Locale, string>; estimatedMinutes: number; topics?: MaxymiaTopic[] }[]; exam?: { id: string } | null };
+  block: { id: string; title: Record<Locale, string>; lessons: { id: string; title: Record<Locale, string>; estimatedMinutes: number; topics?: MaxymiaTopic[] }[]; exams: { id: string; title: Record<Locale, string> }[] };
   courseSlug: string;
   currentLessonId: string;
   completedLessons: Set<string>;
@@ -261,15 +261,16 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                 </div>
               );
             })}
-            {block.exam && block.lessons.length > 0 && (
+            {block.lessons.length > 0 && block.exams.map((exam, examIdx) => (
               <Link
-                href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam`}
+                key={exam.id}
+                href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam?index=${examIdx}`}
                 className="flex items-center gap-2 px-4 pl-8 py-2.5 text-label-md text-purple-400/70 hover:text-purple-300 hover:bg-white/[0.03] transition-colors"
               >
                 <FileQuestion size={11} className="flex-shrink-0" />
-                <span className="line-clamp-1">{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
+                <span className="line-clamp-1">{exam.title[locale]}</span>
               </Link>
-            )}
+            ))}
           </m.div>
         )}
       </AnimatePresence>

@@ -98,7 +98,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
 
   const nextIsExam = useMemo(() => {
     const lastLesson = block.lessons[block.lessons.length - 1];
-    return !!block.exam && lastLesson?.id === lesson.id;
+    return block.exams.length > 0 && lastLesson?.id === lesson.id;
   }, [block, lesson.id]);
 
   const nav = useMemo((): LessonNavigation | null => {
@@ -148,7 +148,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
       await refetch();
     }
     if (nextIsExam) {
-      router.push(`/maxymia/campus/${course.slug}/lesson/${lesson.id}/exam`);
+      router.push(`/maxymia/campus/${course.slug}/lesson/${lesson.id}/exam?index=0`);
     } else if (nav?.next) {
       router.push(`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`);
     } else {

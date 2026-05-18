@@ -1027,6 +1027,7 @@ export interface StrapiMaxymiaBlock {
   order: number;
   lessons: StrapiMaxymiaLesson[];
   exam: StrapiMaxymiaExam | null;
+  exams: StrapiMaxymiaExam[] | null;
 }
 
 export interface StrapiMaxymiaInstructor {

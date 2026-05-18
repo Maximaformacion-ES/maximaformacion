@@ -738,12 +738,12 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                                 </span>
                               </m.div>
                             ))}
-                            {block.exam && (
-                              <div className="flex items-center gap-3 py-3 text-purple-300/70">
+                            {block.exams.map((exam) => (
+                              <div key={exam.id} className="flex items-center gap-3 py-3 text-purple-300/70">
                                 <FileQuestion size={14} className="shrink-0" />
-                                <span className="text-body-sm">{block.exam.title[locale]}</span>
+                                <span className="text-body-sm">{exam.title[locale]}</span>
                               </div>
-                            )}
+                            ))}
                           </div>
                         </m.div>
                       )}
