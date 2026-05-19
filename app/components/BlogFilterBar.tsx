@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getCategoryStyle } from '@/lib/blog-categories';
+import { BLOG_CATEGORY_BY_KEY } from '@/lib/blog-categories-meta';
+import type { BlogCategory } from '@/lib/strapi/types';
 
 interface BlogFilterBarProps {
   categories: string[];
@@ -41,22 +43,22 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
     <div className="sticky top-20 z-30 bg-mx-bg/80 backdrop-blur-md py-6 mb-10 border-b border-mx-border">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs — render as real <Link> for categories that have a
+            dedicated landing page so the chips double as crawlable navigation
+            into /blog/categoria/[slug]. The onClick intercept keeps the
+            in-place client-side filter for users on /blog. */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           {categories.map(cat => {
             const isActive = activeFilter === cat;
             const isAll = cat === 'Todos';
             const style = getCategoryStyle(cat);
-            return (
-              <button
-                key={cat}
-                onClick={() => setActiveFilter(cat)}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full text-body-sm font-medium transition-all duration-300 whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? `${style.filterActiveBg} ${style.filterActiveText}`
-                    : 'bg-mx-card text-mx-text-muted border border-mx-border hover:border-mx-orange/30'
-                }`}
-              >
+            const className = `flex items-center gap-2 px-5 py-2 rounded-full text-body-sm font-medium transition-all duration-300 whitespace-nowrap cursor-pointer ${
+              isActive
+                ? `${style.filterActiveBg} ${style.filterActiveText}`
+                : 'bg-mx-card text-mx-text-muted border border-mx-border hover:border-mx-orange/30'
+            }`;
+            const inner = (
+              <>
                 {!isAll && (
                   <span
                     className={`block w-2 h-2 rounded-full ${
@@ -66,6 +68,36 @@ export const BlogFilterBar: React.FC<BlogFilterBarProps> = ({
                   />
                 )}
                 {cat}
+              </>
+            );
+            const landingHref = isAll
+              ? '/blog'
+              : BLOG_CATEGORY_BY_KEY.get(cat as BlogCategory)?.slug
+                ? `/blog/categoria/${BLOG_CATEGORY_BY_KEY.get(cat as BlogCategory)!.slug}`
+                : null;
+            if (landingHref) {
+              return (
+                <Link
+                  key={cat}
+                  href={landingHref}
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                    e.preventDefault();
+                    setActiveFilter(cat);
+                  }}
+                  className={className}
+                >
+                  {inner}
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveFilter(cat)}
+                className={className}
+              >
+                {inner}
               </button>
             );
           })}
