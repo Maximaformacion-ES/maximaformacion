@@ -662,10 +662,21 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
-            className="absolute left-1/2 -translate-x-1/2 top-full pt-4 z-50"
+            // Full-bleed: span the whole viewport horizontally so the four
+            // columns of program names have room to breathe. Anchored
+            // `fixed` to the bottom of the header instead of relative to
+            // the trigger so the panel is centred on the viewport, not on
+            // the "Formación" link (which sits right of centre).
+            className="fixed inset-x-0 top-[72px] sm:top-[96px] z-50 pt-4 flex justify-center px-4 sm:px-6 md:px-12"
+            // The dropdown is a React child of the trigger wrapper, but
+            // `position: fixed` removes it from the parent's hit-box. Wire
+            // the same hover handlers here so moving the cursor from the
+            // trigger into the menu does not start the close timer.
+            onMouseEnter={handleEnter}
+            onMouseLeave={handleLeave}
           >
             <div
-              className={`min-w-[640px] max-w-[min(96vw,1200px)] rounded-2xl shadow-xl border ${
+              className={`w-full max-w-[1400px] rounded-2xl shadow-xl border ${
                 isDark
                   ? 'bg-[#0f1520] border-white/10'
                   : 'bg-mx-card border-mx-border'
