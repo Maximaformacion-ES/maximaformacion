@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 const strapiUrl = process.env.STRAPI_URL || 'http://localhost:1337';
 const strapiParsed = new URL(strapiUrl);
+
+// Enable with `ANALYZE=true pnpm build`. Writes the report under
+// .next/analyze/client.html and server.html.
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -119,4 +127,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

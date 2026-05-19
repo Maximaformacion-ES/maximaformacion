@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { m } from "framer-motion";
 import { ArrowUpRight, Crown } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Program } from "@/lib/strapi/types";
 import { useUser } from "@clerk/nextjs";
@@ -48,14 +49,23 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
       >
         {/* Image area */}
         <div className="relative h-[220px] xl:h-[240px] 2xl:h-[299px] p-4 xl:p-5 2xl:p-6 flex flex-col justify-between overflow-hidden">
-          {/* Background image */}
-          <m.img
-            src={program.image}
-            alt={program.title}
-            className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+          {/* Background image — next/image generates the responsive srcset and
+              serves AVIF/WebP; the surrounding motion.div carries the hover
+              scale animation that the legacy <m.img> handled in one element. */}
+          <m.div
+            className="absolute inset-0"
             animate={{ scale: isHovered ? 1.05 : 1 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          />
+          >
+            <Image
+              src={program.image}
+              alt={program.title}
+              fill
+              className="object-cover rounded-t-lg"
+              sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 90vw"
+              loading={index < 3 ? 'eager' : 'lazy'}
+            />
+          </m.div>
           {/* Gradient overlay fading to bg */}
           <div
             className="absolute inset-0 z-10 pointer-events-none rounded-t-lg"
