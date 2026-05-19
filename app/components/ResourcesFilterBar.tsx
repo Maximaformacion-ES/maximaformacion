@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Search } from 'lucide-react';
+import { RESOURCE_CATEGORY_BY_KEY } from '@/lib/resource-categories-meta';
+import type { ResourceCategory } from '@/lib/strapi/types';
 
 export interface CategoryFilter {
   value: string;
@@ -31,16 +34,13 @@ export const ResourcesFilterBar: React.FC<ResourcesFilterBarProps> = ({
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           {categories.map((cat) => {
             const isActive = activeFilter === cat.value;
-            return (
-              <button
-                key={cat.value}
-                onClick={() => setActiveFilter(cat.value)}
-                className={`px-5 py-2 rounded-full text-body-sm font-medium transition-all duration-300 whitespace-nowrap cursor-pointer flex items-center gap-2 ${
-                  isActive
-                    ? 'bg-mx-orange text-white'
-                    : 'bg-mx-card text-mx-text-muted border border-mx-border hover:border-mx-orange/30'
-                }`}
-              >
+            const className = `px-5 py-2 rounded-full text-body-sm font-medium transition-all duration-300 whitespace-nowrap cursor-pointer flex items-center gap-2 ${
+              isActive
+                ? 'bg-mx-orange text-white'
+                : 'bg-mx-card text-mx-text-muted border border-mx-border hover:border-mx-orange/30'
+            }`;
+            const inner = (
+              <>
                 <span>{cat.value}</span>
                 <span
                   className={`inline-flex items-center justify-center min-w-[1.25rem] px-1.5 py-0.5 rounded-full text-label-sm font-bold ${
@@ -49,6 +49,34 @@ export const ResourcesFilterBar: React.FC<ResourcesFilterBarProps> = ({
                 >
                   {cat.count}
                 </span>
+              </>
+            );
+            // Real <Link> for categories with their own landing page so Googlebot
+            // discovers them; onClick intercept preserves in-place filter UX.
+            const landingSlug = RESOURCE_CATEGORY_BY_KEY.get(cat.value as ResourceCategory)?.slug;
+            if (landingSlug) {
+              return (
+                <Link
+                  key={cat.value}
+                  href={`/recursos/categoria/${landingSlug}`}
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+                    e.preventDefault();
+                    setActiveFilter(cat.value);
+                  }}
+                  className={className}
+                >
+                  {inner}
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={cat.value}
+                onClick={() => setActiveFilter(cat.value)}
+                className={className}
+              >
+                {inner}
               </button>
             );
           })}
