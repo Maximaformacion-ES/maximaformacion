@@ -34,7 +34,10 @@ import { getEffectivePrice } from '@/lib/pricing';
 
 type SortBy = 'relevance' | 'price-asc' | 'price-desc' | 'newest';
 
-const ITEMS_PER_PAGE = 9;
+// 12 is the LCM of 2, 3 and 4, so a full page fills the grid cleanly at
+// every breakpoint (md=2 cols, lg=3 cols, 2xl=4 cols). With the previous 9
+// per page, the 4-column layout left a single card alone on the last row.
+const ITEMS_PER_PAGE = 12;
 
 interface ProgramsClientProps {
   initialPrograms: Program[];
