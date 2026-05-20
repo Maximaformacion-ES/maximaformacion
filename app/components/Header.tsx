@@ -32,6 +32,9 @@ interface NavItem {
     columns: {
       title: string;
       links: { label: string; href: string; description?: string }[];
+      /** Optional "Ver todos" link rendered at the bottom of the column.
+       *  Used when the visible items are truncated from a larger set. */
+      footerLink?: { label: string; href: string };
     }[];
     /** Optional highlight card on the right side of the dropdown. */
     feature?: {
@@ -578,6 +581,17 @@ function MobileNavRow({
                         </Link>
                       </li>
                     ))}
+                    {col.footerLink && (
+                      <li>
+                        <Link
+                          href={col.footerLink.href}
+                          onClick={onClose}
+                          className={`block px-3 py-1.5 text-label-md font-semibold text-mx-orange rounded-md ${linkHoverBg}`}
+                        >
+                          {col.footerLink.label}
+                        </Link>
+                      </li>
+                    )}
                   </ul>
                 </div>
               ))}
@@ -689,7 +703,7 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
                   }`}
                 >
                   {item.megaMenu.columns.map((col) => (
-                    <div key={col.title}>
+                    <div key={col.title} className="flex flex-col">
                       <p
                         className={`text-label-sm tracking-widest uppercase font-semibold mb-3 ${
                           isDark ? 'text-white/40' : 'text-mx-text-muted'
@@ -697,7 +711,7 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
                       >
                         {col.title}
                       </p>
-                      <ul className="space-y-1">
+                      <ul className="space-y-1 flex-1">
                         {col.links.map((link) => (
                           <li key={link.href}>
                             <Link
@@ -723,6 +737,19 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
                           </li>
                         ))}
                       </ul>
+                      {col.footerLink && (
+                        <Link
+                          href={col.footerLink.href}
+                          onClick={() => setOpen(false)}
+                          className={`mt-2 px-2 py-1.5 text-label-md font-semibold tracking-wide rounded-md transition-colors ${
+                            isDark
+                              ? 'text-mx-orange hover:bg-white/5'
+                              : 'text-mx-orange hover:bg-mx-orange/5'
+                          }`}
+                        >
+                          {col.footerLink.label}
+                        </Link>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -785,8 +812,11 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
   const megaMenu = useMegaMenu();
 
   // Replace the static "Formación" megamenu columns with one column per
-  // subject area, each listing the actual programs in that area. Falls back
-  // to the static columns when Strapi is unavailable at build time.
+  // subject area, each listing up to MAX_PROGRAMS_PER_COLUMN programs from
+  // that area. If an area has more programs than the cap, append a footer
+  // link to the full landing. Falls back to the static columns when Strapi
+  // is unavailable at build time.
+  const MAX_PROGRAMS_PER_COLUMN = 6;
   const items = useMemo(() => {
     const base = navItems ?? NAV_ITEMS;
     const dynamicAreas = megaMenu.areas.filter((a) => a.programs.length > 0);
@@ -797,16 +827,23 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
         ...item,
         megaMenu: {
           ...item.megaMenu,
-          columns: dynamicAreas.map((area) => ({
-            title: area.label,
-            links: [
-              { label: 'Ver toda el área', href: `/programas/area/${area.slug}` },
-              ...area.programs.map((p) => ({
+          columns: dynamicAreas.map((area) => {
+            const capped = area.programs.slice(0, MAX_PROGRAMS_PER_COLUMN);
+            const hasMore = area.programs.length > MAX_PROGRAMS_PER_COLUMN;
+            return {
+              title: area.label,
+              links: capped.map((p) => ({
                 label: p.title,
                 href: `/programas/${p.slug}`,
               })),
-            ],
-          })),
+              ...(hasMore && {
+                footerLink: {
+                  label: `Ver los ${area.programs.length} cursos →`,
+                  href: `/programas/area/${area.slug}`,
+                },
+              }),
+            };
+          }),
         },
       };
     });
