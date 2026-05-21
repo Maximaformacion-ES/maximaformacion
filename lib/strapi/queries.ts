@@ -87,6 +87,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     careers: strapi.careers || '',
     objectives: strapi.objectives || '',
     isPro: strapi.isPro,
+    haveDiscount: strapi.haveDiscount ?? false,
     moodleCourseId: strapi.moodleCourseId ?? null,
     moodle: strapi.moodle ?? null,
     docentes: (strapi.docentes ?? []).map((d) => ({

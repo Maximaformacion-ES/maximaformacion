@@ -104,6 +104,7 @@ function transformProgramWithLessons(strapi: StrapiProgram): ProgramWithLessons 
     objectives: strapi.objectives || '',
     topics: (strapi.topics || []).map((t) => ({ id: t.id, documentId: t.documentId, name: t.name })),
     isPro: strapi.isPro,
+    haveDiscount: strapi.haveDiscount ?? false,
     moodle: strapi.moodle ?? null,
     moodleCourseId: strapi.moodleCourseId ?? null,
     moduleRelations,

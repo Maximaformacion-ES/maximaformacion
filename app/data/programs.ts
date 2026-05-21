@@ -39,6 +39,7 @@ interface Program {
   careers: string;
   objectives: string;
   isPro: boolean; // Whether this program requires Pro subscription
+  haveDiscount?: boolean; // Whether the 20% Pro discount applies (opt-in)
 }
 
 const ALL_PROGRAMS: Partial<Program>[] = [

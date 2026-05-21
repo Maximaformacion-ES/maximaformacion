@@ -119,6 +119,7 @@ export interface StrapiProgram {
   tags: string[] | null;
   featured: boolean;
   isPro: boolean;
+  haveDiscount: boolean | null;
   description: string;
   longDescription: string | null;
   image: StrapiMedia | null;
@@ -265,6 +266,8 @@ export interface Program {
   careers: string;
   objectives: string;
   isPro: boolean;
+  /** Per-course toggle for the 20% Pro discount. Off → course shown at full price to Pro users. */
+  haveDiscount: boolean;
   moodleCourseId?: number | null;
   moodle?: 'data-science' | 'e-learning' | null;
   /**

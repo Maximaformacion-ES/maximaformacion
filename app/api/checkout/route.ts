@@ -192,7 +192,8 @@ export async function POST(request: Request) {
 
       // Apply Pro discounts:
       //   - 100% if program.isPro (included in Pro)
-      //   - 20% if Curso (not Master) and user has Pro
+      //   - 20% if Curso (not Master), user has Pro, and the course has the
+      //     `haveDiscount` toggle enabled in Strapi (opt-in per course)
       const userPlan = (user?.publicMetadata as { plan?: string } | undefined)?.plan;
       const userIsPro = userPlan === 'pro';
       const proIncludedCouponId = process.env.STRIPE_PRO_INCLUDED_COUPON_ID;
@@ -200,7 +201,7 @@ export async function POST(request: Request) {
       const programCouponId =
         userIsPro && program.isPro && proIncludedCouponId
           ? proIncludedCouponId
-          : userIsPro && program.type === 'Curso' && proCourseCouponId
+          : userIsPro && program.type === 'Curso' && program.haveDiscount === true && proCourseCouponId
             ? proCourseCouponId
             : null;
 
