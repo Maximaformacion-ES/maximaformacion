@@ -113,9 +113,13 @@ export interface FilterBarProps {
   onToggleFilters: () => void;
   hasActiveFilters?: boolean;
   filtersLabel?: string;
+  /** Optional content at the start of the toolbar's left group (e.g. a type selector). */
+  leadingSlot?: ReactNode;
   sortSlot: ReactNode;
   paginationSlot: ReactNode;
   searchSlot: ReactNode;
+  /** Optional full-width row rendered below the toolbar, above the divider (e.g. category chips). */
+  secondaryRow?: ReactNode;
   resultsCount: number;
   resultsLabel?: string;
   children?: ReactNode;

@@ -88,7 +88,9 @@ export async function POST(request: Request) {
         },
       });
 
-      // Apply Pro discounts (100% if course.isPro, 20% otherwise — Maxymia courses always eligible)
+      // Apply Pro discounts:
+      //   - 100% if course.isPro (included in Pro)
+      //   - 20% if user has Pro and the course's `haveDiscount` toggle is on
       const userPlanMaxymia = (user?.publicMetadata as { plan?: string } | undefined)?.plan;
       const userIsProMaxymia = userPlanMaxymia === 'pro';
       const proIncludedCouponMaxymia = process.env.STRIPE_PRO_INCLUDED_COUPON_ID;
@@ -96,7 +98,7 @@ export async function POST(request: Request) {
       const maxymiaCouponId =
         userIsProMaxymia && course.isPro && proIncludedCouponMaxymia
           ? proIncludedCouponMaxymia
-          : userIsProMaxymia && proCourseCouponMaxymia
+          : userIsProMaxymia && course.haveDiscount === true && proCourseCouponMaxymia
             ? proCourseCouponMaxymia
             : null;
 

@@ -135,6 +135,8 @@ export interface MaxymiaCourse {
   instructor: MaxymiaInstructor;
   level: MaxymiaLevel;
   isPro: boolean;
+  /** Per-course toggle for the 20% Pro discount (opt-in). */
+  haveDiscount: boolean;
   tags: string[];
   category: MaxymiaCategory;
   thumbnailTitle?: LocalizedString;

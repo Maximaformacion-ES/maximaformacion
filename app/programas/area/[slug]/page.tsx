@@ -68,7 +68,7 @@ export default async function AreaLandingPage({ params }: PageProps) {
             <span className="text-mx-orange text-label-sm md:text-label-md font-medium tracking-[0.5em] uppercase mb-4 block">
               {area.label}
             </span>
-            <h1 className="text-display-sm md:text-display-md font-black leading-heading mb-6 text-mx-blue">
+            <h1 className="text-heading-md md:text-display-sm font-black leading-heading mb-6 text-mx-blue uppercase text-balance md:max-w-[60%]">
               {area.heading}
             </h1>
             <p className="max-w-3xl text-mx-text-muted text-body-md md:text-body-lg font-light leading-relaxed">

@@ -12,9 +12,11 @@ export function FilterBar({
   onToggleFilters,
   hasActiveFilters = false,
   filtersLabel = 'Filtros',
+  leadingSlot,
   sortSlot,
   paginationSlot,
   searchSlot,
+  secondaryRow,
   resultsCount,
   resultsLabel,
   children,
@@ -33,10 +35,11 @@ export function FilterBar({
         </div>
       )}
 
-      {/* Top row: Filtros + Sort + Pagination + Search */}
+      {/* Top row: (leading) + Filtros + Sort + Pagination + Search */}
       <div className="flex items-center justify-between gap-4 pb-4">
-        {/* Left: filter toggle + sort */}
-        <div className="flex items-center gap-2">
+        {/* Left: optional leading slot + filter toggle + sort */}
+        <div className="flex flex-wrap items-center gap-2">
+          {leadingSlot}
           <button
             onClick={onToggleFilters}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm transition-all ${
@@ -72,6 +75,9 @@ export function FilterBar({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Secondary row (e.g. category chips) */}
+      {secondaryRow && <div className="pb-4">{secondaryRow}</div>}
 
       <div className={`border-b ${tc.divider}`} />
 

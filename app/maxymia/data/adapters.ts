@@ -44,9 +44,7 @@ export function maxymiaCourseAsProgram(c: MaxymiaCourse): Program {
     careers: c.careers ?? '',
     objectives: c.objectives ?? '',
     isPro: c.isPro,
-    // Maxymia courses are not part of the Program `haveDiscount` toggle (separate
-    // content type). Kept `true` to preserve their existing 20% Pro discount.
-    haveDiscount: true,
+    haveDiscount: c.haveDiscount,
     moodleCourseId: null,
     moodle: null,
     href: `/maxymia/campus/${c.slug}`,

@@ -38,6 +38,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
         level
         category
         isPro
+        haveDiscount
         tags
         image { url, alternativeText }
         thumbnailTitle
@@ -78,6 +79,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         level
         category
         isPro
+        haveDiscount
         tags
         image { url, alternativeText }
         thumbnailTitle
@@ -397,6 +399,7 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     },
     level: course.level as MaxymiaLevel,
     isPro: course.isPro ?? false,
+    haveDiscount: course.haveDiscount ?? false,
     tags: course.tags ?? [],
     category: course.category as MaxymiaCategory,
     thumbnailTitle: course.thumbnailTitle

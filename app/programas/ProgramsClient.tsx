@@ -16,7 +16,6 @@ import {
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { CatalogHeader } from '../components/CatalogHeader';
 import { CatalogGrid } from '../components/CatalogGrid';
 import { TopicFilterTrigger, TopicBadgesRow } from '../components/TopicFilter';
 import {
@@ -298,6 +297,69 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
     durationRange[0] !== 0 || durationRange[1] !== 2000
   );
 
+  // Type selector (Todos / Másteres / Cursos) — rendered inside the toolbar.
+  const typeSelector = (
+    <div className="inline-flex items-center gap-0.5 p-0.5 rounded-full border border-mx-border bg-mx-card">
+      {([
+        { key: 'all', label: 'Todos' },
+        { key: 'Master', label: 'Másteres' },
+        { key: 'Curso', label: 'Cursos' },
+      ] as const).map(({ key, label }) => {
+        const count =
+          key === 'all'
+            ? initialPrograms.length
+            : initialPrograms.filter((p) => p.type === key).length;
+        const active = activeTypeTab === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => handleTypeTabClick(key)}
+            className={`px-3 py-1.5 rounded-full text-body-sm font-medium whitespace-nowrap transition-all ${
+              active
+                ? 'bg-mx-orange text-white shadow-sm'
+                : 'text-mx-text-muted hover:text-mx-text'
+            }`}
+          >
+            {label}
+            <span className={`ml-1 ${active ? 'text-white/70' : 'text-mx-text-muted/60'}`}>
+              {count}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  // Category chips — rendered as the toolbar's secondary row.
+  const categoryStrip = (
+    <div className="flex flex-wrap items-center gap-2">
+      {([
+        { key: null, label: 'Todas las áreas' },
+        { key: 'Inteligencia Artificial', label: 'Inteligencia Artificial' },
+        { key: 'Ciencia de Datos', label: 'Ciencia de Datos' },
+        { key: 'Moodle / Exelearning / H5P', label: 'Moodle / Exelearning / H5P' },
+        { key: 'Salud basada en datos', label: 'Salud basada en datos' },
+      ] as const).map(({ key, label }) => {
+        const active = subjectAreaFilter === key;
+        return (
+          <button
+            key={key ?? 'all'}
+            type="button"
+            onClick={() => handleSubjectAreaClick(key)}
+            className={`px-3 py-1.5 rounded-full text-label-sm md:text-label-md font-medium border transition-colors ${
+              active
+                ? 'bg-mx-blue text-white border-mx-blue'
+                : 'bg-mx-card text-mx-text-muted border-mx-border hover:border-mx-blue/40 hover:text-mx-text'
+            }`}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
@@ -305,77 +367,32 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10">
-        <CatalogHeader />
-
-        {/* Type tabs (Másteres / Cursos) */}
-        <div className="mb-6 flex justify-center">
-          <div className="inline-flex items-center gap-1 p-1 rounded-full border border-mx-border bg-mx-card">
-            {([
-              { key: 'all', label: 'Todos' },
-              { key: 'Master', label: 'Másteres' },
-              { key: 'Curso', label: 'Cursos' },
-            ] as const).map(({ key, label }) => {
-              const count =
-                key === 'all'
-                  ? initialPrograms.length
-                  : initialPrograms.filter((p) => p.type === key).length;
-              const active = activeTypeTab === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => handleTypeTabClick(key)}
-                  className={`px-5 py-2 rounded-full text-body-sm font-medium transition-all ${
-                    active
-                      ? 'bg-mx-orange text-white shadow-sm'
-                      : 'text-mx-text-muted hover:text-mx-text'
-                  }`}
-                >
-                  {label}{' '}
-                  <span className={active ? 'text-white/70' : 'text-mx-text-muted/60'}>
-                    ({count})
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Subject area filter chips */}
-        <div className="mb-10 flex flex-wrap justify-center gap-2">
-          {([
-            { key: null, label: 'Todas las áreas' },
-            { key: 'Inteligencia Artificial', label: 'Inteligencia Artificial' },
-            { key: 'Ciencia de Datos', label: 'Ciencia de Datos' },
-            { key: 'Moodle / Exelearning / H5P', label: 'Moodle / Exelearning / H5P' },
-            { key: 'Salud basada en datos', label: 'Salud basada en datos' },
-          ] as const).map(({ key, label }) => {
-            const active = subjectAreaFilter === key;
-            return (
-              <button
-                key={key ?? 'all'}
-                type="button"
-                onClick={() => handleSubjectAreaClick(key)}
-                className={`px-4 py-2 rounded-full text-label-sm md:text-label-md font-medium border transition-colors ${
-                  active
-                    ? 'bg-mx-blue text-white border-mx-blue'
-                    : 'bg-mx-card text-mx-text-muted border-mx-border hover:border-mx-blue/40 hover:text-mx-text'
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
+        {/* Hero-style title — same typography as the old CatalogHeader hero,
+            kept on a single line so the catalog stays visible on entry. */}
+        <div className="mb-6">
+          <m.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-display-sm md:text-display-md font-black leading-[0.9] text-mx-blue"
+          >
+            <span className="text-stroke text-mx-orange">Programas</span>
+            <span className="ml-3 align-middle text-body-sm md:text-body-md font-light text-mx-text-muted">
+              · {initialPrograms.length} cursos y másteres
+            </span>
+          </m.h1>
         </div>
 
         <m.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          <div className="sticky top-24 z-30 bg-mx-bg/80 backdrop-blur-md py-6 mb-12" ref={filtersRef}>
+          <div className="sticky top-24 z-30 bg-mx-bg/80 backdrop-blur-md py-4 mb-8" ref={filtersRef}>
             <FilterBar
               variant="light"
+              leadingSlot={typeSelector}
+              secondaryRow={categoryStrip}
               filtersExpanded={filtersExpanded}
               onToggleFilters={() => {
                 setFiltersExpanded(prev => !prev);
@@ -542,9 +559,9 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
         </m.div>
 
         <m.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
         >
           <CatalogGrid
             programs={paginatedPrograms}
