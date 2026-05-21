@@ -7,6 +7,7 @@ import { m } from 'framer-motion';
 import { Play, CheckCircle, Crown, ShoppingBag, Clock, ArrowRight } from 'lucide-react';
 import type { UserCourseData } from '@/lib/strapi/types';
 import { formatTotalDuration } from '@/lib/cloudflare/stream';
+import { buildCourseLink } from '@/lib/courseLink';
 
 interface CourseProgressCardProps {
   courseData: UserCourseData;
@@ -20,9 +21,7 @@ export default function CourseProgressCard({ courseData, index = 0 }: CourseProg
   const hasStarted = progress && progress.completedLessons.length > 0;
 
   const ctaText = isCompleted ? 'Ver certificado' : hasStarted ? 'Continuar' : 'Comenzar';
-  const ctaLink = `/cursos/${program.documentId}${
-    progress?.currentLessonId ? `/lesson/${progress.currentLessonId}` : ''
-  }`;
+  const ctaLink = buildCourseLink(program, progress?.currentLessonId);
 
   return (
     <m.div

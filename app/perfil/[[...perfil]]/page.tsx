@@ -14,19 +14,32 @@ import {
   Save, Shield, User, Lock, Calendar, Trophy, PlayCircle
 } from 'lucide-react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import CourseProgressCard from '../../components/CourseProgressCard';
 import type { UserCourseData } from '@/lib/strapi/types';
 import { getMaxymiaCourses, getCourseMeta } from '@/app/maxymia/data/queries';
+import { buildCourseLink } from '@/lib/courseLink';
 
 // ─── User Info Section ───────────────────────────────────────────────
 const UserInfoSection = () => {
   const { user, isLoaded } = useUser();
-  const { hasPro, isTrialing, courseProgress, enrollments } = useUserCampus();
+  const { hasPro, isTrialing } = useUserCampus();
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const initializedRef = useRef(false);
+
+  // Course stats are derived from /api/user/courses (the same endpoint that
+  // feeds "Mis Cursos") rather than the raw enrollments/courseProgress rows.
+  // That endpoint drops enrollments whose course no longer exists in Strapi or
+  // Maxymia, so the counters here stay in sync with the courses actually shown
+  // — otherwise orphaned rows from deleted courses inflate the totals.
+  const [courseStats, setCourseStats] = useState<{
+    owned: number;
+    inProgress: number;
+    completedLessons: number;
+  } | null>(null);
 
   // Initialize form fields once when user data first loads
   useEffect(() => {
@@ -36,6 +49,30 @@ const UserInfoSection = () => {
       setLastName(user.lastName || '');
     }
   }, [user]);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    fetch('/api/user/courses', { signal: abortController.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const courses: UserCourseData[] = data.courses || [];
+        setCourseStats({
+          owned: courses.filter((c) => c.purchased).length,
+          inProgress: courses.filter(
+            (c) => (c.progress?.completedLessons?.length ?? 0) > 0
+          ).length,
+          completedLessons: courses.reduce(
+            (sum, c) => sum + (c.progress?.completedLessons?.length ?? 0),
+            0
+          ),
+        });
+      })
+      .catch(() => {
+        /* leave courseStats null — counters fall back to 0 */
+      });
+    return () => abortController.abort();
+  }, []);
 
   const handleSave = async () => {
     if (!user) return;
@@ -67,14 +104,9 @@ const UserInfoSection = () => {
         year: 'numeric',
       })
     : null;
-  const totalCompletedLessons = Object.values(courseProgress).reduce(
-    (sum, cp) => sum + (cp?.completedLessons?.length ?? 0),
-    0
-  );
-  const coursesInProgress = Object.values(courseProgress).filter(
-    (cp) => (cp?.completedLessons?.length ?? 0) > 0
-  ).length;
-  const ownedCourses = enrollments.length;
+  const totalCompletedLessons = courseStats?.completedLessons ?? 0;
+  const coursesInProgress = courseStats?.inProgress ?? 0;
+  const ownedCourses = courseStats?.owned ?? 0;
 
   return (
     <div className="space-y-6">
@@ -425,11 +457,10 @@ const MisCursosSection = () => {
               </div>
             </div>
             <Link
-              href={`/cursos/${inProgressCourse.program.documentId}${
+              href={buildCourseLink(
+                inProgressCourse.program,
                 inProgressCourse.progress?.currentLessonId
-                  ? `/lesson/${inProgressCourse.progress.currentLessonId}`
-                  : ''
-              }`}
+              )}
               className="hidden sm:flex items-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-4 py-2 rounded-full font-medium text-body-sm transition-colors"
             >
               <Play size={14} fill="currentColor" />
@@ -864,8 +895,15 @@ const navItems: { key: SectionKey; label: string; icon: React.ReactNode }[] = [
 
 // ─── Main Page ───────────────────────────────────────────────────────
 export default function PerfilPage() {
+  // The route is an optional catch-all (`/perfil`, `/perfil/cursos`, …) so the
+  // Header shortcut and bookmarks can land directly on a section.
+  const routeParams = useParams();
+  const segment = Array.isArray(routeParams?.perfil) ? routeParams.perfil[0] : undefined;
+  const initialSection: SectionKey = navItems.some((i) => i.key === segment)
+    ? (segment as SectionKey)
+    : 'perfil';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<SectionKey>('perfil');
+  const [activeSection, setActiveSection] = useState<SectionKey>(initialSection);
 
   const sectionTitles: Record<SectionKey, string> = {
     perfil: 'Información de usuario',

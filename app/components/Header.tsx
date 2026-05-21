@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Menu, X, ChevronDown, User, Crown } from 'lucide-react';
+import { ArrowUpRight, Menu, X, ChevronDown, User, Crown, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -260,7 +260,17 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
                   ? getProUserButtonAppearance(USER_BUTTON_APPEARANCE, '44px')
                   : USER_BUTTON_APPEARANCE
               }
-            />
+            >
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label="Mis Cursos"
+                  labelIcon={<GraduationCap size={16} />}
+                  href="/perfil/cursos"
+                />
+                <UserButton.Action label="manageAccount" />
+                <UserButton.Action label="signOut" />
+              </UserButton.MenuItems>
+            </UserButton>
             {userHasPro && (
               <span
                 aria-label="Suscripción Pro"
@@ -958,7 +968,17 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                               },
                         },
                       }}
-                    />
+                    >
+                      <UserButton.MenuItems>
+                        <UserButton.Link
+                          label="Mis Cursos"
+                          labelIcon={<GraduationCap size={16} />}
+                          href="/perfil/cursos"
+                        />
+                        <UserButton.Action label="manageAccount" />
+                        <UserButton.Action label="signOut" />
+                      </UserButton.MenuItems>
+                    </UserButton>
                     {userHasPro && (
                       <span
                         aria-label="Suscripción Pro"
