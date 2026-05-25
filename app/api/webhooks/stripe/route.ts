@@ -88,6 +88,28 @@ async function provisionMoodleForPurchase(params: {
   }
 }
 
+/**
+ * Mirror a plan change (and optional flag patches) into Clerk publicMetadata.
+ * Several places in the app read user.publicMetadata.plan directly via
+ * useUser(), so if we only write the DB the user keeps seeing the old plan
+ * on the client until the metadata catches up. Best-effort: we log and
+ * swallow Clerk errors so a transient outage doesn't poison the webhook.
+ */
+async function syncClerkPlan(
+  clerkId: string,
+  patch: Record<string, unknown>
+): Promise<void> {
+  try {
+    const cc = await clerkClient();
+    const u = await cc.users.getUser(clerkId);
+    await cc.users.updateUserMetadata(clerkId, {
+      publicMetadata: { ...u.publicMetadata, ...patch },
+    });
+  } catch (e) {
+    console.warn(`[webhook] Could not sync Clerk metadata for ${clerkId}:`, e);
+  }
+}
+
 async function handleWithDb(event: Stripe.Event): Promise<boolean> {
   if (!isDbConfigured()) return false;
 
@@ -207,6 +229,10 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           const plan = isActive ? 'pro' : 'free';
           await updateSubscriptionStatus(sub.clerkId, subscription.status, plan);
           await updateUserPlan(sub.clerkId, plan);
+          await syncClerkPlan(sub.clerkId, {
+            plan,
+            subscriptionStatus: subscription.status,
+          });
           console.log(`User ${sub.clerkId} subscription updated: ${subscription.status}`);
         }
         return true;
@@ -220,6 +246,11 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
         if (sub) {
           await updateSubscriptionStatus(sub.clerkId, 'canceled', 'free', { canceledAt: new Date() });
           await updateUserPlan(sub.clerkId, 'free');
+          await syncClerkPlan(sub.clerkId, {
+            plan: 'free',
+            subscriptionStatus: 'canceled',
+            canceledAt: new Date().toISOString(),
+          });
           console.log(`User ${sub.clerkId} subscription canceled`);
         }
         return true;
@@ -231,9 +262,14 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
 
         const sub = await getSubscriptionByStripeCustomer(customerId);
         if (sub) {
-          // Payment recovered → clear the grace-period timestamp.
+          // Payment recovered → clear the failure flag everywhere.
           await updateSubscriptionStatus(sub.clerkId, sub.status, sub.plan, {
             lastPaymentAt: new Date(),
+            paymentFailed: false,
+            paymentFailedAt: null,
+          });
+          await syncClerkPlan(sub.clerkId, {
+            lastPaymentAt: new Date().toISOString(),
             paymentFailed: false,
             paymentFailedAt: null,
           });
@@ -258,6 +294,11 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
             paymentFailedAt,
           });
           await updateUserPlan(sub.clerkId, 'free');
+          await syncClerkPlan(sub.clerkId, {
+            plan: 'free',
+            paymentFailed: true,
+            paymentFailedAt: paymentFailedAt.toISOString(),
+          });
           console.log(`User ${sub.clerkId} payment failed → plan downgraded to free (first failure ${paymentFailedAt.toISOString()})`);
         }
         return true;
