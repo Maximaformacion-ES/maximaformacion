@@ -71,14 +71,20 @@ async function provisionMoodleForPurchase(params: {
       moodleInstance: program.moodle,
       moodleCourseId: program.moodleCourseId,
     });
+    console.log(
+      `[provision] OK for ${customerEmail} on "${program.title}" (moodle=${program.moodle}, courseId=${program.moodleCourseId})`
+    );
   } catch (error) {
+    // The error message coming from provisionMoodleAccess is already
+    // tagged with the phase (moodle:lookup, moodle:create-user,
+    // moodle:enrol, email:credentials, email:confirmation).
+    const msg = error instanceof Error ? error.message : String(error);
     console.error(
-      `[moodle] Provisioning failed for ${customerEmail} on program ${program.title}:`,
-      error
+      `[provision] FAILED for ${customerEmail} on "${program.title}" (moodle=${program.moodle}, courseId=${program.moodleCourseId}): ${msg}`
     );
     // Intentionally swallowed: enrollment in our DB still succeeds, and
-    // we don't want Stripe to retry forever. A monitoring/alert system
-    // should pick this up from logs and trigger a manual retry.
+    // we don't want Stripe to retry forever. The phase tag in the log
+    // tells operators exactly which step to fix manually.
   }
 }
 

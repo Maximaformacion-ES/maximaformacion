@@ -33,8 +33,11 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   });
 
   if (error) {
+    // Log full error shape so Vercel logs show Resend's reason
+    // (invalid_from_address, domain_not_verified, rate_limit, etc.)
+    console.error(`[resend] send failed → ${options.to} from=${fromAddress}`, error);
     throw new Error(`Resend send failed: ${error.message}`);
   }
 
-  console.log(`Email sent (id=${data?.id}) → ${options.to}`);
+  console.log(`[resend] sent id=${data?.id} → ${options.to} subject="${options.subject}"`);
 }

@@ -37,6 +37,23 @@ interface ProvisionResult {
   wasNewUser: boolean;
 }
 
+/**
+ * Wrap a step so its error surfaces with a clear phase tag in the logs.
+ * The provisioning flow has four moving pieces (Moodle lookup, Moodle
+ * create, Moodle enrol, Resend send); when something silently fails in
+ * production we want to know which one — re-throwing with a labelled
+ * message keeps the catch in the webhook informative.
+ */
+async function runPhase<T>(phase: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[provision:${phase}] failed: ${msg}`);
+    throw new Error(`[${phase}] ${msg}`);
+  }
+}
+
 export async function provisionMoodleAccess(
   params: ProvisionParams
 ): Promise<ProvisionResult> {
@@ -51,20 +68,24 @@ export async function provisionMoodleAccess(
   } = params;
 
   // 1. Check if the user already exists in Moodle
-  let user = await getMoodleUserByEmail(moodleInstance, email);
+  let user = await runPhase('moodle:lookup', () =>
+    getMoodleUserByEmail(moodleInstance, email)
+  );
   let wasNewUser = false;
   let plainPassword: string | null = null;
 
   // 2. Create the user if needed
   if (!user) {
     plainPassword = generateSecurePassword();
-    const created = await createMoodleUser(moodleInstance, {
-      username: usernameFromEmail(email),
-      password: plainPassword,
-      firstname: firstname || 'Alumno',
-      lastname: lastname || 'Máxima',
-      email,
-    });
+    const created = await runPhase('moodle:create-user', () =>
+      createMoodleUser(moodleInstance, {
+        username: usernameFromEmail(email),
+        password: plainPassword!,
+        firstname: firstname || 'Alumno',
+        lastname: lastname || 'Máxima',
+        email,
+      })
+    );
     user = {
       id: created.id,
       username: created.username,
@@ -74,18 +95,20 @@ export async function provisionMoodleAccess(
     };
     wasNewUser = true;
     console.log(
-      `Created Moodle user "${user.username}" (id=${user.id}) on ${moodleInstance}`
+      `[provision] Created Moodle user "${user.username}" (id=${user.id}) on ${moodleInstance}`
     );
   } else {
     console.log(
-      `Reusing existing Moodle user "${user.username}" (id=${user.id}) on ${moodleInstance}`
+      `[provision] Reusing existing Moodle user "${user.username}" (id=${user.id}) on ${moodleInstance}`
     );
   }
 
   // 3. Enrol in the course
-  await enrolUserInCourse(moodleInstance, user.id, moodleCourseId);
+  await runPhase('moodle:enrol', () =>
+    enrolUserInCourse(moodleInstance, user!.id, moodleCourseId)
+  );
   console.log(
-    `Enrolled user ${user.id} in course ${moodleCourseId} on ${moodleInstance}`
+    `[provision] Enrolled user ${user.id} in course ${moodleCourseId} on ${moodleInstance}`
   );
 
   // 4. Send credentials email
@@ -102,7 +125,9 @@ export async function provisionMoodleAccess(
       password: plainPassword,
       moodleUrl,
     });
-    await sendEmail({ to: email, subject, html, text });
+    await runPhase('email:credentials', () =>
+      sendEmail({ to: email, subject, html, text })
+    );
   } else {
     const subject = `Acceso confirmado a ${programTitle} | Máxima Formación`;
     const loginUrl = `${moodleUrl}/login/index.php`;
@@ -116,7 +141,9 @@ export async function provisionMoodleAccess(
       <p>— Máxima Formación</p>
     `;
     const text = `Hola ${firstname || 'alumno/a'},\n\nTu compra de ${programTitle} se ha procesado correctamente. Ya tienes acceso a tu campus con tu cuenta existente: ${loginUrl}\n\nSi has olvidado tu contraseña, puedes restablecerla desde la propia página de acceso.\n\n— Máxima Formación`;
-    await sendEmail({ to: email, subject, html, text });
+    await runPhase('email:confirmation', () =>
+      sendEmail({ to: email, subject, html, text })
+    );
   }
 
   return { userId: user.id, username: user.username, wasNewUser };
