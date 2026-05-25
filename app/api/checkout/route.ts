@@ -309,13 +309,17 @@ export async function POST(request: Request) {
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
+        // Order matters for the Checkout UI: show the 1€ charged-today
+        // line first, then the recurring plan that starts after the trial.
+        // The trial price is a one-time line item, the recurring price has
+        // its own trial_period_days below.
         line_items: [
           {
-            price: recurringPriceId,
+            price: trialPriceId,
             quantity: 1,
           },
           {
-            price: trialPriceId,
+            price: recurringPriceId,
             quantity: 1,
           },
         ],
