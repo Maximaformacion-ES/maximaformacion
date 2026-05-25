@@ -18,9 +18,9 @@
  *   - Not paginated index pages
  */
 
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es'
-).replace(/\/$/, '');
+import { getSiteUrl } from '@/lib/site-url';
+
+export const SITE_URL = getSiteUrl();
 
 export interface SitemapEntry {
   loc: string;

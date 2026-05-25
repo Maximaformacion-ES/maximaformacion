@@ -5,6 +5,7 @@ import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
 import { fetchMaxymiaCourseBySlug } from '@/app/maxymia/data/queries';
 import { isDbConfigured } from '@/lib/db/client';
+import { getSiteUrl } from '@/lib/site-url';
 
 // Price IDs from your Stripe Dashboard - replace these with your actual price IDs
 const PRICE_IDS = {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
     const user = await currentUser();
     const body: CheckoutRequestBody = await request.json();
     const { type = 'subscription', planId, planPeriod = 'month', programId, documentId, slug } = body;
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = getSiteUrl('http://localhost:3000');
 
     // Handle Maxymia course purchase (one-time payment)
     if (type === 'maxymia-course') {

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createCourseUpdate, getEnrolledUsersWithEmail } from '@/lib/db/queries';
 import { sendEmail } from '@/lib/email/client';
 import { courseUpdateEmail } from '@/lib/email/templates/course-update';
+import { getSiteUrl } from '@/lib/site-url';
 
 const ADMIN_API_KEY = process.env.COURSE_UPDATES_API_KEY;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://maximaformacion.es';
+const APP_URL = getSiteUrl();
 
 export async function POST(request: NextRequest) {
   // Authenticate via API key (called from Strapi MCP, not from browser)

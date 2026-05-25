@@ -2,6 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { isDbConfigured } from '@/lib/db/client';
+import { getSiteUrl } from '@/lib/site-url';
 
 export async function POST() {
   try {
@@ -53,7 +54,7 @@ export async function POST() {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = getSiteUrl('http://localhost:3000');
 
     const session = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,

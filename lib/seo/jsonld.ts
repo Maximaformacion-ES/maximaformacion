@@ -8,10 +8,9 @@
  */
 
 import type { Program, BlogPost } from '@/lib/strapi/types';
+import { getSiteUrl } from '@/lib/site-url';
 
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es'
-).replace(/\/$/, '');
+export const SITE_URL = getSiteUrl();
 const ORG_NAME = 'Máxima Formación';
 const ORG_LEGAL_NAME = 'Máxima Formación, S.L.U.';
 const ORG_LOGO = `${SITE_URL}/logo.png`;

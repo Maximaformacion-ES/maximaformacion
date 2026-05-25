@@ -4,6 +4,7 @@ import { leadCaptureLog } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { getResourceBySlug } from '@/lib/strapi/queries';
 import { upsertProfile, trackEvent, subscribeToList, isKlaviyoConfigured } from '@/lib/klaviyo/client';
+import { getSiteUrl } from '@/lib/site-url';
 
 /**
  * Public endpoint. Captures an email in exchange for a resource download.
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
           last_resource_topic: resource.topic,
         },
       });
-      const siteOrigin = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es').replace(/\/$/, '');
+      const siteOrigin = getSiteUrl();
       const downloadUrl =
         resource.externalUrl ||
         resource.downloads[0]?.url ||

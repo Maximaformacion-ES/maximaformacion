@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { getSiteUrl } from '@/lib/site-url';
 
 /**
  * Per-host robots.txt:
@@ -18,9 +19,7 @@ import { headers } from 'next/headers';
  * request-level access to `host` we cover the preview alias too.
  */
 
-const SITE_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es'
-).replace(/\/$/, '');
+const SITE_URL = getSiteUrl();
 
 const RESTRICTIVE_BODY = `User-agent: *\nDisallow: /\n`;
 

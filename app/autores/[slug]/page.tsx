@@ -9,6 +9,7 @@ import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema } from '@/lib/seo/jsonld';
 import { AuthorArticlesList } from '@/app/components/AuthorArticlesList';
 import TeacherDetailClient from '@/app/profesorado/[slug]/TeacherDetailClient';
+import { getSiteUrl } from '@/lib/site-url';
 
 export const revalidate = 3600;
 
@@ -16,9 +17,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-const SITE_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es'
-).replace(/\/$/, '');
+const SITE_URL = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;

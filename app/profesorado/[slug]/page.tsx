@@ -8,6 +8,7 @@ import {
 } from '@/lib/strapi/queries';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema } from '@/lib/seo/jsonld';
+import { getSiteUrl } from '@/lib/site-url';
 import { TeacherProgramsList } from '@/app/components/TeacherProgramsList';
 import { AuthorArticlesList } from '@/app/components/AuthorArticlesList';
 import TeacherDetailClient from './TeacherDetailClient';
@@ -46,9 +47,7 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-const SITE_URL = (
-  process.env.NEXT_PUBLIC_APP_URL || 'https://www.maximaformacion.es'
-).replace(/\/$/, '');
+const SITE_URL = getSiteUrl();
 
 export default async function TeacherDetailPage({ params }: PageProps) {
   const { slug } = await params;
