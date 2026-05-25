@@ -47,11 +47,11 @@ export async function GET(request: Request) {
     record('env:STRAPI_URL', !!process.env.STRAPI_URL, process.env.STRAPI_URL);
     record('env:STRAPI_API_TOKEN', !!process.env.STRAPI_API_TOKEN);
     record('env:RESEND_API_KEY', !!process.env.RESEND_API_KEY);
-    record('env:EMAIL_FROM', !!process.env.EMAIL_FROM, process.env.EMAIL_FROM);
-    record('env:MOODLE_MAXIMA_URL', !!process.env.MOODLE_MAXIMA_URL, process.env.MOODLE_MAXIMA_URL);
-    record('env:MOODLE_MAXIMA_TOKEN', !!process.env.MOODLE_MAXIMA_TOKEN);
-    record('env:MOODLE_MAXYMIA_URL', !!process.env.MOODLE_MAXYMIA_URL, process.env.MOODLE_MAXYMIA_URL);
-    record('env:MOODLE_MAXYMIA_TOKEN', !!process.env.MOODLE_MAXYMIA_TOKEN);
+    record('env:EMAIL_FROM', !!process.env.EMAIL_FROM, process.env.EMAIL_FROM || '(default: noreply@maximaformacion.es)');
+    record('env:MOODLE_DATA_SCIENCE_URL', !!process.env.MOODLE_DATA_SCIENCE_URL, process.env.MOODLE_DATA_SCIENCE_URL);
+    record('env:MOODLE_DATA_SCIENCE_TOKEN', !!process.env.MOODLE_DATA_SCIENCE_TOKEN);
+    record('env:MOODLE_E_LEARNING_URL', !!process.env.MOODLE_E_LEARNING_URL, process.env.MOODLE_E_LEARNING_URL);
+    record('env:MOODLE_E_LEARNING_TOKEN', !!process.env.MOODLE_E_LEARNING_TOKEN);
 
     let program: StrapiProgram | null = null;
     try {
