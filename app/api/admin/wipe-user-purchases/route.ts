@@ -72,29 +72,34 @@ export async function POST(request: Request) {
 
     const clerkId = dbUser.clerkId;
 
-    // Count what's there now, regardless of dry-run.
-    const counts = {
-      enrollments: (
-        await db.select({ id: enrollments.id }).from(enrollments).where(eq(enrollments.clerkId, clerkId))
-      ).length,
-      lessonProgress: (
-        await db.select({ id: lessonProgress.id }).from(lessonProgress).where(eq(lessonProgress.clerkId, clerkId))
-      ).length,
-      courseActivity: (
-        await db.select({ id: courseActivity.id }).from(courseActivity).where(eq(courseActivity.clerkId, clerkId))
-      ).length,
-      courseReviews: (
-        await db.select({ id: courseReviews.id }).from(courseReviews).where(eq(courseReviews.clerkId, clerkId))
-      ).length,
-      courseUpdateReads: (
-        await db.select({ id: courseUpdateReads.id }).from(courseUpdateReads).where(eq(courseUpdateReads.clerkId, clerkId))
-      ).length,
-      examResults: (
-        await db.select({ id: examResults.id }).from(examResults).where(eq(examResults.clerkId, clerkId))
-      ).length,
-      certificates: (
-        await db.select({ id: certificates.id }).from(certificates).where(eq(certificates.clerkId, clerkId))
-      ).length,
+    // Count what's there now. Each table is wrapped because the prod DB
+    // is behind on migrations — some of the campus.* tables exist only in
+    // the schema file, and we don't want a single missing table to crash
+    // the whole wipe.
+    type CountResult = number | { skipped: string };
+    async function safeCount<T extends { id: unknown; clerkId: unknown }>(
+      table: T,
+      ref: { clerkId: { name: string } }
+    ): Promise<CountResult> {
+      try {
+        const rows = await db
+          .select({ id: (table as { id: unknown }).id as never })
+          .from(table as never)
+          .where(eq(ref.clerkId as never, clerkId));
+        return rows.length;
+      } catch (e) {
+        return { skipped: e instanceof Error ? e.message : String(e) };
+      }
+    }
+
+    const counts: Record<string, CountResult> = {
+      enrollments: await safeCount(enrollments as never, { clerkId: enrollments.clerkId as never }),
+      lessonProgress: await safeCount(lessonProgress as never, { clerkId: lessonProgress.clerkId as never }),
+      courseActivity: await safeCount(courseActivity as never, { clerkId: courseActivity.clerkId as never }),
+      courseReviews: await safeCount(courseReviews as never, { clerkId: courseReviews.clerkId as never }),
+      courseUpdateReads: await safeCount(courseUpdateReads as never, { clerkId: courseUpdateReads.clerkId as never }),
+      examResults: await safeCount(examResults as never, { clerkId: examResults.clerkId as never }),
+      certificates: await safeCount(certificates as never, { clerkId: certificates.clerkId as never }),
     };
 
     // Inspect Clerk metadata keys we'd clear.
@@ -118,15 +123,28 @@ export async function POST(request: Request) {
     }
 
     // ── DESTRUCTIVE: from here on, rows are gone. ───────────────────────
-    // Order matters when FKs are present (none here cascade, but we delete
-    // dependent rows before any potential parent). All filter on clerkId.
-    await db.delete(lessonProgress).where(eq(lessonProgress.clerkId, clerkId));
-    await db.delete(courseActivity).where(eq(courseActivity.clerkId, clerkId));
-    await db.delete(courseReviews).where(eq(courseReviews.clerkId, clerkId));
-    await db.delete(courseUpdateReads).where(eq(courseUpdateReads.clerkId, clerkId));
-    await db.delete(examResults).where(eq(examResults.clerkId, clerkId));
-    await db.delete(certificates).where(eq(certificates.clerkId, clerkId));
-    await db.delete(enrollments).where(eq(enrollments.clerkId, clerkId));
+    // Same try/catch story as counts above — some tables may not exist
+    // in this DB yet. Order is dependent → parent (none cascade today,
+    // but stay defensive in case FKs change).
+    const deletedSummary: Record<string, 'ok' | { skipped: string }> = {};
+    async function safeDelete(
+      name: string,
+      run: () => Promise<unknown>
+    ): Promise<void> {
+      try {
+        await run();
+        deletedSummary[name] = 'ok';
+      } catch (e) {
+        deletedSummary[name] = { skipped: e instanceof Error ? e.message : String(e) };
+      }
+    }
+    await safeDelete('lessonProgress', () => db.delete(lessonProgress).where(eq(lessonProgress.clerkId, clerkId)));
+    await safeDelete('courseActivity', () => db.delete(courseActivity).where(eq(courseActivity.clerkId, clerkId)));
+    await safeDelete('courseReviews', () => db.delete(courseReviews).where(eq(courseReviews.clerkId, clerkId)));
+    await safeDelete('courseUpdateReads', () => db.delete(courseUpdateReads).where(eq(courseUpdateReads.clerkId, clerkId)));
+    await safeDelete('examResults', () => db.delete(examResults).where(eq(examResults.clerkId, clerkId)));
+    await safeDelete('certificates', () => db.delete(certificates).where(eq(certificates.clerkId, clerkId)));
+    await safeDelete('enrollments', () => db.delete(enrollments).where(eq(enrollments.clerkId, clerkId)));
 
     // Clear the Clerk-fallback purchases too. We leave hasUsedTrial,
     // stripeCustomerId, plan, and subscription* alone — those belong to
@@ -141,7 +159,8 @@ export async function POST(request: Request) {
       dryRun: false,
       email,
       clerkId,
-      deleted: counts,
+      countsBefore: counts,
+      deleted: deletedSummary,
       clearedClerkKeys: clerkKeysToClear,
     });
   } catch (e) {
