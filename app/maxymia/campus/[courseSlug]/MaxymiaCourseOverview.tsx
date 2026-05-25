@@ -59,7 +59,7 @@ interface Props {
 export default function MaxymiaCourseOverview({ course }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
-  const { hasPro, hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
+  const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
   const { byExamId: examResultsByExamId } = useExamResults(course.id);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
@@ -194,11 +194,12 @@ export default function MaxymiaCourseOverview({ course }: Props) {
     return course.blocks[0]?.lessons[0]?.id;
   }, [course, completedSet]);
 
-  // Access must come from a current enrollment (or pro plan). courseProgress
-  // is sticky — once a user has started a course, the row stays in their
-  // progress even after enrollment expires/is revoked, so deriving `enrolled`
-  // from it gave permanent access to anyone who ever opened the course.
-  const hasAccess = hasPro || checkAccess(course.id);
+  // Access must come from a current enrollment, or from a Pro plan only when
+  // the course is explicitly `isPro: true` in Strapi. courseProgress is sticky
+  // — once a user has started a course, the row stays in their progress even
+  // after enrollment expires/is revoked, so deriving `enrolled` from it gave
+  // permanent access to anyone who ever opened the course.
+  const hasAccess = checkAccess(course.id, course.isPro);
 
   // Show product/detail page if user doesn't have access
   if (!isLoading && !hasAccess) {

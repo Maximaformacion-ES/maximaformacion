@@ -50,7 +50,7 @@ export default function MyCourses({ courses }: MyCoursesProps) {
 
   // Filter only courses the user has access to
   const myCourses = useMemo(() => {
-    return courses.filter((c) => hasAccess(c.id));
+    return courses.filter((c) => hasAccess(c.id, c.isPro));
   }, [courses, hasAccess]);
 
   // Split into in-progress, completed, not started
@@ -410,7 +410,7 @@ function CourseRow({
   courses: MaxymiaCourse[];
   locale: 'es' | 'en';
   progressMap: Record<string, MaxymiaCourseProgress>;
-  hasAccess: (id: string) => boolean;
+  hasAccess: (id: string, isPro?: boolean | null) => boolean;
   delay?: number;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -486,7 +486,7 @@ function CourseRow({
                 course={course}
                 locale={locale}
                 progress={progressMap[course.id]}
-                enrolled={hasAccess(course.id) || !!progressMap[course.id]}
+                enrolled={hasAccess(course.id, course.isPro) || !!progressMap[course.id]}
                 index={i}
               />
             </div>

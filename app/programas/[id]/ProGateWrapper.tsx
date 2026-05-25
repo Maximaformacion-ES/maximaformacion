@@ -109,7 +109,7 @@ export default function ProGateWrapper({ program, children }: ProGateWrapperProp
   const { hasPro, hasAccess: checkAccess } = useUserCampus();
 
   const userHasPro = isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId);
+  const hasAccess = checkAccess(program.documentId, program.isPro);
 
   // Check if program requires payment (Pro or purchase)
   const requiresPayment = program.isPro;

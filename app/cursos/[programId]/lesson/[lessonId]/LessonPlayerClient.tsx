@@ -45,7 +45,7 @@ export default function LessonPlayerClient({
   const [isCompleted, setIsCompleted] = useState(false);
 
   const userHasPro = isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId) || lesson.isFree;
+  const hasAccess = checkAccess(program.documentId, program.isPro) || lesson.isFree;
 
   // Get course progress
   const progressData = courseProgress[program.documentId];

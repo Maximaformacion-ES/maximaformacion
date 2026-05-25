@@ -357,7 +357,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
   const [error, setError] = useState<string | null>(null);
 
   const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(course.id);
+  const hasAccess = checkAccess(course.id, course.isPro);
   const includedInPro = isFreeWithPro(course, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
   const effectivePrice = getEffectivePrice(course, userHasPro);

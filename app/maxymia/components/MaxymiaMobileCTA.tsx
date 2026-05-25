@@ -21,7 +21,7 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
   const [isLoading, setIsLoading] = useState(false);
 
   const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(course.id);
+  const hasAccess = checkAccess(course.id, course.isPro);
   const includedInPro = isFreeWithPro(course, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
   const effectivePrice = getEffectivePrice(course, userHasPro);

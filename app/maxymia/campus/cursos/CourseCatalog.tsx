@@ -357,7 +357,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
                 course={course}
                 locale={locale}
                 progress={courseProgress[course.id] ? { courseId: course.id, completedLessons: courseProgress[course.id].completedLessons, currentLessonId: courseProgress[course.id].currentLessonId, examResults: {}, startedAt: courseProgress[course.id].startedAt ?? '', lastAccessedAt: courseProgress[course.id].lastAccessedAt ?? '' } : undefined}
-                enrolled={hasAccess(course.id) || !!courseProgress[course.id]}
+                enrolled={hasAccess(course.id, course.isPro) || !!courseProgress[course.id]}
                 index={idx}
               />
             ))}

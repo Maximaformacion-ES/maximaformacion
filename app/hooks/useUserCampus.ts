@@ -45,7 +45,7 @@ interface UseUserCampusReturn {
   subscription: Subscription | null;
   enrollments: Enrollment[];
   courseProgress: Record<string, CourseProgressData>;
-  hasAccess: (programDocumentId: string) => boolean;
+  hasAccess: (programDocumentId: string, isPro?: boolean | null) => boolean;
   isEnrolled: (programDocumentId: string) => boolean;
   isLoading: boolean;
   refetch: () => Promise<void>;
@@ -87,8 +87,12 @@ export function useUserCampus(): UseUserCampusReturn {
   const hasUsedTrial = profile?.hasUsedTrial ?? false;
 
   const hasAccess = useCallback(
-    (programDocumentId: string) => {
-      if (hasPro) return true;
+    (programDocumentId: string, isPro?: boolean | null) => {
+      // Pro plan only grants automatic access to courses explicitly marked
+      // `isPro: true` in Strapi. Non-Pro courses still require a real
+      // enrollment (i.e. a completed Stripe checkout) so the Moodle
+      // provisioning runs and credentials get emailed.
+      if (hasPro && isPro === true) return true;
       return (
         profile?.enrollments.some(
           (e) => e.programDocumentId === programDocumentId

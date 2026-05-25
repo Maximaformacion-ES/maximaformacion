@@ -233,7 +233,7 @@ export default function CourseOverviewClient({
   const showSuccess = showSuccessMessage && !successDismissed;
 
   const userHasPro = isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId);
+  const hasAccess = checkAccess(program.documentId, program.isPro);
 
   // Course progress
   const progressData = courseProgress[program.documentId];

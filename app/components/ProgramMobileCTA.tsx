@@ -19,7 +19,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   const [isLoading, setIsLoading] = useState(false);
 
   const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId);
+  const hasAccess = checkAccess(program.documentId, program.isPro);
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);

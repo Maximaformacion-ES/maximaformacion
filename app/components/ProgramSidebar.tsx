@@ -37,7 +37,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
   const [error, setError] = useState<string | null>(null);
 
   const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId);
+  const hasAccess = checkAccess(program.documentId, program.isPro);
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);

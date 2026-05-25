@@ -170,7 +170,7 @@ interface CourseRowProps {
   courses: MaxymiaCourse[];
   locale: Locale;
   progressMap: Record<string, MaxymiaCourseProgress>;
-  hasAccess: (id: string) => boolean;
+  hasAccess: (id: string, isPro?: boolean | null) => boolean;
   delay?: number;
 }
 
@@ -246,7 +246,7 @@ function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }
                 course={course}
                 locale={locale}
                 progress={progressMap[course.id]}
-                enrolled={hasAccess(course.id) || !!progressMap[course.id]}
+                enrolled={hasAccess(course.id, course.isPro) || !!progressMap[course.id]}
                 index={i}
               />
             </div>
