@@ -102,6 +102,13 @@ const handleClerk = clerkMiddleware(async (auth, req) => {
   if (!shouldSkipRedirectLookup(pathname)) {
     const rule = await lookupRedirect(pathname);
     if (rule) {
+      if (rule.statusCode === 410) {
+        // Page is gone for good — tell search engines to drop it.
+        return new NextResponse(null, {
+          status: 410,
+          headers: { 'X-Robots-Tag': 'noindex' },
+        });
+      }
       const dest = rule.destination.startsWith('http')
         ? new URL(rule.destination)
         : new URL(rule.destination, req.url);
@@ -137,6 +144,15 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     if (!shouldSkipRedirectLookup(pathname)) {
       const rule = await lookupRedirect(pathname);
       if (rule) {
+        if (rule.statusCode === 410) {
+          return applyVercelHostNoindex(
+            req,
+            new NextResponse(null, {
+              status: 410,
+              headers: { 'X-Robots-Tag': 'noindex' },
+            })
+          );
+        }
         const dest = rule.destination.startsWith("http")
           ? new URL(rule.destination)
           : new URL(rule.destination, req.url);

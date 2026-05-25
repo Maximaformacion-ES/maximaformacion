@@ -54,13 +54,21 @@ async function fetchRedirects(): Promise<Map<string, RedirectRule>> {
     const rows = json.data || [];
     const map = new Map<string, RedirectRule>();
     for (const r of rows) {
-      if (!r.source || !r.destination) continue;
+      if (!r.source) continue;
+      // 410 is "gone" — no destination needed. Everything else (3xx) is a
+      // redirect and must have one.
+      const rawStatus = Number(r.statusCode) || 301;
+      const isGone = rawStatus === 410;
+      if (!isGone && !r.destination) continue;
       const source = normalizePath(r.source);
-      const status = Number(r.statusCode) || 301;
+      const statusCode =
+        isGone ? 410 :
+        rawStatus >= 300 && rawStatus <= 308 ? rawStatus :
+        301;
       map.set(source, {
         source,
-        destination: r.destination,
-        statusCode: status >= 300 && status <= 308 ? status : 301,
+        destination: r.destination ?? '',
+        statusCode,
       });
     }
     return map;
