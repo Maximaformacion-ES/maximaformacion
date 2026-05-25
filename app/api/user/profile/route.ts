@@ -2,17 +2,6 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { isDbConfigured } from '@/lib/db/client';
 
-const GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
-
-function isGracePeriodExpired(paymentFailedAt: Date | string | null | undefined): boolean {
-  if (!paymentFailedAt) return false;
-  const ts = paymentFailedAt instanceof Date
-    ? paymentFailedAt.getTime()
-    : new Date(paymentFailedAt).getTime();
-  if (Number.isNaN(ts)) return false;
-  return Date.now() - ts > GRACE_PERIOD_MS;
-}
-
 export async function GET() {
   try {
     const { userId } = await auth();
@@ -55,28 +44,6 @@ export async function GET() {
           getAllCourseProgress(userId),
         ]);
 
-        // Enforce the 3-day grace period after a failed Stripe payment.
-        // Stripe webhooks set `paymentFailedAt` on the first failure; if the
-        // user is still flagged as failed and the window has elapsed, the
-        // plan should drop to 'free' even if Stripe hasn't yet emitted a
-        // subscription.updated event (which can be delayed by smart retries).
-        let effectivePlan = dbUser.plan;
-        if (
-          subscription?.paymentFailed &&
-          isGracePeriodExpired(subscription.paymentFailedAt) &&
-          dbUser.plan !== 'free'
-        ) {
-          const { updateUserPlan, updateSubscriptionStatus } = await import('@/lib/db/queries');
-          await Promise.all([
-            updateUserPlan(userId, 'free'),
-            updateSubscriptionStatus(userId, subscription.status, 'free'),
-          ]);
-          effectivePlan = 'free';
-          console.log(
-            `[grace-period] Downgraded ${userId} to free (paymentFailedAt=${subscription.paymentFailedAt?.toISOString()})`
-          );
-        }
-
         // Determine hasUsedTrial. Any subscription row that ever existed
         // counts — we don't want users who let their trial lapse to be
         // able to start a fresh one. The presence of `startedAt` is the
@@ -101,7 +68,7 @@ export async function GET() {
         }
 
         return NextResponse.json({
-          plan: effectivePlan,
+          plan: dbUser.plan,
           hasUsedTrial,
           subscription: subscription
             ? {
@@ -190,28 +157,8 @@ export async function GET() {
       }
     }
 
-    // Grace-period check for the Clerk-only path (no DB available).
-    let clerkEffectivePlan = (meta.plan as string) || 'free';
-    if (
-      meta.paymentFailed === true &&
-      isGracePeriodExpired(meta.paymentFailedAt as string | undefined) &&
-      clerkEffectivePlan !== 'free'
-    ) {
-      try {
-        const { clerkClient } = await import('@clerk/nextjs/server');
-        const cc = await clerkClient();
-        await cc.users.updateUserMetadata(userId, {
-          publicMetadata: { ...meta, plan: 'free' },
-        });
-        clerkEffectivePlan = 'free';
-        console.log(`[grace-period] Downgraded ${userId} to free via Clerk metadata`);
-      } catch (e) {
-        console.warn('[grace-period] Failed to persist Clerk downgrade:', e);
-      }
-    }
-
     return NextResponse.json({
-      plan: clerkEffectivePlan,
+      plan: (meta.plan as string) || 'free',
       hasUsedTrial: (meta.hasUsedTrial as boolean) || false,
       subscription: meta.stripeCustomerId
         ? {
