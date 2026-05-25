@@ -253,20 +253,39 @@ export async function POST(request: Request) {
       //   of the webhook/verify flow, so a DB-only user could lack it.
       // - The DB row may exist even after a canceled trial, which is
       //   exactly the case we want to block.
-      const hasUsedTrialMeta = (user?.publicMetadata as { hasUsedTrial?: boolean } | undefined)
-        ?.hasUsedTrial === true;
+      const meta = (user?.publicMetadata ?? {}) as Record<string, unknown>;
+      const hasUsedTrialMeta = meta.hasUsedTrial === true;
+      // A Stripe customer id in Clerk metadata is also a strong signal of
+      // a prior checkout — keep it as a fallback in case the DB query
+      // doesn't see the row for whatever reason.
+      const hasStripeCustomerMeta = typeof meta.stripeCustomerId === 'string' && meta.stripeCustomerId.length > 0;
+
       let hasExistingSubscription = false;
+      let dbCheckError: string | null = null;
+      let dbConfigured = false;
       if (isDbConfigured()) {
+        dbConfigured = true;
         try {
           const { getSubscriptionByClerkId } = await import('@/lib/db/queries');
           const existing = await getSubscriptionByClerkId(userId);
           hasExistingSubscription = !!existing;
         } catch (e) {
-          console.warn('Could not check existing subscription for trial guard:', e);
+          dbCheckError = e instanceof Error ? e.message : String(e);
+          console.warn('[trial-guard] DB check threw:', dbCheckError);
         }
       }
 
-      if (hasUsedTrialMeta || hasExistingSubscription) {
+      const blocked = hasUsedTrialMeta || hasExistingSubscription || hasStripeCustomerMeta;
+      console.log(
+        `[trial-guard] user=${userId} blocked=${blocked} ` +
+          `hasUsedTrialMeta=${hasUsedTrialMeta} ` +
+          `hasStripeCustomerMeta=${hasStripeCustomerMeta} ` +
+          `hasExistingSubscription=${hasExistingSubscription} ` +
+          `dbConfigured=${dbConfigured} ` +
+          `dbCheckError=${dbCheckError ?? 'none'}`
+      );
+
+      if (blocked) {
         return NextResponse.json(
           { error: 'Trial already used', code: 'trial_already_used' },
           { status: 400 }

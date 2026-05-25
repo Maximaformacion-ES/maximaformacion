@@ -77,9 +77,11 @@ export async function GET() {
           );
         }
 
-        // Determine hasUsedTrial: check subscription metadata or if status was ever trialing
-        const hasUsedTrial = subscription?.status === 'trialing'
-          || subscription?.status === 'active' && !!subscription?.startedAt;
+        // Determine hasUsedTrial. Any subscription row that ever existed
+        // counts — we don't want users who let their trial lapse to be
+        // able to start a fresh one. The presence of `startedAt` is the
+        // canonical signal of "they went through checkout once".
+        const hasUsedTrial = !!subscription?.startedAt;
 
         // For trial users, fetch trial_end from Stripe
         let trialEnd: string | null = null;
