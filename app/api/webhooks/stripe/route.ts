@@ -171,6 +171,21 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           });
 
           await updateUserPlan(userId, 'pro');
+
+          // Mirror `hasUsedTrial` into Clerk metadata so the checkout-time
+          // trial guard works regardless of which storage backend is live.
+          if (isTrial) {
+            try {
+              const cc = await clerkClient();
+              const u = await cc.users.getUser(userId);
+              await cc.users.updateUserMetadata(userId, {
+                publicMetadata: { ...u.publicMetadata, hasUsedTrial: true },
+              });
+            } catch (e) {
+              console.warn('Could not mark hasUsedTrial in Clerk metadata:', e);
+            }
+          }
+
           console.log(`User ${userId} upgraded to Pro${isTrial ? ' (trial)' : ''}`);
         }
         return true;

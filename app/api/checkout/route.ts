@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
 import { fetchMaxymiaCourseBySlug } from '@/app/maxymia/data/queries';
+import { isDbConfigured } from '@/lib/db/client';
 
 // Price IDs from your Stripe Dashboard - replace these with your actual price IDs
 const PRICE_IDS = {
@@ -246,6 +247,32 @@ export async function POST(request: Request) {
 
     // Handle trial (7-day Pro trial for 1€)
     if (type === 'trial') {
+      // Enforce one-trial-per-user. We check both Clerk metadata and the
+      // subscriptions table because either signal alone is unreliable:
+      // - Clerk meta `hasUsedTrial` is only set on the Clerk fallback path
+      //   of the webhook/verify flow, so a DB-only user could lack it.
+      // - The DB row may exist even after a canceled trial, which is
+      //   exactly the case we want to block.
+      const hasUsedTrialMeta = (user?.publicMetadata as { hasUsedTrial?: boolean } | undefined)
+        ?.hasUsedTrial === true;
+      let hasExistingSubscription = false;
+      if (isDbConfigured()) {
+        try {
+          const { getSubscriptionByClerkId } = await import('@/lib/db/queries');
+          const existing = await getSubscriptionByClerkId(userId);
+          hasExistingSubscription = !!existing;
+        } catch (e) {
+          console.warn('Could not check existing subscription for trial guard:', e);
+        }
+      }
+
+      if (hasUsedTrialMeta || hasExistingSubscription) {
+        return NextResponse.json(
+          { error: 'Trial already used', code: 'trial_already_used' },
+          { status: 400 }
+        );
+      }
+
       const recurringPriceId = planPeriod === 'year'
         ? process.env.STRIPE_PRO_YEARLY_PRICE_ID
         : process.env.STRIPE_PRO_MONTHLY_PRICE_ID;

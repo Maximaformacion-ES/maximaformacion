@@ -62,6 +62,21 @@ export async function POST(request: Request) {
             startedAt: new Date(),
           });
           await updateUserPlan(userId, 'pro');
+
+          // Also flag hasUsedTrial in Clerk so the checkout-time guard sees
+          // it even when the user is mainly stored in the DB.
+          if (isTrial) {
+            try {
+              const cc = await clerkClient();
+              const u = await cc.users.getUser(userId);
+              await cc.users.updateUserMetadata(userId, {
+                publicMetadata: { ...u.publicMetadata, hasUsedTrial: true },
+              });
+            } catch (e) {
+              console.warn('Could not mark hasUsedTrial in Clerk metadata:', e);
+            }
+          }
+
           return NextResponse.json({ success: true, upgraded: true });
         } catch (dbError) {
           console.warn('DB subscription update failed, falling back to Clerk:', dbError);
