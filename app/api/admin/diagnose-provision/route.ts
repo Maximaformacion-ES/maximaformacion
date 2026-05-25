@@ -1,8 +1,8 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
 import { provisionMoodleAccess } from '@/lib/moodle/provision';
+import { requireAdmin } from '@/lib/admin-auth';
 
 /**
  * Mirror of what the Stripe webhook does after a successful checkout, but
@@ -11,8 +11,7 @@ import { provisionMoodleAccess } from '@/lib/moodle/provision';
  *
  * GET /api/admin/diagnose-provision?documentId=...&email=...
  *
- * Auth: signed-in user with an @atlansec.es address. This is a diagnostic
- * tool, not a public surface — gated by domain to keep it cheap.
+ * Auth: signed-in user with publicMetadata.role === 'admin' in Clerk.
  */
 export async function GET(request: Request) {
   const steps: Array<{ step: string; ok: boolean; detail?: unknown }> = [];
@@ -22,16 +21,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const me = await currentUser();
-    const myEmail = me?.emailAddresses?.[0]?.emailAddress ?? '';
-    if (!myEmail.endsWith('@atlansec.es')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const gate = await requireAdmin();
+    if (gate instanceof NextResponse) return gate;
 
     const url = new URL(request.url);
     const documentId = url.searchParams.get('documentId') ?? '';

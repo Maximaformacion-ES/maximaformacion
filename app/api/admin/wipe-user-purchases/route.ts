@@ -1,4 +1,4 @@
-import { auth, currentUser, clerkClient } from '@clerk/nextjs/server';
+import { clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
@@ -12,6 +12,7 @@ import {
   certificates,
   users as usersTable,
 } from '@/lib/db/schema';
+import { requireAdmin } from '@/lib/admin-auth';
 
 /**
  * Wipe a user's course purchases and related per-course state. Useful for
@@ -25,8 +26,8 @@ import {
  * counts of rows that *would* be deleted, plus the Clerk metadata keys
  * that *would* be cleared.
  *
- * Auth: signed-in user with an @atlansec.es address. This is destructive,
- * so keep the surface narrow.
+ * Auth: signed-in user with publicMetadata.role === 'admin' in Clerk.
+ * This is destructive, so keep the surface narrow.
  *
  * NOT touched: campus.users row (account stays), campus.subscriptions
  * (separate concern — handle via Stripe portal/manual SQL if needed),
@@ -35,16 +36,8 @@ import {
  */
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const me = await currentUser();
-    const myEmail = me?.emailAddresses?.[0]?.emailAddress ?? '';
-    if (!myEmail.endsWith('@atlansec.es')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const gate = await requireAdmin();
+    if (gate instanceof NextResponse) return gate;
 
     const url = new URL(request.url);
     const email = url.searchParams.get('email');
