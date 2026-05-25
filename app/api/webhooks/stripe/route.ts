@@ -210,9 +210,11 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
 
         const sub = await getSubscriptionByStripeCustomer(customerId);
         if (sub) {
+          // Payment recovered → clear the grace-period timestamp.
           await updateSubscriptionStatus(sub.clerkId, sub.status, sub.plan, {
             lastPaymentAt: new Date(),
             paymentFailed: false,
+            paymentFailedAt: null,
           });
           console.log(`User ${sub.clerkId} payment succeeded`);
         }
@@ -225,8 +227,15 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
 
         const sub = await getSubscriptionByStripeCustomer(customerId);
         if (sub) {
-          await updateSubscriptionStatus(sub.clerkId, sub.status, sub.plan, { paymentFailed: true });
-          console.log(`User ${sub.clerkId} payment failed`);
+          // Only stamp the grace-period start on the first failure of a
+          // streak — if a later retry also fails we keep the original
+          // timestamp so the 3-day window doesn't reset.
+          const paymentFailedAt = sub.paymentFailedAt ?? new Date();
+          await updateSubscriptionStatus(sub.clerkId, sub.status, sub.plan, {
+            paymentFailed: true,
+            paymentFailedAt,
+          });
+          console.log(`User ${sub.clerkId} payment failed (grace starts ${paymentFailedAt.toISOString()})`);
         }
         return true;
       }
@@ -360,7 +369,12 @@ async function handleWithClerk(event: Stripe.Event) {
       const user = users.data.find((u) => u.publicMetadata?.stripeCustomerId === customerId);
       if (user) {
         await client.users.updateUserMetadata(user.id, {
-          publicMetadata: { ...user.publicMetadata, lastPaymentAt: new Date().toISOString() },
+          publicMetadata: {
+            ...user.publicMetadata,
+            lastPaymentAt: new Date().toISOString(),
+            paymentFailed: false,
+            paymentFailedAt: null,
+          },
         });
       }
       break;
@@ -372,8 +386,15 @@ async function handleWithClerk(event: Stripe.Event) {
       const users = await client.users.getUserList({ limit: 100 });
       const user = users.data.find((u) => u.publicMetadata?.stripeCustomerId === customerId);
       if (user) {
+        // Preserve the original failure timestamp so the 3-day grace window
+        // doesn't reset on each Stripe retry.
+        const existing = user.publicMetadata?.paymentFailedAt as string | undefined;
         await client.users.updateUserMetadata(user.id, {
-          publicMetadata: { ...user.publicMetadata, paymentFailed: true, paymentFailedAt: new Date().toISOString() },
+          publicMetadata: {
+            ...user.publicMetadata,
+            paymentFailed: true,
+            paymentFailedAt: existing || new Date().toISOString(),
+          },
         });
       }
       break;

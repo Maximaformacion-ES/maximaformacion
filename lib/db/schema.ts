@@ -27,6 +27,9 @@ export const subscriptions = campusSchema.table('subscriptions', {
   currentPeriodEnd: timestamp('current_period_end', tz),
   lastPaymentAt: timestamp('last_payment_at', tz),
   paymentFailed: boolean('payment_failed').default(false),
+  // Set when invoice.payment_failed fires; cleared on payment_succeeded.
+  // Used to enforce a 3-day grace period before downgrading plan to 'free'.
+  paymentFailedAt: timestamp('payment_failed_at', tz),
 }, (table) => [
   index('idx_subscriptions_stripe_customer').on(table.stripeCustomerId),
   index('idx_subscriptions_clerk_id').on(table.clerkId),

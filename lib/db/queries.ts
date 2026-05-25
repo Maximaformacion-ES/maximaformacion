@@ -92,7 +92,14 @@ export async function updateSubscriptionStatus(
   clerkId: string,
   status: string,
   plan: string,
-  extra?: { canceledAt?: Date; lastPaymentAt?: Date; paymentFailed?: boolean }
+  extra?: {
+    canceledAt?: Date;
+    lastPaymentAt?: Date;
+    paymentFailed?: boolean;
+    // Pass a Date to start the grace period; null to clear it (e.g. when
+    // a later payment succeeds).
+    paymentFailedAt?: Date | null;
+  }
 ) {
   await db
     .update(subscriptions)
@@ -102,6 +109,7 @@ export async function updateSubscriptionStatus(
       ...(extra?.canceledAt && { canceledAt: extra.canceledAt }),
       ...(extra?.lastPaymentAt && { lastPaymentAt: extra.lastPaymentAt }),
       ...(extra?.paymentFailed !== undefined && { paymentFailed: extra.paymentFailed }),
+      ...(extra?.paymentFailedAt !== undefined && { paymentFailedAt: extra.paymentFailedAt }),
     })
     .where(eq(subscriptions.clerkId, clerkId));
 }
