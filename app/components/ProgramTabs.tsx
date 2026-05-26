@@ -172,9 +172,17 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
                         <h3 className="text-body-sm md:text-body-md font-bold text-mx-text group-hover:text-mx-orange transition-colors duration-300">
                           {module.title}
                         </h3>
-                        <p className="text-mx-text-muted mt-1 text-body-sm font-light">
-                          {module.description}
-                        </p>
+                        {/* Some Strapi entries duplicate the units as a
+                            bulleted blob inside `description`, which makes
+                            the closed-accordion header look noisy and the
+                            opened state shows the same content twice. Only
+                            render description as a header preview when there
+                            are no structured units to fall back on. */}
+                        {(!module.units || module.units.length === 0) && module.description && (
+                          <p className="text-mx-text-muted mt-1 text-body-sm font-light">
+                            {module.description}
+                          </p>
+                        )}
                       </div>
                       <m.div
                         animate={{ rotate: expandedModule === index ? 180 : 0 }}
