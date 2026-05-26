@@ -287,7 +287,8 @@ const getDefaultProgramData = (base: Partial<Program>): Program => ({
   language: base.language || 'Español',
   startDate: base.startDate || 'Próximamente',
   certification: base.certification || (base.type === 'Master' ? 'Título Propio Universidad' : 'Certificado de Experto'),
-  price: base.price || 1499,
+  // 0 means "no price assigned" — UI shows 'Consultar precio'
+  price: base.price ?? 0,
   originalPrice: base.originalPrice,
   modules: base.modules || [
     {

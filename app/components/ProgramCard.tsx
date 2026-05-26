@@ -127,7 +127,15 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
           {/* Price section */}
           <div className="flex items-center justify-between pt-4 mt-auto border-t border-[#ddd]">
             <div className="flex items-center gap-2">
-              {includedInPro ? (
+              {isMaster || !program.price ? (
+                // Masters always go through a sales conversation, regardless
+                // of any number the CMS happens to carry. Same for any other
+                // program lacking a configured price. Pro/discount badges
+                // aren't meaningful without a real base price either.
+                <span className="text-mx-text text-heading-sm font-medium">
+                  Consultar precio
+                </span>
+              ) : includedInPro ? (
                 <>
                   <span className="text-mx-text-muted text-body-sm font-light line-through">
                     {program.price}€

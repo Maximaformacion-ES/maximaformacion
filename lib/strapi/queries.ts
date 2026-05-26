@@ -75,7 +75,10 @@ function transformProgram(strapi: StrapiProgram): Program {
     language: strapi.language || 'Español',
     startDate: strapi.startDate || 'Próximamente',
     certification: strapi.certification || (strapi.type === 'Master' ? 'Título Propio Universidad' : 'Certificado de Experto'),
-    price: strapi.price || 1499,
+    // 0 means "no price assigned in Strapi" — UI renders 'Consultar precio'
+    // in that case rather than a fake number. Common for Masters whose
+    // price is gated behind a sales conversation.
+    price: strapi.price ?? 0,
     priceLabel: strapi.priceLabel ?? null,
     brochurePdfUrl,
     videoUrl: strapi.videoUrl ?? null,
