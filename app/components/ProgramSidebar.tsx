@@ -156,11 +156,11 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
 
             <a
               href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
-              className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
+              className="group flex items-center justify-center gap-2 md:gap-3 w-full bg-mx-orange text-white px-4 md:px-6 py-2.5 md:py-4 text-label-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
-              <Mail size={18} />
+              <Mail size={14} className="md:w-[18px] md:h-[18px]" />
               Consultar precio
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={14} className="md:w-[18px] md:h-[18px] group-hover:translate-x-1 transition-transform" />
             </a>
 
             {program.brochurePdfUrl && (

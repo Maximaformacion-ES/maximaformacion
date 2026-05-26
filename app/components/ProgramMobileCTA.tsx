@@ -79,9 +79,9 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
       <div className={stickyWrapperClass}>
         <a
           href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2.5 text-label-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
         >
-          <Mail size={14} />
+          <Mail size={12} />
           Consultar precio
         </a>
       </div>
@@ -144,25 +144,25 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
       {isLoaded && !campusLoading && hasAccess ? (
         <Link
           href={`/cursos/${program.documentId || program.id}`}
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2.5 text-label-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
         >
           Acceder al Curso
-          <ArrowRight size={14} />
+          <ArrowRight size={12} />
         </Link>
       ) : (
         <button
           onClick={handlePurchaseCourse}
           disabled={isLoading}
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2.5 text-label-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
-              <Loader2 className="animate-spin" size={14} />
+              <Loader2 className="animate-spin" size={12} />
               Procesando...
             </>
           ) : (
             <>
-              <ShoppingCart size={14} />
+              <ShoppingCart size={12} />
               {isSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
             </>
           )}
