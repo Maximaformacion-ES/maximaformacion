@@ -221,6 +221,23 @@
 }
 
 /*
+ * Kill the native list bullet for everything inside .markdown-content.
+ * Tailwind's `[&_ul]:list-none` arbitrary variant wasn't winning over
+ * the browser default in some cases (the marker still painted), and
+ * we already draw our own orange bullet with ::before on each <li>.
+ * Without this, lists rendered with two bullets per row: black native
+ * marker + orange custom one.
+ */
+.markdown-content ul,
+.markdown-content ol {
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+.markdown-content li::marker {
+  content: none;
+}
+
+/*
  * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
  * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
  * inlinea los hex en las utilidades, así que un simple override de la
