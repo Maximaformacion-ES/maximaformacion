@@ -112,25 +112,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </m.a>
           </m.div>
 
-          {/* Scroll indicator — visible at every breakpoint. On mobile we
-              squeeze it down to just the bouncing chevron so it doesn't
-              clash with the stats strip that sits flush against the
-              bottom of the hero; on md+ we get the full label + chevron. */}
+          {/* Scroll indicator — sits above the stats strip that overlaps the
+              hero bottom by 80px (StatsSection has -mt-20). We push the
+              indicator well clear of that overlap on mobile (bottom-40 =
+              10rem) and keep the desktop position (bottom-12). Pill
+              background ensures the chevron + label read against any
+              section that paints behind. Z-index intentionally astronomical
+              to survive any sibling stacking context. */}
           <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="flex absolute bottom-3 md:bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-1 md:gap-2 pointer-events-none"
+            className="flex absolute bottom-40 md:bottom-12 left-1/2 -translate-x-1/2 z-[9999] flex-col items-center gap-1.5 md:gap-2 pointer-events-none bg-mx-bg/85 md:bg-transparent backdrop-blur-sm md:backdrop-blur-0 px-3 py-2 md:px-0 md:py-0 rounded-full md:rounded-none shadow-md md:shadow-none"
           >
-            <span className="hidden md:inline text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
+            <span className="text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
               Scroll
             </span>
             <m.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="flex items-center justify-center w-7 h-7 md:w-auto md:h-auto rounded-full bg-mx-orange/15 md:bg-transparent"
             >
-              <ChevronDown size={16} className="text-mx-orange md:w-5 md:h-5" />
+              <ChevronDown size={20} className="text-mx-orange" />
             </m.div>
           </m.div>
         </m.div>
