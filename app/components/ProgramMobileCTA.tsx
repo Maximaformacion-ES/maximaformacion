@@ -6,7 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
-import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
+import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { SIDEBAR_CTA_ANCHOR_ID } from './ProgramSidebar';
@@ -51,6 +51,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
+  const proSavings = getProSavings(program, userHasPro);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -106,7 +107,10 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
 
   const stickyWrapperClass =
     "fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom " +
-    "lg:bottom-6 lg:right-6 lg:left-auto lg:inset-x-auto lg:max-w-sm lg:w-full " +
+    // On lg+ the CTA stops spanning full width and becomes a centered
+    // pill at the bottom. Centered instead of right-aligned so it
+    // doesn't sit on top of footer/utility buttons in the corner.
+    "lg:bottom-6 lg:left-1/2 lg:-translate-x-1/2 lg:inset-x-auto lg:max-w-md lg:w-[min(28rem,calc(100%-3rem))] " +
     "lg:rounded-2xl lg:border lg:shadow-2xl lg:px-5 lg:pt-4 lg:pb-4 " +
     "lg:transition-all lg:duration-300 ease-out " +
     desktopVisibilityClass;
@@ -173,13 +177,24 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
             </>
           )}
         </div>
-        {!userHasPro && isLoaded && !campusLoading && (
-          <Link href="/pricing" className="flex items-center gap-1 text-label-sm text-mx-orange font-medium">
-            <Crown size={12} />
-            o Pro €18/mes
-          </Link>
-        )}
       </div>
+
+      {/* Pro savings banner — only when the user could actually save by
+          going Pro (matches the equivalent banner inside the sidebar). */}
+      {!userHasPro && isLoaded && !campusLoading && proSavings > 0 && (
+        <Link
+          href="/pricing"
+          className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-mx-orange/30 bg-mx-orange/5 px-2.5 py-1.5 hover:bg-mx-orange/10 hover:border-mx-orange/50 transition-colors group"
+        >
+          <span className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium leading-tight">
+            <Crown size={12} className="shrink-0" />
+            {includedInPro
+              ? `Sería gratis con Pro · ahorras ${proSavings}€`
+              : `Con Pro pagarías ${program.price - proSavings}€ · ahorras ${proSavings}€`}
+          </span>
+          <ArrowRight size={12} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      )}
 
       {/* Row 2: CTA button full width */}
       {isLoaded && !campusLoading && hasAccess ? (

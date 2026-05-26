@@ -37,7 +37,7 @@ import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import type { MaxymiaCourse, Locale } from '../../types';
-import { getEffectivePrice, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
+import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
 const CATEGORY_LABELS: Record<string, Record<Locale, string>> = {
@@ -361,6 +361,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
   const includedInPro = isFreeWithPro(course, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
   const effectivePrice = getEffectivePrice(course, userHasPro);
+  const proSavings = getProSavings(course, userHasPro);
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
@@ -530,13 +531,22 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
               </m.button>
             )}
 
-            {isLoaded && !campusLoading && !userHasPro && (
+            {isLoaded && !campusLoading && !userHasPro && proSavings > 0 && (
               <Link
                 href="/pricing"
-                className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
+                className="flex items-center justify-between gap-2 w-full rounded-lg border border-mx-orange/30 bg-mx-orange/10 px-3 py-2.5 hover:bg-mx-orange/15 hover:border-mx-orange/50 transition-colors group"
               >
-                <Crown size={16} />
-                {locale === 'es' ? 'O hazte Pro por €18/mes' : 'Or go Pro for €18/mo'}
+                <span className="flex items-center gap-2 text-mx-orange text-label-md font-medium">
+                  <Crown size={14} />
+                  {includedInPro
+                    ? (locale === 'es'
+                        ? `Sería gratis con Pro · ahorras ${proSavings}€`
+                        : `Free with Pro · save ${proSavings}€`)
+                    : (locale === 'es'
+                        ? `Con Pro pagarías ${course.price - proSavings}€ · ahorras ${proSavings}€`
+                        : `With Pro you'd pay ${course.price - proSavings}€ · save ${proSavings}€`)}
+                </span>
+                <ArrowRight size={14} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             )}
           </div>
