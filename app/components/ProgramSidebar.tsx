@@ -106,8 +106,12 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
     <div className="sticky top-24">
       <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
 
-        {/* Program Image */}
-        {program.image && (
+        {/* Program Image — skip when the Strapi mapper fell back to the
+            generic placeholder. On mobile this sidebar spans the full
+            width, so a blank aspect-video block is far more jarring than
+            simply not having an image at all. Programs without a real
+            image keep the rest of the sidebar intact. */}
+        {program.image && program.image !== '/placeholder-course.svg' && (
           <div className="relative aspect-video w-full">
             <Image
               src={program.image}
