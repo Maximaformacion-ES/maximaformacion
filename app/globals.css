@@ -172,9 +172,12 @@
   --font-weight-black: 900;
 }
 
-/* Safe area for devices with home indicator */
+/* Safe area for devices with home indicator. Always keeps a minimum of
+ * ~14px so on Android (where env(safe-area-inset-bottom) is 0) the
+ * sticky CTA still has breathing room from the screen edge or the
+ * system bar. Devices with a notch get the larger native inset. */
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.875rem);
 }
 
 /*

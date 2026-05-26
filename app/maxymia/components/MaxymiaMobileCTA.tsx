@@ -69,7 +69,7 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
   };
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-[#0b1018]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 safe-bottom">
+    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-[#0b1018]/95 backdrop-blur-md border-t border-white/10 px-4 pt-3 safe-bottom">
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
