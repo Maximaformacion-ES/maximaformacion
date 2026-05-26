@@ -66,7 +66,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program,
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
+              className="text-[32px] md:text-display-sm 2xl:text-display-md font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
             >
               {program.title}
             </m.h1>
