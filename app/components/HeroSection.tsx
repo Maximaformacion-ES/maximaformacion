@@ -112,24 +112,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </m.a>
           </m.div>
 
-          {/* Scroll indicator — keep it visible on mobile too. Mobile users
-              need the affordance more than desktop ones, since the hero
-              fills the entire viewport with no other content peeking
-              from below to suggest the page continues. */}
+          {/* Scroll indicator — visible at every breakpoint. On mobile we
+              squeeze it down to just the bouncing chevron so it doesn't
+              clash with the stats strip that sits flush against the
+              bottom of the hero; on md+ we get the full label + chevron. */}
           <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="flex absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-2"
+            className="flex absolute bottom-3 md:bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-1 md:gap-2 pointer-events-none"
           >
-            <span className="text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
+            <span className="hidden md:inline text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
               Scroll
             </span>
             <m.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
+              className="flex items-center justify-center w-7 h-7 md:w-auto md:h-auto rounded-full bg-mx-orange/15 md:bg-transparent"
             >
-              <ChevronDown size={20} className="text-mx-orange" />
+              <ChevronDown size={16} className="text-mx-orange md:w-5 md:h-5" />
             </m.div>
           </m.div>
         </m.div>
