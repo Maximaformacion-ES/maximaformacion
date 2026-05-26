@@ -178,6 +178,20 @@
 }
 
 /*
+ * Cookiebot floating widget — lift it above the mobile sticky purchase
+ * bar so it doesn't cover the "Consultar precio" / "Comprar Ahora" CTA
+ * on program detail pages. Cookiebot drops the widget bottom-left by
+ * default with a fixed position and its own z-index; only on viewports
+ * where our sticky bar lives (≤ lg) we push the widget up enough to
+ * clear it (CTA height ~80px + safe-area).
+ */
+@media (max-width: 1023px) {
+  #CookiebotWidget {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/*
  * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
  * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
  * inlinea los hex en las utilidades, así que un simple override de la
