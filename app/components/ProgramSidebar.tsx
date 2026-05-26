@@ -23,6 +23,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
+import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
@@ -35,6 +36,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [consultaOpen, setConsultaOpen] = useState(false);
 
   const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(program.documentId, program.isPro);
@@ -103,6 +105,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
   ].filter((item) => item.value);
 
   return (
+    <>
     <div className="sticky top-24">
       <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
 
@@ -154,14 +157,15 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
               </p>
             </div>
 
-            <a
-              href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
+            <button
+              type="button"
+              onClick={() => setConsultaOpen(true)}
               className="group flex items-center justify-center gap-2 md:gap-3 w-full bg-mx-orange text-white px-4 md:px-6 py-2.5 md:py-4 text-label-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
               <Mail size={14} className="md:w-[18px] md:h-[18px]" />
               Consultar precio
               <ArrowRight size={14} className="md:w-[18px] md:h-[18px] group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
 
             {program.brochurePdfUrl && (
               <a
@@ -342,5 +346,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
         </div>
       </div>
     </div>
+    <ConsultaGratuitaChooser open={consultaOpen} onClose={() => setConsultaOpen(false)} />
+    </>
   );
 };

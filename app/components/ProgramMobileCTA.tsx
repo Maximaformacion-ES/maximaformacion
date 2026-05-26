@@ -8,6 +8,7 @@ import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
+import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 
 interface ProgramMobileCTAProps {
   program: Program;
@@ -17,6 +18,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
+  const [consultaOpen, setConsultaOpen] = useState(false);
 
   const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(program.documentId, program.isPro);
@@ -76,15 +78,19 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
 
   if (program.type === 'Master') {
     return (
-      <div className={stickyWrapperClass}>
-        <a
-          href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
-        >
-          <Mail size={12} />
-          Consultar precio
-        </a>
-      </div>
+      <>
+        <div className={stickyWrapperClass}>
+          <button
+            type="button"
+            onClick={() => setConsultaOpen(true)}
+            className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+          >
+            <Mail size={12} />
+            Consultar precio
+          </button>
+        </div>
+        <ConsultaGratuitaChooser open={consultaOpen} onClose={() => setConsultaOpen(false)} />
+      </>
     );
   }
 
