@@ -66,9 +66,17 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
     }
   };
 
+  // Sticky CTA: full-width bar on mobile (default), compact floating
+  // card pinned bottom-right on lg+. Keeps the purchase CTA in view at
+  // every breakpoint even after the user scrolls past the hero sidebar.
+  const stickyWrapperClass =
+    "fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom " +
+    "lg:bottom-6 lg:right-6 lg:left-auto lg:inset-x-auto lg:max-w-sm lg:w-full " +
+    "lg:rounded-2xl lg:border lg:shadow-2xl lg:px-5 lg:pt-4 lg:pb-4";
+
   if (program.type === 'Master') {
     return (
-      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom">
+      <div className={stickyWrapperClass}>
         <a
           href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
           className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-3 text-body-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
@@ -81,7 +89,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   }
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 py-3 safe-bottom">
+    <div className={stickyWrapperClass}>
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
