@@ -132,7 +132,9 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
                 // of any number the CMS happens to carry. Same for any other
                 // program lacking a configured price. Pro/discount badges
                 // aren't meaningful without a real base price either.
-                <span className="text-mx-text text-heading-sm font-medium">
+                // Smaller type than the numeric price because "Consultar
+                // precio" is two words and at heading-sm dominated the card.
+                <span className="text-mx-text text-body-sm md:text-body-md font-medium">
                   Consultar precio
                 </span>
               ) : includedInPro ? (
