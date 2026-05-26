@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ShoppingCart, Loader2, ArrowRight, Crown, Mail } from 'lucide-react';
+import { ShoppingCart, Loader2, ArrowRight, Crown, Mail, Clock, Monitor, GraduationCap, ShieldCheck } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
@@ -133,8 +133,37 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
     );
   }
 
+  // Build the meta items shown only on desktop (lg+) above the price.
+  // Filter empty values so we don't render dangling icons.
+  const durationLabel = program.durationLabel
+    ?? (program.duration ? `${program.duration} h` : null);
+  const desktopMeta: { icon: typeof Clock; label: string }[] = [];
+  if (durationLabel) desktopMeta.push({ icon: Clock, label: durationLabel });
+  if (program.ects) desktopMeta.push({ icon: GraduationCap, label: `${program.ects} ECTS` });
+  if (program.format) desktopMeta.push({ icon: Monitor, label: program.format });
+
   return (
     <div className={stickyWrapperClass}>
+      {/* Desktop-only header: course title + key meta. Keeps the floating
+          card readable as a stand-alone summary once the user has
+          scrolled past the hero. Hidden on mobile so the sticky bar
+          stays compact. */}
+      <div className="hidden lg:block mb-3">
+        <p className="text-mx-text text-label-md font-bold line-clamp-1 mb-1.5">
+          {program.title}
+        </p>
+        {desktopMeta.length > 0 && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-mx-text-muted text-label-sm">
+            {desktopMeta.map((item) => (
+              <span key={item.label} className="flex items-center gap-1">
+                <item.icon size={12} className="text-mx-orange shrink-0" />
+                {item.label}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
@@ -224,6 +253,14 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
           )}
         </button>
       )}
+
+      {/* Desktop-only trust line below the CTA. Same guarantee that the
+          full sidebar already advertises; keeps the floating card from
+          looking too transactional. */}
+      <p className="hidden lg:flex items-center justify-center gap-1.5 mt-2.5 text-mx-text-muted text-label-sm">
+        <ShieldCheck size={12} className="text-mx-orange shrink-0" />
+        14 días de garantía · Acceso permanente
+      </p>
     </div>
   );
 };
