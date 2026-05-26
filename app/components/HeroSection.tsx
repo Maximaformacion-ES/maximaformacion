@@ -31,15 +31,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   });
 
   return (
-    <section ref={containerRef} className="relative min-h-[100svh] lg:h-[120dvh]">
-      <div className="lg:sticky lg:top-0 min-h-[100svh] lg:h-screen lg:overflow-hidden">
+    <section ref={containerRef} className="relative min-h-[100dvh] lg:h-[120dvh]">
+      <div className="lg:sticky lg:top-0 min-h-[100dvh] lg:h-screen lg:overflow-hidden">
         {/* Background */}
         <m.div style={{ y }} className="absolute inset-0 bg-mx-bg" />
 
         {/* Content */}
         <m.div
           style={{ scale, opacity }}
-          className="relative min-h-[100svh] lg:h-full flex flex-col items-center justify-center px-6 pt-24 pb-12 lg:pt-20 lg:pb-0"
+          className="relative min-h-[100dvh] lg:h-full flex flex-col items-center justify-center px-6 pt-24 pb-12 lg:pt-20 lg:pb-0"
         >
           <m.p
             initial={{ opacity: 0, y: 20 }}
