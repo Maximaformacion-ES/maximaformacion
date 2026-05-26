@@ -20,9 +20,12 @@ interface LogoMarqueeProps {
 
 function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: PartnerLogo[] }) {
   const ordered = direction === 'left' ? logos : [...logos].reverse();
-  const copies = [0, 1, 2, 3] as const;
-  const from = direction === 'left' ? 0 : -25;
-  const to = direction === 'left' ? -25 : 0;
+  // Two copies is enough for the seamless loop; four doubled the number
+  // of <Image> requests the browser had to make before anything appeared
+  // on mobile.
+  const copies = [0, 1] as const;
+  const from = direction === 'left' ? 0 : -50;
+  const to = direction === 'left' ? -50 : 0;
 
   return (
     <div className="overflow-hidden relative"
@@ -45,6 +48,9 @@ function LogoRow({ direction, logos }: { direction: 'left' | 'right'; logos: Par
                 fill
                 className="object-contain"
                 sizes="128px"
+                // Eager-load the first pass; the duplicated copy is just
+                // for the marquee loop and can lazy-load behind the scenes.
+                loading={copyIndex === 0 ? 'eager' : 'lazy'}
               />
             </div>
           ))

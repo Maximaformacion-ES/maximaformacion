@@ -123,8 +123,11 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                       key={r}
                       initial={{ opacity: 0, x: slideFrom }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.1 * r }}
+                      // Trigger ~150px before fully entering the viewport so
+                      // the row is already mid-animation by the time the
+                      // user scrolls to it instead of starting from blank.
+                      viewport={{ once: true, margin: '150px 0px' }}
+                      transition={{ duration: 0.5, delay: 0.06 * r }}
                       className="flex gap-2 md:gap-3 justify-center"
                       style={
                         r % 2 === 1
@@ -144,6 +147,9 @@ export const BadgesSection: React.FC<BadgesSectionProps> = ({
                             unoptimized
                             className="object-contain p-2"
                             sizes="(max-width: 768px) 20vw, (max-width: 1200px) 13vw, 10vw"
+                            // Eager-load the first two rows; the rest can
+                            // lazy-load since they're below the fold.
+                            loading={r < 2 ? 'eager' : 'lazy'}
                           />
                         </div>
                       ))}
