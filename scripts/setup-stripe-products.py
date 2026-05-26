@@ -16,6 +16,10 @@ What it creates (idempotent — re-running won't duplicate):
        (STRIPE_PRO_INCLUDED_COUPON_ID)
   3. Coupon "Pro Course Discount" — 20% off, forever
        (STRIPE_PRO_COURSE_COUPON_ID)
+  4. Coupon "Pro Annual Discount" — 20% off, forever
+       (STRIPE_PRO_ANNUAL_COUPON_ID)
+       Applied automatically when a user starts the trial on the yearly
+       plan, so the post-trial billing is 172.80€ instead of 216€.
 
 Dry-run by default: prints what it would create. Pass --apply to actually
 create. After running with --apply, copy the printed IDs into Vercel's
@@ -56,6 +60,10 @@ COUPON_PRO_INCLUDED_NAME = "Pro Plan Included"
 COUPON_PRO_COURSE_ID = "pro_course_discount"    # custom id → 20% off forever
 COUPON_PRO_COURSE_NAME = "Pro Course Discount"
 PRO_COURSE_DISCOUNT_PCT = 20
+
+COUPON_PRO_ANNUAL_ID = "pro_annual_discount"    # 20% off applied to the
+COUPON_PRO_ANNUAL_NAME = "Pro Annual Discount"   # Pro yearly plan when the
+PRO_ANNUAL_DISCOUNT_PCT = 20                     # trial flow starts it
 
 
 # ── HTTP helpers ──────────────────────────────────────────────────────────
@@ -270,6 +278,10 @@ def main() -> int:
         COUPON_PRO_COURSE_ID, name=COUPON_PRO_COURSE_NAME,
         percent_off=PRO_COURSE_DISCOUNT_PCT, apply=args.apply,
     )
+    annual = ensure_coupon(
+        COUPON_PRO_ANNUAL_ID, name=COUPON_PRO_ANNUAL_NAME,
+        percent_off=PRO_ANNUAL_DISCOUNT_PCT, apply=args.apply,
+    )
 
     print("\n" + "=" * 60)
     print("Env vars to set in Vercel Production (and in Strapi Cloud for STRIPE_SECRET_KEY):")
@@ -279,6 +291,7 @@ def main() -> int:
     print(f"STRIPE_PRO_TRIAL_PRICE_ID={trial['id']}")
     print(f"STRIPE_PRO_INCLUDED_COUPON_ID={included['id']}")
     print(f"STRIPE_PRO_COURSE_COUPON_ID={course['id']}")
+    print(f"STRIPE_PRO_ANNUAL_COUPON_ID={annual['id']}")
     print()
     print("Plus (you set these yourself):")
     print("  STRIPE_SECRET_KEY      → sk_live_… (the client's secret key)")

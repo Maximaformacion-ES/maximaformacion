@@ -306,6 +306,13 @@ export async function POST(request: Request) {
         );
       }
 
+      // For the yearly plan we automatically apply the Pro Annual coupon
+      // (20% off) so the post-trial billing lands at 172.80€ instead of
+      // 216€. Stripe Checkout disallows mixing `discounts` with
+      // `allow_promotion_codes`, so toggle between them.
+      const annualCouponId = process.env.STRIPE_PRO_ANNUAL_COUPON_ID;
+      const applyAnnualDiscount = planPeriod === 'year' && !!annualCouponId;
+
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
@@ -336,8 +343,11 @@ export async function POST(request: Request) {
           userId,
           type: 'trial',
           planPeriod: planPeriod || 'month',
+          ...(applyAnnualDiscount ? { proAnnualDiscountApplied: 'true' } : {}),
         },
-        allow_promotion_codes: true,
+        ...(applyAnnualDiscount
+          ? { discounts: [{ coupon: annualCouponId! }] }
+          : { allow_promotion_codes: true }),
         billing_address_collection: 'auto',
         success_url: `${baseUrl}/pricing?success=true&trial=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing`,
