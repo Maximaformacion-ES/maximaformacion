@@ -192,6 +192,32 @@
 }
 
 /*
+ * Normalise <strong> inside the markdown body so a bold span in the
+ * middle of a sentence doesn't pick up stray spacing from the source
+ * markdown or interact weirdly with the list item flex layout. Some
+ * Strapi entries had double spaces around the bold span which read as
+ * visible gutters on the left/right of the bold word. We also give it
+ * a touch of brand colour so the emphasis works without needing extra
+ * whitespace as a separator.
+ */
+.markdown-content strong,
+.markdown-content b {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  color: #c45a0a; /* mx-orange-dark — emphasis without screaming */
+  font-weight: 700;
+}
+
+.markdown-content li > strong:first-child,
+.markdown-content li > b:first-child {
+  /* When a list item starts with a bold span (typical "Profile, then
+     description" pattern), tighten the line so the comma right after
+     it doesn't visibly float. */
+  margin-right: 0.05em;
+}
+
+/*
  * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
  * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
  * inlinea los hex en las utilidades, así que un simple override de la
