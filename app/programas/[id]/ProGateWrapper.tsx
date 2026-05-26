@@ -75,7 +75,7 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
               <span className="text-white/60 text-body-sm">Plan Pro</span>
             </div>
             <div className="flex items-baseline justify-center gap-1 mb-4">
-              <span className="text-display-sm font-black text-white">€29</span>
+              <span className="text-heading-md md:text-display-sm font-black text-white">€29</span>
               <span className="text-white/60">/mes</span>
             </div>
             <p className="text-white/40 text-body-sm mb-6">

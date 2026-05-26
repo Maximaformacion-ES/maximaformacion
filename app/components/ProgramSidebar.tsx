@@ -198,7 +198,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                     <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
                       {program.price}€
                     </span>
-                    <span className="text-mx-orange text-display-sm font-black">
+                    <span className="text-mx-orange text-heading-md md:text-display-sm font-black">
                       {effectivePrice}€
                     </span>
                   </>
@@ -209,7 +209,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                         {program.originalPrice}€
                       </span>
                     )}
-                    <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
+                    <span className={`${program.originalPrice ? 'text-mx-orange' : 'text-mx-text'} text-heading-md md:text-display-sm font-black`}>
                       {program.price}€
                     </span>
                   </>
