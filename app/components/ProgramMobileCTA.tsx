@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Loader2, ArrowRight, Crown, Mail } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
@@ -9,6 +9,7 @@ import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
+import { SIDEBAR_CTA_ANCHOR_ID } from './ProgramSidebar';
 
 interface ProgramMobileCTAProps {
   program: Program;
@@ -19,6 +20,31 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [consultaOpen, setConsultaOpen] = useState(false);
+  // Desktop-only visibility flag. Starts hidden so we don't double-render
+  // the CTA while the sidebar's primary button is still in view; flips
+  // true once that anchor scrolls out of the viewport.
+  const [desktopVisible, setDesktopVisible] = useState(false);
+
+  useEffect(() => {
+    const anchor = document.getElementById(SIDEBAR_CTA_ANCHOR_ID);
+    if (!anchor) {
+      // No anchor mounted yet (e.g. mobile-only page or hero hasn't
+      // hydrated). Fall back to "always visible on desktop" so the user
+      // doesn't end up without a CTA at all.
+      setDesktopVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        setDesktopVisible(!entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(anchor);
+    return () => observer.disconnect();
+  }, []);
 
   const userHasPro = !!isSignedIn && hasPro;
   const hasAccess = checkAccess(program.documentId, program.isPro);
@@ -68,13 +94,22 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
     }
   };
 
-  // Sticky CTA: full-width bar on mobile (default), compact floating
-  // card pinned bottom-right on lg+. Keeps the purchase CTA in view at
-  // every breakpoint even after the user scrolls past the hero sidebar.
+  // Sticky CTA: full-width bar on mobile (always visible), compact
+  // floating card pinned bottom-right on lg+ that only appears after
+  // the in-hero sidebar's primary button scrolls out of view (see the
+  // IntersectionObserver above). Hidden state on desktop uses opacity
+  // + translate + pointer-events:none so the transition is smooth and
+  // the card doesn't block clicks while invisible.
+  const desktopVisibilityClass = desktopVisible
+    ? "lg:opacity-100 lg:translate-y-0 lg:pointer-events-auto"
+    : "lg:opacity-0 lg:translate-y-4 lg:pointer-events-none";
+
   const stickyWrapperClass =
     "fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom " +
     "lg:bottom-6 lg:right-6 lg:left-auto lg:inset-x-auto lg:max-w-sm lg:w-full " +
-    "lg:rounded-2xl lg:border lg:shadow-2xl lg:px-5 lg:pt-4 lg:pb-4";
+    "lg:rounded-2xl lg:border lg:shadow-2xl lg:px-5 lg:pt-4 lg:pb-4 " +
+    "lg:transition-all lg:duration-300 ease-out " +
+    desktopVisibilityClass;
 
   if (program.type === 'Master') {
     return (

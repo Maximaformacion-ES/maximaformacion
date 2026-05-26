@@ -29,9 +29,23 @@ import { trackBeginCheckout } from '@/lib/analytics';
 
 interface ProgramSidebarProps {
   program: Program;
+  /**
+   * When set, the primary CTA inside the sidebar (Comprar / Acceder /
+   * Consultar precio) is tagged with this DOM id. ProgramMobileCTA
+   * watches that element on desktop to decide whether to show its own
+   * floating version: while the in-hero sidebar's button is on screen
+   * the floating CTA stays hidden; once it scrolls out of view the
+   * floating CTA appears.
+   *
+   * Only the hero/desktop instance receives this prop; the
+   * full-width mobile duplicate omits it so we don't double-anchor.
+   */
+  stickyAnchorId?: string;
 }
 
-export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
+export const SIDEBAR_CTA_ANCHOR_ID = 'program-purchase-cta-anchor';
+
+export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program, stickyAnchorId }) => {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
@@ -158,6 +172,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             </div>
 
             <button
+              {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
               type="button"
               onClick={() => setConsultaOpen(true)}
               className="group flex items-center justify-center gap-2 md:gap-3 w-full bg-mx-orange text-white px-4 md:px-6 py-2.5 md:py-4 text-label-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
@@ -266,6 +281,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
             <div className="space-y-3">
               {isLoaded && !campusLoading && hasAccess ? (
                 <Link
+                  {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
                   href={`/cursos/${program.documentId || program.id}`}
                   className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
                 >
@@ -274,6 +290,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program }) => {
                 </Link>
               ) : (
                 <m.button
+                  {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
                   onClick={handlePurchaseCourse}
                   disabled={isLoading}
                   className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"

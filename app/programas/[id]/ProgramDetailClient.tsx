@@ -7,7 +7,7 @@ import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { ProgramHeroSection } from '../../components/ProgramHeroSection';
 import { ProgramTabs } from '../../components/ProgramTabs';
-import { ProgramSidebar } from '../../components/ProgramSidebar';
+import { ProgramSidebar, SIDEBAR_CTA_ANCHOR_ID } from '../../components/ProgramSidebar';
 import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
@@ -65,7 +65,7 @@ export default function ProgramDetailClient({ program, richHtml }: ProgramDetail
       <main className="relative z-10">
         <ProgramHeroSection 
           program={program}
-          sidebar={<ProgramSidebar program={program} />}
+          sidebar={<ProgramSidebar program={program} stickyAnchorId={SIDEBAR_CTA_ANCHOR_ID} />}
           tabs={<ProgramTabs program={program} richHtml={richHtml} />}
         />
 
