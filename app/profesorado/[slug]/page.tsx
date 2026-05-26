@@ -82,15 +82,16 @@ export default async function TeacherDetailPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={[personSchema, breadcrumb]} />
-      <TeacherDetailClient teacher={teacher} />
-      <TeacherProgramsList
-        programs={programs}
-        heading={`Programas que imparte ${teacher.name}`}
-      />
-      <AuthorArticlesList
-        posts={posts}
-        heading={`Artículos de ${teacher.name}`}
-      />
+      <TeacherDetailClient teacher={teacher}>
+        <TeacherProgramsList
+          programs={programs}
+          heading={`Programas que imparte ${teacher.name}`}
+        />
+        <AuthorArticlesList
+          posts={posts}
+          heading={`Artículos de ${teacher.name}`}
+        />
+      </TeacherDetailClient>
     </>
   );
 }

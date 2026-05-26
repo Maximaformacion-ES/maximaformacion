@@ -10,9 +10,16 @@ import type { TeacherProfile } from '@/lib/strapi/types';
 
 interface TeacherDetailClientProps {
   teacher: TeacherProfile;
+  /**
+   * Sections rendered between the main bio block and the footer — e.g.
+   * the list of programs and articles fetched on the server. Keeping
+   * them inside this wrapper means the footer stays at the bottom of
+   * the page instead of slotting in between the bio and the rest.
+   */
+  children?: React.ReactNode;
 }
 
-export default function TeacherDetailClient({ teacher }: TeacherDetailClientProps) {
+export default function TeacherDetailClient({ teacher, children }: TeacherDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -119,6 +126,8 @@ export default function TeacherDetailClient({ teacher }: TeacherDetailClientProp
           </article>
         </div>
       </main>
+
+      {children}
 
       <Footer />
     </div>
