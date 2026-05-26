@@ -44,6 +44,25 @@ interface ProgramTabsProps {
   richHtml: ProgramRichHtml;
 }
 
+/**
+ * Markdown styling for the bulleted "Objetivos / Audiencia / Salidas"
+ * panels. We can't use display:flex on the <li> to align the custom
+ * orange bullet because then a <strong> followed by plain text inside
+ * the list item becomes two separate flex items with `gap` between
+ * them — that's where the visible side-gutters around bold spans came
+ * from. Instead the bullet sits absolutely positioned and the <li>
+ * carries left padding to clear it, so the text content flows inline
+ * the way the markdown intends.
+ */
+const BULLET_MARKDOWN_CLASS =
+  "text-body-sm md:text-body-md text-mx-text-muted font-light " +
+  "[&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_ul]:list-none [&_ul]:pl-0 " +
+  "[&_li]:relative [&_li]:pl-5 md:[&_li]:pl-6 " +
+  "[&_li]:before:content-[''] [&_li]:before:absolute [&_li]:before:left-0 " +
+  "[&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 " +
+  "[&_li]:before:rounded-full [&_li]:before:bg-mx-orange " +
+  "[&_p]:mb-3 md:[&_p]:mb-4";
+
 interface TabDef {
   value: string;
   label: string;
@@ -238,7 +257,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
           >
             <MarkdownHtml
               html={richHtml.objectives}
-              className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
+              className={BULLET_MARKDOWN_CLASS}
             />
           </div>
 
@@ -249,7 +268,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
           >
             <MarkdownHtml
               html={richHtml.audience}
-              className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
+              className={BULLET_MARKDOWN_CLASS}
             />
           </div>
 
@@ -260,7 +279,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
           >
             <MarkdownHtml
               html={richHtml.careers}
-              className="text-body-sm md:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 md:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 md:[&_p]:mb-4"
+              className={BULLET_MARKDOWN_CLASS}
             />
           </div>
 
