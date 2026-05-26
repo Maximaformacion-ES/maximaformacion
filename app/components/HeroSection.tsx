@@ -112,18 +112,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </m.a>
           </m.div>
 
-          {/* Scroll indicator — sits above the stats strip that overlaps the
-              hero bottom by 80px (StatsSection has -mt-20). We push the
-              indicator well clear of that overlap on mobile (bottom-40 =
-              10rem) and keep the desktop position (bottom-12). Pill
-              background ensures the chevron + label read against any
-              section that paints behind. Z-index intentionally astronomical
-              to survive any sibling stacking context. */}
+          {/* Scroll indicator — bottom of the hero, no pill background
+              now that StatsSection no longer overlaps the hero. Small
+              gap from the bottom edge so it doesn't fight the system
+              chrome on tall phones. */}
           <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="flex absolute bottom-40 md:bottom-12 left-1/2 -translate-x-1/2 z-[9999] flex-col items-center gap-1.5 md:gap-2 pointer-events-none bg-mx-bg/85 md:bg-transparent backdrop-blur-sm md:backdrop-blur-0 px-3 py-2 md:px-0 md:py-0 rounded-full md:rounded-none shadow-md md:shadow-none"
+            className="flex absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 z-[9999] flex-col items-center gap-1.5 md:gap-2 pointer-events-none"
           >
             <span className="text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
               Scroll
