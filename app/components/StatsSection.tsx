@@ -31,10 +31,14 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
           {stats.map((stat, i) => (
             <m.div
               key={stat.label}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ delay: i * 0.1, duration: 0.8 }}
+              // The stats sit right under the hero, often partially visible
+              // on first paint on mobile. Animate on mount instead of
+              // whileInView so they don't sit at opacity:0 waiting for the
+              // user to scroll a few pixels — that's what caused the
+              // "appear out of nowhere a few seconds later" complaint.
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, duration: 0.4 }}
               className="text-center"
             >
               <stat.icon size={28} className="text-mx-orange mx-auto mb-4" strokeWidth={1.5} />

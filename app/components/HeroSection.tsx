@@ -112,12 +112,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </m.a>
           </m.div>
 
-          {/* Scroll indicator */}
+          {/* Scroll indicator — keep it visible on mobile too. Mobile users
+              need the affordance more than desktop ones, since the hero
+              fills the entire viewport with no other content peeking
+              from below to suggest the page continues. */}
           <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-2"
+            className="flex absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 flex-col items-center gap-2"
           >
             <span className="text-mx-orange text-label-sm md:text-label-md leading-label tracking-widest uppercase">
               Scroll
