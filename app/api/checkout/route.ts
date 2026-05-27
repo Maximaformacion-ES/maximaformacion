@@ -293,10 +293,14 @@ export async function POST(request: Request) {
         );
       }
 
-      const recurringPriceId = planPeriod === 'year'
-        ? process.env.STRIPE_PRO_YEARLY_PRICE_ID
-        : process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
-
+      // The 1€ trial *always* rolls over into the monthly plan, regardless
+      // of the toggle the visitor used in /pricing. Reason: someone who
+      // clicked "Probar Pro 1€" is signalling minimum commitment — an
+      // automatic 173€ yearly charge a week later would feel like a
+      // surprise. If they want annual, they can switch from the customer
+      // portal once active. We keep the user-chosen `planPeriod` in
+      // metadata for analytics ("they saw the yearly toggle but trialed").
+      const recurringPriceId = process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
       const trialPriceId = process.env.STRIPE_PRO_TRIAL_PRICE_ID;
 
       if (!recurringPriceId || !trialPriceId) {
@@ -305,13 +309,6 @@ export async function POST(request: Request) {
           { status: 500 }
         );
       }
-
-      // For the yearly plan we automatically apply the Pro Annual coupon
-      // (20% off) so the post-trial billing lands at 172.80€ instead of
-      // 216€. Stripe Checkout disallows mixing `discounts` with
-      // `allow_promotion_codes`, so toggle between them.
-      const annualCouponId = process.env.STRIPE_PRO_ANNUAL_COUPON_ID;
-      const applyAnnualDiscount = planPeriod === 'year' && !!annualCouponId;
 
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
@@ -335,19 +332,20 @@ export async function POST(request: Request) {
           metadata: {
             userId,
             planId: 'pro',
-            planPeriod: planPeriod || 'month',
+            // Always monthly post-trial. Stash the toggle choice the user
+            // saw in /pricing under `togglePeriodSeen` for future analytics.
+            planPeriod: 'month',
+            togglePeriodSeen: planPeriod || 'month',
             isTrial: 'true',
           },
         },
         metadata: {
           userId,
           type: 'trial',
-          planPeriod: planPeriod || 'month',
-          ...(applyAnnualDiscount ? { proAnnualDiscountApplied: 'true' } : {}),
+          planPeriod: 'month',
+          togglePeriodSeen: planPeriod || 'month',
         },
-        ...(applyAnnualDiscount
-          ? { discounts: [{ coupon: annualCouponId! }] }
-          : { allow_promotion_codes: true }),
+        allow_promotion_codes: true,
         billing_address_collection: 'auto',
         success_url: `${baseUrl}/pricing?success=true&trial=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing`,
