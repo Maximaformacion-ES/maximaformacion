@@ -238,6 +238,28 @@
 }
 
 /*
+ * Body copy color for every markdown block in the program detail tabs
+ * (Descripción / Objetivos / Audiencia / Salidas profesionales). Forced
+ * to pure black with !important so it wins regardless of whatever
+ * Tailwind utility class lands on the wrapping div. The orange-bold
+ * rule above keeps its own color thanks to a more specific selector.
+ */
+.markdown-content,
+.markdown-content p,
+.markdown-content li,
+.markdown-content span,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6,
+.markdown-content blockquote,
+.markdown-content td,
+.markdown-content th {
+  color: #000 !important;
+}
+
+/*
  * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
  * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
  * inlinea los hex en las utilidades, así que un simple override de la

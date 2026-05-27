@@ -163,14 +163,9 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program, stickyA
         {/* Pricing & CTA */}
         {program.type === 'Master' ? (
           <>
-            <div>
-              <p className="text-body-sm md:text-body-md text-mx-text-muted font-light">
-                {program.priceLabel
-                  ? `Precio: ${program.priceLabel}. Solicita información detallada por email.`
-                  : 'El precio de este máster varía en función del país de residencia del alumno.'}
-              </p>
-            </div>
-
+            {/* No price block for Masters — the only price-related element
+                shown to the user is the CTA below ("Consultar precio"),
+                which opens the consultation modal. */}
             <button
               {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
               type="button"
