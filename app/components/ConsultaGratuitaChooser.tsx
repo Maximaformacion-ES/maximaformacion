@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Calendar, PenSquare, X } from 'lucide-react';
 import ConsultoriaFormModal from './ConsultoriaFormModal';
 
-const SCHEDULE_URL =
+export const SCHEDULE_URL =
   'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3kfq4Oykzp4tRiY7GHPyz0C3fIzPmdWDHIBuFG3rS3aaVr6SLu9pN3nIUg9nM8gMDuTQK1gFF5';
 
 interface Props {

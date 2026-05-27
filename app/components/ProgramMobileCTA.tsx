@@ -8,7 +8,7 @@ import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
-import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
+import { SCHEDULE_URL } from './ConsultaGratuitaChooser';
 import { SIDEBAR_CTA_ANCHOR_ID } from './ProgramSidebar';
 
 interface ProgramMobileCTAProps {
@@ -19,7 +19,6 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
-  const [consultaOpen, setConsultaOpen] = useState(false);
   // Desktop-only visibility flag. Starts hidden so we don't double-render
   // the CTA while the sidebar's primary button is still in view; flips
   // true once that anchor scrolls out of the viewport.
@@ -117,19 +116,17 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
 
   if (program.type === 'Master') {
     return (
-      <>
-        <div className={stickyWrapperClass}>
-          <button
-            type="button"
-            onClick={() => setConsultaOpen(true)}
-            className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
-          >
-            <Mail size={12} />
-            Consultar precio
-          </button>
-        </div>
-        <ConsultaGratuitaChooser open={consultaOpen} onClose={() => setConsultaOpen(false)} />
-      </>
+      <div className={stickyWrapperClass}>
+        <a
+          href={SCHEDULE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+        >
+          <Mail size={12} />
+          Consultar precio
+        </a>
+      </div>
     );
   }
 
