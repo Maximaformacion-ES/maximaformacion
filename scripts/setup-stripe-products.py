@@ -51,8 +51,10 @@ STRIPE_API = "https://api.stripe.com/v1"
 # ── Edit these if the client wants different numbers ──────────────────────
 PRO_PRODUCT_NAME = "Pro"
 PRICE_MONTHLY_EUR = 18      # 18€/mes
-PRICE_YEARLY_EUR = 180      # 180€/año (2 meses gratis)
-PRICE_TRIAL_EUR = 1         # 1€ — recurring add-on line
+PRICE_YEARLY_EUR = 216      # 216€/año = 18*12 base (el descuento de 20%
+                            # se aplica vía pro_annual_discount coupon
+                            # → cobro real anual = 172.80€)
+PRICE_TRIAL_EUR = 1         # 1€ — one-time charged at checkout
 
 COUPON_PRO_INCLUDED_ID = "pro_plan_included"   # custom id → 100% off forever
 COUPON_PRO_INCLUDED_NAME = "Pro Plan Included"
