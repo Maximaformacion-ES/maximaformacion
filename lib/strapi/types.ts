@@ -858,20 +858,13 @@ export interface StrapiMaxymiaDownloadBlock {
   files: StrapiMaxymiaDownloadFile[];
 }
 
-export interface StrapiMaxymiaEmbedBlock {
-  __typename: 'ComponentMaxymiaEmbedBlock';
-  html: string;
-  provider: string | null;
-}
-
 export type StrapiMaxymiaContentBlock =
   | StrapiMaxymiaTextBlock
   | StrapiMaxymiaVideoBlock
   | StrapiMaxymiaImageBlock
   | StrapiMaxymiaCodeBlock
   | StrapiMaxymiaCalloutBlock
-  | StrapiMaxymiaDownloadBlock
-  | StrapiMaxymiaEmbedBlock;
+  | StrapiMaxymiaDownloadBlock;
 
 // Blog dynamic-zone components (REST shape — `__component` discriminator)
 export interface StrapiBlogTextBlockRest {

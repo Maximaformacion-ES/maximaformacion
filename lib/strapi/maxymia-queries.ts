@@ -101,7 +101,6 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
               __typename
               ... on ComponentMaxymiaTextBlock { html }
               ... on ComponentMaxymiaVideoBlock { vimeoId, videoHash, title }
-              ... on ComponentMaxymiaEmbedBlock { html, provider }
               ... on ComponentMaxymiaImageBlock { image { url }, alt, caption }
               ... on ComponentMaxymiaCodeBlock { language, code, fileName }
               ... on ComponentMaxymiaCalloutBlock { variant, title, content }
@@ -119,7 +118,6 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
               __typename
               ... on ComponentMaxymiaTextBlock { html }
               ... on ComponentMaxymiaVideoBlock { vimeoId, videoHash, title }
-              ... on ComponentMaxymiaEmbedBlock { html, provider }
               ... on ComponentMaxymiaImageBlock { image { url }, alt, caption }
               ... on ComponentMaxymiaCodeBlock { language, code, fileName }
               ... on ComponentMaxymiaCalloutBlock { variant, title, content }
@@ -211,12 +209,6 @@ function transformContentBlock(block: StrapiMaxymiaContentBlock): ContentBlock {
         youtubeId: block.youtubeId ?? undefined,
         videoHash: block.videoHash ?? undefined,
         title: block.title ?? undefined,
-      };
-    case 'ComponentMaxymiaEmbedBlock':
-      return {
-        type: 'embed',
-        html: block.html,
-        provider: block.provider ?? undefined,
       };
     case 'ComponentMaxymiaImageBlock':
       return {
