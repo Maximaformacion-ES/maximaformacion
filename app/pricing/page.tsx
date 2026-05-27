@@ -222,7 +222,7 @@ function PlanCard({
             <Check size={18} />
             {isTrialing ? 'Prueba Activa' : 'Plan Activo'}
           </button>
-        ) : showTrial ? (
+        ) : showTrial && billingPeriod === 'monthly' ? (
           <div className="space-y-3">
             <button
               onClick={onTrial}
@@ -243,10 +243,7 @@ function PlanCard({
               )}
             </button>
             <p className="text-mx-text-muted text-label-md text-center">
-              7 días de acceso completo. Después, {billingPeriod === 'yearly'
-                ? `${formatPrice(plan.price.yearly)}€/año`
-                : `${formatPrice(plan.price.monthly)}€/mes`
-              }. Cancela cuando quieras.
+              7 días de acceso completo. Después, {formatPrice(plan.price.monthly)}€/mes. Cancela cuando quieras.
             </p>
           </div>
         ) : (
