@@ -176,8 +176,24 @@ export async function POST(request: Request) {
         );
       }
 
-      // Use existing Stripe price or create one ad-hoc from the program price
-      let priceIdForCheckout = program.stripePriceId;
+      // Use existing Stripe price or create one ad-hoc from the program price.
+      // The stored ID belongs to whichever Stripe account Strapi was talking
+      // to when its lifecycle last ran — if that's a different account than
+      // the one this endpoint is using (e.g. dev with sk_test_ vs Strapi
+      // Cloud already migrated to live), the retrieve will 404 and we fall
+      // back to creating an ad-hoc price so the checkout still proceeds.
+      let priceIdForCheckout: string | null = program.stripePriceId ?? null;
+      if (priceIdForCheckout) {
+        try {
+          await stripe.prices.retrieve(priceIdForCheckout);
+        } catch {
+          console.warn(
+            `Stripe price ${priceIdForCheckout} not found in current account ` +
+            `for program ${program.id} (${program.title}); creating ad-hoc.`
+          );
+          priceIdForCheckout = null;
+        }
+      }
       if (!priceIdForCheckout) {
         const stripePrice = await stripe.prices.create({
           currency: 'eur',
