@@ -41,39 +41,66 @@ function normalizePath(p: string): string {
   return lower.startsWith('/') ? lower : `/${lower}`;
 }
 
+interface StrapiRedirectRow {
+  source?: string;
+  destination?: string;
+  statusCode?: number;
+}
+
+interface StrapiPaginatedResponse {
+  data?: StrapiRedirectRow[];
+  meta?: { pagination?: { page?: number; pageCount?: number; total?: number } };
+}
+
+const PAGE_SIZE = 100;
+
 async function fetchRedirects(): Promise<Map<string, RedirectRule>> {
-  const url = `${STRAPI_URL}/api/redirects?filters[active][$eq]=true&pagination[pageSize]=500&fields[0]=source&fields[1]=destination&fields[2]=statusCode`;
+  // Strapi v5 caps pageSize internally (default max 100, configurable to a
+  // few hundred); just asking for 500 silently returned 250 in our case,
+  // which left ~76 of the SEO team's 326 rules unloaded. Page properly
+  // until pageCount is exhausted.
+  const map = new Map<string, RedirectRule>();
   try {
-    const res = await fetch(url, {
-      headers: STRAPI_API_TOKEN ? { Authorization: `Bearer ${STRAPI_API_TOKEN}` } : {},
-      // Middleware runs at edge — avoid Next data cache.
-      cache: 'no-store',
-    });
-    if (!res.ok) return new Map();
-    const json = (await res.json()) as { data?: { source?: string; destination?: string; statusCode?: number }[] };
-    const rows = json.data || [];
-    const map = new Map<string, RedirectRule>();
-    for (const r of rows) {
-      if (!r.source) continue;
-      // 410 is "gone" — no destination needed. Everything else (3xx) is a
-      // redirect and must have one.
-      const rawStatus = Number(r.statusCode) || 301;
-      const isGone = rawStatus === 410;
-      if (!isGone && !r.destination) continue;
-      const source = normalizePath(r.source);
-      const statusCode =
-        isGone ? 410 :
-        rawStatus >= 300 && rawStatus <= 308 ? rawStatus :
-        301;
-      map.set(source, {
-        source,
-        destination: r.destination ?? '',
-        statusCode,
+    let page = 1;
+    while (true) {
+      const url =
+        `${STRAPI_URL}/api/redirects?filters[active][$eq]=true` +
+        `&pagination[page]=${page}&pagination[pageSize]=${PAGE_SIZE}` +
+        `&fields[0]=source&fields[1]=destination&fields[2]=statusCode`;
+      const res = await fetch(url, {
+        headers: STRAPI_API_TOKEN ? { Authorization: `Bearer ${STRAPI_API_TOKEN}` } : {},
+        cache: 'no-store',
       });
+      if (!res.ok) break;
+      const json = (await res.json()) as StrapiPaginatedResponse;
+      const rows = json.data ?? [];
+      for (const r of rows) {
+        if (!r.source) continue;
+        // 410 is "gone" — no destination needed. Everything else (3xx) is
+        // a redirect and must have one.
+        const rawStatus = Number(r.statusCode) || 301;
+        const isGone = rawStatus === 410;
+        if (!isGone && !r.destination) continue;
+        const source = normalizePath(r.source);
+        const statusCode =
+          isGone ? 410 :
+          rawStatus >= 300 && rawStatus <= 308 ? rawStatus :
+          301;
+        map.set(source, {
+          source,
+          destination: r.destination ?? '',
+          statusCode,
+        });
+      }
+      const pageCount = json.meta?.pagination?.pageCount ?? 1;
+      if (page >= pageCount || rows.length === 0) break;
+      page += 1;
+      // Defensive cap so a misconfigured pageCount can't spin forever.
+      if (page > 50) break;
     }
     return map;
   } catch {
-    return new Map();
+    return map;
   }
 }
 
