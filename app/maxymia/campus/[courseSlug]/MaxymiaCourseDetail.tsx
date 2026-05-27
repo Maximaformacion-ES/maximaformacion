@@ -598,7 +598,10 @@ function MarkdownContent({ content, className = '' }: { content: string; classNa
 
   return (
     <div
-      className={`markdown-content ${className}`}
+      // markdown-on-dark flips the globals.css color rule from #000 (used
+      // on the program detail pages over the light background) to #fff so
+      // the copy reads on Maxymia's dark theme.
+      className={`markdown-content markdown-on-dark ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

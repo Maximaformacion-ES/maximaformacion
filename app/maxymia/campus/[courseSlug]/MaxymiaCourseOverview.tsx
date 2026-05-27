@@ -624,7 +624,11 @@ function MarkdownBlock({ content }: { content: string }) {
 
   return (
     <div
-      className="markdown-content text-body-sm sm:text-body-md text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
+      // markdown-on-dark flips the globals.css color rule to white so
+      // the body copy reads on Maxymia's dark theme; without it the
+      // shared `.markdown-content { color: #000 !important }` rule used
+      // by the program pages forces it to invisible black.
+      className="markdown-content markdown-on-dark text-body-sm sm:text-body-md font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

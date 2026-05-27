@@ -260,6 +260,28 @@
 }
 
 /*
+ * Dark variant — Maxymia tab panels paint on the dark course-detail
+ * background, so #000 reads as invisible. When the wrapper carries the
+ * `markdown-on-dark` modifier we flip the cascade to white. Two-class
+ * selector outranks the single-class rule above thanks to specificity,
+ * so the !important order doesn't matter here.
+ */
+.markdown-content.markdown-on-dark,
+.markdown-content.markdown-on-dark p,
+.markdown-content.markdown-on-dark li,
+.markdown-content.markdown-on-dark span,
+.markdown-content.markdown-on-dark h2,
+.markdown-content.markdown-on-dark h3,
+.markdown-content.markdown-on-dark h4,
+.markdown-content.markdown-on-dark h5,
+.markdown-content.markdown-on-dark h6,
+.markdown-content.markdown-on-dark blockquote,
+.markdown-content.markdown-on-dark td,
+.markdown-content.markdown-on-dark th {
+  color: #fff !important;
+}
+
+/*
  * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
  * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
  * inlinea los hex en las utilidades, así que un simple override de la
