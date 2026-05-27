@@ -100,9 +100,17 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   // IntersectionObserver above). Hidden state on desktop uses opacity
   // + translate + pointer-events:none so the transition is smooth and
   // the card doesn't block clicks while invisible.
-  const desktopVisibilityClass = desktopVisible
-    ? "lg:opacity-100 lg:translate-y-0 lg:pointer-events-auto"
-    : "lg:opacity-0 lg:translate-y-4 lg:pointer-events-none";
+  //
+  // When the user already owns the course, hide the desktop card
+  // entirely — the sidebar's "Acceder al Curso" button is the canonical
+  // entry point and there's no compra to nudge. The mobile sticky bar
+  // stays as a quick-access shortcut.
+  const userOwnsCourse = isLoaded && !campusLoading && hasAccess;
+  const desktopVisibilityClass = userOwnsCourse
+    ? "lg:hidden"
+    : desktopVisible
+      ? "lg:opacity-100 lg:translate-y-0 lg:pointer-events-auto"
+      : "lg:opacity-0 lg:translate-y-4 lg:pointer-events-none";
 
   const stickyWrapperClass =
     "fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom " +
