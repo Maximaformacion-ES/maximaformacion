@@ -55,13 +55,31 @@ interface ProgramTabsProps {
  * the way the markdown intends.
  */
 const BULLET_MARKDOWN_CLASS =
-  "text-body-sm md:text-body-md text-mx-text-muted font-light " +
+  "text-body-sm md:text-body-md text-black font-light leading-relaxed " +
   "[&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_ul]:list-none [&_ul]:pl-0 " +
   "[&_li]:relative [&_li]:pl-5 md:[&_li]:pl-6 " +
   "[&_li]:before:content-[''] [&_li]:before:absolute [&_li]:before:left-0 " +
   "[&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 " +
   "[&_li]:before:rounded-full [&_li]:before:bg-mx-orange " +
-  "[&_p]:mb-3 md:[&_p]:mb-4";
+  "[&_p]:mb-4 md:[&_p]:mb-5 " +
+  "[&_h2]:text-heading-sm md:[&_h2]:text-heading-md [&_h2]:font-bold [&_h2]:text-black [&_h2]:mt-8 [&_h2]:mb-3 " +
+  "[&_h3]:text-body-md md:[&_h3]:text-heading-sm [&_h3]:font-semibold [&_h3]:text-black [&_h3]:mt-6 [&_h3]:mb-2 " +
+  "[&_h4]:text-body-md [&_h4]:font-semibold [&_h4]:text-black [&_h4]:mt-5 [&_h4]:mb-2 " +
+  "[&_blockquote]:border-l-4 [&_blockquote]:border-mx-orange [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-5 " +
+  "[&_a]:text-mx-orange [&_a]:underline [&_a]:decoration-mx-orange/40 hover:[&_a]:decoration-mx-orange";
+
+// Same scaffolding but without the custom bullet (description tab is
+// usually free-flowing copy with the occasional list — let the cascade
+// from the global .markdown-content rules handle list styling).
+const DESCRIPTION_MARKDOWN_CLASS =
+  "text-body-sm md:text-body-md text-black font-light leading-relaxed " +
+  "[&_p]:mb-4 md:[&_p]:mb-5 " +
+  "[&_h2]:text-heading-sm md:[&_h2]:text-heading-md [&_h2]:font-bold [&_h2]:text-black [&_h2]:mt-8 [&_h2]:mb-3 " +
+  "[&_h3]:text-body-md md:[&_h3]:text-heading-sm [&_h3]:font-semibold [&_h3]:text-black [&_h3]:mt-6 [&_h3]:mb-2 " +
+  "[&_h4]:text-body-md [&_h4]:font-semibold [&_h4]:text-black [&_h4]:mt-5 [&_h4]:mb-2 " +
+  "[&_ul]:space-y-2 [&_ul]:my-4 " +
+  "[&_blockquote]:border-l-4 [&_blockquote]:border-mx-orange [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-5 " +
+  "[&_a]:text-mx-orange [&_a]:underline [&_a]:decoration-mx-orange/40 hover:[&_a]:decoration-mx-orange";
 
 interface TabDef {
   value: string;
@@ -152,7 +170,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
           >
             <MarkdownHtml
               html={richHtml.longDescription}
-              className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed"
+              className={DESCRIPTION_MARKDOWN_CLASS}
             />
           </div>
 
