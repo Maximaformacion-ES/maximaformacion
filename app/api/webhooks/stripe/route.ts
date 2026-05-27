@@ -21,13 +21,40 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
  * Stripe to retry the webhook indefinitely. We still want the enrollment
  * record in our DB to succeed.
  */
+/**
+ * Resolve the buyer's real name from Clerk (which is what they registered
+ * with, and what we want printed on certificates) instead of trusting
+ * `session.customer_details.name` from Stripe Checkout — that field is
+ * free-text typed at billing time and frequently arrives partial,
+ * abbreviated, or just plain wrong (e.g. "a" → Moodle ends up showing
+ * "a Máxima" because the fallback lastname kicks in).
+ *
+ * Returns nulls when Clerk doesn't have the data so the fallback values
+ * upstream still apply.
+ */
+async function resolveStudentName(
+  clerkId: string
+): Promise<{ firstname: string | null; lastname: string | null }> {
+  try {
+    const cc = await clerkClient();
+    const u = await cc.users.getUser(clerkId);
+    return {
+      firstname: u.firstName ?? null,
+      lastname: u.lastName ?? null,
+    };
+  } catch (e) {
+    console.warn(`[provision] Could not resolve Clerk user ${clerkId}:`, e);
+    return { firstname: null, lastname: null };
+  }
+}
+
 async function provisionMoodleForPurchase(params: {
   documentId: string;
   programTitle: string | undefined;
   customerEmail: string | null;
-  customerName: string | null;
+  clerkId: string;
 }): Promise<void> {
-  const { documentId, programTitle, customerEmail, customerName } = params;
+  const { documentId, programTitle, customerEmail, clerkId } = params;
 
   if (!customerEmail) {
     console.warn('No customer email available for Moodle provisioning');
@@ -58,8 +85,7 @@ async function provisionMoodleForPurchase(params: {
     return;
   }
 
-  const [firstname, ...rest] = (customerName ?? '').trim().split(/\s+/);
-  const lastname = rest.join(' ');
+  const { firstname, lastname } = await resolveStudentName(clerkId);
 
   try {
     await provisionMoodleAccess({
@@ -179,7 +205,7 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
               documentId,
               programTitle: title,
               customerEmail: session.customer_email,
-              customerName: session.customer_details?.name ?? null,
+              clerkId: userId,
             });
           }
         } else {
@@ -374,7 +400,7 @@ async function handleWithClerk(event: Stripe.Event) {
             documentId,
             programTitle: title,
             customerEmail: session.customer_email,
-            customerName: session.customer_details?.name ?? null,
+            clerkId: userId,
           });
         }
       } else {
