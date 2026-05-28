@@ -30,21 +30,21 @@ export default function SignUpPage() {
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-32 pb-16">
+      <main className="relative z-10 min-h-screen flex items-center justify-center px-6 pt-20 pb-8 md:pt-32 md:pb-16">
         <div className="w-full max-w-xl">
           <m.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center mb-10"
+            className="text-center mb-5 md:mb-10"
           >
-            <span className="text-mx-orange text-body-sm font-medium tracking-[0.3em] uppercase mb-4 block">
+            <span className="text-mx-orange text-body-sm font-medium tracking-[0.3em] uppercase mb-2 md:mb-4 block">
               Únete a nosotros
             </span>
-            <h1 className="text-display-sm md:text-display-sm font-black text-mx-blue mb-4">
+            <h1 className="text-heading-lg md:text-display-sm font-black text-mx-blue mb-2 md:mb-4">
               Crea tu Cuenta
             </h1>
-            <p className="text-mx-text-muted font-light">
+            <p className="text-mx-text-muted text-body-sm md:text-body-md font-light">
               Comienza tu camino hacia la excelencia profesional
             </p>
           </m.div>
@@ -111,7 +111,7 @@ export default function SignUpPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="text-center text-mx-text-muted text-body-sm mt-8"
+            className="text-center text-mx-text-muted text-label-md md:text-body-sm mt-4 md:mt-8"
           >
             Al registrarte, aceptas nuestros{' '}
             <Link href="/aviso-legal" className="text-mx-orange hover:text-mx-orange-dark transition-colors">
@@ -126,7 +126,7 @@ export default function SignUpPage() {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-20 py-4 px-6 bg-mx-bg/80 backdrop-blur-md border-t border-mx-border">
+      <footer className="hidden md:block fixed bottom-0 left-0 right-0 z-20 py-4 px-6 bg-mx-bg/80 backdrop-blur-md border-t border-mx-border">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between text-mx-text-muted text-label-md">
           <span>&copy; 2025 Máxima Formación. Todos los derechos reservados.</span>
           <div className="flex items-center gap-4">
