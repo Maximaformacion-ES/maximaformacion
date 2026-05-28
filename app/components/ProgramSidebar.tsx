@@ -26,6 +26,7 @@ import type { Program } from '@/lib/strapi/types';
 import { SCHEDULE_URL } from './ConsultaGratuitaChooser';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
+import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProgramSidebarProps {
   program: Program;
@@ -41,18 +42,47 @@ interface ProgramSidebarProps {
    * full-width mobile duplicate omits it so we don't double-anchor.
    */
   stickyAnchorId?: string;
+  /**
+   * Server-resolved user access state. When provided, the sidebar uses
+   * these values during the first paint (before useUserCampus has
+   * finished its async fetch) so the right CTA renders immediately
+   * instead of a "Cargando…" placeholder. After hydration, useUserCampus
+   * takes over and reflects any client-side change (e.g. just-completed
+   * checkout in another tab).
+   */
+  initialUserState?: ServerUserState;
 }
 
 export const SIDEBAR_CTA_ANCHOR_ID = 'program-purchase-cta-anchor';
 
-export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program, stickyAnchorId }) => {
+export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
+  program,
+  stickyAnchorId,
+  initialUserState,
+}) => {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId, program.isPro);
+  // While the client-side auth hooks are still resolving, prefer the
+  // server-resolved state if the caller provided it. Once the hooks
+  // finish (isLoaded && !campusLoading), trust them — they're the
+  // freshest signal (e.g. a checkout completed in another tab).
+  const authLoading = !isLoaded || campusLoading;
+  const useServer = authLoading && !!initialUserState;
+  // "Known" means we have something authoritative to render — either
+  // the hooks finished or the page handed us a server snapshot.
+  const userStateKnown = !authLoading || !!initialUserState;
+  const effectiveIsSignedIn = useServer ? initialUserState!.isSignedIn : !!isSignedIn;
+  const userHasPro = useServer
+    ? initialUserState!.isSignedIn && initialUserState!.hasPro
+    : !!isSignedIn && hasPro;
+  const hasAccess = useServer
+    ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
+      || (program.isPro === true && initialUserState!.hasPro)
+    : checkAccess(program.documentId, program.isPro);
+
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
@@ -273,12 +303,12 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program, stickyA
 
             {/* CTA Button */}
             <div className="space-y-3">
-              {/* While Clerk + campus profile are still resolving, render a
-               * neutral loading button instead of defaulting to "Comprar
-               * Ahora". Otherwise a signed-in owner of the course sees the
-               * purchase CTA for 1-2s before it flips to "Acceder al
-               * Curso", which felt like a bug. */}
-              {!isLoaded || campusLoading ? (
+              {/* If the page passed a server-resolved user state, render
+               * the correct CTA from the first paint. Without it we'd
+               * still need the "Cargando…" placeholder while Clerk +
+               * campus profile load on the client — kept as a fallback
+               * for pages that haven't migrated yet. */}
+              {authLoading && !initialUserState ? (
                 <button
                   {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
                   disabled
@@ -314,13 +344,13 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program, stickyA
                   ) : (
                     <>
                       <ShoppingCart size={18} />
-                      {isSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
+                      {effectiveIsSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
                     </>
                   )}
                 </m.button>
               )}
 
-              {isLoaded && !campusLoading && !userHasPro && (
+              {userStateKnown && !userHasPro && (
                 <Link
                   href="/pricing"
                   className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"

@@ -211,6 +211,7 @@ interface CourseOverviewClientProps {
   showSuccessMessage: boolean;
   checkoutSessionId?: string;
   richHtml: import('@/app/programas/[id]/page').ProgramRichHtml;
+  initialUserState?: import('@/lib/auth/server-user-state').ServerUserState;
 }
 
 export default function CourseOverviewClient({
@@ -219,6 +220,7 @@ export default function CourseOverviewClient({
   showSuccessMessage,
   checkoutSessionId,
   richHtml,
+  initialUserState,
 }: CourseOverviewClientProps) {
   const { isSignedIn, isLoaded } = useUser();
   const {
@@ -232,8 +234,19 @@ export default function CourseOverviewClient({
   const [successDismissed, setSuccessDismissed] = useState(false);
   const showSuccess = showSuccessMessage && !successDismissed;
 
-  const userHasPro = isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId, program.isPro);
+  // Use the server-resolved access state during the brief client-load
+  // window so we render the right view (gate vs course content) on the
+  // first paint, then trust the hooks once they settle.
+  const authLoading = !isLoaded || campusLoading;
+  const useServer = authLoading && !!initialUserState;
+  const userStateKnown = !authLoading || !!initialUserState;
+  const userHasPro = useServer
+    ? initialUserState!.isSignedIn && initialUserState!.hasPro
+    : isSignedIn && hasPro;
+  const hasAccess = useServer
+    ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
+      || (program.isPro === true && initialUserState!.hasPro)
+    : checkAccess(program.documentId, program.isPro);
 
   // Course progress
   const progressData = courseProgress[program.documentId];
@@ -295,7 +308,7 @@ export default function CourseOverviewClient({
   };
 
   // If user doesn't have access and the course is Pro, show access gate
-  if (isLoaded && !campusLoading && program.isPro && !hasAccess) {
+  if (userStateKnown && program.isPro && !hasAccess) {
     return (
       <div className="bg-mx-bg min-h-screen text-mx-text overflow-x-hidden">
         <FontStyles />

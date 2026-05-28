@@ -10,12 +10,16 @@ import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro
 import { trackBeginCheckout } from '@/lib/analytics';
 import { SCHEDULE_URL } from './ConsultaGratuitaChooser';
 import { SIDEBAR_CTA_ANCHOR_ID } from './ProgramSidebar';
+import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProgramMobileCTAProps {
   program: Program;
+  /** See ProgramSidebar — same purpose: server-resolved access state so
+   *  the sticky bar shows the right CTA on the first paint. */
+  initialUserState?: ServerUserState;
 }
 
-export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) => {
+export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, initialUserState }) => {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
@@ -75,8 +79,19 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
     return () => observer.disconnect();
   }, []);
 
-  const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId, program.isPro);
+  // Prefer the server snapshot during the brief client-side load window
+  // (see ProgramSidebar for the same pattern).
+  const authLoading = !isLoaded || campusLoading;
+  const useServer = authLoading && !!initialUserState;
+  const userStateKnown = !authLoading || !!initialUserState;
+  const effectiveIsSignedIn = useServer ? initialUserState!.isSignedIn : !!isSignedIn;
+  const userHasPro = useServer
+    ? initialUserState!.isSignedIn && initialUserState!.hasPro
+    : !!isSignedIn && hasPro;
+  const hasAccess = useServer
+    ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
+      || (program.isPro === true && initialUserState!.hasPro)
+    : checkAccess(program.documentId, program.isPro);
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
@@ -135,7 +150,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   // entirely — the sidebar's "Acceder al Curso" button is the canonical
   // entry point and there's no compra to nudge. The mobile sticky bar
   // stays as a quick-access shortcut.
-  const userOwnsCourse = isLoaded && !campusLoading && hasAccess;
+  const userOwnsCourse = userStateKnown && hasAccess;
   const desktopVisibilityClass = userOwnsCourse
     ? "lg:hidden"
     : desktopVisible
@@ -264,10 +279,10 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
         </Link>
       )}
 
-      {/* Row 2: CTA button full width. Same loading-first pattern as the
-          sidebar — show a neutral "Cargando…" while auth resolves so
-          owners of the course don't see "Comprar Ahora" for 1-2s. */}
-      {!isLoaded || campusLoading ? (
+      {/* Row 2: CTA button full width. If the page handed us a server-
+          resolved state, render the correct CTA from the first paint.
+          Without that we still need the "Cargando…" placeholder. */}
+      {authLoading && !initialUserState ? (
         <button
           disabled
           className="flex items-center justify-center gap-2 w-full bg-mx-orange/70 text-white px-4 py-2 text-label-sm font-medium rounded-lg cursor-wait"
@@ -298,7 +313,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
           ) : (
             <>
               <ShoppingCart size={12} />
-              {isSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
+              {effectiveIsSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
             </>
           )}
         </button>

@@ -8,10 +8,15 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import type { Program } from '@/lib/strapi/types';
 import CourseAccessGate from '@/app/components/CourseAccessGate';
+import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProGateWrapperProps {
   program: Program;
   children: React.ReactNode;
+  /** Server-resolved access state so we don't briefly render the gate
+   *  for users who already own the program (the hooks default to "no
+   *  access" until the campus profile fetch completes). */
+  initialUserState?: ServerUserState;
 }
 
 const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) => {
@@ -104,12 +109,23 @@ const ProUpgradeGate: React.FC<{ programTitle: string }> = ({ programTitle }) =>
   );
 };
 
-export default function ProGateWrapper({ program, children }: ProGateWrapperProps) {
-  const { isSignedIn } = useUser();
-  const { hasPro, hasAccess: checkAccess } = useUserCampus();
+export default function ProGateWrapper({ program, children, initialUserState }: ProGateWrapperProps) {
+  const { isSignedIn, isLoaded } = useUser();
+  const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
 
-  const userHasPro = isSignedIn && hasPro;
-  const hasAccess = checkAccess(program.documentId, program.isPro);
+  // Same pattern as ProgramSidebar: prefer the server snapshot until the
+  // client hooks finish loading, then trust the hooks. Without this
+  // a Pro user who owns the program would briefly see the access gate
+  // before the campus profile fetch confirms their entitlement.
+  const authLoading = !isLoaded || campusLoading;
+  const useServer = authLoading && !!initialUserState;
+  const userHasPro = useServer
+    ? initialUserState!.isSignedIn && initialUserState!.hasPro
+    : !!isSignedIn && hasPro;
+  const hasAccess = useServer
+    ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
+      || (program.isPro === true && initialUserState!.hasPro)
+    : checkAccess(program.documentId, program.isPro);
 
   // Check if program requires payment (Pro or purchase)
   const requiresPayment = program.isPro;
@@ -120,7 +136,7 @@ export default function ProGateWrapper({ program, children }: ProGateWrapperProp
     return (
       <CourseAccessGate
         program={program}
-        isSignedIn={isSignedIn || false}
+        isSignedIn={useServer ? initialUserState!.isSignedIn : (isSignedIn || false)}
         userHasPro={userHasPro || false}
       />
     );

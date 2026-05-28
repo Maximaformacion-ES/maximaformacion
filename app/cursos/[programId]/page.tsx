@@ -4,10 +4,15 @@ import { getProgramWithLessons, getFirstLessonOfProgram } from '@/lib/strapi/les
 import { getProgramById } from '@/lib/strapi/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import type { ProgramRichHtml } from '@/app/programas/[id]/page';
+import { getServerUserState } from '@/lib/auth/server-user-state';
 import CourseOverviewClient from './CourseOverviewClient';
 
-// ISR: Revalidar cada hora
-export const revalidate = 3600;
+// Page becomes dynamic per request so we can read auth() and pass the
+// access state down — without that, owners of the course briefly see
+// the "Comprar" branch before useUserCampus settles. Strapi fetches
+// inside getProgramWithLessons keep their own caching so the per-
+// request cost stays at one DB round-trip.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ programId: string }>;
@@ -35,7 +40,10 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const { programId } = resolvedParams;
 
-  const program = await getProgramWithLessons(programId);
+  const [program, initialUserState] = await Promise.all([
+    getProgramWithLessons(programId),
+    getServerUserState(),
+  ]);
 
   if (!program) {
     notFound();
@@ -65,6 +73,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
       showSuccessMessage={resolvedSearchParams.success === 'true'}
       checkoutSessionId={resolvedSearchParams.session_id}
       richHtml={richHtml}
+      initialUserState={initialUserState}
     />
   );
 }

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
-import { getProgramBySlug, getAllProgramSlugs } from '@/lib/strapi/queries';
+import { getProgramBySlug } from '@/lib/strapi/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema, courseSchema, faqSchema } from '@/lib/seo/jsonld';
+import { getServerUserState } from '@/lib/auth/server-user-state';
 import ProgramDetailClient from './ProgramDetailClient';
 
 export interface ProgramRichHtml {
@@ -13,7 +14,11 @@ export interface ProgramRichHtml {
   careers: string;
 }
 
-export const revalidate = 60;
+// Page becomes dynamic the moment we read auth() inside the server
+// component. The Strapi queries below still use their own revalidate
+// (60s) so we don't hit the CMS per request — auth check is the only
+// per-request work.
+export const dynamic = 'force-dynamic';
 
 interface ProgramPageProps {
   params: Promise<{
@@ -45,17 +50,23 @@ export async function generateMetadata({ params }: ProgramPageProps): Promise<Me
   };
 }
 
-export async function generateStaticParams() {
-  const slugs = await getAllProgramSlugs();
-  return slugs.map((slug) => ({ id: slug }));
-}
+// generateStaticParams removed: the page is now `force-dynamic` so we
+// can read auth() per request. Strapi fetches inside getProgramBySlug
+// keep their own revalidate=60 cache, so we don't hit the CMS per
+// request — just one DB round-trip for getServerUserState.
 
 export default async function ProgramPage({ params }: ProgramPageProps) {
   const { isEnabled: isDraft } = await draftMode();
   const resolvedParams = await params;
   const slug = resolvedParams.id;
 
-  const program = await getProgramBySlug(slug, isDraft);
+  // Fetch the program and the visitor's auth state in parallel — the
+  // Strapi call is cached (revalidate=60) so this only adds one DB
+  // round-trip per request, not a full Strapi fetch.
+  const [program, initialUserState] = await Promise.all([
+    getProgramBySlug(slug, isDraft),
+    getServerUserState(),
+  ]);
 
   const schemas = program
     ? [
@@ -88,7 +99,11 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   return (
     <>
       {schemas.length > 0 && <JsonLd data={schemas} />}
-      <ProgramDetailClient program={program} richHtml={richHtml} />
+      <ProgramDetailClient
+        program={program}
+        richHtml={richHtml}
+        initialUserState={initialUserState}
+      />
     </>
   );
 }
