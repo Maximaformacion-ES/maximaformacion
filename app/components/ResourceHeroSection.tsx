@@ -9,9 +9,16 @@ import type { Resource } from '@/lib/strapi/types';
 interface ResourceHeroSectionProps {
   resource: Resource;
   onDownloadClick: (e: React.MouseEvent<HTMLAnchorElement>, url: string, filename: string) => void;
+  /** Collapses the top padding when a breadcrumb directly above already
+   *  provides spacing under the fixed header. */
+  compactTop?: boolean;
 }
 
-export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({ resource, onDownloadClick }) => {
+export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({
+  resource,
+  onDownloadClick,
+  compactTop = false,
+}) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -21,7 +28,7 @@ export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({ resour
   const primaryDownload = resource.downloads[0];
 
   return (
-    <section className="relative pt-32 md:pt-40 pb-12 md:pb-16">
+    <section className={`relative ${compactTop ? 'pt-4 md:pt-8' : 'pt-32 md:pt-40'} pb-12 md:pb-16`}>
       <div className="px-4 sm:px-6 md:px-24">
         <div
           className={

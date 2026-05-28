@@ -13,15 +13,22 @@ import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import { ProgramTeachers } from '../../components/ProgramTeachers';
 import ProGateWrapper from './ProGateWrapper';
+import { Breadcrumb } from '../../components/Breadcrumb';
 import type { Program } from '@/lib/strapi/types';
 import type { ProgramRichHtml } from './page';
+import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProgramDetailClientProps {
   program: Program | null;
   richHtml: ProgramRichHtml;
+  initialUserState?: ServerUserState;
 }
 
-export default function ProgramDetailClient({ program, richHtml }: ProgramDetailClientProps) {
+export default function ProgramDetailClient({
+  program,
+  richHtml,
+  initialUserState,
+}: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   if (!program) {
@@ -63,17 +70,30 @@ export default function ProgramDetailClient({ program, richHtml }: ProgramDetail
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
-        <ProgramHeroSection 
+        <Breadcrumb
+          items={[
+            { label: 'Programas', href: '/programas' },
+            { label: program.title },
+          ]}
+        />
+        <ProgramHeroSection
           program={program}
-          sidebar={<ProgramSidebar program={program} stickyAnchorId={SIDEBAR_CTA_ANCHOR_ID} />}
+          compactTop
+          sidebar={
+            <ProgramSidebar
+              program={program}
+              stickyAnchorId={SIDEBAR_CTA_ANCHOR_ID}
+              initialUserState={initialUserState}
+            />
+          }
           tabs={<ProgramTabs program={program} richHtml={richHtml} />}
         />
 
-        <ProGateWrapper program={program}>
+        <ProGateWrapper program={program} initialUserState={initialUserState}>
           {/* Sidebar on mobile — hidden on desktop since it's in the hero */}
           <section className="pb-16 px-6 md:px-12 bg-mx-bg lg:hidden">
             <div className="max-w-[1400px] mx-auto">
-              <ProgramSidebar program={program} />
+              <ProgramSidebar program={program} initialUserState={initialUserState} />
             </div>
           </section>
           <ProgramTeachers program={program} />
@@ -85,7 +105,7 @@ export default function ProgramDetailClient({ program, richHtml }: ProgramDetail
       <Footer />
 
       {/* Sticky mobile purchase bar */}
-      <ProgramMobileCTA program={program} />
+      <ProgramMobileCTA program={program} initialUserState={initialUserState} />
       {/* Bottom spacing so footer isn't hidden behind the sticky bar */}
       <div className="h-20 lg:hidden" />
     </div>

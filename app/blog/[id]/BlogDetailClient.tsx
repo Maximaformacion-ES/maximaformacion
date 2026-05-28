@@ -9,6 +9,7 @@ import { BlogHeroSection } from '../../components/BlogHeroSection';
 import { BlogContent } from '../../components/BlogContent';
 import { BlogAuthor } from '../../components/BlogAuthor';
 import { BlogRelatedClient } from '../../components/BlogRelatedClient';
+import { Breadcrumb } from '../../components/Breadcrumb';
 import type { BlogPost } from '@/lib/strapi/types';
 
 interface BlogDetailClientProps {
@@ -58,7 +59,13 @@ export default function BlogDetailClient({ post, relatedPosts }: BlogDetailClien
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
-        <BlogHeroSection post={post} />
+        <Breadcrumb
+          items={[
+            { label: 'Blog', href: '/blog' },
+            { label: post.title },
+          ]}
+        />
+        <BlogHeroSection post={post} compactTop />
         <BlogContent post={post} />
         <BlogAuthor post={post} />
         <BlogRelatedClient posts={relatedPosts} />

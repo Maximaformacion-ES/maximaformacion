@@ -9,6 +9,7 @@ import { ResourceHeroSection } from '../../components/ResourceHeroSection';
 import { ResourceContent } from '../../components/ResourceContent';
 import { ResourceRelatedClient } from '../../components/ResourceRelatedClient';
 import { LeadFormModal, hasLeadCookie, type LeadFormResult } from '../../components/LeadFormModal';
+import { Breadcrumb } from '../../components/Breadcrumb';
 import type { Resource } from '@/lib/strapi/types';
 
 interface RecursoDetailClientProps {
@@ -102,7 +103,13 @@ export default function RecursoDetailClient({
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
-        <ResourceHeroSection resource={resource} onDownloadClick={handleDownloadClick} />
+        <Breadcrumb
+          items={[
+            { label: 'Recursos', href: '/recursos' },
+            { label: resource.title },
+          ]}
+        />
+        <ResourceHeroSection resource={resource} onDownloadClick={handleDownloadClick} compactTop />
         <ResourceContent resource={resource} bodyHtml={bodyHtml} onDownloadClick={handleDownloadClick} />
         <ResourceRelatedClient resources={relatedResources} />
       </main>

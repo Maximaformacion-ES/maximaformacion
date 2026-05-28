@@ -10,11 +10,22 @@ interface ProgramHeroSectionProps {
   program: Program;
   sidebar?: React.ReactNode;
   tabs?: React.ReactNode;
+  /** When the page renders a breadcrumb directly above the hero, the
+   *  hero's own top padding (sized to clear the fixed header) becomes
+   *  redundant and creates a noticeable empty gap. Setting this flag
+   *  collapses the top padding to just enough breathing room. */
+  compactTop?: boolean;
 }
 
-export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({ program, sidebar, tabs }) => {
+export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
+  program,
+  sidebar,
+  tabs,
+  compactTop = false,
+}) => {
+  const topPaddingClass = compactTop ? 'pt-4 md:pt-6' : 'pt-28 md:pt-32';
   return (
-    <section className="relative pt-28 pb-12 md:pt-32 md:pb-16 overflow-visible">
+    <section className={`relative ${topPaddingClass} pb-12 md:pb-16 overflow-visible`}>
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.82)] to-[rgba(255,252,248,0.55)] z-10" />
