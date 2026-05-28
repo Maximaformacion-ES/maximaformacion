@@ -206,19 +206,90 @@ export async function POST(request: Request) {
         }
       }
       if (!priceIdForCheckout) {
-        const stripePrice = await stripe.prices.create({
-          currency: 'eur',
-          unit_amount: Math.round(program.price! * 100),
-          product_data: {
-            name: program.title,
-            metadata: {
-              programId: String(program.id),
-              documentId: program.documentId,
-              type: program.type,
+        // Reuse the stored Stripe Product if it still exists and is active,
+        // so we don't accumulate orphan products on every healing event.
+        // Only create a brand-new product when the stored one is also
+        // missing/archived (or there isn't one).
+        let productIdForNewPrice: string | null = program.stripeProductId ?? null;
+        if (productIdForNewPrice) {
+          try {
+            const existingProduct = await stripe.products.retrieve(productIdForNewPrice);
+            if (!existingProduct.active) {
+              productIdForNewPrice = null;
+            }
+          } catch {
+            productIdForNewPrice = null;
+          }
+        }
+
+        const priceAmountCents = Math.round(program.price! * 100);
+        const newPrice = productIdForNewPrice
+          ? await stripe.prices.create({
+              product: productIdForNewPrice,
+              currency: 'eur',
+              unit_amount: priceAmountCents,
+              metadata: {
+                strapiProgramId: String(program.id),
+                source: 'checkout-self-heal',
+              },
+            })
+          : await stripe.prices.create({
+              currency: 'eur',
+              unit_amount: priceAmountCents,
+              product_data: {
+                name: program.title,
+                metadata: {
+                  strapiProgramId: String(program.id),
+                  documentId: program.documentId,
+                  type: program.type,
+                  source: 'checkout-self-heal',
+                },
+              },
+            });
+        priceIdForCheckout = newPrice.id;
+
+        // Heal Strapi so the next checkout reuses these IDs instead of
+        // creating yet another price every time. The lifecycle guard
+        // `onlyStripeFieldsUpdated` in Strapi prevents this PUT from
+        // triggering a sync loop. Fire-and-forget: a Strapi blip must
+        // not block the user's purchase.
+        const strapiUrl = process.env.STRAPI_URL;
+        const strapiToken = process.env.STRAPI_API_TOKEN;
+        if (strapiUrl && strapiToken && program.documentId) {
+          const writeBack: Record<string, string> = { stripePriceId: newPrice.id };
+          if (!productIdForNewPrice) {
+            const newProductId =
+              typeof newPrice.product === 'string'
+                ? newPrice.product
+                : newPrice.product.id;
+            writeBack.stripeProductId = newProductId;
+          }
+          fetch(`${strapiUrl}/api/programs/${program.documentId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${strapiToken}`,
             },
-          },
-        });
-        priceIdForCheckout = stripePrice.id;
+            body: JSON.stringify({ data: writeBack }),
+          })
+            .then(async (res) => {
+              if (!res.ok) {
+                const text = await res.text().catch(() => '');
+                console.warn(
+                  `[checkout-heal] Strapi PUT returned ${res.status} for ` +
+                  `program ${program.documentId}: ${text.slice(0, 200)}`
+                );
+              } else {
+                console.log(
+                  `[checkout-heal] Wrote ${Object.keys(writeBack).join(',')} ` +
+                  `back to Strapi for program ${program.id} (${program.title})`
+                );
+              }
+            })
+            .catch((e) => {
+              console.warn('[checkout-heal] Strapi PUT threw:', e);
+            });
+        }
       }
 
       // Apply Pro discounts:
