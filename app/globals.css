@@ -181,17 +181,27 @@
 }
 
 /*
- * Cookiebot floating widget — lift it above the mobile sticky purchase
- * bar so it doesn't cover the "Consultar precio" / "Comprar Ahora" CTA
- * on program detail pages. Cookiebot drops the widget bottom-left by
- * default with a fixed position and its own z-index; only on viewports
- * where our sticky bar lives (≤ lg) we push the widget up enough to
- * clear it (CTA height ~80px + safe-area).
+ * Bottom offset shared by the two floating widgets that live at the
+ * lower edge of the viewport (Cookiebot consent button on the left,
+ * our "Consulta gratuita" CTA on the right). They use the same CSS
+ * variable so they always sit at the same `bottom` value — otherwise
+ * the visitor sees one floating higher than the other.
+ *
+ * On viewports ≤ lg we push them both above the sticky mobile
+ * purchase bar that appears on program detail pages (CTA height
+ * ~80px + safe-area). On larger viewports the bar isn't there, so
+ * they sit flush near the bottom.
  */
+:root {
+  --floating-cta-bottom: 2rem;
+}
 @media (max-width: 1023px) {
-  #CookiebotWidget {
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  :root {
+    --floating-cta-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
+}
+#CookiebotWidget {
+  bottom: var(--floating-cta-bottom) !important;
 }
 
 /*

@@ -22,7 +22,8 @@ export default function FloatingConsultCTA({ variant = 'global' }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-40 flex items-center gap-2 bg-mx-orange text-white px-5 py-3.5 rounded-full shadow-lg shadow-mx-orange/20 hover:bg-mx-orange/90 hover:shadow-xl transition-all text-body-sm font-medium"
+        style={{ bottom: 'var(--floating-cta-bottom)' }}
+        className="fixed right-5 md:right-8 z-40 flex items-center gap-2 bg-mx-orange text-white px-5 py-3.5 rounded-full shadow-lg shadow-mx-orange/20 hover:bg-mx-orange/90 hover:shadow-xl transition-all text-body-sm font-medium"
         aria-label="Consulta gratuita"
       >
         <MessageCircle size={18} />
