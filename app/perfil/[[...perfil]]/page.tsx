@@ -790,6 +790,41 @@ const MiPlanSection = () => {
             </p>
           </div>
         )}
+
+        {/* Billing portal access for non-Pro users who have bought at
+            least one course. The Pro branch above already surfaces
+            this button inside the subscription card; for course-only
+            buyers we render it as a standalone box so they can still
+            download invoices and update their payment method. */}
+        {!isPro && stripeCustomerId && (
+          <div className="mt-4 p-4 sm:p-6 bg-mx-bg border border-mx-border rounded-xl">
+            <h3 className="text-body-lg font-bold text-mx-text mb-2 flex items-center gap-2">
+              <CreditCard className="text-mx-orange" size={18} />
+              Tus facturas
+            </h3>
+            <p className="text-mx-text-muted text-body-sm mb-4">
+              Descarga las facturas de tus cursos y actualiza tu método de pago.
+            </p>
+            <button
+              onClick={handleOpenBillingPortal}
+              disabled={isLoadingPortal}
+              className="w-full flex items-center justify-center gap-2 bg-mx-bg hover:bg-mx-border/50 text-mx-text border border-mx-border px-4 py-3 rounded-lg font-medium text-body-sm transition-colors disabled:opacity-50 disabled:cursor-wait"
+            >
+              {isLoadingPortal ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>
+                  <CreditCard size={16} />
+                  Ver facturas
+                  <ExternalLink size={12} className="opacity-60" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
