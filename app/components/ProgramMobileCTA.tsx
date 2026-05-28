@@ -8,7 +8,7 @@ import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
-import { SCHEDULE_URL } from './ConsultaGratuitaChooser';
+import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { SIDEBAR_CTA_ANCHOR_ID } from './ProgramSidebar';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -27,6 +27,10 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
   // the CTA while the sidebar's primary button is still in view; flips
   // true once that anchor scrolls out of the viewport.
   const [desktopVisible, setDesktopVisible] = useState(false);
+  // Master "Consultar precio" opens a chooser (form vs videollamada).
+  // Mirrors the sidebar so a Master visitor gets the same options
+  // regardless of viewport.
+  const [masterChooserOpen, setMasterChooserOpen] = useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
   // Publish the sticky bar's actual height on the body so the Cookiebot
@@ -169,17 +173,23 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
 
   if (program.type === 'Master') {
     return (
-      <div ref={wrapperRef} className={stickyWrapperClass}>
-        <a
-          href={SCHEDULE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
-        >
-          <Mail size={12} />
-          Consultar precio
-        </a>
-      </div>
+      <>
+        <div ref={wrapperRef} className={stickyWrapperClass}>
+          <button
+            type="button"
+            onClick={() => setMasterChooserOpen(true)}
+            className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+          >
+            <Mail size={12} />
+            Consultar precio
+          </button>
+        </div>
+        <ConsultaGratuitaChooser
+          open={masterChooserOpen}
+          onClose={() => setMasterChooserOpen(false)}
+          formMode="contacto-page"
+        />
+      </>
     );
   }
 

@@ -23,7 +23,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
-import { SCHEDULE_URL } from './ConsultaGratuitaChooser';
+import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
@@ -64,6 +64,10 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Master CTA opens a chooser (form vs videocall) instead of jumping
+  // straight to Alfonso's calendar. The form branch links to /contacto
+  // (the generic site form), not the consultoria form modal.
+  const [masterChooserOpen, setMasterChooserOpen] = useState(false);
 
   // While the client-side auth hooks are still resolving, prefer the
   // server-resolved state if the caller provided it. Once the hooks
@@ -193,18 +197,22 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
           <>
             {/* No price block for Masters — the only price-related element
                 shown to the user is the CTA below ("Consultar precio"),
-                which opens the consultation modal. */}
-            <a
+                which opens the chooser modal (form vs videollamada). */}
+            <button
+              type="button"
               {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
-              href={SCHEDULE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => setMasterChooserOpen(true)}
               className="group flex items-center justify-center gap-2 md:gap-3 w-full bg-mx-orange text-white px-4 md:px-6 py-2.5 md:py-4 text-label-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
               <Mail size={14} className="md:w-[18px] md:h-[18px]" />
               Consultar precio
               <ArrowRight size={14} className="md:w-[18px] md:h-[18px] group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
+            <ConsultaGratuitaChooser
+              open={masterChooserOpen}
+              onClose={() => setMasterChooserOpen(false)}
+              formMode="contacto-page"
+            />
 
             {program.brochurePdfUrl && (
               <a
