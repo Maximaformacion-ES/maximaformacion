@@ -41,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Ops scripts kept local — one-off migrations, GDPR erasure, manual
+# data fixes. They reference real emails and prod table names and
+# don't need to be tracked. The files live on disk for whoever runs
+# them; new entries belong in this directory but not in git.
+/scripts
