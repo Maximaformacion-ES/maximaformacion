@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Calendar, PenSquare, X } from 'lucide-react';
+import Link from 'next/link';
 import ConsultoriaFormModal from './ConsultoriaFormModal';
 
 export const SCHEDULE_URL =
@@ -10,15 +11,21 @@ export const SCHEDULE_URL =
 interface Props {
   open: boolean;
   onClose: () => void;
+  /**
+   * Where the "Rellenar formulario" option leads.
+   * - 'consultoria-form' (default): opens the inline ConsultoriaFormModal,
+   *   used in /consultoria where the form is project-scoped.
+   * - 'contacto-page': navigates to /contacto, used everywhere else (home
+   *   and every other page that just needs the generic contact form).
+   */
+  formMode?: 'consultoria-form' | 'contacto-page';
 }
 
-/**
- * Shared "¿Cómo prefieres empezar?" modal used by every "Consulta gratuita"
- * entry point on the site (floating CTA + every PrimaryCTA on the
- * consultoria page). Always offers both options: open the form modal inline
- * or jump to the external scheduling calendar. Never redirects to /contacto.
- */
-export default function ConsultaGratuitaChooser({ open, onClose }: Props) {
+export default function ConsultaGratuitaChooser({
+  open,
+  onClose,
+  formMode = 'consultoria-form',
+}: Props) {
   const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
@@ -67,19 +74,35 @@ export default function ConsultaGratuitaChooser({ open, onClose }: Props) {
             </p>
 
             <div className="space-y-3">
-              <button
-                type="button"
-                onClick={openForm}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-mx-orange text-white hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
-              >
-                <PenSquare size={18} />
-                <div className="text-left flex-1">
-                  <p className="font-semibold">Rellenar formulario</p>
-                  <p className="text-white/70 text-label-md font-normal">
-                    Cuéntanos los detalles de tu proyecto
-                  </p>
-                </div>
-              </button>
+              {formMode === 'consultoria-form' ? (
+                <button
+                  type="button"
+                  onClick={openForm}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-mx-orange text-white hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
+                >
+                  <PenSquare size={18} />
+                  <div className="text-left flex-1">
+                    <p className="font-semibold">Rellenar formulario</p>
+                    <p className="text-white/70 text-label-md font-normal">
+                      Cuéntanos los detalles de tu proyecto
+                    </p>
+                  </div>
+                </button>
+              ) : (
+                <Link
+                  href="/contacto"
+                  onClick={onClose}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-mx-orange text-white hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
+                >
+                  <PenSquare size={18} />
+                  <div className="text-left flex-1">
+                    <p className="font-semibold">Formulario de contacto</p>
+                    <p className="text-white/70 text-label-md font-normal">
+                      Escríbenos y te respondemos lo antes posible
+                    </p>
+                  </div>
+                </Link>
+              )}
               <a
                 href={SCHEDULE_URL}
                 target="_blank"

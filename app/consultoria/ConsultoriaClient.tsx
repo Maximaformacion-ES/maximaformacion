@@ -94,7 +94,7 @@ export default function ConsultoriaClient() {
         />
       </main>
 
-      <FloatingConsultCTA />
+      <FloatingConsultCTA variant="consultoria" />
       <Footer />
 
       <ConsultaGratuitaChooser open={isChooserOpen} onClose={() => setIsChooserOpen(false)} />
