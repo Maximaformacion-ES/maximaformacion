@@ -177,15 +177,26 @@ export async function POST(request: Request) {
       }
 
       // Use existing Stripe price or create one ad-hoc from the program price.
-      // The stored ID belongs to whichever Stripe account Strapi was talking
-      // to when its lifecycle last ran — if that's a different account than
-      // the one this endpoint is using (e.g. dev with sk_test_ vs Strapi
-      // Cloud already migrated to live), the retrieve will 404 and we fall
-      // back to creating an ad-hoc price so the checkout still proceeds.
+      // The stored ID can fail for two reasons:
+      //   1. The price doesn't exist in this Stripe account (e.g. dev with
+      //      sk_test_ vs Strapi Cloud already migrated to live) — retrieve
+      //      throws 404.
+      //   2. The price exists but was archived in Stripe (active: false).
+      //      Retrieve succeeds but Checkout rejects archived prices in
+      //      line_items, surfacing as "Failed to create checkout session".
+      // Both cases fall back to creating a fresh ad-hoc price so the user
+      // can still complete the purchase.
       let priceIdForCheckout: string | null = program.stripePriceId ?? null;
       if (priceIdForCheckout) {
         try {
-          await stripe.prices.retrieve(priceIdForCheckout);
+          const retrieved = await stripe.prices.retrieve(priceIdForCheckout);
+          if (!retrieved.active) {
+            console.warn(
+              `Stripe price ${priceIdForCheckout} is archived ` +
+              `for program ${program.id} (${program.title}); creating ad-hoc.`
+            );
+            priceIdForCheckout = null;
+          }
         } catch {
           console.warn(
             `Stripe price ${priceIdForCheckout} not found in current account ` +
