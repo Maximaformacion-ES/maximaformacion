@@ -6,6 +6,10 @@ import { isDbConfigured } from '@/lib/db/client';
 import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
 import { provisionMoodleAccess } from '@/lib/moodle/provision';
+import { sendEmail } from '@/lib/email/client';
+import { adminPurchaseNotificationEmail } from '@/lib/email/templates/admin-purchase-notification';
+
+const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'cursos@maximaformacion.es';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
@@ -197,6 +201,39 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           }
 
           console.log(`User ${userId} purchased ${paymentType}: ${title} (${documentId})`);
+
+          // Fire-and-forget admin notification so a Resend outage or
+          // missing template never blocks the enrollment / Moodle
+          // pipeline below. Wrapped in try/catch with an explicit
+          // .catch on the awaited send.
+          try {
+            const studentName = await resolveStudentName(userId);
+            const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
+            const notification = adminPurchaseNotificationEmail({
+              studentName: fullName,
+              studentEmail: session.customer_email || 'desconocido',
+              productTitle: title || documentId,
+              productType:
+                paymentType === 'maxymia-course'
+                  ? 'Maxymia'
+                  : title?.toLowerCase().startsWith('máster') || title?.toLowerCase().startsWith('master')
+                    ? 'Master'
+                    : 'Curso',
+              amount: (session.amount_total || 0) / 100,
+              currency: (session.currency || 'eur').toUpperCase(),
+              stripeSessionId: session.id,
+              purchasedAt: new Date(),
+            });
+            await sendEmail({
+              to: ADMIN_NOTIFICATION_EMAIL,
+              subject: notification.subject,
+              html: notification.html,
+              text: notification.text,
+              replyTo: session.customer_email || undefined,
+            });
+          } catch (e) {
+            console.warn('[admin-notify] failed to send purchase email:', e);
+          }
 
           // Provision Moodle access if the program is configured for it.
           // Only for regular program purchases (not Maxymia courses).
@@ -392,6 +429,36 @@ async function handleWithClerk(event: Stripe.Event) {
               }],
             },
           });
+        }
+
+        // Admin notification (same flow as the DB-backed branch above).
+        try {
+          const studentName = await resolveStudentName(userId);
+          const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
+          const notification = adminPurchaseNotificationEmail({
+            studentName: fullName,
+            studentEmail: session.customer_email || 'desconocido',
+            productTitle: title || documentId,
+            productType:
+              paymentType === 'maxymia-course'
+                ? 'Maxymia'
+                : title?.toLowerCase().startsWith('máster') || title?.toLowerCase().startsWith('master')
+                  ? 'Master'
+                  : 'Curso',
+            amount: (session.amount_total || 0) / 100,
+            currency: (session.currency || 'eur').toUpperCase(),
+            stripeSessionId: session.id,
+            purchasedAt: new Date(),
+          });
+          await sendEmail({
+            to: ADMIN_NOTIFICATION_EMAIL,
+            subject: notification.subject,
+            html: notification.html,
+            text: notification.text,
+            replyTo: session.customer_email || undefined,
+          });
+        } catch (e) {
+          console.warn('[admin-notify] failed to send purchase email:', e);
         }
 
         // Provision Moodle access if the program is configured for it.
