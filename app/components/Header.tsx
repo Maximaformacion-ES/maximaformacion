@@ -983,9 +983,9 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                       <span
                         aria-label="Suscripción Pro"
                         title="Suscripción Pro"
-                        className="absolute -top-0.5 -right-0.5 z-10 pointer-events-none flex items-center justify-center w-3.5 h-3.5 bg-white text-mx-orange rounded-full ring-[1.5px] ring-mx-orange"
+                        className="absolute -top-1 -right-1 z-10 pointer-events-none flex items-center justify-center w-[18px] h-[18px] bg-white text-mx-orange rounded-full ring-2 ring-mx-orange shadow-sm"
                       >
-                        <Crown size={8} fill="currentColor" />
+                        <Crown size={11} fill="currentColor" />
                       </span>
                     )}
                   </div>
