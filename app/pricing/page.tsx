@@ -42,13 +42,14 @@ const PLAN_FEATURES = [
   { feature: 'Acceso a cursos gratuitos', free: true, pro: true },
   { feature: 'Blog y recursos educativos', free: true, pro: true },
   { feature: 'Soporte por email', free: true, pro: true },
-  { feature: 'Acceso a cursos exclusivos', free: false, pro: true },
+  { feature: 'Acceso a cursos exclusivos para Pro', free: false, pro: true },
+  { feature: 'Acceso al Campus de e-learning', free: false, pro: true },
+  { feature: '20% de descuento en la mayoría de cursos', free: false, pro: true },
   { feature: 'Certificados descargables', free: false, pro: true },
-  { feature: 'Soporte prioritario 24/7', free: false, pro: true },
+  { feature: 'Contacto preferente y soporte prioritario', free: false, pro: true },
   { feature: 'Recursos descargables premium', free: false, pro: true },
   { feature: 'Acceso anticipado a nuevos cursos', free: false, pro: true },
   { feature: 'Sesiones de mentoría grupales', free: false, pro: true },
-  { feature: 'Comunidad exclusiva', free: false, pro: true },
 ];
 
 // Plans data - these should match your Clerk Dashboard plans
@@ -76,13 +77,14 @@ const PLANS: Plan[] = [
     icon: Crown,
     features: [
       'Todo lo del plan Free',
-      'Cursos exclusivos premium',
+      'Cursos exclusivos para Pro',
+      'Acceso al Campus de e-learning',
+      '20% de descuento en la mayoría de cursos',
       'Certificados descargables',
-      'Soporte prioritario 24/7',
-      'Recursos descargables',
-      'Acceso anticipado',
-      'Sesiones de mentoría',
-      'Comunidad exclusiva',
+      'Contacto preferente',
+      'Recursos descargables premium',
+      'Acceso anticipado a nuevos cursos',
+      'Sesiones de mentoría grupales',
     ],
     highlighted: true,
     cta: 'Comenzar Pro',
@@ -380,7 +382,7 @@ function PricingCTA({ isSignedIn }: { isSignedIn: boolean | undefined }) {
 
 function PricingContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const { isSignedIn } = useUser();
   const { hasPro, isTrialing, hasUsedTrial, subscription } = useUserCampus();
