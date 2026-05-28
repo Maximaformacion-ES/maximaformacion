@@ -183,20 +183,25 @@
 /*
  * Bottom offset shared by the two floating widgets that live at the
  * lower edge of the viewport (Cookiebot consent button on the left,
- * our "Consulta gratuita" CTA on the right). They use the same CSS
- * variable so they always sit at the same `bottom` value — otherwise
- * the visitor sees one floating higher than the other.
+ * our "Consulta gratuita" CTA on the right). Both read the same CSS
+ * variable so they always sit at the same `bottom` value.
  *
- * On viewports ≤ lg we push them both above the sticky mobile
- * purchase bar that appears on program detail pages (CTA height
- * ~80px + safe-area). On larger viewports the bar isn't there, so
- * they sit flush near the bottom.
+ * Default: sit close to the bottom edge (bottom-5 / bottom-8 in
+ * Tailwind terms). On program detail pages the sticky purchase bar
+ * (ProgramMobileCTA) sets `body[data-mobile-cta]`, which lifts the
+ * widgets above it. We only lift on viewports where that bar is
+ * visible (≤ lg) — desktop renders the bar differently.
  */
 :root {
-  --floating-cta-bottom: 2rem;
+  --floating-cta-bottom: 1.25rem;
+}
+@media (min-width: 768px) {
+  :root {
+    --floating-cta-bottom: 2rem;
+  }
 }
 @media (max-width: 1023px) {
-  :root {
+  body[data-mobile-cta] {
     --floating-cta-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
 }

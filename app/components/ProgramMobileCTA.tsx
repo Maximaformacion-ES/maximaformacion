@@ -24,6 +24,16 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   // true once that anchor scrolls out of the viewport.
   const [desktopVisible, setDesktopVisible] = useState(false);
 
+  // Tell the global styles that this page mounts the sticky mobile bar
+  // so the Cookiebot widget can lift above it. Other pages (home,
+  // consultoria, blog, etc.) keep the widget at its natural bottom.
+  useEffect(() => {
+    document.body.dataset.mobileCta = 'true';
+    return () => {
+      delete document.body.dataset.mobileCta;
+    };
+  }, []);
+
   useEffect(() => {
     const anchor = document.getElementById(SIDEBAR_CTA_ANCHOR_ID);
     if (!anchor) {
