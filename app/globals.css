@@ -202,7 +202,14 @@
 }
 @media (max-width: 1023px) {
   body[data-mobile-cta] {
-    --floating-cta-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    /* Lift to clear the sticky purchase bar. Its actual height is set by
+     * ProgramMobileCTA via --mobile-cta-height on mount; the fallback
+     * covers the first paint before the JS measure lands. The +12px is
+     * breathing room so the widget doesn't kiss the top edge of the bar.
+     */
+    --floating-cta-bottom: calc(
+      var(--mobile-cta-height, 140px) + 12px + env(safe-area-inset-bottom, 0px)
+    );
   }
 }
 #CookiebotWidget {

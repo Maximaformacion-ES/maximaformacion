@@ -23,14 +23,34 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   // the CTA while the sidebar's primary button is still in view; flips
   // true once that anchor scrolls out of the viewport.
   const [desktopVisible, setDesktopVisible] = useState(false);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
 
-  // Tell the global styles that this page mounts the sticky mobile bar
-  // so the Cookiebot widget can lift above it. Other pages (home,
-  // consultoria, blog, etc.) keep the widget at its natural bottom.
+  // Publish the sticky bar's actual height on the body so the Cookiebot
+  // widget (and any other floating widget that reads
+  // --floating-cta-bottom) sits exactly above it instead of relying on
+  // a hardcoded lift that may not match. ResizeObserver re-measures when
+  // the "Con Pro pagarías..." row appears/disappears.
   useEffect(() => {
     document.body.dataset.mobileCta = 'true';
+    const el = wrapperRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') {
+      return () => {
+        delete document.body.dataset.mobileCta;
+      };
+    }
+    const update = () => {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) {
+        document.body.style.setProperty('--mobile-cta-height', `${Math.round(h)}px`);
+      }
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
     return () => {
+      observer.disconnect();
       delete document.body.dataset.mobileCta;
+      document.body.style.removeProperty('--mobile-cta-height');
     };
   }, []);
 
@@ -134,7 +154,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
 
   if (program.type === 'Master') {
     return (
-      <div className={stickyWrapperClass}>
+      <div ref={wrapperRef} className={stickyWrapperClass}>
         <a
           href={SCHEDULE_URL}
           target="_blank"
@@ -158,7 +178,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
   if (program.format) desktopMeta.push({ icon: Monitor, label: program.format });
 
   return (
-    <div className={stickyWrapperClass}>
+    <div ref={wrapperRef} className={stickyWrapperClass}>
       {/* Desktop-only header: course title + key meta. Keeps the floating
           card readable as a stand-alone summary once the user has
           scrolled past the hero. Hidden on mobile so the sticky bar
