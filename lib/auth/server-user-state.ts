@@ -7,6 +7,12 @@ export interface ServerUserState {
   isSignedIn: boolean;
   /** User is on the Pro plan according to the DB (or Clerk metadata fallback). */
   hasPro: boolean;
+  /** Subscription is in the trial period right now. */
+  isTrialing: boolean;
+  /** User has ever started a subscription (including a trial that later
+   *  lapsed). Used by /pricing to suppress the "Probar Pro 1€" CTA so
+   *  the same trial can't be claimed twice. */
+  hasUsedTrial: boolean;
   /** Document IDs of programs the user has bought (purchased or trial). */
   enrolledProgramDocumentIds: string[];
 }
@@ -14,6 +20,8 @@ export interface ServerUserState {
 const EMPTY: ServerUserState = {
   isSignedIn: false,
   hasPro: false,
+  isTrialing: false,
+  hasUsedTrial: false,
   enrolledProgramDocumentIds: [],
 };
 
@@ -40,15 +48,20 @@ export async function getServerUserState(): Promise<ServerUserState> {
     return { ...EMPTY, isSignedIn: true };
   }
 
-  const { getUserByClerkId, getUserEnrollments } = await import('@/lib/db/queries');
-  const [dbUser, userEnrollments] = await Promise.all([
+  const { getUserByClerkId, getUserEnrollments, getSubscriptionByClerkId } = await import('@/lib/db/queries');
+  const [dbUser, userEnrollments, subscription] = await Promise.all([
     getUserByClerkId(userId),
     getUserEnrollments(userId),
+    getSubscriptionByClerkId(userId),
   ]);
 
   return {
     isSignedIn: true,
     hasPro: dbUser?.plan === 'pro',
+    isTrialing: subscription?.status === 'trialing',
+    // hasUsedTrial = any prior subscription row existed (mirrors the
+    // logic in /api/user/profile so the client and server agree).
+    hasUsedTrial: !!subscription?.startedAt,
     enrolledProgramDocumentIds: userEnrollments.map((e) => e.programDocumentId),
   };
 }
