@@ -110,6 +110,16 @@ export async function POST(request: Request) {
         success_url: `${baseUrl}/maxymia/campus/${course.slug}?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/maxymia/campus/${course.slug}?canceled=true`,
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: `Compra del curso Maxymia "${course.title.es}"`,
+            metadata: {
+              courseId: String(course.id),
+              slug: course.slug,
+            },
+          },
+        },
         metadata: {
           userId,
           type: 'maxymia-course',
@@ -307,7 +317,11 @@ export async function POST(request: Request) {
             ? proCourseCouponId
             : null;
 
-      // Create one-time payment checkout session
+      // Create one-time payment checkout session. invoice_creation makes
+      // Stripe generate a formal invoice PDF (the AEAT-compliant kind,
+      // provided the Stripe account has Business details + fiscal
+      // address configured) and email it to the buyer. Without this
+      // they only get a basic payment receipt.
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [
@@ -319,6 +333,16 @@ export async function POST(request: Request) {
         success_url: `${baseUrl}/cursos/${program.documentId}?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/programas/${program.slug}?canceled=true`,
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: `Compra del curso "${program.title}"`,
+            metadata: {
+              programId: String(program.id),
+              documentId: program.documentId,
+            },
+          },
+        },
         metadata: {
           userId,
           type: 'course',
