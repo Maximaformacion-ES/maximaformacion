@@ -165,64 +165,112 @@ const CHILD_TABLES = [
   { name: 'exam_results', table: examResults },
 ] as const;
 
+/**
+ * Treat "relation does not exist" (Postgres 42P01) as "table absent in
+ * this database" rather than fatal. Schema drift between environments
+ * is common — a fresh dev DB may lack tables that prod has, and vice
+ * versa. We log it and move on so the rest of the GDPR sweep still
+ * runs.
+ */
+function isMissingRelation(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false;
+  const e = err as { code?: string; cause?: { code?: string } };
+  return e.code === '42P01' || e.cause?.code === '42P01';
+}
+
 async function inventoryDb(clerkId: string | null, email: string): Promise<DbInventory> {
-  const userRows = clerkId
-    ? await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1)
-    : email
-      ? await db.select().from(users).where(eq(users.email, email)).limit(1)
-      : [];
-  const userRow = userRows[0] ?? null;
+  let userRow: { id: string; clerkId: string; email: string | null } | null = null;
+  try {
+    const userRows = clerkId
+      ? await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1)
+      : email
+        ? await db.select().from(users).where(eq(users.email, email)).limit(1)
+        : [];
+    const first = userRows[0];
+    if (first) userRow = { id: first.id, clerkId: first.clerkId, email: first.email };
+  } catch (e) {
+    if (isMissingRelation(e)) log.warn('campus.users table missing — skipping user lookup');
+    else throw e;
+  }
 
   const effectiveClerkId = clerkId ?? userRow?.clerkId ?? null;
 
   const counts: Record<string, number> = {};
-  if (effectiveClerkId) {
-    for (const { name, table } of CHILD_TABLES) {
-      // `clerkId` exists on every table in CHILD_TABLES — Drizzle's typing
-      // doesn't generalise the column reference, so we cast inline.
+  for (const { name, table } of CHILD_TABLES) {
+    if (!effectiveClerkId) {
+      counts[name] = 0;
+      continue;
+    }
+    try {
       const col = (table as unknown as { clerkId: typeof users.clerkId }).clerkId;
-      const rows = await db.select({ id: (table as unknown as { id: typeof users.id }).id })
+      const rows = await db
+        .select({ id: (table as unknown as { id: typeof users.id }).id })
         .from(table as unknown as typeof users)
         .where(eq(col, effectiveClerkId));
       counts[name] = rows.length;
+    } catch (e) {
+      if (isMissingRelation(e)) {
+        log.warn(`campus.${name} table missing — skipping`);
+        counts[name] = -1; // sentinel: "table absent"
+      } else {
+        throw e;
+      }
     }
-  } else {
-    for (const { name } of CHILD_TABLES) counts[name] = 0;
   }
 
-  const leadRows = await db
-    .select({ id: leadCaptureLog.id })
-    .from(leadCaptureLog)
-    .where(eq(leadCaptureLog.email, email));
-  const leadCaptureCount = leadRows.length;
+  let leadCaptureCount = 0;
+  try {
+    const leadRows = await db
+      .select({ id: leadCaptureLog.id })
+      .from(leadCaptureLog)
+      .where(eq(leadCaptureLog.email, email));
+    leadCaptureCount = leadRows.length;
+  } catch (e) {
+    if (isMissingRelation(e)) {
+      log.warn('campus.lead_capture_log table missing — skipping');
+      leadCaptureCount = -1;
+    } else {
+      throw e;
+    }
+  }
 
-  return {
-    userRow: userRow
-      ? { id: userRow.id, clerkId: userRow.clerkId, email: userRow.email }
-      : null,
-    counts,
-    leadCaptureCount,
-  };
+  return { userRow, counts, leadCaptureCount };
 }
 
 async function deleteDb(clerkId: string, email: string) {
   // Delete child rows first so the FK on `users.clerk_id` doesn't trip.
-  // Each table has a `clerk_id` column we filter on.
+  // Each table has a `clerk_id` column we filter on. Tables that don't
+  // exist in this environment (schema drift) are skipped.
   for (const { name, table } of CHILD_TABLES) {
-    const col = (table as unknown as { clerkId: typeof users.clerkId }).clerkId;
-    const deleted = await db
-      .delete(table as unknown as typeof users)
-      .where(eq(col, clerkId))
-      .returning({ id: (table as unknown as { id: typeof users.id }).id });
-    log.done(`db: deleted ${deleted.length} row(s) from ${name}`);
+    try {
+      const col = (table as unknown as { clerkId: typeof users.clerkId }).clerkId;
+      const deleted = await db
+        .delete(table as unknown as typeof users)
+        .where(eq(col, clerkId))
+        .returning({ id: (table as unknown as { id: typeof users.id }).id });
+      log.done(`db: deleted ${deleted.length} row(s) from ${name}`);
+    } catch (e) {
+      if (isMissingRelation(e)) log.warn(`db: ${name} table missing — skipping`);
+      else throw e;
+    }
   }
-  const userDeleted = await db.delete(users).where(eq(users.clerkId, clerkId)).returning({ id: users.id });
-  log.done(`db: deleted ${userDeleted.length} row(s) from users`);
-  const leadDeleted = await db
-    .delete(leadCaptureLog)
-    .where(eq(leadCaptureLog.email, email))
-    .returning({ id: leadCaptureLog.id });
-  log.done(`db: deleted ${leadDeleted.length} row(s) from lead_capture_log`);
+  try {
+    const userDeleted = await db.delete(users).where(eq(users.clerkId, clerkId)).returning({ id: users.id });
+    log.done(`db: deleted ${userDeleted.length} row(s) from users`);
+  } catch (e) {
+    if (isMissingRelation(e)) log.warn('db: users table missing — skipping');
+    else throw e;
+  }
+  try {
+    const leadDeleted = await db
+      .delete(leadCaptureLog)
+      .where(eq(leadCaptureLog.email, email))
+      .returning({ id: leadCaptureLog.id });
+    log.done(`db: deleted ${leadDeleted.length} row(s) from lead_capture_log`);
+  } catch (e) {
+    if (isMissingRelation(e)) log.warn('db: lead_capture_log table missing — skipping');
+    else throw e;
+  }
 }
 
 // ─── Klaviyo lookup + delete ──────────────────────────────────────────────
@@ -337,11 +385,17 @@ async function main() {
       log.missing('no row in users');
     }
     for (const [name, count] of Object.entries(inv.counts)) {
+      if (count === -1) continue; // already logged via log.warn during inventory
       if (count > 0) log.found(`${name}: ${count} row(s)`);
       else log.missing(`${name}: 0`);
     }
-    if (inv.leadCaptureCount > 0) log.found(`lead_capture_log: ${inv.leadCaptureCount} row(s) by email`);
-    else log.missing('lead_capture_log: 0');
+    if (inv.leadCaptureCount === -1) {
+      // already logged via log.warn during inventory
+    } else if (inv.leadCaptureCount > 0) {
+      log.found(`lead_capture_log: ${inv.leadCaptureCount} row(s) by email`);
+    } else {
+      log.missing('lead_capture_log: 0');
+    }
   }
 
   // ─── 3. Stripe lookup ───────────────────────────────────────────────
