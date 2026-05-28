@@ -8,7 +8,6 @@ import Link from "next/link";
 import { Program } from "@/lib/strapi/types";
 import { useUser } from "@clerk/nextjs";
 import { useUserCampus } from "@/app/hooks/useUserCampus";
-import { useIsMobile } from "@/app/hooks/useIsMobile";
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from "@/lib/pricing";
 
 interface ProgramCardProps {
@@ -21,7 +20,6 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
   index = 0,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const isMobile = useIsMobile();
   const { isSignedIn } = useUser();
   const { hasPro } = useUserCampus();
 
@@ -35,16 +33,9 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
 
   return (
     <m.div
-      layout
-      {...(isMobile
-        ? {}
-        : {
-            initial: { opacity: 0, y: 60 },
-            whileInView: { opacity: 1, y: 0 },
-            viewport: { once: true, margin: "-50px" },
-            transition: { delay: index * 0.1, duration: 0.8 },
-            exit: { opacity: 0, scale: 0.9 },
-          })}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(index, 5) * 0.08, duration: 0.5 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative bg-mx-bg rounded-lg overflow-hidden cursor-pointer border border-[#ddd] hover:border-mx-orange/50 transition-all duration-300"
