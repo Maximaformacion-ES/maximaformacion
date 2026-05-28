@@ -273,7 +273,22 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({ program, stickyA
 
             {/* CTA Button */}
             <div className="space-y-3">
-              {isLoaded && !campusLoading && hasAccess ? (
+              {/* While Clerk + campus profile are still resolving, render a
+               * neutral loading button instead of defaulting to "Comprar
+               * Ahora". Otherwise a signed-in owner of the course sees the
+               * purchase CTA for 1-2s before it flips to "Acceder al
+               * Curso", which felt like a bug. */}
+              {!isLoaded || campusLoading ? (
+                <button
+                  {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
+                  disabled
+                  className="flex items-center justify-center gap-3 w-full bg-mx-orange/70 text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg cursor-wait"
+                  aria-busy="true"
+                >
+                  <Loader2 className="animate-spin" size={18} />
+                  Cargando…
+                </button>
+              ) : hasAccess ? (
                 <Link
                   {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
                   href={`/cursos/${program.documentId || program.id}`}

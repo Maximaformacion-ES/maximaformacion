@@ -243,9 +243,13 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
         </div>
       </div>
 
-      {/* Pro savings banner — only when the user could actually save by
-          going Pro (matches the equivalent banner inside the sidebar). */}
-      {!userHasPro && isLoaded && !campusLoading && proSavings > 0 && (
+      {/* Pro savings banner — render optimistically while auth is still
+          loading. proSavings is computed assuming the visitor is not Pro
+          (the common case), so we show it immediately and only hide once
+          we confirm the user actually does have Pro. Previously this
+          waited for isLoaded + campusLoading, which delayed the banner
+          1-2s on mobile. */}
+      {!userHasPro && proSavings > 0 && (
         <Link
           href="/pricing"
           className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-mx-orange/30 bg-mx-orange/5 px-2.5 py-1.5 hover:bg-mx-orange/10 hover:border-mx-orange/50 transition-colors group"
@@ -260,8 +264,19 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program }) =
         </Link>
       )}
 
-      {/* Row 2: CTA button full width */}
-      {isLoaded && !campusLoading && hasAccess ? (
+      {/* Row 2: CTA button full width. Same loading-first pattern as the
+          sidebar — show a neutral "Cargando…" while auth resolves so
+          owners of the course don't see "Comprar Ahora" for 1-2s. */}
+      {!isLoaded || campusLoading ? (
+        <button
+          disabled
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange/70 text-white px-4 py-2 text-label-sm font-medium rounded-lg cursor-wait"
+          aria-busy="true"
+        >
+          <Loader2 className="animate-spin" size={12} />
+          Cargando…
+        </button>
+      ) : hasAccess ? (
         <Link
           href={`/cursos/${program.documentId || program.id}`}
           className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
