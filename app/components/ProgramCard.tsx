@@ -179,11 +179,13 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
             </m.div>
           </div>
 
-          {/* Pro savings hint for non-Pro users */}
+          {/* Pro savings hint for non-Pro users — shows the post-discount
+              price first, then the saving figure: "232€ 👑 Ahorras 58€ con Pro". */}
           {proSavings > 0 && (
             <p className="mt-2 flex items-center gap-1.5 text-mx-orange text-label-md font-medium">
+              <span className="text-body-md">{program.price - proSavings}€</span>
               <Crown size={11} />
-              Ahorra {proSavings}€ con Pro
+              Ahorras {proSavings}€ con Pro
             </p>
           )}
         </div>
