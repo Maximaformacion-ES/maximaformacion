@@ -209,9 +209,14 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           try {
             const studentName = await resolveStudentName(userId);
             const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
+            // Teléfono lo recoge Stripe en customer_details cuando
+            // phone_number_collection está activo en la sesión.
+            // (El DNI se captura post-compra, no en el carro — ver checkout.)
+            const studentPhone = session.customer_details?.phone || undefined;
             const notification = adminPurchaseNotificationEmail({
               studentName: fullName,
               studentEmail: session.customer_email || 'desconocido',
+              studentPhone,
               productTitle: title || documentId,
               productType:
                 paymentType === 'maxymia-course'
@@ -435,9 +440,11 @@ async function handleWithClerk(event: Stripe.Event) {
         try {
           const studentName = await resolveStudentName(userId);
           const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
+          const studentPhone = session.customer_details?.phone || undefined;
           const notification = adminPurchaseNotificationEmail({
             studentName: fullName,
             studentEmail: session.customer_email || 'desconocido',
+            studentPhone,
             productTitle: title || documentId,
             productType:
               paymentType === 'maxymia-course'

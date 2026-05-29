@@ -15,6 +15,18 @@ const PRICE_IDS = {
   },
 };
 
+// Único campo extra en Checkout: teléfono. Es un input nativo de Stripe que
+// no añade un paso, sólo una fila más en el formulario de facturación que ya
+// se rellena. Cero fricción.
+//
+// El DNI/NIE NO se pide aquí (acuerdo Alfonso, 29-may-2026): la universidad
+// lo necesita para emitir el diploma, pero pedirlo en el carro frena la
+// compra. Se captura post-compra mediante modal + banner persistente en
+// /maxymia/campus (pendiente, próximo push).
+const STRIPE_CHECKOUT_EXTRA_FIELDS = {
+  phone_number_collection: { enabled: true },
+} as const satisfies Pick<Stripe.Checkout.SessionCreateParams, 'phone_number_collection'>;
+
 interface CheckoutRequestBody {
   type?: 'subscription' | 'course' | 'maxymia-course' | 'trial';
   planId?: string;
@@ -136,6 +148,7 @@ export async function POST(request: Request) {
           ? { discounts: [{ coupon: maxymiaCouponId }] }
           : { allow_promotion_codes: true }),
         billing_address_collection: 'auto',
+        ...STRIPE_CHECKOUT_EXTRA_FIELDS,
         locale: 'es',
       });
 
@@ -359,6 +372,7 @@ export async function POST(request: Request) {
           ? { discounts: [{ coupon: programCouponId }] }
           : { allow_promotion_codes: true }),
         billing_address_collection: 'auto',
+        ...STRIPE_CHECKOUT_EXTRA_FIELDS,
         locale: 'es',
       });
 
@@ -469,6 +483,7 @@ export async function POST(request: Request) {
         },
         allow_promotion_codes: true,
         billing_address_collection: 'auto',
+        ...STRIPE_CHECKOUT_EXTRA_FIELDS,
         success_url: `${baseUrl}/pricing?success=true&trial=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing`,
       });
@@ -525,6 +540,7 @@ export async function POST(request: Request) {
       allow_promotion_codes: true,
       // Billing address collection
       billing_address_collection: 'auto',
+      ...STRIPE_CHECKOUT_EXTRA_FIELDS,
     });
 
     return NextResponse.json({

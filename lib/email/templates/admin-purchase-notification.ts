@@ -1,6 +1,7 @@
 interface AdminPurchaseNotificationParams {
   studentName: string;
   studentEmail: string;
+  studentPhone?: string;
   productTitle: string;
   productType: 'Curso' | 'Master' | 'Maxymia';
   amount: number;
@@ -17,7 +18,17 @@ interface AdminPurchaseNotificationParams {
 export function adminPurchaseNotificationEmail(
   params: AdminPurchaseNotificationParams,
 ): { subject: string; html: string; text: string } {
-  const { studentName, studentEmail, productTitle, productType, amount, currency, stripeSessionId, purchasedAt } = params;
+  const {
+    studentName,
+    studentEmail,
+    studentPhone,
+    productTitle,
+    productType,
+    amount,
+    currency,
+    stripeSessionId,
+    purchasedAt,
+  } = params;
 
   const formattedAmount = new Intl.NumberFormat('es-ES', {
     style: 'currency',
@@ -65,6 +76,10 @@ export function adminPurchaseNotificationEmail(
                   </td>
                 </tr>
                 <tr>
+                  <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;color:#666;font-size:14px;">Teléfono</td>
+                  <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;font-size:14px;font-weight:500;">${studentPhone ? `<a href="tel:${studentPhone}" style="color:#f59e0b;text-decoration:none;">${studentPhone}</a>` : '<span style="color:#999;">—</span>'}</td>
+                </tr>
+                <tr>
                   <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;color:#666;font-size:14px;">Tipo</td>
                   <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;font-size:14px;font-weight:500;">${productType}</td>
                 </tr>
@@ -101,6 +116,7 @@ export function adminPurchaseNotificationEmail(
     `Producto: ${productTitle}`,
     `Tipo:     ${productType}`,
     `Alumno:   ${studentName} <${studentEmail}>`,
+    `Teléfono: ${studentPhone || '—'}`,
     `Importe:  ${formattedAmount}`,
     `Fecha:    ${formattedDate}`,
     `Stripe:   ${stripeSessionId}`,

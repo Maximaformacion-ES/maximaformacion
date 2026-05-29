@@ -70,15 +70,17 @@ export default function ProgramDetailClient({
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
-        <Breadcrumb
-          items={[
-            { label: 'Programas', href: '/programas' },
-            { label: program.title },
-          ]}
-        />
         <ProgramHeroSection
           program={program}
-          compactTop
+          breadcrumb={
+            <Breadcrumb
+              items={[
+                { label: 'Programas', href: '/programas' },
+                { label: program.title },
+              ]}
+              className=""
+            />
+          }
           sidebar={
             <ProgramSidebar
               program={program}

@@ -40,7 +40,18 @@ const EMPTY: ServerUserState = {
  * round-trip per page view.
  */
 export async function getServerUserState(): Promise<ServerUserState> {
-  const { userId } = await auth();
+  // Bot requests bypass the Clerk middleware wrapper (see proxy.ts) to avoid
+  // the dev-handshake redirect that crawlers can't follow. Without the
+  // wrapper context, `auth()` throws — which turned every public program page
+  // into a 5xx for Googlebot. Treat the failure as "anonymous visitor": the
+  // bot sees the same SSR HTML that signed-out users get, which is exactly
+  // what we want indexed.
+  let userId: string | null = null;
+  try {
+    ({ userId } = await auth());
+  } catch {
+    return EMPTY;
+  }
   if (!userId) return EMPTY;
   if (!isDbConfigured()) {
     // No Postgres → can't read enrollments. Still report signed-in so the

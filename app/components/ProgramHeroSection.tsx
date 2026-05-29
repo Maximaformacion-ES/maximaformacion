@@ -10,22 +10,26 @@ interface ProgramHeroSectionProps {
   program: Program;
   sidebar?: React.ReactNode;
   tabs?: React.ReactNode;
-  /** When the page renders a breadcrumb directly above the hero, the
-   *  hero's own top padding (sized to clear the fixed header) becomes
-   *  redundant and creates a noticeable empty gap. Setting this flag
-   *  collapses the top padding to just enough breathing room. */
-  compactTop?: boolean;
+  /** Optional breadcrumb rendered inside the hero, right under the
+   *  fixed header. Sits on top of the hero's background image so the
+   *  image starts at the very top of the section instead of below an
+   *  extra gap. Pass it as a node so callers can configure labels and
+   *  styling without this component knowing about the trail. */
+  breadcrumb?: React.ReactNode;
 }
 
 export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
   program,
   sidebar,
   tabs,
-  compactTop = false,
+  breadcrumb,
 }) => {
-  const topPaddingClass = compactTop ? 'pt-4 md:pt-6' : 'pt-28 md:pt-32';
+  // The hero always clears the fixed header. When a breadcrumb is
+  // supplied, it sits at the top of the content area below the header
+  // and the badges/title shift down by mb-4, so the image stays as the
+  // visual backdrop from the top edge.
   return (
-    <section className={`relative ${topPaddingClass} pb-12 md:pb-16 overflow-visible`}>
+    <section className="relative pt-24 md:pt-28 pb-12 md:pb-16 overflow-visible">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.82)] to-[rgba(255,252,248,0.55)] z-10" />
@@ -43,6 +47,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
       </div>
 
       <div className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12">
+        {breadcrumb && <div className="mb-4 md:mb-6">{breadcrumb}</div>}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
