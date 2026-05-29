@@ -76,7 +76,7 @@ export const InnovacionServicesSection: React.FC = () => {
             <span className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block">
               Nuestros servicios
             </span>
-            <h2 className="text-[#016157] text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6 leading-heading uppercase">
+            <h2 className="text-[#016157] text-heading-sm md:text-heading-md xl:text-heading-lg font-black mb-6 leading-heading uppercase text-balance">
               Todo lo que debes saber
             </h2>
             <p className="text-mx-text-muted text-body-sm md:text-body-md font-light">

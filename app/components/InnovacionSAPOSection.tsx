@@ -51,14 +51,45 @@ export const InnovacionSAPOSection: React.FC = () => {
   return (
     <section className="py-20 md:py-32 px-6 md:px-12 bg-mx-bg overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        {/* Sub-zone A: Product hero with image */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-16 md:mb-32">
+        {/* Sub-zone A: Product hero with image. The image now lives as an
+            oversized absolute layer hugging the right edge so it reads as
+            a backdrop rather than an inline screenshot, while the text
+            column keeps its half-width so copy stays legible on top. */}
+        <div className="relative flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-16 md:mb-32">
+          {/* Background images — desktop only, behind the text. Two
+              mockups stacked vertically on the right half. Centered as
+              a group via top-1/2 + -translate-y-1/2 so the pair grows
+              upward and downward equally around the section midpoint. */}
+          <m.div
+            initial={{ opacity: 0, x: 60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="hidden lg:flex flex-col gap-8 pointer-events-none absolute top-1/2 -translate-y-1/2 right-0 z-0 w-full max-w-xl opacity-90"
+            aria-hidden="true"
+          >
+            <Image
+              src="/sapo_university-mockup.png"
+              alt=""
+              className="w-full h-auto drop-shadow-2xl"
+              width={448}
+              height={800}
+            />
+            <Image
+              src="/sapo-mockup-2.png"
+              alt=""
+              className="w-full h-auto drop-shadow-2xl"
+              width={448}
+              height={800}
+            />
+          </m.div>
+
           {/* Left: Text content + cards */}
           <m.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="lg:w-1/2"
+            className="relative z-10 lg:w-1/2"
           >
             <span
               className="text-label-sm md:text-label-md xl:text-label-lg font-medium tracking-[0.5em] uppercase mb-4 block text-mx-orange"
@@ -115,15 +146,23 @@ export const InnovacionSAPOSection: React.FC = () => {
             </a>
           </m.div>
 
-          {/* Right: App image */}
+          {/* Mobile/tablet inline images — on lg+ the absolute backdrop
+              above replaces this so we don't render the screenshots twice. */}
           <m.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="lg:w-1/2 flex justify-center"
+            className="lg:hidden w-full flex flex-col items-center gap-8"
           >
             <Image
-              src="/sapo.png"
+              src="/sapo_university-mockup.png"
+              alt="SAPO Statistical Assistant"
+              className="w-full max-w-md drop-shadow-2xl"
+              width={448}
+              height={800}
+            />
+            <Image
+              src="/sapo-mockup-2.png"
               alt="SAPO Statistical Assistant"
               className="w-full max-w-md drop-shadow-2xl"
               width={448}

@@ -77,7 +77,7 @@ export const InnovacionHeroSection: React.FC<InnovacionHeroSectionProps> = ({ da
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-white/90 text-body-sm md:text-body-md xl:text-body-lg font-light mb-10 max-w-2xl mx-auto drop-shadow"
+          className="text-[#016157] text-body-sm md:text-body-md xl:text-body-lg font-light mb-10 max-w-2xl mx-auto drop-shadow"
         >
           {heroDescription}
         </m.p>

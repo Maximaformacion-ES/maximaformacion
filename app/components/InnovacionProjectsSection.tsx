@@ -16,16 +16,16 @@ const projects: Project[] = [
   {
     title: 'SAPO Statistical Assistant',
     description:
-      'Aplicación móvil que automatiza el análisis estadístico y genera resultados listos para publicar.',
-    url: 'https://biomaximainnovacion.es/sapo',
-    image: '/sapo_url.png',
+      'Aplicación web que automatiza el análisis estadístico y genera resultados listos para publicar.',
+    url: 'https://www.sapo.university/',
+    image: '/sapo_url.webp',
   },
   {
     title: 'Maxymia: Formación en IA aplicada a la ciencia',
     description:
       'Plataforma de cursos online especializados en inteligencia artificial aplicada a ciencia y salud.',
-    url: 'https://maxymia.com/',
-    image: '/maximia.png',
+    url: '/maxymia',
+    image: '/maxymia.webp',
   },
 ];
 
@@ -54,12 +54,17 @@ export const InnovacionProjectsSection: React.FC = () => {
 
         {/* Two 50/50 image cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {projects.map((project, idx) => (
+          {projects.map((project, idx) => {
+            // External projects (SAPO, partner sites) open in a new tab so
+            // the visitor doesn't lose the marketing page. Internal routes
+            // (e.g. /maxymia) navigate in the same tab — that's the normal
+            // expectation for in-site links.
+            const isExternal = /^https?:\/\//.test(project.url);
+            return (
             <m.a
               key={project.title}
               href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -93,7 +98,8 @@ export const InnovacionProjectsSection: React.FC = () => {
                 <ArrowUpRight size={24} className="text-white" />
               </div>
             </m.a>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
