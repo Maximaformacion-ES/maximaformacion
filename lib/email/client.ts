@@ -22,6 +22,13 @@ interface SendEmailOptions {
   html: string;
   text?: string;
   replyTo?: string;
+  /** Override the sender address for this email. Falls back to the global
+   *  EMAIL_FROM (noreply@…). Pass this when the email represents a person
+   *  (e.g. tutor académico, customer success) and the user might reply
+   *  expecting a human on the other side. The address must be verified
+   *  in Resend (DKIM/SPF) under the same domain — otherwise Resend
+   *  rejects the send or it lands in spam. */
+  from?: string;
   attachments?: EmailAttachment[];
 }
 
@@ -32,7 +39,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   }
 
   const { data, error } = await resend.emails.send({
-    from: fromAddress,
+    from: options.from || fromAddress,
     to: options.to,
     subject: options.subject,
     html: options.html,
@@ -52,7 +59,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   if (error) {
     // Log full error shape so Vercel logs show Resend's reason
     // (invalid_from_address, domain_not_verified, rate_limit, etc.)
-    console.error(`[resend] send failed → ${options.to} from=${fromAddress}`, error);
+    console.error(`[resend] send failed → ${options.to} from=${options.from || fromAddress}`, error);
     throw new Error(`Resend send failed: ${error.message}`);
   }
 

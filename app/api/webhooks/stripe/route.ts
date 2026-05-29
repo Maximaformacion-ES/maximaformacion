@@ -8,6 +8,8 @@ import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
 import { provisionMoodleAccess } from '@/lib/moodle/provision';
 import { sendEmail } from '@/lib/email/client';
 import { adminPurchaseNotificationEmail } from '@/lib/email/templates/admin-purchase-notification';
+import { diplomaWelcomeEmail } from '@/lib/email/templates/diploma-welcome';
+import { getSiteUrl } from '@/lib/site-url';
 
 const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'cursos@maximaformacion.es';
 
@@ -125,6 +127,97 @@ async function provisionMoodleForPurchase(params: {
  * on the client until the metadata catches up. Best-effort: we log and
  * swallow Clerk errors so a transient outage doesn't poison the webhook.
  */
+// Si el alumno compra el curso "Moodle para Docentes y Creación de
+// Contenidos con eXeLearning", mandarle el correo de bienvenida con la
+// documentación necesaria para emitir el diploma de la Universidad de
+// Nebrija — replica el email manual que José Antonio enviaba hasta hoy.
+// Solo se dispara para ese slug; cualquier otro curso ignora este paso.
+const DIPLOMA_COURSE_SLUG = 'curso-moodle-para-docentes-con-exelearning';
+// Display name + email — Gmail/Outlook bajan la sospecha de phishing cuando
+// el From identifica a una persona en lugar de un alias suelto. Tiene que
+// coincidir con la firma del cuerpo.
+const DIPLOMA_EMAIL_FROM = 'José Antonio Lorente <cursos@maximaformacion.es>';
+const DIPLOMA_DOCS_INBOX = 'tutor@maximaformacion.es';
+const DIPLOMA_PDF_FILES = [
+  'Autorización Solicitud de Título.pdf',
+  'ANEXO I - TRATAMIENTO DATOS PERSONALES NEBRIJA.pdf',
+] as const;
+
+async function sendDiplomaWelcomeIfApplicable(params: {
+  documentId: string;
+  customerEmail: string | null;
+  clerkId: string;
+}): Promise<void> {
+  const { documentId, customerEmail, clerkId } = params;
+  if (!customerEmail) return;
+
+  let program: StrapiProgram | null = null;
+  try {
+    const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
+      `/api/programs/${documentId}?populate=*`,
+      { revalidate: 0 }
+    );
+    program = response.data;
+  } catch (error) {
+    console.warn(`[diploma-welcome] Could not fetch program ${documentId}:`, error);
+    return;
+  }
+
+  if (!program || program.slug !== DIPLOMA_COURSE_SLUG) return;
+
+  // Los PDFs viven en public/diploma/. En Vercel, los assets de public/
+  // se sirven estáticamente pero NO están en el filesystem del serverless
+  // function por defecto, así que los descargamos vía HTTPS desde el
+  // propio dominio. En local apunta a localhost:3000 (donde el dev
+  // server los sirve igualmente). El nombre con tildes/espacios se
+  // codifica con encodeURIComponent — Resend lo recibe como bytes y
+  // sólo usa `filename` como display name (sin re-codificar).
+  const baseUrl = getSiteUrl('http://localhost:3000');
+  let attachments: { filename: string; content: Buffer; contentType: string }[];
+  try {
+    attachments = await Promise.all(
+      DIPLOMA_PDF_FILES.map(async (filename) => {
+        const url = `${baseUrl}/diploma/${encodeURIComponent(filename)}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`fetch ${url} → ${res.status}`);
+        }
+        return {
+          filename,
+          content: Buffer.from(await res.arrayBuffer()),
+          contentType: 'application/pdf',
+        };
+      })
+    );
+  } catch (error) {
+    console.error(
+      `[diploma-welcome] Failed to fetch attachment PDFs — email NOT sent:`,
+      error
+    );
+    return;
+  }
+
+  const { firstname } = await resolveStudentName(clerkId);
+  const { subject, html, text } = diplomaWelcomeEmail({
+    studentName: firstname || 'alumno',
+  });
+
+  try {
+    await sendEmail({
+      to: customerEmail,
+      from: DIPLOMA_EMAIL_FROM,
+      replyTo: DIPLOMA_DOCS_INBOX,
+      subject,
+      html,
+      text,
+      attachments,
+    });
+    console.log(`[diploma-welcome] sent to ${customerEmail}`);
+  } catch (error) {
+    console.error(`[diploma-welcome] send failed for ${customerEmail}:`, error);
+  }
+}
+
 async function syncClerkPlan(
   clerkId: string,
   patch: Record<string, unknown>
@@ -328,6 +421,14 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
             await provisionMoodleForPurchase({
               documentId,
               programTitle: title,
+              customerEmail: session.customer_email,
+              clerkId: userId,
+            });
+
+            // Si el curso requiere diploma de Nebrija (hoy solo el de
+            // Moodle + eXeLearning), pedir la documentación al alumno.
+            await sendDiplomaWelcomeIfApplicable({
+              documentId,
               customerEmail: session.customer_email,
               clerkId: userId,
             });
@@ -569,6 +670,13 @@ async function handleWithClerk(event: Stripe.Event) {
           await provisionMoodleForPurchase({
             documentId,
             programTitle: title,
+            customerEmail: session.customer_email,
+            clerkId: userId,
+          });
+
+          // Diploma docs welcome (ver handleWithDb).
+          await sendDiplomaWelcomeIfApplicable({
+            documentId,
             customerEmail: session.customer_email,
             clerkId: userId,
           });
