@@ -15,17 +15,39 @@ const PRICE_IDS = {
   },
 };
 
-// Único campo extra en Checkout: teléfono. Es un input nativo de Stripe que
-// no añade un paso, sólo una fila más en el formulario de facturación que ya
-// se rellena. Cero fricción.
+// Campos fiscales en Checkout (29-may-2026, Marcos):
 //
-// El DNI/NIE NO se pide aquí (acuerdo Alfonso, 29-may-2026): la universidad
-// lo necesita para emitir el diploma, pero pedirlo en el carro frena la
-// compra. Se captura post-compra mediante modal + banner persistente en
-// /maxymia/campus (pendiente, próximo push).
+//   - custom_fields.dni: NIF (DNI / NIE / CIF). Obligatorio. AEAT
+//     exige factura ordinaria con NIF para importes ≥400€
+//     (RD 1619/2012 art. 7), y la mayoría del catálogo está por encima.
+//     Recogerlo post-compra deja facturas sin DNI si el alumno nunca
+//     entra al campus → riesgo en inspección AEAT.
+//
+//   - tax_id_collection: las empresas pueden añadir su CIF formal
+//     como Tax ID estándar de Stripe → aparece en la factura PDF
+//     auto-generada. Toggle plegado, no añade fricción al particular.
+//
+// El teléfono NO se recoge: Stripe sólo permite phone_number_collection
+// como obligatorio, no opcional, y Marcos dijo "opcional o nada".
+// Si quisiéramos opcional habría que meterlo como custom_field libre,
+// pero introduce un segundo campo sin validación nativa.
 const STRIPE_CHECKOUT_EXTRA_FIELDS = {
-  phone_number_collection: { enabled: true },
-} as const satisfies Pick<Stripe.Checkout.SessionCreateParams, 'phone_number_collection'>;
+  tax_id_collection: { enabled: true },
+  custom_fields: [
+    {
+      key: 'dni',
+      label: {
+        type: 'custom',
+        custom: 'DNI / NIE / CIF (requerido para tu factura)',
+      },
+      type: 'text',
+      text: { minimum_length: 8, maximum_length: 12 },
+    },
+  ],
+} as const satisfies Pick<
+  Stripe.Checkout.SessionCreateParams,
+  'tax_id_collection' | 'custom_fields'
+>;
 
 interface CheckoutRequestBody {
   type?: 'subscription' | 'course' | 'maxymia-course' | 'trial';
@@ -147,7 +169,7 @@ export async function POST(request: Request) {
         ...(maxymiaCouponId
           ? { discounts: [{ coupon: maxymiaCouponId }] }
           : { allow_promotion_codes: true }),
-        billing_address_collection: 'auto',
+        billing_address_collection: 'required',
         ...STRIPE_CHECKOUT_EXTRA_FIELDS,
         locale: 'es',
       });
@@ -371,7 +393,7 @@ export async function POST(request: Request) {
         ...(programCouponId
           ? { discounts: [{ coupon: programCouponId }] }
           : { allow_promotion_codes: true }),
-        billing_address_collection: 'auto',
+        billing_address_collection: 'required',
         ...STRIPE_CHECKOUT_EXTRA_FIELDS,
         locale: 'es',
       });
@@ -482,7 +504,7 @@ export async function POST(request: Request) {
           togglePeriodSeen: planPeriod || 'month',
         },
         allow_promotion_codes: true,
-        billing_address_collection: 'auto',
+        billing_address_collection: 'required',
         ...STRIPE_CHECKOUT_EXTRA_FIELDS,
         success_url: `${baseUrl}/pricing?success=true&trial=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing`,
@@ -539,7 +561,7 @@ export async function POST(request: Request) {
       // Allow promotion codes
       allow_promotion_codes: true,
       // Billing address collection
-      billing_address_collection: 'auto',
+      billing_address_collection: 'required',
       ...STRIPE_CHECKOUT_EXTRA_FIELDS,
     });
 

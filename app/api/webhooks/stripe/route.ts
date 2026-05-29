@@ -140,6 +140,85 @@ async function syncClerkPlan(
   }
 }
 
+/**
+ * Forward a Stripe-generated invoice PDF to the maximaformación admin
+ * inbox so accountancy can archive without hunting in the Stripe
+ * Dashboard. Triggered on `invoice.finalized` events.
+ *
+ * Why a separate function: the email goes to `cursos@…`, not to the
+ * buyer, and the PDF is downloaded server-side and attached so the
+ * recipient doesn't depend on Stripe's hosted URL staying live.
+ *
+ * Best-effort: any failure (PDF fetch, Resend down) is logged and
+ * swallowed so the webhook still returns 200 and Stripe doesn't retry.
+ */
+async function forwardInvoiceToAdmin(invoice: Stripe.Invoice): Promise<void> {
+  if (!invoice.invoice_pdf) {
+    console.warn(`[invoice-forward] invoice ${invoice.id} has no invoice_pdf URL — skipping`);
+    return;
+  }
+
+  const pdfResponse = await fetch(invoice.invoice_pdf);
+  if (!pdfResponse.ok) {
+    throw new Error(`Stripe PDF fetch failed: ${pdfResponse.status}`);
+  }
+  const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer());
+
+  const amountFormatted = new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: (invoice.currency || 'eur').toUpperCase(),
+  }).format((invoice.amount_paid || invoice.amount_due || 0) / 100);
+
+  const customer =
+    invoice.customer_name ||
+    invoice.customer_email ||
+    (typeof invoice.customer === 'string' ? invoice.customer : 'desconocido');
+
+  // Invoice number falls back to invoice.id during preview mode where
+  // Stripe hasn't assigned a sequence number yet.
+  const invoiceLabel = invoice.number || invoice.id;
+  const filename = `factura-${invoiceLabel}.pdf`;
+
+  const subject = `Factura ${invoiceLabel} — ${customer} (${amountFormatted})`;
+  const html = `<!DOCTYPE html><html lang="es"><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a;padding:24px;">
+    <p style="margin:0 0 12px;color:#f59e0b;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Factura emitida</p>
+    <h1 style="margin:0 0 20px;font-size:20px;">${invoiceLabel}</h1>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:8px 0;color:#666;width:120px;">Cliente</td><td style="padding:8px 0;font-weight:500;">${customer}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;">Email</td><td style="padding:8px 0;">${invoice.customer_email || '—'}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;">Importe</td><td style="padding:8px 0;font-weight:600;color:#f59e0b;">${amountFormatted}</td></tr>
+      <tr><td style="padding:8px 0;color:#666;">Estado</td><td style="padding:8px 0;">${invoice.status || 'unknown'}</td></tr>
+    </table>
+    <p style="margin:24px 0 0;color:#999;font-size:12px;">PDF adjunto. Notificación automática.</p>
+  </body></html>`;
+
+  const text = [
+    `Factura emitida: ${invoiceLabel}`,
+    `Cliente: ${customer} <${invoice.customer_email || '—'}>`,
+    `Importe: ${amountFormatted}`,
+    `Estado:  ${invoice.status || 'unknown'}`,
+    '',
+    'PDF adjunto. Notificación automática.',
+  ].join('\n');
+
+  await sendEmail({
+    to: ADMIN_NOTIFICATION_EMAIL,
+    subject,
+    html,
+    text,
+    replyTo: invoice.customer_email || undefined,
+    attachments: [
+      {
+        filename,
+        content: pdfBuffer,
+        contentType: 'application/pdf',
+      },
+    ],
+  });
+
+  console.log(`[invoice-forward] ${invoiceLabel} → ${ADMIN_NOTIFICATION_EMAIL}`);
+}
+
 async function handleWithDb(event: Stripe.Event): Promise<boolean> {
   if (!isDbConfigured()) return false;
 
@@ -209,14 +288,17 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           try {
             const studentName = await resolveStudentName(userId);
             const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
-            // Teléfono lo recoge Stripe en customer_details cuando
-            // phone_number_collection está activo en la sesión.
-            // (El DNI se captura post-compra, no en el carro — ver checkout.)
-            const studentPhone = session.customer_details?.phone || undefined;
+            // DNI/NIE/CIF llega como custom_field key='dni'
+            // (ver app/api/checkout/route.ts). Si la sesión es legacy
+            // (compra anterior a este push), llegará undefined y el
+            // email lo marca como "no facilitado" en rojo para que
+            // José Antonio sepa reclamarlo manualmente.
+            const dniField = session.custom_fields?.find((f) => f.key === 'dni');
+            const studentDni = dniField?.text?.value || undefined;
             const notification = adminPurchaseNotificationEmail({
               studentName: fullName,
               studentEmail: session.customer_email || 'desconocido',
-              studentPhone,
+              studentDni,
               productTitle: title || documentId,
               productType:
                 paymentType === 'maxymia-course'
@@ -372,6 +454,19 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
         return true;
       }
 
+      case 'invoice.finalized': {
+        // Forward every Stripe-generated invoice to the admin inbox so
+        // José Antonio doesn't have to dig through the Stripe Dashboard
+        // (req. 29-may-2026). PDF is fetched server-side and attached so
+        // the recipient can archive without depending on Stripe's hosted
+        // URL staying live forever.
+        const invoice = event.data.object as Stripe.Invoice;
+        await forwardInvoiceToAdmin(invoice).catch((e) =>
+          console.warn('[invoice-forward] failed:', e)
+        );
+        return true;
+      }
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
         return true;
@@ -440,11 +535,12 @@ async function handleWithClerk(event: Stripe.Event) {
         try {
           const studentName = await resolveStudentName(userId);
           const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
-          const studentPhone = session.customer_details?.phone || undefined;
+          const dniField = session.custom_fields?.find((f) => f.key === 'dni');
+          const studentDni = dniField?.text?.value || undefined;
           const notification = adminPurchaseNotificationEmail({
             studentName: fullName,
             studentEmail: session.customer_email || 'desconocido',
-            studentPhone,
+            studentDni,
             productTitle: title || documentId,
             productType:
               paymentType === 'maxymia-course'
@@ -562,6 +658,16 @@ async function handleWithClerk(event: Stripe.Event) {
           },
         });
       }
+      break;
+    }
+
+    case 'invoice.finalized': {
+      // Mirror of the DB-branch behaviour: forward the PDF to admin.
+      // No Clerk state to update here — it's a pure side-effect.
+      const invoice = event.data.object as Stripe.Invoice;
+      await forwardInvoiceToAdmin(invoice).catch((e) =>
+        console.warn('[invoice-forward] failed:', e)
+      );
       break;
     }
   }

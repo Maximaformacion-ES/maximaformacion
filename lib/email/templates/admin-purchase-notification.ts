@@ -1,7 +1,7 @@
 interface AdminPurchaseNotificationParams {
   studentName: string;
   studentEmail: string;
-  studentPhone?: string;
+  studentDni?: string;
   productTitle: string;
   productType: 'Curso' | 'Master' | 'Maxymia';
   amount: number;
@@ -21,7 +21,7 @@ export function adminPurchaseNotificationEmail(
   const {
     studentName,
     studentEmail,
-    studentPhone,
+    studentDni,
     productTitle,
     productType,
     amount,
@@ -76,8 +76,8 @@ export function adminPurchaseNotificationEmail(
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;color:#666;font-size:14px;">Teléfono</td>
-                  <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;font-size:14px;font-weight:500;">${studentPhone ? `<a href="tel:${studentPhone}" style="color:#f59e0b;text-decoration:none;">${studentPhone}</a>` : '<span style="color:#999;">—</span>'}</td>
+                  <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;color:#666;font-size:14px;">DNI / NIE / CIF</td>
+                  <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;font-size:14px;font-weight:600;font-family:'SFMono-Regular',Menlo,monospace;">${studentDni || '<span style="color:#cc0000;font-weight:500;">⚠ no facilitado</span>'}</td>
                 </tr>
                 <tr>
                   <td style="padding:14px 0;border-bottom:1px solid #e5e5e5;color:#666;font-size:14px;">Tipo</td>
@@ -116,7 +116,7 @@ export function adminPurchaseNotificationEmail(
     `Producto: ${productTitle}`,
     `Tipo:     ${productType}`,
     `Alumno:   ${studentName} <${studentEmail}>`,
-    `Teléfono: ${studentPhone || '—'}`,
+    `DNI/NIE:  ${studentDni || '⚠ no facilitado'}`,
     `Importe:  ${formattedAmount}`,
     `Fecha:    ${formattedDate}`,
     `Stripe:   ${stripeSessionId}`,

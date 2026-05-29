@@ -9,12 +9,20 @@ if (!apiKey && process.env.NODE_ENV === 'production') {
 
 const resend = apiKey ? new Resend(apiKey) : null;
 
+interface EmailAttachment {
+  filename: string;
+  /** Raw PDF/file bytes. Resend re-encodes to base64 on the wire. */
+  content: Buffer;
+  contentType?: string;
+}
+
 interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
+  attachments?: EmailAttachment[];
 }
 
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
@@ -30,6 +38,15 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     html: options.html,
     text: options.text,
     replyTo: options.replyTo,
+    ...(options.attachments && options.attachments.length > 0
+      ? {
+          attachments: options.attachments.map((a) => ({
+            filename: a.filename,
+            content: a.content,
+            ...(a.contentType ? { contentType: a.contentType } : {}),
+          })),
+        }
+      : {}),
   });
 
   if (error) {
