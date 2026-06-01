@@ -17,6 +17,14 @@ import "./globals.css";
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 const GTM_AUTH = process.env.NEXT_PUBLIC_GTM_AUTH;
 const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW;
+// Segundo contenedor GTM que CONVIVE con el principal (p. ej. el de la
+// agencia de marketing). @next/third-parties solo admite un gtmId por
+// componente, así que renderizamos un <GoogleTagManager> por contenedor.
+// Ambos comparten el mismo window.dataLayer, por lo que un único
+// <Analytics /> alimenta los triggers de los dos.
+const GTM_ID_2 = process.env.NEXT_PUBLIC_GTM_ID_2;
+const GTM_AUTH_2 = process.env.NEXT_PUBLIC_GTM_AUTH_2;
+const GTM_PREVIEW_2 = process.env.NEXT_PUBLIC_GTM_PREVIEW_2;
 const COOKIEBOT_ID = process.env.NEXT_PUBLIC_COOKIEBOT_ID;
 
 const ztNature = localFont({
@@ -184,7 +192,14 @@ gtag('consent', 'default', {
               preview={GTM_PREVIEW}
             />
           )}
-          {GTM_ID && <Analytics />}
+          {GTM_ID_2 && (
+            <GoogleTagManager
+              gtmId={GTM_ID_2}
+              auth={GTM_AUTH_2}
+              preview={GTM_PREVIEW_2}
+            />
+          )}
+          {(GTM_ID || GTM_ID_2) && <Analytics />}
           <SiteBrandingProvider value={branding}>
             <MegaMenuProvider value={{ areas: megaMenuAreas }}>
               <MotionProvider>{children}</MotionProvider>
