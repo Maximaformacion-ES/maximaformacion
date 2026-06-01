@@ -166,6 +166,7 @@ export interface StrapiAuthor {
   bio?: string | null;
   isTeacher?: boolean;
   featured?: boolean;
+  displayOrder?: number | null;
   expertiseAreas?: string[] | null;
   websiteUrl?: string | null;
   twitter?: string | null;

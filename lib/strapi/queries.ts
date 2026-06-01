@@ -431,7 +431,7 @@ function transformTeacher(strapi: StrapiAuthor): TeacherProfile {
 export async function getTeachers(): Promise<TeacherProfile[]> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiAuthor[]>>(
-      '/api/authors?filters[isTeacher][$eq]=true&populate[avatar]=true&pagination[pageSize]=100&sort=featured:desc,name:asc',
+      '/api/authors?filters[isTeacher][$eq]=true&populate[avatar]=true&pagination[pageSize]=100&sort=displayOrder:asc,featured:desc,name:asc',
       { revalidate: 60, tags: ['authors', 'teachers'] },
     );
     return response.data.map(transformTeacher).filter((t) => t.slug);
