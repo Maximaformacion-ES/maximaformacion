@@ -141,7 +141,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               className="flex items-center gap-6 pt-8 border-t border-white/10"
             >
               {[
-                { value: '2.500+', label: 'Alumnos activos' },
+                { value: '2.500+', label: 'Alumnado activo' },
                 { value: '44', label: 'Cursos especializados' },
                 { value: '98%', label: 'Satisfacción' },
               ].map((stat, i) => (

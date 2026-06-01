@@ -13,7 +13,7 @@ interface StatsSectionProps {
 
 export const StatsSection: React.FC<StatsSectionProps> = ({
   students = '15K+',
-  bussiness = '50+',
+  bussiness = '200+',
   activePrograms = '150+',
   mediaRating = '4.9',
 }) => {

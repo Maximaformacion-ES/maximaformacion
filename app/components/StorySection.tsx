@@ -16,7 +16,7 @@ export const StorySection: React.FC = () => {
           Máxima Formación nace con un propósito claro: democratizar la formación superior online de alta calidad, especializada y con un enfoque humano y cercano.
         </p>
         <p>
-          Nuestro nombre no es casual. Buscamos la <strong className="text-mx-text">máxima</strong> excelencia en nuestros programas, la <strong className="text-mx-text">máxima</strong> atención a nuestros alumnos y el <strong className="text-mx-text">máximo</strong> impacto en sus carreras profesionales.
+          Nuestro nombre no es casual. Buscamos la <strong className="text-mx-text">máxima</strong> excelencia en nuestros programas, la <strong className="text-mx-text">máxima</strong> atención a nuestro alumnado y el <strong className="text-mx-text">máximo</strong> impacto en sus carreras profesionales.
         </p>
         <div className="pt-6 md:pt-8 grid grid-cols-2 gap-4 md:gap-8 border-t border-mx-border">
           <div>
@@ -25,7 +25,7 @@ export const StorySection: React.FC = () => {
           </div>
           <div>
             <span className="text-mx-orange text-heading-sm md:text-heading-md xl:text-heading-lg font-bold block">40k+</span>
-            <span className="text-label-sm md:text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Alumnos formados</span>
+            <span className="text-label-sm md:text-label-md leading-label text-mx-text-muted uppercase tracking-widest">Alumnado formado</span>
           </div>
         </div>
       </div>

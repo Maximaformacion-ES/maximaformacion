@@ -64,7 +64,7 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
   partnerLogos = DEFAULT_PARTNER_LOGOS,
   overline = 'Partners',
   title = 'Confían en nosotros',
-  description = 'Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
+  description = 'Más de 200 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
 }) => {
 
   return (

@@ -35,7 +35,7 @@ export const MissionVisionSection: React.FC = () => {
             <p className="text-body-sm md:text-body-md text-mx-text-muted font-light leading-relaxed max-w-2xl mx-auto">
               Ofrecer formación online rigurosa y práctica que{' '}
               <span className="text-mx-text font-medium">transforme la vida profesional</span>{' '}
-              de nuestros alumnos, proporcionándoles herramientas y conocimientos que generen un impacto real en sus carreras.
+              de nuestro alumnado, proporcionándole herramientas y conocimientos que generen un impacto real en sus carreras.
             </p>
           </m.div>
 
@@ -73,7 +73,7 @@ export const MissionVisionSection: React.FC = () => {
               <h3 className="text-heading-sm md:text-heading-md font-black text-mx-text uppercase tracking-wide">Valores</h3>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
-              {['Cercanía', 'Rigor académico', 'Innovación constante', 'Compromiso con el alumno'].map(
+              {['Cercanía', 'Rigor', 'Innovación', 'Compromiso'].map(
                 (valor) => (
                   <span
                     key={valor}

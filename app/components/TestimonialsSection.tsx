@@ -37,7 +37,7 @@ interface TestimonialsSectionProps {
 }
 
 export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
-  overline = 'Lo que dicen nuestros alumnos',
+  overline = 'Lo que dice nuestro alumnado',
   title = 'HISTORIAS {DE ÉXITO}',
   testimonials = DEFAULT_TESTIMONIALS,
 }) => {

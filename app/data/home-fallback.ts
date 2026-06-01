@@ -6,7 +6,7 @@ export const HOME_FALLBACK: HomeData = {
   heroDescription: 'Formación especializada que impulsa tu carrera profesional al siguiente nivel',
   numericSection: {
     students: '15K+',
-    bussiness: '50+',
+    bussiness: '200+',
     activePrograms: '150+',
     mediaRating: '4.9',
   },
@@ -19,10 +19,10 @@ export const HOME_FALLBACK: HomeData = {
     partnersTitle: 'Confían en nosotros',
     partnersLogos: [],
     partnersDescription:
-      'Más de 50 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
+      'Más de 200 empresas e instituciones han elegido nuestra formación para impulsar el talento de sus equipos',
   },
   testimonialsSection: {
-    testimonialsOverline: 'Lo que dicen nuestros alumnos',
+    testimonialsOverline: 'Lo que dice nuestro alumnado',
     testimonialsTitle: 'HISTORIAS {DE ÉXITO}',
     testimonials: [
       {
