@@ -54,6 +54,28 @@ async function resolveStudentName(
   }
 }
 
+/**
+ * El NIF/DNI/CIF del comprador ahora se recoge con el Tax ID nativo de
+ * Stripe (tax_id_collection.required, ver app/api/checkout/route.ts), que
+ * Stripe imprime directamente en la factura PDF. Lo leemos de
+ * customer_details.tax_ids para la notificación al admin.
+ *
+ * Sesiones legacy (compras anteriores a este cambio) traían el dato como
+ * custom_field key='dni'; lo mantenemos como fallback para no perderlo en
+ * reintentos de webhooks antiguos.
+ */
+function extractBuyerTaxId(session: Stripe.Checkout.Session): string | undefined {
+  const taxIds = session.customer_details?.tax_ids ?? [];
+  // Preferimos es_cif (NIF/CIF español); si no, el primero con valor.
+  const preferred =
+    taxIds.find((t) => t.type === 'es_cif' && t.value) ??
+    taxIds.find((t) => t.value);
+  if (preferred?.value) return preferred.value;
+  // Fallback legacy: custom field 'dni'.
+  const dniField = session.custom_fields?.find((f) => f.key === 'dni');
+  return dniField?.text?.value || undefined;
+}
+
 async function provisionMoodleForPurchase(params: {
   documentId: string;
   programTitle: string | undefined;
@@ -381,13 +403,11 @@ async function handleWithDb(event: Stripe.Event): Promise<boolean> {
           try {
             const studentName = await resolveStudentName(userId);
             const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
-            // DNI/NIE/CIF llega como custom_field key='dni'
-            // (ver app/api/checkout/route.ts). Si la sesión es legacy
-            // (compra anterior a este push), llegará undefined y el
-            // email lo marca como "no facilitado" en rojo para que
-            // José Antonio sepa reclamarlo manualmente.
-            const dniField = session.custom_fields?.find((f) => f.key === 'dni');
-            const studentDni = dniField?.text?.value || undefined;
+            // NIF/DNI/CIF del Tax ID nativo de Stripe (ver
+            // app/api/checkout/route.ts y extractBuyerTaxId). Si llega
+            // undefined, el email lo marca como "no facilitado" en rojo
+            // para que José Antonio sepa reclamarlo manualmente.
+            const studentDni = extractBuyerTaxId(session);
             const notification = adminPurchaseNotificationEmail({
               studentName: fullName,
               studentEmail: session.customer_email || 'desconocido',
@@ -636,8 +656,7 @@ async function handleWithClerk(event: Stripe.Event) {
         try {
           const studentName = await resolveStudentName(userId);
           const fullName = [studentName.firstname, studentName.lastname].filter(Boolean).join(' ') || 'Sin nombre';
-          const dniField = session.custom_fields?.find((f) => f.key === 'dni');
-          const studentDni = dniField?.text?.value || undefined;
+          const studentDni = extractBuyerTaxId(session);
           const notification = adminPurchaseNotificationEmail({
             studentName: fullName,
             studentEmail: session.customer_email || 'desconocido',

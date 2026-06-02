@@ -87,7 +87,7 @@ export const TeamSection: React.FC<TeamSectionProps> = ({ members }) => {
               <h3 className="text-white text-heading-sm md:text-heading-md xl:text-heading-lg font-bold">{ceo.name}</h3>
               <p className="text-white/60 text-body-sm font-light mb-3">CEO de Máxima Formación</p>
               <p className="text-white/80 text-body-sm md:text-body-md italic">
-                &laquo;Más que un equipo, una gran familia.&raquo;
+                &laquo;El conocimiento útil y práctico es el activo más transformador y liberador.&raquo;
               </p>
             </div>
           </m.div>

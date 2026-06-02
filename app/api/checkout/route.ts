@@ -15,30 +15,28 @@ const PRICE_IDS = {
   },
 };
 
-// Campos fiscales en Checkout (29-may-2026, Marcos):
+// Campo fiscal en Checkout (actualizado 01-jun-2026, Aaron):
 //
-//   - custom_fields.dni: NIF (DNI / NIE / CIF). Obligatorio. AEAT
-//     exige factura ordinaria con NIF para importes ≥400€
-//     (RD 1619/2012 art. 7), y la mayoría del catálogo está por encima.
-//     Recogerlo post-compra deja facturas sin DNI si el alumno nunca
-//     entra al campus → riesgo en inspección AEAT.
+//   - custom_fields.dni: DNI/NIE/CIF del comprador como campo de texto
+//     etiquetado. NO usamos el tax_id_collection nativo de Stripe porque,
+//     al introducir un tax ID, Stripe obliga a rellenar "nombre de
+//     empresa" — fricción absurda para un particular, que ni siquiera lo
+//     es. El custom field es solo una caja de texto, sin ese flujo B2B.
 //
-//   - tax_id_collection: las empresas pueden añadir su CIF formal
-//     como Tax ID estándar de Stripe → aparece en la factura PDF
-//     auto-generada. Toggle plegado, no añade fricción al particular.
+//   El DNI se imprime en el justificante con branding propio de Máxima
+//   que generamos en el webhook (no en la factura de Stripe, porque los
+//   custom_fields no salen en su PDF y una factura `paid` es inmutable).
+//   La factura oficial la emite la gestoría con el DNI que le llega.
 //
-// El teléfono NO se recoge: Stripe sólo permite phone_number_collection
-// como obligatorio, no opcional, y Marcos dijo "opcional o nada".
-// Si quisiéramos opcional habría que meterlo como custom_field libre,
-// pero introduce un segundo campo sin validación nativa.
+//   El CIF del emisor (Máxima Formación) sí sale en la factura de Stripe
+//   vía account_tax_ids (ver getAccountTaxIds). El teléfono no se recoge.
 const STRIPE_CHECKOUT_EXTRA_FIELDS = {
-  tax_id_collection: { enabled: true },
   custom_fields: [
     {
       key: 'dni',
       label: {
         type: 'custom',
-        custom: 'DNI / NIE / CIF (requerido para tu factura)',
+        custom: 'DNI / NIE / CIF (para tu factura)',
       },
       type: 'text',
       text: { minimum_length: 8, maximum_length: 12 },
@@ -46,8 +44,34 @@ const STRIPE_CHECKOUT_EXTRA_FIELDS = {
   ],
 } as const satisfies Pick<
   Stripe.Checkout.SessionCreateParams,
-  'tax_id_collection' | 'custom_fields'
+  'custom_fields'
 >;
+
+// CIF del emisor (Máxima Formación). En Stripe es un "account tax ID"
+// (owner = self) que se registra UNA vez en la cuenta (Dashboard →
+// Settings → Business, o vía API). Lo adjuntamos explícitamente a cada
+// factura de compra puntual con `account_tax_ids` para que Stripe lo
+// imprima en el bloque del emisor: las facturas generadas por Checkout
+// (invoice_creation) no siempre heredan los tax IDs de la cuenta, así que
+// no nos fiamos del ajuste global y lo pasamos de forma determinista.
+//
+// No hardcodeamos el CIF: leemos los tax IDs de la propia cuenta y usamos
+// los que haya registrados (normalmente solo el es_cif). Cacheado a nivel
+// de módulo porque la lista de la cuenta casi nunca cambia; solo cacheamos
+// cuando hay alguno, para reintentar mientras aún no se ha registrado.
+let cachedAccountTaxIds: string[] | null = null;
+async function getAccountTaxIds(stripe: Stripe): Promise<string[]> {
+  if (cachedAccountTaxIds) return cachedAccountTaxIds;
+  try {
+    const list = await stripe.taxIds.list({ limit: 5 });
+    const ids = list.data.map((t) => t.id);
+    if (ids.length > 0) cachedAccountTaxIds = ids;
+    return ids;
+  } catch (e) {
+    console.warn('[checkout] no se pudieron leer los account tax IDs:', e);
+    return [];
+  }
+}
 
 interface CheckoutRequestBody {
   type?: 'subscription' | 'course' | 'maxymia-course' | 'trial';
@@ -138,6 +162,7 @@ export async function POST(request: Request) {
             ? proCourseCouponMaxymia
             : null;
 
+      const maxymiaAccountTaxIds = await getAccountTaxIds(stripe);
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [{ price: stripePrice.id, quantity: 1 }],
@@ -152,6 +177,9 @@ export async function POST(request: Request) {
               courseId: String(course.id),
               slug: course.slug,
             },
+            ...(maxymiaAccountTaxIds.length
+              ? { account_tax_ids: maxymiaAccountTaxIds }
+              : {}),
           },
         },
         metadata: {
@@ -357,6 +385,7 @@ export async function POST(request: Request) {
       // provided the Stripe account has Business details + fiscal
       // address configured) and email it to the buyer. Without this
       // they only get a basic payment receipt.
+      const courseAccountTaxIds = await getAccountTaxIds(stripe);
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [
@@ -376,6 +405,9 @@ export async function POST(request: Request) {
               programId: String(program.id),
               documentId: program.documentId,
             },
+            ...(courseAccountTaxIds.length
+              ? { account_tax_ids: courseAccountTaxIds }
+              : {}),
           },
         },
         metadata: {
