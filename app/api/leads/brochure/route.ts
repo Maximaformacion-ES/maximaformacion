@@ -91,15 +91,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No email on account' }, { status: 400 });
     }
   } else {
+    // Option B: el email es obligatorio (hace falta para entregar el PDF),
+    // pero el consentimiento de marketing es OPCIONAL — no se bloquea la
+    // descarga por no marcarlo; solo condiciona la suscripción a newsletter.
     email = body.email?.trim().toLowerCase();
     name = body.name?.trim() || null;
     consent = body.consent === true;
     source = 'brochure_download';
     if (!email || !EMAIL_RE.test(email)) {
       return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
-    }
-    if (!consent) {
-      return NextResponse.json({ error: 'Consent required' }, { status: 400 });
     }
   }
 

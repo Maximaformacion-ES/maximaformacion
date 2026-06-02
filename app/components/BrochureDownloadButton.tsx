@@ -82,6 +82,7 @@ export function BrochureDownloadButton({ program }: BrochureDownloadButtonProps)
         open={formOpen}
         onClose={() => setFormOpen(false)}
         endpoint="/api/leads/brochure"
+        consentRequired={false}
         resourceSlug={program.slug}
         resourceTitle={`el temario de ${program.title}`}
         onSuccess={handleFormSuccess}
