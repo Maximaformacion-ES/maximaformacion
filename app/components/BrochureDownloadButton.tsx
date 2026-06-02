@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Download } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 import { LeadFormModal, hasLeadCookie, type LeadFormResult } from './LeadFormModal';
 import type { Program } from '@/lib/strapi/types';
 
@@ -18,6 +19,7 @@ interface BrochureDownloadButtonProps {
  * is skipped and the download fires straight away.
  */
 export function BrochureDownloadButton({ program }: BrochureDownloadButtonProps) {
+  const { isSignedIn } = useUser();
   const [open, setOpen] = useState(false);
   const brochureUrl = program.brochurePdfUrl;
 
@@ -30,8 +32,12 @@ export function BrochureDownloadButton({ program }: BrochureDownloadButtonProps)
   };
 
   const handleClick = () => {
-    // Already a known lead (here or on /recursos) → no need to ask again.
-    if (hasLeadCookie()) {
+    // The form is a lead-capture gate, so it only makes sense for unknown
+    // visitors. Signed-in users are already known contacts (we have their
+    // name/email in Clerk), and anyone who already left their details here
+    // or on /recursos has the cookie — both skip the form and download
+    // straight away.
+    if (isSignedIn || hasLeadCookie()) {
       triggerDownload(brochureUrl);
       return;
     }
