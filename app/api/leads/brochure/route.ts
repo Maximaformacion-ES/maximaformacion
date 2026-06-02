@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { db } from '@/lib/db/client';
 import { leadCaptureLog } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
@@ -53,17 +54,7 @@ export async function POST(request: NextRequest) {
   }
 
   const slug = body.slug?.trim();
-  const email = body.email?.trim().toLowerCase();
-  const name = body.name?.trim();
-  const consent = body.consent === true;
-
   if (!slug) return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
-  if (!email || !EMAIL_RE.test(email)) {
-    return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
-  }
-  if (!consent) {
-    return NextResponse.json({ error: 'Consent required' }, { status: 400 });
-  }
 
   const program = await getProgramBySlug(slug, false).catch(() => null);
   if (!program) {
@@ -71,6 +62,51 @@ export async function POST(request: NextRequest) {
   }
   if (!program.brochurePdfUrl) {
     return NextResponse.json({ error: 'No brochure available' }, { status: 404 });
+  }
+
+  // Identity & consent depend on whether the visitor is signed in:
+  //   • Signed-in (consent-only modal): we already have their identity in
+  //     Clerk, so we read name/email from the SESSION server-side (never
+  //     trusting the client) and consent is optional.
+  //   • Anonymous (full form): name/email/consent come from the body, and
+  //     consent is required.
+  const { userId } = await auth();
+  let email: string | undefined;
+  let name: string | null = null;
+  let consent: boolean;
+  let source: string;
+
+  if (userId) {
+    try {
+      const cc = await clerkClient();
+      const user = await cc.users.getUser(userId);
+      email = user.primaryEmailAddress?.emailAddress?.trim().toLowerCase();
+      name = [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || null;
+    } catch {
+      return NextResponse.json({ error: 'Could not resolve account' }, { status: 500 });
+    }
+    consent = body.consent === true; // optional for signed-in users
+    source = 'brochure_download_auth';
+    if (!email) {
+      return NextResponse.json({ error: 'No email on account' }, { status: 400 });
+    }
+  } else {
+    email = body.email?.trim().toLowerCase();
+    name = body.name?.trim() || null;
+    consent = body.consent === true;
+    source = 'brochure_download';
+    if (!email || !EMAIL_RE.test(email)) {
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
+    }
+    if (!consent) {
+      return NextResponse.json({ error: 'Consent required' }, { status: 400 });
+    }
+  }
+
+  // Both branches above guarantee a valid email (or already returned); this
+  // also narrows the type from `string | undefined` to `string`.
+  if (!email) {
+    return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
   }
 
   const ipPrefix = anonymizeIp(
@@ -84,9 +120,9 @@ export async function POST(request: NextRequest) {
   const [logRow] = await db
     .insert(leadCaptureLog)
     .values({
-      source: 'brochure_download',
+      source,
       email,
-      name: name || null,
+      name,
       resourceSlug: program.slug,
       resourceTitle: program.title,
       consent,
@@ -128,10 +164,12 @@ export async function POST(request: NextRequest) {
           download_url: program.brochurePdfUrl,
         },
       });
-      // MF-18: el consentimiento del formulario cubre la suscripción a la
-      // newsletter (mismo criterio que /recursos). La segmentación de
-      // "descargaron temario" se hace por el evento, no por una lista aparte.
-      if (LIST_ID) {
+      // MF-18: solo suscribimos a newsletter cuando hay consentimiento
+      // explícito (checkbox del formulario en anónimos; checkbox del
+      // mini-modal en logueados). Sin consentimiento, el perfil + evento se
+      // registran igual (para segmentar), pero NO se suscribe. La
+      // segmentación de "descargaron temario" se hace por el evento.
+      if (consent && LIST_ID) {
         await subscribeToList({ email, listId: LIST_ID, consent: true });
       }
       if (logRow?.id) {

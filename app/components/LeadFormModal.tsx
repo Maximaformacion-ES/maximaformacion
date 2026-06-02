@@ -12,7 +12,7 @@ export function hasLeadCookie(): boolean {
   return document.cookie.split('; ').some((c) => c.startsWith(`${COOKIE_NAME}=`));
 }
 
-function setLeadCookie() {
+export function setLeadCookie() {
   if (typeof document === 'undefined') return;
   const maxAge = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60;
   document.cookie = `${COOKIE_NAME}=1; path=/; max-age=${maxAge}; samesite=lax`;
