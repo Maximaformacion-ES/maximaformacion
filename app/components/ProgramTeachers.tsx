@@ -21,7 +21,7 @@ export const ProgramTeachers: React.FC<Props> = ({ program }) => {
   if (docentes.length === 0) return null;
 
   return (
-    <section className="py-16 md:py-20 px-6 md:px-12 bg-mx-bg border-t border-mx-border">
+    <section className="py-16 md:py-20 px-6 md:px-12 bg-mx-bg border-t border-mx-border bg-transparent">
       <div className="max-w-[1400px] mx-auto">
         <span className="text-mx-orange text-label-md tracking-widest uppercase font-semibold mb-3 block">
           Profesorado
