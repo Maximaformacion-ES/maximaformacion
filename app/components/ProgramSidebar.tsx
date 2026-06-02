@@ -7,7 +7,6 @@ import {
   ShoppingCart,
   Loader2,
   Crown,
-  ShieldCheck,
   ArrowRight,
   Monitor,
   Globe,
@@ -16,15 +15,15 @@ import {
   Clock,
   GraduationCap,
   Mail,
-  Phone,
-  Download,
 } from 'lucide-react';
+// Note: ShieldCheck (garantía badge) and the Pro-savings hint were removed
+// in MF-17 to keep the panel compact enough to stay sticky on screen.
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
-import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -32,14 +31,14 @@ interface ProgramSidebarProps {
   program: Program;
   /**
    * When set, the primary CTA inside the sidebar (Comprar / Acceder /
-   * Consultar precio) is tagged with this DOM id. ProgramMobileCTA
-   * watches that element on desktop to decide whether to show its own
-   * floating version: while the in-hero sidebar's button is on screen
-   * the floating CTA stays hidden; once it scrolls out of view the
-   * floating CTA appears.
+   * Consultar precio) is tagged with this DOM id so it can be used as a
+   * scroll anchor.
    *
-   * Only the hero/desktop instance receives this prop; the
-   * full-width mobile duplicate omits it so we don't double-anchor.
+   * Historically the desktop floating CTA watched this element to decide
+   * when to appear; that floating card was removed in MF-17 (the sticky
+   * sidebar is now the only desktop CTA), so the id is no longer observed
+   * — it's kept as a harmless, optional hook. Only the hero/desktop
+   * instance receives it; the full-width mobile duplicate omits it.
    */
   stickyAnchorId?: string;
   /**
@@ -78,7 +77,6 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   // "Known" means we have something authoritative to render — either
   // the hooks finished or the page handed us a server snapshot.
   const userStateKnown = !authLoading || !!initialUserState;
-  const effectiveIsSignedIn = useServer ? initialUserState!.isSignedIn : !!isSignedIn;
   const userHasPro = useServer
     ? initialUserState!.isSignedIn && initialUserState!.hasPro
     : !!isSignedIn && hasPro;
@@ -90,7 +88,6 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
-  const proSavings = getProSavings(program, userHasPro);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -152,7 +149,9 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   ].filter((item) => item.value);
 
   return (
-    <div className="sticky top-24">
+    // top-32 (not top-24) so the pinned card keeps a margin below the fixed
+    // header instead of butting right up against it (MF-17).
+    <div className="sticky top-32">
       <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
 
         {/* Program Image — skip when the Strapi mapper fell back to the
@@ -213,19 +212,8 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
               onClose={() => setMasterChooserOpen(false)}
               formMode="contacto-page"
             />
-
-            {program.brochurePdfUrl && (
-              <a
-                href={program.brochurePdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-                className="flex items-center justify-center gap-2 w-full border border-mx-border text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/40 px-6 py-3 text-body-sm font-light rounded-lg transition-colors"
-              >
-                <Download size={16} />
-                Descarga el temario (PDF)
-              </a>
-            )}
+            {/* Temario download moved to the hero (under the description)
+                in MF-17 — see ProgramHeroSection. */}
           </>
         ) : (
           <>
@@ -278,30 +266,6 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                 )
               )}
               <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
-
-              {/* Pro savings hint for non-Pro users */}
-              {proSavings > 0 && (
-                <Link
-                  href="/pricing"
-                  className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-mx-orange/30 bg-mx-orange/5 px-3 py-2.5 hover:bg-mx-orange/10 hover:border-mx-orange/50 transition-colors group"
-                >
-                  <span className="flex items-center gap-2 text-mx-orange text-label-md font-medium">
-                    <Crown size={14} />
-                    {program.isPro
-                      ? `Sería gratis con Pro · ahorras ${proSavings}€`
-                      : `Con Pro pagarías ${program.price - proSavings}€ · ahorras ${proSavings}€`}
-                  </span>
-                  <ArrowRight size={14} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              )}
-            </div>
-
-            {/* Guarantee badge */}
-            <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
-              <ShieldCheck size={18} className="text-mx-orange shrink-0" />
-              <span className="text-label-sm md:text-label-md text-mx-text-muted font-light">
-                <span className="font-semibold text-mx-orange">14 días de garantía</span> — Devolución del 100%
-              </span>
             </div>
 
             {/* Error */}
@@ -352,12 +316,20 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                   ) : (
                     <>
                       <ShoppingCart size={18} />
-                      {effectiveIsSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
+                      {/* Always the same label. If the visitor isn't signed
+                          in, handlePurchaseCourse redirects them to
+                          /sign-in (register or log in) before checkout. */}
+                      Matricúlate ahora
                     </>
                   )}
                 </m.button>
               )}
 
+              {/* Secondary CTA: Pro upsell. Per MF-17 the course sidebar
+                  keeps exactly two action buttons — the primary purchase
+                  CTA above and this one. The brochure/"Descarga el temario"
+                  button was removed from the sidebar (the temario still
+                  lives in the program tabs). */}
               {userStateKnown && !userHasPro && (
                 <Link
                   href="/pricing"
@@ -367,46 +339,9 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                   O hazte Pro por €18/mes
                 </Link>
               )}
-
-              {program.brochurePdfUrl && (
-                <a
-                  href={program.brochurePdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="flex items-center justify-center gap-2 w-full border border-mx-border text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/40 px-6 py-3 text-body-sm font-light rounded-lg transition-colors"
-                >
-                  <Download size={16} />
-                  Descarga el temario (PDF)
-                </a>
-              )}
             </div>
           </>
         )}
-
-        {/* Divider */}
-        <div className="border-t border-mx-border" />
-
-        {/* Contact */}
-        <div className="space-y-3">
-          <div className="text-label-sm md:text-label-md text-mx-text-muted uppercase tracking-widest font-bold">
-            Contacto
-          </div>
-          <a
-            href="mailto:cursos@maximaformacion.es"
-            className="flex items-center gap-3 text-mx-text-muted text-body-sm hover:text-mx-orange transition-colors"
-          >
-            <Mail size={14} />
-            cursos@maximaformacion.es
-          </a>
-          <a
-            href="tel:+34635659391"
-            className="flex items-center gap-3 text-mx-text-muted text-body-sm hover:text-mx-orange transition-colors"
-          >
-            <Phone size={14} />
-            +34 635 65 93 91
-          </a>
-        </div>
         </div>
       </div>
     </div>

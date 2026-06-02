@@ -62,7 +62,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   const displayFaqs = faqs.length > 0 ? faqs : DEFAULT_FAQS;
 
   return (
-    <section className="relative py-16 md:py-32 bg-mx-bg overflow-hidden">
+    <section className="relative py-16 md:py-32 bg-mx-bg overflow-hidden bg-transparent">
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}
