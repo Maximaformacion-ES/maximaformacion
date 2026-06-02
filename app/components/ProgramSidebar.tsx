@@ -23,7 +23,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
-import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -88,6 +88,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
+  const proSavings = getProSavings(program, userHasPro);
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -218,7 +219,8 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
         ) : (
           <>
             <div>
-              <div className="flex items-baseline gap-3">
+              <div className="flex items-baseline justify-between gap-x-3 gap-y-1 flex-wrap">
+                <div className="flex items-baseline gap-3">
                 {includedInPro ? (
                   <>
                     <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
@@ -248,6 +250,15 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                       {program.price}€
                     </span>
                   </>
+                )}
+                </div>
+                {/* "Precio si fueras Pro" a la derecha del precio — mismo
+                    patrón que la card del catálogo (ProgramCard). */}
+                {proSavings > 0 && (
+                  <p className="flex items-center gap-1.5 text-mx-orange text-label-md font-medium">
+                    <span className="text-body-md font-bold">{program.price - proSavings}€</span>
+                    <Crown size={11} /> Ahorras {proSavings}€ con Pro
+                  </p>
                 )}
               </div>
               {includedInPro ? (

@@ -193,26 +193,15 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
             </>
           )}
         </div>
+        {/* "Precio si fueras Pro" a la derecha del precio — mismo patrón que
+            la card del catálogo. */}
+        {!userHasPro && proSavings > 0 && (
+          <p className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium whitespace-nowrap">
+            <span className="text-body-sm font-bold">{program.price - proSavings}€</span>
+            <Crown size={11} className="shrink-0" /> Ahorras {proSavings}€ con Pro
+          </p>
+        )}
       </div>
-
-      {/* Pro savings banner — render optimistically while auth is still
-          loading. proSavings is computed assuming the visitor is not Pro
-          (the common case), so we show it immediately and only hide once
-          we confirm the user actually does have Pro. */}
-      {!userHasPro && proSavings > 0 && (
-        <Link
-          href="/pricing"
-          className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-mx-orange/30 bg-mx-orange/5 px-2.5 py-1.5 hover:bg-mx-orange/10 hover:border-mx-orange/50 transition-colors group"
-        >
-          <span className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium leading-tight">
-            <Crown size={12} className="shrink-0" />
-            {includedInPro
-              ? `Sería gratis con Pro · ahorras ${proSavings}€`
-              : `Con Pro pagarías ${program.price - proSavings}€ · ahorras ${proSavings}€`}
-          </span>
-          <ArrowRight size={12} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-      )}
 
       {/* Row 2: CTA button full width. If the page handed us a server-
           resolved state, render the correct CTA from the first paint.
