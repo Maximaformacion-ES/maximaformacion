@@ -47,3 +47,8 @@ next-env.d.ts
 # don't need to be tracked. The files live on disk for whoever runs
 # them; new entries belong in this directory but not in git.
 /scripts
+
+# claude-mem auto-generated per-directory context files. Ignore every
+# nested CLAUDE.md but keep the root one (the real project doc).
+CLAUDE.md
+!/CLAUDE.md
