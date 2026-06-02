@@ -12,7 +12,7 @@ export function hasLeadCookie(): boolean {
   return document.cookie.split('; ').some((c) => c.startsWith(`${COOKIE_NAME}=`));
 }
 
-function setLeadCookie() {
+export function setLeadCookie() {
   if (typeof document === 'undefined') return;
   const maxAge = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60;
   document.cookie = `${COOKIE_NAME}=1; path=/; max-age=${maxAge}; samesite=lax`;
@@ -35,6 +35,14 @@ interface LeadFormModalProps {
    * return the same `LeadFormResult` shape.
    */
   endpoint?: string;
+  /**
+   * Whether the marketing-consent checkbox is mandatory to submit. Defaults
+   * to true (legacy /recursos behaviour). The course brochure (MF-18, option
+   * B) passes false: the email is required to deliver the PDF, but marketing
+   * consent is optional — the download is never blocked, and we only
+   * subscribe to the newsletter when the box is ticked.
+   */
+  consentRequired?: boolean;
   /** Called after a successful submit with the URLs returned by the API. */
   onSuccess: (result: LeadFormResult) => void;
 }
@@ -45,6 +53,7 @@ export function LeadFormModal({
   resourceSlug,
   resourceTitle,
   endpoint = '/api/leads/resource',
+  consentRequired = true,
   onSuccess,
 }: LeadFormModalProps) {
   const [submitting, setSubmitting] = useState(false);
@@ -82,7 +91,7 @@ export function LeadFormModal({
       consent: fd.get('consent') === 'on',
       referer: typeof document !== 'undefined' ? document.referrer || null : null,
     };
-    if (!payload.consent) {
+    if (consentRequired && !payload.consent) {
       setError('Necesitas aceptar para recibir el recurso por email.');
       return;
     }
@@ -169,7 +178,7 @@ export function LeadFormModal({
               <input
                 type="checkbox"
                 name="consent"
-                required
+                required={consentRequired}
                 className="mt-1 accent-mx-orange shrink-0"
               />
               <span>
