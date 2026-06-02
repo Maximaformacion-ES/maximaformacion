@@ -28,7 +28,14 @@ interface LeadFormModalProps {
   onClose: () => void;
   resourceSlug: string;
   resourceTitle: string;
-  /** Called after a successful submit with the resource URLs returned by the API. */
+  /**
+   * API endpoint the form posts to. Defaults to the resource-download
+   * endpoint; the course brochure (MF-18) passes `/api/leads/brochure`.
+   * Both accept the same body ({ slug, name, email, consent, referer }) and
+   * return the same `LeadFormResult` shape.
+   */
+  endpoint?: string;
+  /** Called after a successful submit with the URLs returned by the API. */
   onSuccess: (result: LeadFormResult) => void;
 }
 
@@ -37,6 +44,7 @@ export function LeadFormModal({
   onClose,
   resourceSlug,
   resourceTitle,
+  endpoint = '/api/leads/resource',
   onSuccess,
 }: LeadFormModalProps) {
   const [submitting, setSubmitting] = useState(false);
@@ -80,7 +88,7 @@ export function LeadFormModal({
     }
     try {
       setSubmitting(true);
-      const res = await fetch('/api/leads/resource', {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

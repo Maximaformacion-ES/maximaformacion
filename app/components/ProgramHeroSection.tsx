@@ -3,8 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
-import { Clock, BookOpen, Award, Crown, Download } from 'lucide-react';
+import { Clock, BookOpen, Award, Crown } from 'lucide-react';
 import type { Program } from '@/lib/strapi/types';
+import { BrochureDownloadButton } from './BrochureDownloadButton';
 
 interface ProgramHeroSectionProps {
   program: Program;
@@ -131,24 +132,9 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
             </m.p>
 
             {/* Temario download — placed right after the short description
-                (MF-17). Moved here out of the purchase sidebar so the panel
-                stays focused on its two CTAs; the temario is an info/lead
-                action that belongs next to the program description. */}
-            {program.brochurePdfUrl && (
-              <m.a
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.5 }}
-                href={program.brochurePdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-                className="inline-flex items-center gap-2 mb-8 border border-mx-border bg-mx-card/60 backdrop-blur-sm text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/40 px-5 py-2.5 text-body-sm font-medium rounded-lg transition-colors"
-              >
-                <Download size={16} />
-                Descarga el temario (PDF)
-              </m.a>
-            )}
+                (MF-17). Gated behind a lead-capture form (MF-18): opens the
+                Nombre+email modal and delivers the PDF on success. */}
+            <BrochureDownloadButton program={program} />
 
             {/* Info pills */}
             <m.div

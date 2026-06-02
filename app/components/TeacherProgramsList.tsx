@@ -17,7 +17,7 @@ interface Props {
 export const TeacherProgramsList: React.FC<Props> = ({ programs, heading = 'Programas que imparte' }) => {
   if (programs.length === 0) return null;
   return (
-    <section className="py-16 md:py-20 px-6 md:px-12 bg-mx-bg border-t border-mx-border">
+    <section className="py-16 md:py-20 px-6 md:px-12 bg-mx-bg border-t border-mx-border bg-transparent">
       <div className="max-w-6xl mx-auto">
         <span className="text-mx-orange text-label-md tracking-widest uppercase font-semibold mb-3 block">
           Cursos & másteres
