@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
+import { ChevronDownIcon } from 'lucide-react';
 import { m } from 'framer-motion';
 import { StyledTitle } from './StyledTitle';
 import {
@@ -54,6 +55,10 @@ interface FAQSectionProps {
   faqs?: FAQItem[];
 }
 
+// Stable no-op subscribe for useSyncExternalStore (the FAQ "mounted" flag
+// never changes after hydration, so there's nothing to subscribe to).
+const emptySubscribe = () => () => {};
+
 export const FAQSection: React.FC<FAQSectionProps> = ({
   overline = 'Resolvemos tus dudas',
   title = 'PREGUNTAS {FRECUENTES}',
@@ -61,8 +66,22 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
 }) => {
   const displayFaqs = faqs.length > 0 ? faqs : DEFAULT_FAQS;
 
+  // Radix's Accordion derives aria ids from React.useId(); upstream client
+  // components (Clerk, Framer Motion LazyMotion) can shift that counter
+  // between SSR and the first client paint, surfacing as a hydration
+  // mismatch on the generated ids. Render a native <details> fallback for
+  // SSR + first paint (same closed look, crawlable) and swap to the
+  // interactive Radix Accordion only after mount. useSyncExternalStore gives
+  // a hydration-safe "are we on the client yet?" flag (false on the server,
+  // true after hydration) without a setState-in-effect.
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
   return (
-    <section className="relative py-16 md:py-32 bg-mx-bg overflow-hidden">
+    <section className="relative py-16 md:py-32 bg-mx-bg overflow-hidden bg-transparent">
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}
@@ -88,21 +107,34 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          {/* suppressHydrationWarning: Radix Accordion uses useId() for
-              aria-controls/id pairs, and those identifiers can drift between
-              SSR and the first client paint when something upstream renders
-              an extra node on one side (Clerk's user hook, Framer Motion's
-              LazyMotion, etc.). Content is identical on both sides — only
-              the auto-generated a11y identifiers differ — so let React
-              patch them up without warning. */}
-          <Accordion type="single" collapsible className="w-full" suppressHydrationWarning>
-            {displayFaqs.map((faq, index) => (
-              <AccordionItem key={faq.question} value={`faq-${index}`}>
-                <AccordionTrigger>{faq.question}</AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          {mounted ? (
+            <Accordion type="single" collapsible className="w-full">
+              {displayFaqs.map((faq, index) => (
+                <AccordionItem key={faq.question} value={`faq-${index}`}>
+                  <AccordionTrigger>{faq.question}</AccordionTrigger>
+                  <AccordionContent>{faq.answer}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            // SSR / pre-hydration fallback: native <details>, no useId.
+            <div className="w-full">
+              {displayFaqs.map((faq) => (
+                <details
+                  key={faq.question}
+                  className="border-b border-mx-border last:border-b-0"
+                >
+                  <summary className="flex items-center justify-between gap-4 py-5 cursor-pointer list-none text-left text-body-sm md:text-body-md 2xl:text-body-lg font-medium text-mx-text">
+                    {faq.question}
+                    <ChevronDownIcon className="text-mx-orange pointer-events-none size-5 shrink-0" />
+                  </summary>
+                  <div className="pt-0 pb-5 text-mx-text-muted text-body-sm md:text-body-md 2xl:text-body-lg font-light leading-relaxed">
+                    {faq.answer}
+                  </div>
+                </details>
+              ))}
+            </div>
+          )}
         </m.div>
       </div>
     </section>

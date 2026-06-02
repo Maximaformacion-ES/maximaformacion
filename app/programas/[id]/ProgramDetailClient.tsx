@@ -33,7 +33,7 @@ export default function ProgramDetailClient({
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip">
         <FontStyles />
 
         <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
@@ -64,12 +64,18 @@ export default function ProgramDetailClient({
   }
 
   return (
-    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip">
       <FontStyles />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
+        {/* MF-17: single page-wide 2-column layout. The hero hosts the grid:
+            LEFT column = all the program content (hero text + tabs + teachers
+            + FAQ), RIGHT column = the purchase card, pinned (sticky) and
+            spanning the full height of the left column. On mobile the columns
+            stack, the card column is hidden, and the fixed bottom bar
+            (ProgramMobileCTA) is the only purchase affordance. */}
         <ProgramHeroSection
           program={program}
           breadcrumb={
@@ -89,17 +95,18 @@ export default function ProgramDetailClient({
             />
           }
           tabs={<ProgramTabs program={program} richHtml={richHtml} />}
+          belowContent={
+            <>
+              <ProgramTeachers program={program} />
+              <ProgramFAQSection program={program} />
+            </>
+          }
         />
 
+        {/* Closing CTA stays full-width below the grid. Still gated: for
+            isPro programs without access ProGateWrapper swaps it for the
+            upgrade gate. */}
         <ProGateWrapper program={program} initialUserState={initialUserState}>
-          {/* Sidebar on mobile — hidden on desktop since it's in the hero */}
-          <section className="pb-16 px-6 md:px-12 bg-mx-bg lg:hidden">
-            <div className="max-w-[1400px] mx-auto">
-              <ProgramSidebar program={program} initialUserState={initialUserState} />
-            </div>
-          </section>
-          <ProgramTeachers program={program} />
-          <ProgramFAQSection program={program} />
           <ProgramCTASection program={program} />
         </ProGateWrapper>
       </main>

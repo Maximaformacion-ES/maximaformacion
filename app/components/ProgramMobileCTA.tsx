@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ShoppingCart, Loader2, ArrowRight, Crown, Mail, Clock, Monitor, GraduationCap, ShieldCheck } from 'lucide-react';
+import { ShoppingCart, Loader2, ArrowRight, Crown, Mail } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
@@ -9,7 +9,6 @@ import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
-import { SIDEBAR_CTA_ANCHOR_ID } from './ProgramSidebar';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProgramMobileCTAProps {
@@ -19,25 +18,28 @@ interface ProgramMobileCTAProps {
   initialUserState?: ServerUserState;
 }
 
+/**
+ * Mobile-only sticky purchase bar.
+ *
+ * On desktop (lg+) there is NO floating CTA: the in-hero ProgramSidebar is
+ * sticky and stays with the user through the program content, so the old
+ * floating card was redundant clutter (removed in MF-17). This component is
+ * therefore `lg:hidden` and only handles the small-screen case, where the
+ * sidebar can't be pinned and a full-width bottom bar is the right pattern.
+ */
 export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, initialUserState }) => {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
-  // Desktop-only visibility flag. Starts hidden so we don't double-render
-  // the CTA while the sidebar's primary button is still in view; flips
-  // true once that anchor scrolls out of the viewport.
-  const [desktopVisible, setDesktopVisible] = useState(false);
   // Master "Consultar precio" opens a chooser (form vs videollamada).
-  // Mirrors the sidebar so a Master visitor gets the same options
-  // regardless of viewport.
   const [masterChooserOpen, setMasterChooserOpen] = useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
   // Publish the sticky bar's actual height on the body so the Cookiebot
-  // widget (and any other floating widget that reads
-  // --floating-cta-bottom) sits exactly above it instead of relying on
-  // a hardcoded lift that may not match. ResizeObserver re-measures when
-  // the "Con Pro pagarías..." row appears/disappears.
+  // widget (and any other floating widget that reads --floating-cta-bottom)
+  // sits exactly above it. The CSS only lifts on viewports < lg, which is
+  // exactly where this bar renders. ResizeObserver re-measures when the
+  // "Con Pro pagarías..." row appears/disappears.
   useEffect(() => {
     document.body.dataset.mobileCta = 'true';
     const el = wrapperRef.current;
@@ -62,33 +64,10 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
     };
   }, []);
 
-  useEffect(() => {
-    const anchor = document.getElementById(SIDEBAR_CTA_ANCHOR_ID);
-    if (!anchor) {
-      // No anchor mounted yet (e.g. mobile-only page or hero hasn't
-      // hydrated). Fall back to "always visible on desktop" so the user
-      // doesn't end up without a CTA at all.
-      setDesktopVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry) return;
-        setDesktopVisible(!entry.isIntersecting);
-      },
-      { threshold: 0 }
-    );
-    observer.observe(anchor);
-    return () => observer.disconnect();
-  }, []);
-
   // Prefer the server snapshot during the brief client-side load window
   // (see ProgramSidebar for the same pattern).
   const authLoading = !isLoaded || campusLoading;
   const useServer = authLoading && !!initialUserState;
-  const userStateKnown = !authLoading || !!initialUserState;
-  const effectiveIsSignedIn = useServer ? initialUserState!.isSignedIn : !!isSignedIn;
   const userHasPro = useServer
     ? initialUserState!.isSignedIn && initialUserState!.hasPro
     : !!isSignedIn && hasPro;
@@ -143,33 +122,10 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
     }
   };
 
-  // Sticky CTA: full-width bar on mobile (always visible), compact
-  // floating card pinned bottom-right on lg+ that only appears after
-  // the in-hero sidebar's primary button scrolls out of view (see the
-  // IntersectionObserver above). Hidden state on desktop uses opacity
-  // + translate + pointer-events:none so the transition is smooth and
-  // the card doesn't block clicks while invisible.
-  //
-  // When the user already owns the course, hide the desktop card
-  // entirely — the sidebar's "Acceder al Curso" button is the canonical
-  // entry point and there's no compra to nudge. The mobile sticky bar
-  // stays as a quick-access shortcut.
-  const userOwnsCourse = userStateKnown && hasAccess;
-  const desktopVisibilityClass = userOwnsCourse
-    ? "lg:hidden"
-    : desktopVisible
-      ? "lg:opacity-100 lg:translate-y-0 lg:pointer-events-auto"
-      : "lg:opacity-0 lg:translate-y-4 lg:pointer-events-none";
-
+  // Full-width bar pinned to the bottom on mobile only. Hidden on lg+,
+  // where the sticky sidebar is the canonical CTA.
   const stickyWrapperClass =
-    "fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom " +
-    // On lg+ the CTA stops spanning full width and becomes a centered
-    // pill at the bottom. Centered instead of right-aligned so it
-    // doesn't sit on top of footer/utility buttons in the corner.
-    "lg:bottom-6 lg:left-1/2 lg:-translate-x-1/2 lg:inset-x-auto lg:max-w-md lg:w-[min(28rem,calc(100%-3rem))] " +
-    "lg:rounded-2xl lg:border lg:shadow-2xl lg:px-5 lg:pt-4 lg:pb-4 " +
-    "lg:transition-all lg:duration-300 ease-out " +
-    desktopVisibilityClass;
+    "lg:hidden fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom";
 
   if (program.type === 'Master') {
     return (
@@ -193,37 +149,8 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
     );
   }
 
-  // Build the meta items shown only on desktop (lg+) above the price.
-  // Filter empty values so we don't render dangling icons.
-  const durationLabel = program.durationLabel
-    ?? (program.duration ? `${program.duration} h` : null);
-  const desktopMeta: { icon: typeof Clock; label: string }[] = [];
-  if (durationLabel) desktopMeta.push({ icon: Clock, label: durationLabel });
-  if (program.ects) desktopMeta.push({ icon: GraduationCap, label: `${program.ects} ECTS` });
-  if (program.format) desktopMeta.push({ icon: Monitor, label: program.format });
-
   return (
     <div ref={wrapperRef} className={stickyWrapperClass}>
-      {/* Desktop-only header: course title + key meta. Keeps the floating
-          card readable as a stand-alone summary once the user has
-          scrolled past the hero. Hidden on mobile so the sticky bar
-          stays compact. */}
-      <div className="hidden lg:block mb-3">
-        <p className="text-mx-text text-label-md font-bold line-clamp-1 mb-1.5">
-          {program.title}
-        </p>
-        {desktopMeta.length > 0 && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-mx-text-muted text-label-sm">
-            {desktopMeta.map((item) => (
-              <span key={item.label} className="flex items-center gap-1">
-                <item.icon size={12} className="text-mx-orange shrink-0" />
-                {item.label}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
@@ -266,28 +193,15 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
             </>
           )}
         </div>
+        {/* "Precio si fueras Pro" a la derecha del precio — mismo patrón que
+            la card del catálogo. */}
+        {!userHasPro && proSavings > 0 && (
+          <p className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium whitespace-nowrap">
+            <span className="text-body-sm font-bold">{program.price - proSavings}€</span>
+            <Crown size={11} className="shrink-0" /> Ahorras {proSavings}€ con Pro
+          </p>
+        )}
       </div>
-
-      {/* Pro savings banner — render optimistically while auth is still
-          loading. proSavings is computed assuming the visitor is not Pro
-          (the common case), so we show it immediately and only hide once
-          we confirm the user actually does have Pro. Previously this
-          waited for isLoaded + campusLoading, which delayed the banner
-          1-2s on mobile. */}
-      {!userHasPro && proSavings > 0 && (
-        <Link
-          href="/pricing"
-          className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-mx-orange/30 bg-mx-orange/5 px-2.5 py-1.5 hover:bg-mx-orange/10 hover:border-mx-orange/50 transition-colors group"
-        >
-          <span className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium leading-tight">
-            <Crown size={12} className="shrink-0" />
-            {includedInPro
-              ? `Sería gratis con Pro · ahorras ${proSavings}€`
-              : `Con Pro pagarías ${program.price - proSavings}€ · ahorras ${proSavings}€`}
-          </span>
-          <ArrowRight size={12} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-      )}
 
       {/* Row 2: CTA button full width. If the page handed us a server-
           resolved state, render the correct CTA from the first paint.
@@ -323,19 +237,13 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
           ) : (
             <>
               <ShoppingCart size={12} />
-              {effectiveIsSignedIn ? 'Comprar Ahora' : 'Iniciar sesión para comprar'}
+              {/* Always the same label; handlePurchaseCourse redirects to
+                  /sign-in (register or log in) when there's no session. */}
+              Matricúlate ahora
             </>
           )}
         </button>
       )}
-
-      {/* Desktop-only trust line below the CTA. Same guarantee that the
-          full sidebar already advertises; keeps the floating card from
-          looking too transactional. */}
-      <p className="hidden lg:flex items-center justify-center gap-1.5 mt-2.5 text-mx-text-muted text-label-sm">
-        <ShieldCheck size={12} className="text-mx-orange shrink-0" />
-        14 días de garantía · Acceso permanente
-      </p>
     </div>
   );
 };

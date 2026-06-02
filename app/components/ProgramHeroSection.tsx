@@ -3,13 +3,19 @@
 import React from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
-import { Clock, BookOpen, Award, Crown } from 'lucide-react';
+import { Clock, BookOpen, Award, Crown, Download } from 'lucide-react';
 import type { Program } from '@/lib/strapi/types';
 
 interface ProgramHeroSectionProps {
   program: Program;
   sidebar?: React.ReactNode;
   tabs?: React.ReactNode;
+  /** Extra content rendered in the LEFT column, below the tabs (e.g.
+   *  teachers + FAQ). MF-17: the whole page is one 2-column grid — all
+   *  content on the left, the purchase card on the right spanning the
+   *  full height — so these sections live inside the hero's left column
+   *  instead of as separate full-width sections below. */
+  belowContent?: React.ReactNode;
   /** Optional breadcrumb rendered inside the hero, right under the
    *  fixed header. Sits on top of the hero's background image so the
    *  image starts at the very top of the section instead of below an
@@ -22,6 +28,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
   program,
   sidebar,
   tabs,
+  belowContent,
   breadcrumb,
 }) => {
   // The hero always clears the fixed header. When a breadcrumb is
@@ -30,27 +37,34 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
   // visual backdrop from the top edge.
   return (
     <section className="relative pt-24 md:pt-28 pb-12 md:pb-16 overflow-visible">
-      {/* Background image */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.82)] to-[rgba(255,252,248,0.55)] z-10" />
-        <div className="absolute inset-0 bg-linear-to-t from-mx-bg via-[rgba(255,252,248,0.2)] to-transparent z-10" />
+      {/* Background banner image: full width with the height following the
+          image's own aspect ratio (h-auto — no vertical stretching to fill
+          the now-tall section), capped and centered on very large screens.
+          It sits behind the hero text at the top; the content below has
+          solid backgrounds that cover the rest. */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-0 w-full max-w-[1920px] overflow-hidden">
         <Image
           src={program.image}
           alt={program.title}
-          className="w-full h-full object-cover opacity-70"
-          fill
+          className="w-full h-auto opacity-70"
+          width={1920}
+          height={1080}
           sizes="100vw"
           unoptimized
           priority
           fetchPriority="high"
         />
+        <div className="absolute inset-0 bg-linear-to-r from-[rgba(255,252,248,0.95)] via-[rgba(255,252,248,0.82)] to-[rgba(255,252,248,0.55)]" />
+        <div className="absolute inset-0 bg-linear-to-t from-mx-bg via-[rgba(255,252,248,0.2)] to-transparent" />
       </div>
 
       <div className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12">
         {breadcrumb && <div className="mb-4 md:mb-6">{breadcrumb}</div>}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Left: Hero content */}
-          <div className="lg:col-span-2">
+          {/* Left: Hero content. Spans the full width when no sidebar is
+              passed (MF-17 moved the purchase sidebar out of the hero into
+              the 2-column content layout below). */}
+          <div className={sidebar ? 'lg:col-span-2' : 'lg:col-span-3'}>
             {/* Badges row */}
             <m.div
               initial={{ opacity: 0, y: 10 }}
@@ -116,6 +130,26 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
               {program.description}
             </m.p>
 
+            {/* Temario download — placed right after the short description
+                (MF-17). Moved here out of the purchase sidebar so the panel
+                stays focused on its two CTAs; the temario is an info/lead
+                action that belongs next to the program description. */}
+            {program.brochurePdfUrl && (
+              <m.a
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.5 }}
+                href={program.brochurePdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="inline-flex items-center gap-2 mb-8 border border-mx-border bg-mx-card/60 backdrop-blur-sm text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/40 px-5 py-2.5 text-body-sm font-medium rounded-lg transition-colors"
+              >
+                <Download size={16} />
+                Descarga el temario (PDF)
+              </m.a>
+            )}
+
             {/* Info pills */}
             <m.div
               initial={{ opacity: 0, y: 10 }}
@@ -155,6 +189,10 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
                 {tabs}
               </m.div>
             )}
+
+            {/* Extra content (teachers, FAQ) stacked below the tabs, still
+                inside the left column so the right-hand card spans it all. */}
+            {belowContent}
           </div>
 
           {/* Right: Sidebar slot (renders inside hero on desktop) */}
