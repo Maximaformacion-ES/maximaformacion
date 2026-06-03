@@ -54,9 +54,13 @@ type TabId = 'objectives' | 'audience' | 'careers';
 
 interface Props {
   course: MaxymiaCourse;
+  /** Server-resolved access for the first paint. While the client campus
+   *  profile is still loading we trust this so a non-buyer sees the purchase
+   *  view immediately instead of the student view flashing. */
+  initialHasAccess?: boolean;
 }
 
-export default function MaxymiaCourseOverview({ course }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
@@ -199,10 +203,15 @@ export default function MaxymiaCourseOverview({ course }: Props) {
   // — once a user has started a course, the row stays in their progress even
   // after enrollment expires/is revoked, so deriving `enrolled` from it gave
   // permanent access to anyone who ever opened the course.
-  const hasAccess = checkAccess(course.id, course.isPro);
+  // While the client profile is still loading, trust the server-resolved
+  // access (purchase view by default for non-buyers) so the student view
+  // never flashes; once loaded, the hook is the source of truth.
+  const hasAccess = isLoading ? !!initialHasAccess : checkAccess(course.id, course.isPro);
 
-  // Show product/detail page if user doesn't have access
-  if (!isLoading && !hasAccess) {
+  // Show product/detail (purchase) page whenever the user isn't entitled.
+  // Defaulting to this during load means "Comprar" shows first and only
+  // switches to the student view once we've confirmed a real purchase.
+  if (!hasAccess) {
     return <MaxymiaCourseDetail course={course} />;
   }
 
