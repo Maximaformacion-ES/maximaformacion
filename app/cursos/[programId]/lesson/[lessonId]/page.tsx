@@ -1,10 +1,13 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { getProgramWithLessons, getLessonById, getLessonNavigation } from '@/lib/strapi/lesson-queries';
+import { getCourseAccess } from '@/lib/auth/entitlement';
 import LessonPlayerClient from './LessonPlayerClient';
 
-// ISR: Revalidar cada hora
-export const revalidate = 3600;
+// Per-user gated content: must render dynamically so the server-side
+// enrollment check runs on every request and the player HTML is never
+// statically cached and served to a non-buyer.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ programId: string; lessonId: string }>;
@@ -41,6 +44,17 @@ export default async function LessonPage({ params }: PageProps) {
 
   if (!program || !lesson) {
     notFound();
+  }
+
+  // Server-side access gate. Free preview lessons stay open; everything else
+  // requires a real enrollment (or Pro for `isPro` courses). A non-entitled
+  // visitor is bounced to the course overview, which shows the purchase gate
+  // — the lesson content is never sent to their browser.
+  if (!lesson.isFree) {
+    const { hasAccess } = await getCourseAccess(program.documentId, program.isPro);
+    if (!hasAccess) {
+      redirect(`/cursos/${programId}`);
+    }
   }
 
   return (

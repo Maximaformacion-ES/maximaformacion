@@ -147,6 +147,11 @@ export interface MaxymiaCourse {
   careers?: string;
   objectives?: string;
   audiences?: string;
+  /** Preguntas frecuentes de la ficha. Opcional: la sección sólo se
+   *  pinta cuando hay al menos una. Mismo formato pregunta/respuesta que
+   *  las FAQ de los programas de Máxima, listo para alimentarse desde el
+   *  fallback (app/maxymia/data/courses.ts) o un futuro campo en Strapi. */
+  faqs?: { question: string; answer: string }[];
 }
 
 // ============ Exam Question Types ============

@@ -304,6 +304,18 @@
 }
 
 /*
+ * Dark-variant bold. The base rule paints <strong>/<b> in mx-orange-dark
+ * (#c45a0a), which all but vanishes on the dark course-detail background —
+ * the emphasis read as plain (slightly darker) text. On dark we lift it to
+ * the brighter brand amber so the bold actually stands out. Two-class +
+ * element selector outranks the base `.markdown-content strong`.
+ */
+.markdown-content.markdown-on-dark strong,
+.markdown-content.markdown-on-dark b {
+  color: #f59e0b !important; /* mx-orange — visible emphasis on dark */
+}
+
+/*
  * Tema /consultoria — Máxima Consultoría usa una paleta verde + azul (en el
  * resto del sitio el acento es naranja). Tailwind 4 con `@theme inline`
  * inlinea los hex en las utilidades, así que un simple override de la

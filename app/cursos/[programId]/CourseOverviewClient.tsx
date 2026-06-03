@@ -307,8 +307,12 @@ export default function CourseOverviewClient({
     });
   };
 
-  // If user doesn't have access and the course is Pro, show access gate
-  if (userStateKnown && program.isPro && !hasAccess) {
+  // If the user isn't entitled to this course, show the purchase gate.
+  // This applies to every paid course, not only Pro ones: /cursos/[id] is
+  // the members-only campus view (the public sales page is /programas/[slug]),
+  // so a non-buyer must never see the "Comenzar curso" CTA here. The lesson
+  // route enforces the same rule server-side as the real backstop.
+  if (userStateKnown && !hasAccess) {
     return (
       <div className="bg-mx-bg min-h-screen text-mx-text overflow-x-hidden">
         <FontStyles />

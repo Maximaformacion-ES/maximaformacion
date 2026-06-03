@@ -295,7 +295,11 @@ export default function CampusShell({ children, courses = [] }: CampusShellProps
   return (
     <LocaleProvider>
       <CampusCoursesContext.Provider value={courses}>
-        <div className="min-h-screen bg-[#0b1018] text-white overflow-x-hidden relative">
+        {/* overflow-x-clip (not -hidden) so the course-detail sidebar can use
+            position: sticky. `overflow-x: hidden` makes this a scroll
+            container and pins sticky children to it instead of the viewport;
+            `clip` prevents the horizontal scrollbar without that side effect. */}
+        <div className="min-h-screen bg-[#0b1018] text-white overflow-x-clip relative">
           <CampusHeader />
           <main className="relative z-10">
             {children}

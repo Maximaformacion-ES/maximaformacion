@@ -28,6 +28,8 @@ import {
   Target,
   Users,
   Briefcase,
+  FileText,
+  HelpCircle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
@@ -158,6 +160,7 @@ export default function MaxymiaCourseDetail({ course }: Props) {
         tabs={
           <CourseTabs course={course} locale={locale} totalLessons={totalLessons} />
         }
+        belowContent={<CourseFAQSection course={course} locale={locale} />}
       />
 
       {/* CTA Section */}
@@ -180,13 +183,22 @@ interface HeroProps {
   sidebar?: React.ReactNode;
   mobileSidebar?: React.ReactNode;
   tabs?: React.ReactNode;
+  /** Extra content stacked in the LEFT column below the tabs (e.g. FAQ).
+   *  Lives inside the left column so the sticky sidebar spans its height,
+   *  matching the Máxima program ficha. */
+  belowContent?: React.ReactNode;
 }
 
-function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar, mobileSidebar, tabs }: HeroProps) {
+function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar, mobileSidebar, tabs, belowContent }: HeroProps) {
+  // overflow-visible on the <section> (clipping moved to the background
+  // wrapper below) so the right-column sidebar's position: sticky works — an
+  // overflow-hidden ancestor turns into the sticky scroll container and the
+  // card never pins as you scroll. Mirrors the Máxima ProgramHeroSection.
   return (
-    <section className="relative pt-0 pb-12 md:pb-16 overflow-hidden">
-      {/* Background image with dark overlays */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative pt-0 pb-12 md:pb-16 overflow-visible">
+      {/* Background image with dark overlays — clipped here, not on the
+          <section>, so it doesn't break the sidebar's sticky. */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0b1018]/95 via-[#0b1018]/85 to-[#0b1018]/60 z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0b1018] via-[#0b1018]/30 to-transparent z-10" />
         <img
@@ -328,6 +340,10 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                 {tabs}
               </m.div>
             )}
+
+            {/* Extra content (e.g. FAQ) below the tabs, inside the left
+                column so the sticky sidebar spans its full height. */}
+            {belowContent}
           </div>
 
           {/* Right: Sidebar (desktop) */}
@@ -485,18 +501,6 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
             </p>
           </div>
 
-          {/* Guarantee */}
-          <div className="flex items-center gap-3 px-4 py-3 border border-mx-orange/20 bg-mx-orange/5 rounded-lg">
-            <ShieldCheck size={18} className="text-mx-orange shrink-0" />
-            <span className="text-label-md text-white/60 font-light">
-              <span className="font-semibold text-mx-orange">
-                {locale === 'es' ? '14 días de garantía' : '14-day guarantee'}
-              </span>
-              {' — '}
-              {locale === 'es' ? 'Devolución del 100%' : '100% refund'}
-            </span>
-          </div>
-
           {error && <p className="text-red-500 text-body-sm">{error}</p>}
 
           {/* CTA Buttons */}
@@ -550,29 +554,6 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
               </Link>
             )}
           </div>
-
-          <div className="border-t border-white/10" />
-
-          {/* Contact */}
-          <div className="space-y-3">
-            <div className="text-label-md text-white/40 uppercase tracking-widest font-bold">
-              {locale === 'es' ? 'Contacto' : 'Contact'}
-            </div>
-            <a
-              href="mailto:cursos@maximaformacion.es"
-              className="flex items-center gap-3 text-white/40 text-body-sm hover:text-mx-orange transition-colors"
-            >
-              <Mail size={14} />
-              cursos@maximaformacion.es
-            </a>
-            <a
-              href="tel:+34635659391"
-              className="flex items-center gap-3 text-white/40 text-body-sm hover:text-mx-orange transition-colors"
-            >
-              <Phone size={14} />
-              +34 635 65 93 91
-            </a>
-          </div>
         </div>
       </div>
     </div>
@@ -622,13 +603,15 @@ interface TabsProps {
 }
 
 function CourseTabs({ course, locale, totalLessons }: TabsProps) {
-  const [activeTab, setActiveTab] = useState('contenido');
+  const hasDescription = !!course.description?.[locale]?.trim();
+  const [activeTab, setActiveTab] = useState(hasDescription ? 'descripcion' : 'contenido');
   const [expandedBlock, setExpandedBlock] = useState<number | null>(0);
 
   const tabs = useMemo<TabDef[]>(() => {
-    const t: TabDef[] = [
-      { value: 'contenido', label: locale === 'es' ? 'Temario' : 'Syllabus', icon: ListOrdered },
-    ];
+    const t: TabDef[] = [];
+    if (hasDescription)
+      t.push({ value: 'descripcion', label: locale === 'es' ? 'Descripción' : 'Description', icon: FileText });
+    t.push({ value: 'contenido', label: locale === 'es' ? 'Temario' : 'Syllabus', icon: ListOrdered });
     if (course.objectives)
       t.push({ value: 'objetivos', label: locale === 'es' ? 'Objetivos' : 'Objectives', icon: Target });
     if (course.audiences)
@@ -636,7 +619,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
     if (course.careers)
       t.push({ value: 'salidas', label: locale === 'es' ? 'Salidas profesionales' : 'Career paths', icon: Briefcase });
     return t;
-  }, [locale, course.objectives, course.audiences, course.careers]);
+  }, [locale, hasDescription, course.objectives, course.audiences, course.careers]);
 
   const markdownTabClasses =
     'text-body-sm sm:text-body-md text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[\'\'] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
@@ -656,6 +639,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
             <span className="flex items-center gap-1 sm:gap-2">
               <tab.icon className="size-3.5 sm:size-4" />
               <span className="sm:hidden">
+                {tab.value === 'descripcion' && (locale === 'es' ? 'Descripción' : 'Description')}
                 {tab.value === 'contenido' && (locale === 'es' ? 'Temario' : 'Content')}
                 {tab.value === 'objetivos' && (locale === 'es' ? 'Objetivos' : 'Goals')}
                 {tab.value === 'audiencia' && (locale === 'es' ? 'Audiencia' : 'Audience')}
@@ -677,6 +661,18 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
       {/* Tab content */}
       <div className="pt-6 md:pt-4">
         <AnimatePresence mode="wait">
+          {activeTab === 'descripcion' && hasDescription && (
+            <m.div
+              key="descripcion"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+            >
+              <MarkdownContent content={course.description[locale]} className={markdownTabClasses} />
+            </m.div>
+          )}
+
           {activeTab === 'contenido' && (
             <m.div
               key="contenido"
@@ -805,6 +801,79 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+// ─── FAQ Section ────────────────────────────────────────────────
+
+function CourseFAQSection({ course, locale }: { course: MaxymiaCourse; locale: Locale }) {
+  const faqs = course.faqs ?? [];
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  // No FAQs configured for this course → render nothing. The capability is
+  // there; editors add Q&A pairs in the fallback data file (or a future
+  // Strapi field) and the section appears automatically.
+  if (faqs.length === 0) return null;
+
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.45, duration: 0.6 }}
+      className="mt-12 md:mt-16"
+    >
+      <div className="flex items-center gap-2 mb-6">
+        <HelpCircle size={18} className="text-mx-orange" />
+        <h2 className="text-heading-sm md:text-heading-md font-black tracking-tight text-white">
+          {locale === 'es' ? 'Preguntas frecuentes' : 'Frequently asked questions'}
+        </h2>
+      </div>
+
+      <div className="space-y-3">
+        {faqs.map((faq, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={faq.question}
+              className="bg-white/[0.03] border border-white/10 overflow-hidden rounded-lg"
+            >
+              <button
+                onClick={() => setOpenIndex(isOpen ? null : index)}
+                className="w-full p-5 md:p-6 flex items-center justify-between gap-4 text-left hover:bg-white/[0.02] duration-200 transition-colors group"
+                aria-expanded={isOpen}
+              >
+                <span className="text-body-sm md:text-body-md font-bold text-white group-hover:text-mx-orange transition-colors">
+                  {faq.question}
+                </span>
+                <m.div
+                  animate={{ rotate: isOpen ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="shrink-0"
+                >
+                  <ChevronDown size={20} className="text-white/30" />
+                </m.div>
+              </button>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <m.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-5 md:px-6 pb-5 md:pb-6 pt-1 text-body-sm text-white/60 font-light leading-relaxed">
+                      {faq.answer}
+                    </div>
+                  </m.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
+    </m.div>
   );
 }
 
