@@ -45,7 +45,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         className="flex flex-col h-full"
       >
         {/* Image area */}
-        <div className="relative h-[220px] xl:h-[240px] 2xl:h-[299px] p-4 xl:p-5 2xl:p-6 flex flex-col justify-between overflow-hidden">
+        <div className="relative h-[220px] xl:h-[200px] 2xl:h-[299px] p-4 2xl:p-6 flex flex-col justify-between overflow-hidden">
           {/* Background image — next/image generates the responsive srcset and
               serves AVIF/WebP; the surrounding motion.div carries the hover
               scale animation that the legacy <m.img> handled in one element. */}
@@ -110,13 +110,13 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="bg-mx-bg px-4 xl:px-5 2xl:px-6 py-3 flex flex-col flex-grow rounded-b-lg">
+        <div className="bg-mx-bg px-4 2xl:px-6 py-3 flex flex-col flex-grow rounded-b-lg">
           {/* Title & Description */}
-          <div className="flex flex-col gap-2 mb-4">
-            <h3 className="text-mx-text-muted text-heading-sm  font-medium line-clamp-2">
+          <div className="flex flex-col gap-2 mb-3 2xl:mb-4">
+            <h3 className="text-mx-text-muted text-body-lg 2xl:text-heading-sm font-medium line-clamp-2">
               {program.title}
             </h3>
-            <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light line-clamp-3 leading-normal">
+            <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light line-clamp-2 2xl:line-clamp-3 leading-normal">
               {program.description}
             </p>
           </div>
