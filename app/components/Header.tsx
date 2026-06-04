@@ -844,7 +844,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
               title: area.label,
               links: capped.map((p) => ({
                 label: p.title,
-                href: `/programas/${p.slug}`,
+                href: p.href,
               })),
               ...(hasMore && {
                 footerLink: {

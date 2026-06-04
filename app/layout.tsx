@@ -5,6 +5,9 @@ import { esES } from "@clerk/localizations";
 import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { getSiteMetadata, getPrograms } from "@/lib/strapi/queries";
+import { fetchMaxymiaCourses } from "./maxymia/data/queries";
+import { maxymiaCourseAsProgram } from "./maxymia/data/adapters";
+import type { MaxymiaCourse } from "./maxymia/types";
 import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
 import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
@@ -110,9 +113,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [siteMetadata, programsResult] = await Promise.all([
+  const [siteMetadata, programsResult, maxymiaCourses] = await Promise.all([
     getSiteMetadata(),
     getPrograms({ limit: 200 }).catch(() => ({ programs: [], total: 0, pageCount: 0 })),
+    fetchMaxymiaCourses().catch(() => [] as MaxymiaCourse[]),
   ]);
   const branding = {
     logoMaximaformacion: siteMetadata?.logoMaximaformacion || '',
@@ -121,12 +125,23 @@ export default async function RootLayout({
 
   // Group programs by subjectArea for the desktop megamenu. Ordering and
   // labels come from the shared SUBJECT_AREAS table so /programas/area/[slug]
-  // landings and the header stay in sync.
-  const grouped = new Map<string, { title: string; slug: string }[]>();
-  for (const p of programsResult.programs) {
+  // landings and the header stay in sync. Maxymia courses are merged in the
+  // same way /programas does it — they carry the "Inteligencia Artificial"
+  // area (and link to /maxymia/campus/[slug] via their href), so without this
+  // merge the IA column would always be empty and get filtered out.
+  const mergedPrograms = [
+    ...programsResult.programs,
+    ...maxymiaCourses.map(maxymiaCourseAsProgram),
+  ];
+  const grouped = new Map<string, { title: string; slug: string; href: string }[]>();
+  for (const p of mergedPrograms) {
     if (!p.subjectArea || !p.slug) continue;
     if (!grouped.has(p.subjectArea)) grouped.set(p.subjectArea, []);
-    grouped.get(p.subjectArea)!.push({ title: p.title, slug: p.slug });
+    grouped.get(p.subjectArea)!.push({
+      title: p.title,
+      slug: p.slug,
+      href: p.href ?? `/programas/${p.slug}`,
+    });
   }
   const megaMenuAreas: MegaMenuArea[] = SUBJECT_AREAS.map((a) => ({
     key: a.key,

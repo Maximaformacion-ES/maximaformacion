@@ -9,7 +9,12 @@ export type MegaMenuArea = {
   label: string;
   /** URL slug for /programas/area/[slug] */
   slug: string;
-  programs: { title: string; slug: string }[];
+  /**
+   * Programs in this area. `href` is the canonical detail URL — `/programas/[slug]`
+   * for Strapi programs, `/maxymia/campus/[slug]` for Maxymia courses — so the
+   * header doesn't assume every program lives under /programas.
+   */
+  programs: { title: string; slug: string; href: string }[];
 };
 
 export type MegaMenuData = {
