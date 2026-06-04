@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, ChevronDown, Sparkles, BarChart3, MonitorPlay, Activity, GraduationCap, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { ProgramCard } from './ProgramCard';
@@ -119,7 +119,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.6 }}
-                className="flex flex-col gap-8"
+                className="flex flex-col"
               >
                 {/* Area header: gradient band (title) with the
                     "Ver los N cursos" link centered alongside it. */}
@@ -151,25 +151,21 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
                   </Link>
                 </div>
 
-                {/* Area course cards (capped) — collapsible */}
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <m.div
-                      id={panelId}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-1">
-                        {courses.slice(0, MAX_CARDS_PER_AREA).map((program, i) => (
-                          <ProgramCard key={program.documentId ?? program.slug} program={program} index={i} />
-                        ))}
-                      </div>
-                    </m.div>
-                  )}
-                </AnimatePresence>
+                {/* Area course cards (capped) — collapsible via grid-rows
+                    (0fr → 1fr). A pure CSS transition on grid-template-rows is
+                    self-measuring, so there's no height:auto snap at the end. */}
+                <div
+                  id={panelId}
+                  className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-6 md:pt-8">
+                      {courses.slice(0, MAX_CARDS_PER_AREA).map((program, i) => (
+                        <ProgramCard key={program.documentId ?? program.slug} program={program} index={i} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </m.div>
             );
           })}
