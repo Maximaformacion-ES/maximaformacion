@@ -59,17 +59,13 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
     ),
   })).filter((a) => a.courses.length > 0);
 
-  // Each area is independently collapsible; the first one starts expanded.
-  const [openKeys, setOpenKeys] = useState<Set<SubjectAreaKey>>(() =>
-    areas.length ? new Set([areas[0].area.key]) : new Set()
+  // Single-open accordion: expanding one area collapses the others. The first
+  // area starts expanded. Clicking the open area collapses it.
+  const [openKey, setOpenKey] = useState<SubjectAreaKey | null>(
+    () => areas[0]?.area.key ?? null
   );
   const toggleArea = (key: SubjectAreaKey) =>
-    setOpenKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
+    setOpenKey((prev) => (prev === key ? null : key));
 
   return (
     <section id="masters" className="relative py-16 md:py-32 bg-mx-bg">
@@ -114,7 +110,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
         <div className="space-y-12">
           {areas.map(({ area, presentation, courses }) => {
             const Icon = presentation.icon;
-            const isOpen = openKeys.has(area.key);
+            const isOpen = openKey === area.key;
             const panelId = `area-panel-${area.slug}`;
             return (
               <m.div
@@ -133,23 +129,22 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
                     onClick={() => toggleArea(area.key)}
                     aria-expanded={isOpen}
                     aria-controls={panelId}
-                    className="flex-1 min-w-0 flex items-center gap-2 px-6 py-1 text-left"
-                    style={{ backgroundImage: `linear-gradient(to right, ${presentation.accent}, ${presentation.accent}00)` }}
+                    className="flex-1 min-w-0 flex items-center gap-2 px-5 sm:px-6 py-1.5 text-left"
+                    style={{ backgroundImage: `linear-gradient(to right, ${presentation.accent} 0%, ${presentation.accent} 30%, ${presentation.accent}00 100%)` }}
                   >
-                    <Icon size={18} className="text-white shrink-0" aria-hidden />
-                    <h3 className="text-white font-black uppercase tracking-[-0.7px] text-[22px] sm:text-[28px] leading-[42px] truncate">
+                    <Icon className="size-4 sm:size-[18px] text-white shrink-0" aria-hidden />
+                    <h3 className="min-w-0 text-white font-black uppercase tracking-[-0.7px] text-[17px] sm:text-heading-sm md:text-heading-md leading-[1.35]">
                       {presentation.name}
                     </h3>
                     <ChevronDown
-                      size={20}
-                      className={`text-white shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                      className={`size-[18px] text-white shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
                       aria-hidden
                     />
                   </button>
 
                   <Link
                     href={`/programas/area/${area.slug}`}
-                    className="shrink-0 flex items-center gap-2 text-mx-blue text-body-sm font-black whitespace-nowrap hover:opacity-70 transition-opacity group"
+                    className="shrink-0 flex items-center gap-2 text-mx-blue text-body-md font-black whitespace-nowrap hover:opacity-70 transition-opacity group"
                   >
                     Ver los {courses.length} {courses.length === 1 ? 'curso' : 'cursos'}
                     <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
