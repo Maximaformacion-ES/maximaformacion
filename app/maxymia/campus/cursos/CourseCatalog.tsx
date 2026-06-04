@@ -9,7 +9,6 @@ import {
   Tag,
   BarChart3,
   Hourglass,
-  Star,
 } from 'lucide-react';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
@@ -28,7 +27,7 @@ import type { MaxymiaCourse, MaxymiaCategory, MaxymiaLevel } from '../../types';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
-type SortBy = 'relevance' | 'rating' | 'price-asc' | 'price-desc' | 'newest' | 'students';
+type SortBy = 'relevance' | 'price-asc' | 'price-desc' | 'newest';
 
 const COURSES_PER_PAGE = 20;
 
@@ -52,7 +51,6 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
   const [level, setLevel] = useState<MaxymiaLevel | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [durationRange, setDurationRange] = useState<[number, number]>([0, 600]);
-  const [minRating, setMinRating] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('relevance');
   const [currentPage, setCurrentPage] = useState(1);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
@@ -73,7 +71,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, category, level, priceRange, durationRange, minRating, sortBy]);
+  }, [search, category, level, priceRange, durationRange, sortBy]);
 
   // Memoize course metadata
   const coursesWithMeta = useMemo(
@@ -120,16 +118,9 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
       );
     }
 
-    // Rating
-    if (minRating) {
-      result = result.filter(({ course }) => (course.rating ?? 0) >= minRating);
-    }
-
     // Sort
     result.sort((a, b) => {
       switch (sortBy) {
-        case 'rating':
-          return (b.course.rating ?? 0) - (a.course.rating ?? 0);
         case 'price-asc':
           return a.course.price - b.course.price;
         case 'price-desc':
@@ -139,15 +130,13 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             new Date(b.course.createdAt ?? 0).getTime() -
             new Date(a.course.createdAt ?? 0).getTime()
           );
-        case 'students':
-          return (b.course.studentCount ?? 0) - (a.course.studentCount ?? 0);
         default:
           return 0; // relevance = original order
       }
     });
 
     return result.map(({ course }) => course);
-  }, [coursesWithMeta, search, category, level, priceRange, durationRange, minRating, sortBy]);
+  }, [coursesWithMeta, search, category, level, priceRange, durationRange, sortBy]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredCourses.length / COURSES_PER_PAGE));
@@ -170,19 +159,11 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
     { value: 'advanced', label: t('level.advanced') },
   ];
 
-  const ratingOptions: FilterOption[] = [
-    { value: 'all', label: t('filter.rating.all') },
-    { value: '4', label: t('filter.rating.4plus') },
-    { value: '3', label: t('filter.rating.3plus') },
-  ];
-
   const sortOptions: SortOption<SortBy>[] = [
     { value: 'relevance', label: t('sort.relevance') },
-    { value: 'rating', label: t('sort.rating') },
     { value: 'price-asc', label: t('sort.priceAsc') },
     { value: 'price-desc', label: t('sort.priceDesc') },
     { value: 'newest', label: t('sort.newest') },
-    { value: 'students', label: t('sort.students') },
   ];
 
   function toggleDropdown(id: string) {
@@ -190,7 +171,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
   }
 
   const hasActiveFilters = !!(
-    category || level || minRating ||
+    category || level ||
     priceRange[0] !== 0 || priceRange[1] !== 500 ||
     durationRange[0] !== 0 || durationRange[1] !== 600
   );
@@ -331,17 +312,6 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             formatValue={(v) => v < 60 ? `${v}min` : `${Math.floor(v / 60)}h${v % 60 ? ` ${v % 60}min` : ''}`}
             isOpen={openDropdown === 'duration'}
             onToggle={() => toggleDropdown('duration')}
-            variant="dark"
-          />
-          <FilterDropdown
-            id="rating"
-            icon={<Star size={14} />}
-            label={t('filter.rating')}
-            options={ratingOptions}
-            value={minRating !== null ? String(minRating) : null}
-            onChange={(v) => setMinRating(v ? parseInt(v) : null)}
-            isOpen={openDropdown === 'rating'}
-            onToggle={() => toggleDropdown('rating')}
             variant="dark"
           />
         </FilterBar>

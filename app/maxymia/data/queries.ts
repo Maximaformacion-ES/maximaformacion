@@ -116,11 +116,9 @@ export function getMaxymiaCategories(): { id: MaxymiaCategory; label: Record<Loc
   ];
 }
 
-/** Get courses sorted by rating descending */
-export function getBestRatedCourses(courses: MaxymiaCourse[], limit = 6): MaxymiaCourse[] {
-  return [...courses]
-    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-    .slice(0, limit);
+/** Get featured courses in editorial (data) order */
+export function getFeaturedCourses(courses: MaxymiaCourse[], limit = 6): MaxymiaCourse[] {
+  return courses.slice(0, limit);
 }
 
 /** Get the most recently added course */
@@ -138,10 +136,8 @@ export function getRecommendedCourses(
   limit = 6
 ): MaxymiaCourse[] {
   if (enrolledCourseIds.length === 0) {
-    // Fallback: return popular courses (by student count)
-    return [...courses]
-      .sort((a, b) => (b.studentCount ?? 0) - (a.studentCount ?? 0))
-      .slice(0, limit);
+    // Fallback: return featured courses in editorial order
+    return courses.slice(0, limit);
   }
 
   const enrolledCategories = new Set(
@@ -155,34 +151,13 @@ export function getRecommendedCourses(
   );
 
   if (recommended.length === 0) {
-    // Fallback: return courses not enrolled, sorted by rating
+    // Fallback: return courses not enrolled, in editorial order
     return courses
       .filter((c) => !enrolledCourseIds.includes(c.id))
-      .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
       .slice(0, limit);
   }
 
-  return recommended
-    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-    .slice(0, limit);
-}
-
-/** Merge DB ratings into course objects (pure function, no DB import) */
-export function mergeRatings(
-  courses: MaxymiaCourse[],
-  ratings: Record<string, { averageRating: number; reviewCount: number }>
-): MaxymiaCourse[] {
-  return courses.map((c) => {
-    const dbRating = ratings[c.id];
-    if (dbRating && dbRating.reviewCount > 0) {
-      return {
-        ...c,
-        rating: Math.round(dbRating.averageRating * 10) / 10,
-        studentCount: c.studentCount ?? dbRating.reviewCount,
-      };
-    }
-    return c;
-  });
+  return recommended.slice(0, limit);
 }
 
 /** Get recently published courses, sorted newest first */

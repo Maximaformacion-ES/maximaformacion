@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getMaxymiaHome } from '@/lib/strapi/queries';
-import { fetchMaxymiaCourses, getBestRatedCourses } from './data/queries';
+import { fetchMaxymiaCourses, getFeaturedCourses } from './data/queries';
 import MaxymiaClient from './MaxymiaClient';
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default async function MaxymiaPage() {
   ]);
 
   const homeData = maxymiaData;
-  const topCourses = getBestRatedCourses(allCourses, 8);
+  const topCourses = getFeaturedCourses(allCourses, 8);
 
   return <MaxymiaClient data={homeData!} courses={topCourses} />;
 }

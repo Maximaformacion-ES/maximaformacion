@@ -3,34 +3,14 @@
 import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Star, Users, ArrowRight } from 'lucide-react';import { useUserCampus } from '@/app/hooks/useUserCampus';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../i18n/LocaleProvider';
 import { getTranslation } from '../i18n/translations';
 import MaxymiaCourseCard from '../components/MaxymiaCourseCard';
 import SlideIndicator from '@/app/components/SlideIndicator';
-import { getBestRatedCourses, getLatestCourse, getRecommendedCourses, getRecentCourses, getCourseProgressStats } from '../data/queries';
+import { getFeaturedCourses, getLatestCourse, getRecommendedCourses, getRecentCourses, getCourseProgressStats } from '../data/queries';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
-
-// ─── Star Rating ─────────────────────────────────────────────────────
-function StarRating({ rating, size = 14 }: { rating: number; size?: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          size={size}
-          className={
-            star <= Math.floor(rating)
-              ? 'text-mx-orange fill-mx-orange'
-              : star <= Math.ceil(rating) && rating % 1 >= 0.5
-              ? 'text-mx-orange fill-mx-orange/50'
-              : 'text-white/20'
-          }
-        />
-      ))}
-    </div>
-  );
-}
 
 // ─── Hero Carousel ───────────────────────────────────────────────────
 interface HeroCarouselProps {
@@ -53,7 +33,7 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
 
   if (courses.length === 0) return null;
 
-  const badges = [t('campus.bestRatedBadge'), t('campus.newCourse')];
+  const badges = [t('campus.featuredBadge'), t('campus.newCourse')];
 
   const activeCourse = courses[activeIndex];
 
@@ -76,11 +56,6 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
         <AnimatePresence mode="wait">
           {courses.map((course, i) => {
             if (i !== activeIndex) return null;
-            const rating = course.rating ?? 0;
-            const studentCount = course.studentCount ?? 0;
-            const studentLabel = studentCount >= 1000
-              ? `${(studentCount / 1000).toFixed(1).replace(/\.0$/, '')}k`
-              : `${studentCount}`;
 
             return (
               <m.div
@@ -101,17 +76,6 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                     <h1 className="text-heading-sm sm:text-heading-md md:text-heading-lg 2xl:text-display-sm font-bold text-white leading-tight mb-3 sm:mb-5 text-balance">
                       {course.title[locale].toUpperCase()}
                     </h1>
-
-                    {/* Rating + students */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <StarRating rating={rating} size={16} />
-                      <span className="text-white/70 text-body-sm font-medium">{rating.toFixed(1)}</span>
-                      <span className="text-white/20">|</span>
-                      <span className="flex items-center gap-1 text-white/50 text-body-sm">
-                        <Users size={14} />
-                        {studentLabel} {t('campus.students')}
-                      </span>
-                    </div>
 
                     <p className="text-white/50 text-body-sm sm:text-body-md 2xl:text-body-lg leading-relaxed mb-4 sm:mb-6 max-w-lg">
                       {course.description[locale]}
@@ -290,18 +254,18 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
 
   const enrolledCourseIds = useMemo(() => Object.keys(progressMap), [progressMap]);
 
-  // Hero slides: best rated + latest
+  // Hero slides: featured + latest
   const heroSlides = useMemo(() => {
-    const bestRated = getBestRatedCourses(courses, 1)[0];
+    const featured = getFeaturedCourses(courses, 1)[0];
     const latest = getLatestCourse(courses);
     const slides: MaxymiaCourse[] = [];
-    if (bestRated) slides.push(bestRated);
-    if (latest && latest.id !== bestRated?.id) slides.push(latest);
+    if (featured) slides.push(featured);
+    if (latest && latest.id !== featured?.id) slides.push(latest);
     return slides;
   }, [courses]);
 
   // Rows
-  const bestRatedCourses = useMemo(() => getBestRatedCourses(courses, 6), [courses]);
+  const featuredCourses = useMemo(() => getFeaturedCourses(courses, 6), [courses]);
   const recommendedCourses = useMemo(
     () => getRecommendedCourses(courses, enrolledCourseIds, 6),
     [courses, enrolledCourseIds]
@@ -345,10 +309,10 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
           delay={0.05}
         />
 
-        {/* Best Rated */}
+        {/* Featured */}
         <CourseRow
-          title={t('campus.bestRated')}
-          courses={bestRatedCourses}
+          title={t('campus.featured')}
+          courses={featuredCourses}
           locale={locale}
           progressMap={progressMap}
           hasAccess={hasAccess}

@@ -22,7 +22,6 @@ import {
   Globe,
   BarChart3,
   FileQuestion,
-  Star,
   User,
   ListOrdered,
   Target,
@@ -61,26 +60,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
   en: 'English',
   bilingual: 'Bilingüe',
 };
-
-// ─── Star Rating ────────────────────────────────────────────────
-
-function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => {
-        const fill = Math.min(1, Math.max(0, rating - (star - 1)));
-        return (
-          <div key={star} className="relative" style={{ width: size, height: size }}>
-            <Star size={size} className="text-white/20" />
-            <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
-              <Star size={size} className="text-mx-orange fill-mx-orange" />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 // ─── Course Thumbnail (replicates card style) ───────────────────
 
@@ -296,27 +275,6 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                 <p className="text-white/40 text-label-md">{course.instructor.role}</p>
               </div>
             </m.div>
-
-            {/* Rating — 5 stars */}
-            {course.rating != null && (
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28, duration: 0.5 }}
-                className="flex items-center gap-3 mb-6"
-              >
-                <div className="flex items-center gap-1">
-                  <StarRating rating={course.rating} />
-                  <span className="text-white font-semibold text-body-sm ml-1">{course.rating}</span>
-                </div>
-                {course.studentCount != null && (
-                  <span className="text-white/40 text-label-md">
-                    ({course.studentCount.toLocaleString()}{' '}
-                    {locale === 'es' ? 'estudiantes' : 'students'})
-                  </span>
-                )}
-              </m.div>
-            )}
 
             {/* Mobile Sidebar — before tabs so purchase is visible early */}
             {mobileSidebar && (

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { m } from 'framer-motion';
-import { Star, ArrowUpRight, Users, Calendar, User, Trophy } from 'lucide-react';
+import { ArrowUpRight, Calendar, User, Trophy } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
 import { getCourseMeta, getCourseProgressStats } from '../data/queries';
 
@@ -15,26 +15,6 @@ interface MaxymiaCourseCardProps {
   progress?: MaxymiaCourseProgress;
   enrolled?: boolean;
   index?: number;
-}
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          size={12}
-          className={
-            star <= Math.floor(rating)
-              ? 'text-mx-orange fill-mx-orange'
-              : star <= Math.ceil(rating) && rating % 1 >= 0.5
-              ? 'text-mx-orange fill-mx-orange/50'
-              : 'text-white/20'
-          }
-        />
-      ))}
-    </div>
-  );
 }
 
 export default function MaxymiaCourseCard({
@@ -65,12 +45,6 @@ export default function MaxymiaCourseCard({
     isCompleted: isFullyCompleted,
     completed: completedCount,
   } = getCourseProgressStats(course, progress?.completedLessons);
-
-  const rating = course.rating ?? 0;
-  const studentCount = course.studentCount ?? 0;
-  const studentLabel = studentCount >= 1000
-    ? `${(studentCount / 1000).toFixed(1).replace(/\.0$/, '')}k`
-    : `${studentCount}`;
 
   const thumbnailLines = course.thumbnailTitle
     ? course.thumbnailTitle[locale].split('\n')
@@ -163,17 +137,6 @@ export default function MaxymiaCourseCard({
 
         {/* Content area — dark background */}
         <div className="bg-[#171c24] px-4 py-4 flex flex-col flex-grow">
-          {/* Rating + students */}
-          <div className="flex items-center gap-2 mb-2">
-            <StarRating rating={rating} />
-            <span className="text-white/60 text-label-md font-medium">{rating.toFixed(1)}</span>
-            <span className="text-white/30 text-label-md">|</span>
-            <span className="flex items-center gap-1 text-white/40 text-label-md">
-              <Users size={11} />
-              {studentLabel} {locale === 'es' ? 'estudiantes' : 'students'}
-            </span>
-          </div>
-
           {/* Title */}
           <h3 className="text-white font-semibold text-body-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors">
             {course.title[locale]}

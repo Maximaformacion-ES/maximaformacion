@@ -140,8 +140,6 @@ export interface MaxymiaCourse {
   tags: string[];
   category: MaxymiaCategory;
   thumbnailTitle?: LocalizedString;
-  rating?: number;
-  studentCount?: number;
   originalPrice?: number;
   createdAt?: string;
   careers?: string;

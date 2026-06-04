@@ -396,8 +396,6 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     haveDiscount: false,
     tags: ['IA', 'machine learning', 'redes neuronales', 'python'],
     category: 'ia',
-    rating: 4.8,
-    studentCount: 2340,
     originalPrice: 149,
     createdAt: '2025-09-15T00:00:00Z',
     objectives: `- Comprender los fundamentos teóricos de la inteligencia artificial y el aprendizaje automático
@@ -706,8 +704,6 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     haveDiscount: false,
     tags: ['NLP', 'transformers', 'hugging face', 'BERT', 'GPT'],
     category: 'nlp',
-    rating: 4.5,
-    studentCount: 1520,
     originalPrice: 199,
     createdAt: '2025-11-01T00:00:00Z',
     objectives: `- Dominar las arquitecturas Transformer y sus variantes (BERT, GPT, T5)
@@ -862,8 +858,6 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     haveDiscount: false,
     tags: ['computer vision', 'CNN', 'ViT', 'pytorch'],
     category: 'computer-vision',
-    rating: 4.2,
-    studentCount: 980,
     originalPrice: 179,
     createdAt: '2026-01-10T00:00:00Z',
     objectives: `- Comprender los fundamentos de la visión por computador y el procesamiento de imágenes
@@ -955,8 +949,6 @@ export const MAXYMIA_COURSES: MaxymiaCourse[] = [
     haveDiscount: false,
     tags: ['LLM', 'GPT', 'investigación', 'prompting', 'ciencia'],
     category: 'ia',
-    rating: 4.8,
-    studentCount: 120,
     originalPrice: 129,
     createdAt: '2026-03-01T00:00:00Z',
   },
