@@ -580,7 +580,11 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
   }, [locale, hasDescription, course.objectives, course.audiences, course.careers]);
 
   const markdownTabClasses =
-    'text-body-sm sm:text-body-md text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[\'\'] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
+    // Bullet posicionado en absoluto (no flex) para que un <strong> seguido
+    // de texto dentro del <li> no se parta en dos flex items con `gap` —
+    // eso era lo que metía el hueco visible alrededor de la negrita. Mismo
+    // patrón que ProgramTabs (BULLET_MARKDOWN_CLASS).
+    'text-body-sm sm:text-body-md text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:relative [&_li]:pl-5 sm:[&_li]:pl-6 [&_li]:before:content-[\'\'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
 
   return (
     <div>

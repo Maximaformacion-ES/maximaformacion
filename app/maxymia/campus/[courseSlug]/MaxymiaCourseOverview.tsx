@@ -50,7 +50,7 @@ const LANGUAGE_LABELS: Record<string, Record<Locale, string>> = {
   bilingual: { es: 'Bilingüe', en: 'Bilingual' },
 };
 
-type TabId = 'objectives' | 'audience' | 'careers';
+type TabId = 'description' | 'objectives' | 'audience' | 'careers';
 
 interface Props {
   course: MaxymiaCourse;
@@ -67,7 +67,8 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
   const { byExamId: examResultsByExamId } = useExamResults(course.id);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<TabId>('objectives');
+  const hasDescription = !!course.description?.[locale]?.trim();
+  const [activeTab, setActiveTab] = useState<TabId>(hasDescription ? 'description' : 'objectives');
   const [showCertificate, setShowCertificate] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
   const [issuedCertificate, setIssuedCertificate] = useState<{
@@ -216,6 +217,9 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [
+    ...(hasDescription
+      ? [{ id: 'description' as const, label: { es: 'Descripción', en: 'Description' }, icon: BookOpen }]
+      : []),
     { id: 'objectives', label: { es: 'Objetivos', en: 'Objectives' }, icon: Target },
     { id: 'audience', label: { es: 'A quién va dirigido', en: 'Who is this for' }, icon: Users },
     { id: 'careers', label: { es: 'Salidas profesionales', en: 'Career paths' }, icon: Briefcase },
@@ -281,9 +285,23 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
               </p>
 
               {/* Instructor */}
-              <div className="flex items-center mb-12">
+              <div className="flex items-center gap-3 mb-12">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
-                  <User size={18} className="text-white/40" />
+                  {course.instructor.avatar ? (
+                    <Image
+                      src={course.instructor.avatar}
+                      alt={course.instructor.name}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User size={18} className="text-white/40" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-white text-body-sm font-medium">{course.instructor.name}</p>
+                  <p className="text-white/40 text-label-md">{course.instructor.role}</p>
                 </div>
               </div>
 
@@ -314,6 +332,9 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
 
               {/* Tab Content */}
               <div className="max-w-full">
+                {activeTab === 'description' && hasDescription && (
+                  <MarkdownBlock content={course.description[locale]} />
+                )}
                 {activeTab === 'objectives' && (
                   <MarkdownBlock content={course.objectives || (locale === 'es' ? 'Los objetivos de este curso se irán definiendo a medida que avances en el temario.' : 'Course objectives will be defined as you progress through the syllabus.')} />
                 )}
@@ -451,23 +472,6 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
                       </div>
                     </>
                   )}
-
-                  <div className="border-t border-white/10" />
-
-                  {/* Contact */}
-                  <div className="flex flex-col gap-3">
-                    <p className="text-white/40 text-[12px] font-black tracking-[1.2px] uppercase">
-                      {locale === 'es' ? 'Contacto' : 'Contact'}
-                    </p>
-                    <a href="mailto:cursos@maximaformacion.es" className="flex items-center gap-3 text-white/40 text-sm hover:text-white/60 transition-colors">
-                      <Mail size={14} />
-                      cursos@maximaformacion.es
-                    </a>
-                    <a href="tel:+34635659391" className="flex items-center gap-3 text-white/40 text-sm hover:text-white/60 transition-colors">
-                      <Phone size={14} />
-                      +34 635 65 93 91
-                    </a>
-                  </div>
                 </div>
               </div>
             </div>
@@ -637,7 +641,10 @@ function MarkdownBlock({ content }: { content: string }) {
       // the body copy reads on Maxymia's dark theme; without it the
       // shared `.markdown-content { color: #000 !important }` rule used
       // by the program pages forces it to invisible black.
-      className="markdown-content markdown-on-dark text-body-sm sm:text-body-md font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:flex [&_li]:items-start [&_li]:gap-3 sm:[&_li]:gap-4 [&_li]:before:content-[''] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_li]:before:mt-[7px] [&_li]:before:shrink-0 [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
+      // Bullet en absoluto (no flex+gap): si el <li> es flex, un <strong>
+      // seguido de texto se parte en dos flex items y el `gap` mete el
+      // hueco visible alrededor de la negrita. Mismo patrón que ProgramTabs.
+      className="markdown-content markdown-on-dark text-body-sm sm:text-body-md font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:relative [&_li]:pl-5 sm:[&_li]:pl-6 [&_li]:before:content-[''] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
