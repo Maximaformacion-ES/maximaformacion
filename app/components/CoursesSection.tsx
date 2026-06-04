@@ -12,7 +12,7 @@ import type { Program } from '@/lib/strapi/types';
 // How many course cards to surface per area on the home. The goal is to
 // communicate coverage of the area, not to dump the full catalog — the rest
 // live behind the "Ver los N cursos" link to /programas/area/[slug].
-const MAX_CARDS_PER_AREA = 3;
+const MAX_CARDS_PER_AREA = 4;
 
 // Presentation metadata for each area: home-facing name, icon and the gradient
 // accent colour. The colour fills a left-to-right band fading to transparent
@@ -167,7 +167,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
                       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pt-1">
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-1">
                         {courses.slice(0, MAX_CARDS_PER_AREA).map((program, i) => (
                           <ProgramCard key={program.documentId ?? program.slug} program={program} index={i} />
                         ))}
