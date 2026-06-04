@@ -30,6 +30,7 @@ import { trackViewItemList } from '@/lib/analytics';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { getEffectivePrice } from '@/lib/pricing';
+import { normalizeForSearch } from '@/lib/normalize-search';
 
 type SortBy = 'relevance' | 'price-asc' | 'price-desc' | 'newest';
 
@@ -176,13 +177,13 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
   const filteredPrograms = useMemo(() => {
     let result = [...initialPrograms];
 
-    // Search
+    // Search (insensible a mayúsculas y tildes: "estadistica" → "Estadística")
     if (search) {
-      const q = search.toLowerCase();
+      const q = normalizeForSearch(search);
       result = result.filter(p =>
-        p.title.toLowerCase().includes(q) ||
-        p.tags.some(t => t.toLowerCase().includes(q)) ||
-        p.topics?.some(t => t.name.toLowerCase().includes(q))
+        normalizeForSearch(p.title).includes(q) ||
+        p.tags.some(t => normalizeForSearch(t).includes(q)) ||
+        p.topics?.some(t => normalizeForSearch(t.name).includes(q))
       );
     }
 

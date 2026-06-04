@@ -24,6 +24,7 @@ import {
 } from '@/app/components/filters';
 import type { FilterOption, SortOption } from '@/app/components/filters';
 import type { MaxymiaCourse, MaxymiaCategory, MaxymiaLevel } from '../../types';
+import { normalizeForSearch } from '@/lib/normalize-search';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -83,14 +84,14 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
   const filteredCourses = useMemo(() => {
     let result = [...coursesWithMeta];
 
-    // Search
+    // Search (insensible a mayúsculas y tildes: "estadistica" → "Estadística")
     if (search) {
-      const q = search.toLowerCase();
+      const q = normalizeForSearch(search);
       result = result.filter(
         ({ course }) =>
-          course.title.es.toLowerCase().includes(q) ||
-          course.title.en.toLowerCase().includes(q) ||
-          course.tags.some((tag) => tag.toLowerCase().includes(q))
+          normalizeForSearch(course.title.es).includes(q) ||
+          normalizeForSearch(course.title.en).includes(q) ||
+          course.tags.some((tag) => normalizeForSearch(tag).includes(q))
       );
     }
 
