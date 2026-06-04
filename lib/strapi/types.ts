@@ -127,7 +127,7 @@ export interface StrapiProgram {
   brochurePdf: StrapiMedia | null;
   videoUrl: string | null;
   faqs: { id?: number; question: string; answer: string }[] | null;
-  subjectArea: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | null;
+  subjectArea: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
   startDate: string | null;
@@ -261,7 +261,7 @@ export interface Program {
   brochurePdfUrl?: string | null;
   videoUrl?: string | null;
   faqs?: { question: string; answer: string }[];
-  subjectArea?: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | null;
+  subjectArea?: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   modules: ProgramModule[];
   audience: string;
   careers: string;

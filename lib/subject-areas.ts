@@ -7,7 +7,8 @@ export type SubjectAreaKey =
   | 'Inteligencia Artificial'
   | 'Ciencia de Datos'
   | 'Moodle / Exelearning / H5P'
-  | 'Salud basada en datos';
+  | 'Salud basada en datos'
+  | 'Educación';
 
 export interface SubjectArea {
   /** Stored value in Strapi's `subjectArea` enum. */
@@ -70,6 +71,17 @@ export const SUBJECT_AREAS: SubjectArea[] = [
       'Cursos de estadística aplicada a la salud, metodología de investigación cualitativa y comunicación científica para profesionales sanitarios y de investigación.',
     intro:
       'Itinerario para profesionales de la salud y la investigación que quieren reforzar su base estadística, metodológica y de comunicación científica.',
+  },
+  {
+    key: 'Educación',
+    slug: 'educacion',
+    label: 'Educación',
+    heading: 'Formación en Educación',
+    metaTitle: 'Cursos del Área de Educación | Máxima Formación',
+    metaDescription:
+      'Cursos del área de educación de Máxima Formación: didáctica, innovación docente y herramientas para el aula.',
+    intro:
+      'Programas orientados a docentes y profesionales de la educación que quieren actualizar su práctica didáctica e incorporar nuevas metodologías y herramientas.',
   },
 ];
 
