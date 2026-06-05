@@ -356,11 +356,20 @@ function transformLesson(lesson: StrapiMaxymiaLesson): MaxymiaLesson {
     intro: transformLessonIntro(lesson),
     content: transformLocalizedContent(lesson.topics),
     estimatedMinutes: lesson.estimatedMinutes ?? 0,
-    topics: (lesson.topics ?? []).map((t) => ({
-      id: String(t.id),
-      title: { es: t.title_es, en: t.title_en ?? t.title_es },
-      anchorId: t.anchorId,
-    })),
+    topics: (lesson.topics ?? []).map((t) => {
+      const topicBlocks = (t.content ?? []).map(transformContentBlock);
+      return {
+        id: String(t.id),
+        title: { es: t.title_es, en: t.title_en ?? t.title_es },
+        anchorId: t.anchorId,
+        // Each topic keeps its OWN content. Previously this was dropped and the
+        // player re-split the lesson's flat content evenly across topics, which
+        // mis-assigned blocks to the wrong topic (content bleeding into the
+        // previous unit). The blocks are locale-agnostic (same as the flat
+        // mapping in transformLocalizedContent), so both locales share them.
+        content: { es: topicBlocks, en: topicBlocks },
+      };
+    }),
   };
 }
 

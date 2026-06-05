@@ -17,24 +17,17 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../../../i18n/LocaleProvider';
 import LessonContentRenderer from '../../../../components/LessonContentRenderer';
 import MaxymiaLessonSidebar from '../../../../components/MaxymiaLessonSidebar';
-import type { MaxymiaCourse, MaxymiaBlock, MaxymiaLesson, MaxymiaTopic, LessonNavigation, ContentBlock } from '../../../../types';
+import type { MaxymiaCourse, MaxymiaBlock, MaxymiaLesson, MaxymiaTopic, LessonNavigation, ContentBlock, Locale } from '../../../../types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 
-/** Split content blocks evenly among topics */
-function distributeBlocks(topics: MaxymiaTopic[], blocks: ContentBlock[]) {
-  const n = topics.length;
-  if (n === 0) return [];
-  const perTopic = Math.floor(blocks.length / n);
-  const remainder = blocks.length % n;
-  const sections: { topic: MaxymiaTopic; blocks: ContentBlock[] }[] = [];
-  let offset = 0;
-  for (let i = 0; i < n; i++) {
-    const count = perTopic + (i < remainder ? 1 : 0);
-    sections.push({ topic: topics[i], blocks: blocks.slice(offset, offset + count) });
-    offset += count;
-  }
-  return sections;
+/**
+ * Each topic carries its own content blocks (per H3 section in the source doc).
+ * We render exactly those — NOT an even split of the lesson's flat content,
+ * which used to mis-assign blocks and bleed content into the previous topic.
+ */
+function topicSectionsFor(topics: MaxymiaTopic[], locale: Locale) {
+  return topics.map((topic) => ({ topic, blocks: topic.content[locale] }));
 }
 
 interface Props {
@@ -78,8 +71,8 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   const introBlocks: ContentBlock[] = lesson.intro ? lesson.intro[locale] : [];
 
   const topicSections = useMemo(
-    () => (hasTopics ? distributeBlocks(lesson.topics, lesson.content[locale]) : []),
-    [hasTopics, lesson.topics, lesson.content, locale]
+    () => (hasTopics ? topicSectionsFor(lesson.topics, locale) : []),
+    [hasTopics, lesson.topics, locale]
   );
 
   const selectedSection = useMemo(

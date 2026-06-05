@@ -94,6 +94,8 @@ export interface MaxymiaTopic {
   id: string;
   title: LocalizedString;
   anchorId: string;
+  /** Content blocks that belong to THIS topic (per H3 section in the docx). */
+  content: LocalizedContent;
 }
 
 export interface MaxymiaLesson {
