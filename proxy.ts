@@ -64,8 +64,14 @@ const isWebhookRoute = createRouteMatcher([
 // branch returns 404 directly. They're also disallowed in robots.txt so
 // well-behaved crawlers won't reach them.
 const isAuthRequiredRoute = createRouteMatcher([
-  '/maxymia/campus/(.*)',
+  // NOTE: the course ficha /maxymia/campus/[courseSlug] is intentionally NOT
+  // listed — it's a public landing, so bots must be able to render it (link
+  // previews / SEO). The genuinely protected campus pages are listed instead.
   '/maxymia/campus',
+  '/maxymia/campus/cursos(.*)',
+  '/maxymia/campus/mis-cursos(.*)',
+  '/maxymia/campus/notas(.*)',
+  '/maxymia/campus/(.*)/lesson(.*)',
   '/perfil(.*)',
   '/api/checkout(.*)',
   '/api/billing-portal(.*)',

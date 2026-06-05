@@ -1,5 +1,6 @@
 import { fetchMaxymiaCourses } from '../../data/queries';
 import CourseCatalog from './CourseCatalog';
+import { requireCampusLogin } from '../require-campus-login';
 
 export const metadata = {
   title: 'Cursos — Campus Maxymia',
@@ -7,6 +8,7 @@ export const metadata = {
 };
 
 export default async function CursosPage() {
+  await requireCampusLogin('/maxymia/campus/cursos');
   const courses = await fetchMaxymiaCourses();
 
   return <CourseCatalog courses={courses} />;

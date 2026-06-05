@@ -2,8 +2,6 @@
 
 import React, { useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
 import { m } from 'framer-motion';
 import { ArrowUpRight, Calendar, User, Trophy } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
@@ -24,20 +22,9 @@ export default function MaxymiaCourseCard({
   enrolled,
   index = 0,
 }: MaxymiaCourseCardProps) {
-  // SSR-stable href points to /sign-in so SEO crawlers never follow a link
-  // into the protected campus area; signed-in clicks are routed straight to
-  // the course by handleCardClick.
+  // The course ficha is a public landing now, so every visitor — signed in or
+  // not, crawlers included — links straight to it (no detour through /sign-in).
   const campusHref = `/maxymia/campus/${course.slug}`;
-  const publicHref = `/sign-in?redirect_url=${encodeURIComponent(campusHref)}`;
-  const { isSignedIn } = useUser();
-  const router = useRouter();
-  const handleCardClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      router.push(isSignedIn ? campusHref : publicHref);
-    },
-    [isSignedIn, router, campusHref, publicHref],
-  );
 
   const { totalLessons } = getCourseMeta(course);
   const {
@@ -79,7 +66,7 @@ export default function MaxymiaCourseCard({
       transition={{ delay: index * 0.06, duration: 0.5 }}
       className="group/card relative h-full"
     >
-      <Link href={publicHref} onClick={handleCardClick} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-[#2e3339]'}`}>
+      <Link href={campusHref} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-[#2e3339]'}`}>
         {/* Thumbnail area */}
         <div className={`relative h-[200px] overflow-hidden flex items-center justify-center ${isFullyCompleted ? 'bg-gradient-to-br from-amber-600 to-amber-800' : 'bg-[#527be7]'}`}>
           {/* Completion badge */}
