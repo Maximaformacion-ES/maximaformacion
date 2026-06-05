@@ -191,6 +191,15 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
+            {/* Breadcrumb (como en las fichas de /programas) */}
+            <nav aria-label="breadcrumb" className="mb-5 text-label-md text-white/40">
+              <Link href="/" className="hover:text-mx-orange transition-colors">Inicio</Link>
+              <span className="mx-2">/</span>
+              <Link href="/maxymia" className="hover:text-mx-orange transition-colors">Maxymia</Link>
+              <span className="mx-2">/</span>
+              <span className="text-white/70">{course.title[locale]}</span>
+            </nav>
+
             {/* Badges */}
             <m.div
               initial={{ opacity: 0, y: 10 }}

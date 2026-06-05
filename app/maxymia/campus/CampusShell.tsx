@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Search, ChevronLeft, ArrowUpRight, Menu, X } from 'lucide-react';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 import { LocaleProvider, useLocale } from '../i18n/LocaleProvider';
 
 import NotificationBell from '../components/NotificationBell';
@@ -77,29 +77,34 @@ function DefaultCampusHeader() {
               )}
             </Link>
 
-            <nav className="hidden md:flex items-center gap-1">
-              {CAMPUS_NAV.map((item) => {
-                const isActive = pathname === item.path;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.path}
-                    className="relative px-4 py-2 rounded-lg"
-                  >
-                    <span
-                      className={`text-body-sm 2xl:text-body-md ${
-                        isActive ? 'font-medium text-white' : 'font-normal text-white/50 hover:text-white/70 transition-colors'
-                      }`}
+            {/* Las secciones del campus son privadas: solo se muestran a
+                usuarios logueados. Un anónimo (viendo una ficha pública) no las
+                ve. */}
+            <SignedIn>
+              <nav className="hidden md:flex items-center gap-1">
+                {CAMPUS_NAV.map((item) => {
+                  const isActive = pathname === item.path;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.path}
+                      className="relative px-4 py-2 rounded-lg"
                     >
-                      {item.name}
-                    </span>
-                    {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#527be7] rounded-full" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
+                      <span
+                        className={`text-body-sm 2xl:text-body-md ${
+                          isActive ? 'font-medium text-white' : 'font-normal text-white/50 hover:text-white/70 transition-colors'
+                        }`}
+                      >
+                        {item.name}
+                      </span>
+                      {isActive && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#527be7] rounded-full" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </SignedIn>
           </div>
 
           {/* Right side */}
@@ -112,22 +117,35 @@ function DefaultCampusHeader() {
               <ArrowUpRight size={10} className="opacity-60" />
             </Link>
             <div className="w-px h-4 bg-white/10 hidden md:block" />
-            <button className="p-2 sm:p-2.5 rounded-full hover:bg-white/5 transition-colors" aria-label="Search">
-              <Search size={16} className="text-white/60" />
-            </button>
-            <NotificationBell courses={courses} />
-            <div className="rounded-full p-px hidden md:block" suppressHydrationWarning>
-              <UserButton
-                afterSignOutUrl="/maxymia"
-                userProfileMode="navigation"
-                userProfileUrl="/perfil"
-                appearance={{
-                  elements: {
-                    avatarBox: 'w-6 h-6',
-                  },
-                }}
-              />
-            </div>
+            {/* Search, notificaciones y avatar son propios del usuario:
+                ocultos para anónimos. */}
+            <SignedIn>
+              <button className="p-2 sm:p-2.5 rounded-full hover:bg-white/5 transition-colors" aria-label="Search">
+                <Search size={16} className="text-white/60" />
+              </button>
+              <NotificationBell courses={courses} />
+              <div className="rounded-full p-px hidden md:block" suppressHydrationWarning>
+                <UserButton
+                  afterSignOutUrl="/maxymia"
+                  userProfileMode="navigation"
+                  userProfileUrl="/perfil"
+                  appearance={{
+                    elements: {
+                      avatarBox: 'w-6 h-6',
+                    },
+                  }}
+                />
+              </div>
+            </SignedIn>
+            {/* Anónimo viendo una ficha pública: CTA para entrar al campus. */}
+            <SignedOut>
+              <Link
+                href="/sign-in?redirect_url=/maxymia/campus"
+                className="hidden md:inline-flex items-center px-4 py-2 rounded-full bg-mx-orange hover:bg-mx-orange-dark text-white text-body-sm font-bold transition-colors"
+              >
+                Iniciar sesión
+              </Link>
+            </SignedOut>
 
             {/* Burger button — mobile only */}
             <button
@@ -158,16 +176,21 @@ function DefaultCampusHeader() {
           <div className="absolute top-0 right-0 w-56 h-full bg-[#0f1520] border-l border-white/10 shadow-2xl shadow-black/50 flex flex-col">
             {/* Close + avatar */}
             <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5" suppressHydrationWarning>
-              <UserButton
-                afterSignOutUrl="/maxymia"
-                userProfileMode="navigation"
-                userProfileUrl="/perfil"
-                appearance={{
-                  elements: {
-                    avatarBox: 'w-7 h-7',
-                  },
-                }}
-              />
+              <SignedIn>
+                <UserButton
+                  afterSignOutUrl="/maxymia"
+                  userProfileMode="navigation"
+                  userProfileUrl="/perfil"
+                  appearance={{
+                    elements: {
+                      avatarBox: 'w-7 h-7',
+                    },
+                  }}
+                />
+              </SignedIn>
+              <SignedOut>
+                <span className="text-white/70 text-label-md font-medium">Maxymia</span>
+              </SignedOut>
               <button
                 onClick={() => setMenuOpen(false)}
                 className="p-1.5 rounded-full hover:bg-white/5 transition-colors"
@@ -176,25 +199,38 @@ function DefaultCampusHeader() {
               </button>
             </div>
 
-            {/* Nav links */}
-            <nav className="flex flex-col py-3">
-              {CAMPUS_NAV.map((item) => {
-                const isActive = pathname === item.path;
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.path}
-                    className={`px-4 py-2.5 text-label-md font-medium transition-colors ${
-                      isActive
-                        ? 'text-white bg-white/5 border-l-2 border-mx-blue'
-                        : 'text-white/50 hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent'
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                );
-              })}
-            </nav>
+            {/* Nav links — secciones privadas, solo para logueados */}
+            <SignedIn>
+              <nav className="flex flex-col py-3">
+                {CAMPUS_NAV.map((item) => {
+                  const isActive = pathname === item.path;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.path}
+                      className={`px-4 py-2.5 text-label-md font-medium transition-colors ${
+                        isActive
+                          ? 'text-white bg-white/5 border-l-2 border-mx-blue'
+                          : 'text-white/50 hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent'
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </SignedIn>
+            {/* Anónimo: CTA para entrar al campus */}
+            <SignedOut>
+              <div className="px-4 py-4">
+                <Link
+                  href="/sign-in?redirect_url=/maxymia/campus"
+                  className="flex items-center justify-center px-4 py-2.5 rounded-full bg-mx-orange hover:bg-mx-orange-dark text-white text-label-md font-bold transition-colors"
+                >
+                  Iniciar sesión
+                </Link>
+              </div>
+            </SignedOut>
 
             {/* Bottom link */}
             <div className="mt-auto px-4 py-4 border-t border-white/5">
