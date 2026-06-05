@@ -44,11 +44,12 @@ export async function GET() {
           getAllCourseProgress(userId),
         ]);
 
-        // Determine hasUsedTrial. Any subscription row that ever existed
-        // counts — we don't want users who let their trial lapse to be
-        // able to start a fresh one. The presence of `startedAt` is the
-        // canonical signal of "they went through checkout once".
-        const hasUsedTrial = !!subscription?.startedAt;
+        // Hide the 1€ trial only for users who have actually been Pro at some
+        // point (durable hasBeenPro flag, latched the first time they go Pro).
+        // The old heuristic (any subscription row with startedAt) wrongly
+        // tripped on the placeholder rows created on single-course purchases,
+        // hiding the promo from users who were never Pro.
+        const hasUsedTrial = !!dbUser?.hasBeenPro;
 
         // For trial users, fetch trial_end from Stripe
         let trialEnd: string | null = null;

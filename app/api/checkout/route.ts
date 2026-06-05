@@ -444,34 +444,36 @@ export async function POST(request: Request) {
       //   of the webhook/verify flow, so a DB-only user could lack it.
       // - The DB row may exist even after a canceled trial, which is
       //   exactly the case we want to block.
+      // Block a second trial ONLY for users who have actually been Pro (used a
+      // trial or subscribed) — the durable hasBeenPro DB flag, same signal the
+      // /pricing display uses, so "ves la promo" y "puedes reclamarla" coinciden.
+      // We deliberately do NOT block on "has any subscription row" or "has a
+      // stripeCustomerId": those are also true for someone who merely bought a
+      // single course, and wrongly denied them the 1€ trial (MF-30). Clerk
+      // metadata `hasUsedTrial` stays as a fallback for when the DB is down.
       const meta = (user?.publicMetadata ?? {}) as Record<string, unknown>;
       const hasUsedTrialMeta = meta.hasUsedTrial === true;
-      // A Stripe customer id in Clerk metadata is also a strong signal of
-      // a prior checkout — keep it as a fallback in case the DB query
-      // doesn't see the row for whatever reason.
-      const hasStripeCustomerMeta = typeof meta.stripeCustomerId === 'string' && meta.stripeCustomerId.length > 0;
 
-      let hasExistingSubscription = false;
+      let hasBeenPro = false;
       let dbCheckError: string | null = null;
       let dbConfigured = false;
       if (isDbConfigured()) {
         dbConfigured = true;
         try {
-          const { getSubscriptionByClerkId } = await import('@/lib/db/queries');
-          const existing = await getSubscriptionByClerkId(userId);
-          hasExistingSubscription = !!existing;
+          const { getUserByClerkId } = await import('@/lib/db/queries');
+          const dbUser = await getUserByClerkId(userId);
+          hasBeenPro = !!dbUser?.hasBeenPro;
         } catch (e) {
           dbCheckError = e instanceof Error ? e.message : String(e);
           console.warn('[trial-guard] DB check threw:', dbCheckError);
         }
       }
 
-      const blocked = hasUsedTrialMeta || hasExistingSubscription || hasStripeCustomerMeta;
+      const blocked = hasBeenPro || hasUsedTrialMeta;
       console.log(
         `[trial-guard] user=${userId} blocked=${blocked} ` +
+          `hasBeenPro=${hasBeenPro} ` +
           `hasUsedTrialMeta=${hasUsedTrialMeta} ` +
-          `hasStripeCustomerMeta=${hasStripeCustomerMeta} ` +
-          `hasExistingSubscription=${hasExistingSubscription} ` +
           `dbConfigured=${dbConfigured} ` +
           `dbCheckError=${dbCheckError ?? 'none'}`
       );

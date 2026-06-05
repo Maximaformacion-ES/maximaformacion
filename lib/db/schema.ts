@@ -10,6 +10,12 @@ export const users = campusSchema.table('users', {
   clerkId: text('clerk_id').notNull().unique(),
   email: text('email'),
   plan: text('plan').default('free').notNull(),
+  // Durable "has the user ever been Pro (trial or subscription)?" flag. Set
+  // true the first time they go Pro and never reset. Used to decide whether to
+  // offer the 1€ trial — replaces the old heuristic (any subscription row),
+  // which wrongly tripped on the placeholder rows created on single-course
+  // purchases and hid the promo from users who were never Pro.
+  hasBeenPro: boolean('has_been_pro').default(false).notNull(),
   createdAt: timestamp('created_at', tz).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', tz).defaultNow().notNull(),
 });

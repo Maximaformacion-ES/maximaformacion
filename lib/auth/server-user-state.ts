@@ -70,9 +70,12 @@ export async function getServerUserState(): Promise<ServerUserState> {
     isSignedIn: true,
     hasPro: dbUser?.plan === 'pro',
     isTrialing: subscription?.status === 'trialing',
-    // hasUsedTrial = any prior subscription row existed (mirrors the
-    // logic in /api/user/profile so the client and server agree).
-    hasUsedTrial: !!subscription?.startedAt,
+    // The 1€ trial is hidden only for users who have actually been Pro at some
+    // point (durable hasBeenPro flag). The old heuristic (any subscription row
+    // with startedAt) wrongly tripped on the placeholder rows created on
+    // single-course purchases. Mirrors /api/user/profile so client and server
+    // agree. The field stays named hasUsedTrial to avoid a frontend change.
+    hasUsedTrial: !!dbUser?.hasBeenPro,
     enrolledProgramDocumentIds: userEnrollments.map((e) => e.programDocumentId),
   };
 }

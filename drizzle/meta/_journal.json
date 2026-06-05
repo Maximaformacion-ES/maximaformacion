@@ -8,6 +8,13 @@
       "when": 1779709070302,
       "tag": "0000_add_payment_failed_at",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780000000000,
+      "tag": "0001_add_has_been_pro",
+      "breakpoints": true
     }
   ]
 }

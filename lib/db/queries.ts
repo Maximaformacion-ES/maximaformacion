@@ -31,7 +31,10 @@ export async function getUserByClerkId(clerkId: string) {
 export async function updateUserPlan(clerkId: string, plan: string) {
   await db
     .update(users)
-    .set({ plan, updatedAt: new Date() })
+    // Going Pro (trial or subscription) latches hasBeenPro to true forever;
+    // downgrades to 'free' never reset it. This is the single chokepoint the
+    // webhook uses for every plan→pro transition.
+    .set({ plan, updatedAt: new Date(), ...(plan === 'pro' ? { hasBeenPro: true } : {}) })
     .where(eq(users.clerkId, clerkId));
 }
 
