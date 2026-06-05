@@ -189,20 +189,36 @@ function PlanCard({
 
       {/* Price */}
       <div className="mb-6">
-        <div className="flex items-baseline gap-1">
-          <span className="text-display-sm md:text-display-sm font-black text-mx-text">
-            €{formatPrice(billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly)}
-          </span>
-          <span className="text-mx-text-muted font-light">
-            {plan.price.monthly === 0 ? '' : billingPeriod === 'yearly' ? '/año' : '/mes'}
-          </span>
-        </div>
-        {billingPeriod === 'yearly' && plan.price.monthly > 0 && (
-          <p className="text-mx-orange text-body-sm mt-2">
-            Equivalente a €{formatPrice(plan.price.yearly / 12)}/mes
-          </p>
+        {plan.highlighted && showTrial && billingPeriod === 'monthly' ? (
+          // Trial-first: lo primero y más visible es "7 días por 1€"; los
+          // 18€/mes quedan como nota de renovación (pedido de Marcos, MF-31).
+          <>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-display-sm font-black text-mx-orange">€1</span>
+              <span className="text-mx-text font-bold text-body-lg">los primeros 7 días</span>
+            </div>
+            <p className="text-mx-text-muted font-light mt-2">
+              Luego se renueva automáticamente a €{formatPrice(plan.price.monthly)}/mes. Cancela cuando quieras.
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="flex items-baseline gap-1">
+              <span className="text-display-sm md:text-display-sm font-black text-mx-text">
+                €{formatPrice(billingPeriod === 'yearly' ? plan.price.yearly : plan.price.monthly)}
+              </span>
+              <span className="text-mx-text-muted font-light">
+                {plan.price.monthly === 0 ? '' : billingPeriod === 'yearly' ? '/año' : '/mes'}
+              </span>
+            </div>
+            {billingPeriod === 'yearly' && plan.price.monthly > 0 && (
+              <p className="text-mx-orange text-body-sm mt-2">
+                Equivalente a €{formatPrice(plan.price.yearly / 12)}/mes
+              </p>
+            )}
+            <p className="text-mx-text-muted font-light mt-2">{plan.description}</p>
+          </>
         )}
-        <p className="text-mx-text-muted font-light mt-2">{plan.description}</p>
       </div>
 
       {/* Features */}
@@ -246,7 +262,7 @@ function PlanCard({
               )}
             </button>
             <p className="text-mx-text-muted text-label-md text-center">
-              7 días de acceso completo. Después, {formatPrice(plan.price.monthly)}€/mes. Cancela cuando quieras.
+              Acceso completo a todo el contenido Pro durante los 7 días de prueba.
             </p>
           </div>
         ) : (
