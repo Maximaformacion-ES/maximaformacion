@@ -348,9 +348,33 @@ function transformExam(exam: StrapiMaxymiaExam): MaxymiaExam {
   };
 }
 
-function transformLesson(lesson: StrapiMaxymiaLesson): MaxymiaLesson {
+/**
+ * Stable, content-derived lesson id used everywhere as the lesson's identity
+ * (progress key, completion checks, navigation, URLs). We deliberately do NOT
+ * use the Strapi component `id`: repeatable-component ids regenerate on every
+ * save/re-import of the course, which orphaned the stored progress and reset
+ * the student to "sin empezar". A slug from block+lesson title survives both
+ * re-imports and admin edits (only changes if the title itself is edited).
+ */
+function lessonStableId(lesson: StrapiMaxymiaLesson, blockSlug: string): string {
+  const lessonSlug = slugify(lesson.title_es) || `l${lesson.order ?? 0}`;
+  return `${blockSlug}__${lessonSlug}`;
+}
+
+function slugify(text: string | null | undefined): string {
+  return (text ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function transformLesson(lesson: StrapiMaxymiaLesson, blockSlug: string): MaxymiaLesson {
   return {
-    id: String(lesson.id),
+    id: lessonStableId(lesson, blockSlug),
     title: { es: lesson.title_es, en: lesson.title_en ?? lesson.title_es },
     description: { es: '', en: '' },
     intro: transformLessonIntro(lesson),
@@ -381,11 +405,12 @@ function transformBlock(block: StrapiMaxymiaBlock): MaxymiaBlock {
       : block.exam
         ? [block.exam]
         : [];
+  const blockSlug = slugify(block.title_es) || `b${block.order ?? 0}`;
   return {
     id: String(block.id),
     title: { es: block.title_es, en: block.title_en ?? block.title_es },
     content: transformLocalizedContent(),
-    lessons: sortedLessons.map(transformLesson),
+    lessons: sortedLessons.map((l) => transformLesson(l, blockSlug)),
     exams: examsArray.map(transformExam),
   };
 }
