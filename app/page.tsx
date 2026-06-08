@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getPrograms, getBadges, getHomeData } from '@/lib/strapi/queries';
 import { fetchMaxymiaCourses } from './maxymia/data/queries';
@@ -7,6 +8,15 @@ import HomeClient from './HomeClient';
 import type { HomeData } from '@/lib/strapi/types';
 
 export const revalidate = 60;
+
+// Self-referential canonical for the homepage. The root layout sets a
+// site-wide canonical from Strapi (siteMetadata.canonicalUrl), which can be
+// an empty string and leaves the most important page of the site without a
+// self-canonical. Pin it explicitly here so / always declares itself
+// canonical, matching the pattern every other static page already follows.
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 export default async function Home() {
   const { isEnabled: isDraft } = await draftMode();

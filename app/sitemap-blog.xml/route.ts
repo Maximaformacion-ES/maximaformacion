@@ -1,4 +1,4 @@
-import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
+import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, toLastmod, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
 import { getBlogPosts } from '@/lib/strapi/queries';
 import { BLOG_CATEGORIES_META } from '@/lib/blog-categories-meta';
 
@@ -12,7 +12,7 @@ export async function GET() {
     .filter((p) => p.slug)
     .map((p) => ({
       loc: `${SITE_URL}/blog/${p.slug}`,
-      lastmod: p.publishedAt ? new Date(p.publishedAt).toISOString() : undefined,
+      lastmod: p.publishedAt ? toLastmod(p.publishedAt) : undefined,
       changefreq: 'monthly',
       priority: 0.6,
     }));

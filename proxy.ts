@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
-import { lookupRedirect } from "@/lib/seo/redirects";
+import { lookupRedirect, legacyNamespaceRedirect } from "@/lib/seo/redirects";
 
 // Search-engine crawlers, link previewers, and SEO/AI agents. With Clerk
 // development keys (pk_test_*) every request whose Accept advertises HTML
@@ -120,6 +120,12 @@ const handleClerk = clerkMiddleware(async (auth, req) => {
         : new URL(rule.destination, req.url);
       return NextResponse.redirect(dest, rule.statusCode);
     }
+    // No explicit Strapi rule — fall back to the legacy /product/ namespace
+    // 301 (Strapi above always wins; this only covers what it doesn't map).
+    const legacy = legacyNamespaceRedirect(pathname);
+    if (legacy) {
+      return NextResponse.redirect(new URL(legacy.destination, req.url), legacy.statusCode);
+    }
   }
 
   // Protect all non-public routes
@@ -163,6 +169,12 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
           ? new URL(rule.destination)
           : new URL(rule.destination, req.url);
         return applyVercelHostNoindex(req, NextResponse.redirect(dest, rule.statusCode));
+      }
+      // Same legacy /product/ fallback for bots, so ranking signals on the
+      // old WooCommerce URLs consolidate onto /programas/ (Strapi wins).
+      const legacy = legacyNamespaceRedirect(pathname);
+      if (legacy) {
+        return applyVercelHostNoindex(req, NextResponse.redirect(new URL(legacy.destination, req.url), legacy.statusCode));
       }
     }
 
