@@ -137,9 +137,11 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
           ) : (
             <>
               <ShoppingCart size={16} />
-              {isSignedIn
-                ? (locale === 'es' ? 'Comprar Ahora' : 'Buy Now')
-                : (locale === 'es' ? 'Iniciar sesión para comprar' : 'Sign in to buy')}
+              {/* Match the desktop CTA (MaxymiaCourseDetail), which always
+                  reads "Comprar Ahora". handlePurchase redirects to /sign-in
+                  when there's no session, so the signed-out label doesn't
+                  need to differ. */}
+              {locale === 'es' ? 'Comprar Ahora' : 'Buy Now'}
             </>
           )}
         </button>
