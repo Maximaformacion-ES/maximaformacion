@@ -24,7 +24,7 @@ export const SITE_URL = getSiteUrl();
 
 export interface SitemapEntry {
   loc: string;
-  lastmod?: string; // ISO 8601
+  lastmod?: string; // W3C date, YYYY-MM-DD (see toLastmod)
   changefreq?:
     | 'always'
     | 'hourly'
@@ -34,6 +34,17 @@ export interface SitemapEntry {
     | 'yearly'
     | 'never';
   priority?: number;
+}
+
+/**
+ * Format a value as a sitemap <lastmod> in the safe date-only W3C form
+ * (YYYY-MM-DD). A full ISO timestamp (e.g. 2025-04-03T16:28:32.000Z) is
+ * technically valid per the sitemaps spec, but several validators flag the
+ * millisecond form as invalid, so we trim to the date. Accepts anything
+ * `new Date()` understands (Date, ISO string, epoch ms).
+ */
+export function toLastmod(date: Date | string | number): string {
+  return new Date(date).toISOString().slice(0, 10);
 }
 
 function escapeXml(value: string): string {

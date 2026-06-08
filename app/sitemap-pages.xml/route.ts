@@ -1,4 +1,4 @@
-import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
+import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, toLastmod, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +21,7 @@ const PAGES: SitemapEntry[] = [
 export async function GET() {
   if (!isProductionEnv()) return emptyForPreview('urlset');
 
-  const now = new Date().toISOString();
+  const now = toLastmod(new Date());
   const entries: SitemapEntry[] = PAGES.map((p) => ({
     loc: `${SITE_URL}${p.loc}`,
     lastmod: now,

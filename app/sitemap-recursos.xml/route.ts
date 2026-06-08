@@ -1,4 +1,4 @@
-import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
+import { SITE_URL, emptyForPreview, isProductionEnv, renderUrlSet, toLastmod, xmlResponse, type SitemapEntry } from '@/lib/seo/sitemap';
 import { getResources } from '@/lib/strapi/queries';
 import { RESOURCE_CATEGORIES_META } from '@/lib/resource-categories-meta';
 
@@ -12,7 +12,7 @@ export async function GET() {
     .filter((r) => r.slug)
     .map((r) => ({
       loc: `${SITE_URL}/recursos/${r.slug}`,
-      lastmod: r.publishedAt ? new Date(r.publishedAt).toISOString() : undefined,
+      lastmod: r.publishedAt ? toLastmod(r.publishedAt) : undefined,
       changefreq: 'monthly',
       priority: 0.6,
     }));

@@ -133,3 +133,31 @@ export async function lookupRedirect(pathname: string): Promise<RedirectRule | n
   const rules = await getRules();
   return rules.get(key) || null;
 }
+
+/**
+ * Namespace-level fallback for legacy WooCommerce `/product/<slug>` URLs.
+ *
+ * The old WordPress store exposed every course at `/product/<slug>`. The
+ * migration mapped `/curso/` and `/masters/` but never captured `/product/`,
+ * so that whole namespace 404s today. Course slugs carried over 1:1 to
+ * `/programas/<slug>`, so we 301 the entire namespace with a single rule.
+ *
+ * This is a wildcard the exact-match Strapi engine (a `Map.get`) can't
+ * express, which is why it lives in code. It is intentionally consulted
+ * ONLY AFTER `lookupRedirect` misses, so the Strapi Redirect collection
+ * stays the source of truth and can override any individual `/product/...`
+ * path — e.g. a discontinued product mapped to a 410, or one whose slug
+ * changed — without touching code.
+ *
+ * Matches a single path segment only (`/product/foo`, not `/product/foo/bar`
+ * nor `/product-category/...`).
+ */
+export function legacyNamespaceRedirect(
+  pathname: string,
+): { destination: string; statusCode: number } | null {
+  const m = pathname.toLowerCase().match(/^\/product\/([^/]+)\/?$/);
+  if (m && m[1]) {
+    return { destination: `/programas/${m[1]}`, statusCode: 301 };
+  }
+  return null;
+}
