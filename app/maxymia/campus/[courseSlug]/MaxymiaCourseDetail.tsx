@@ -28,7 +28,6 @@ import {
   Users,
   Briefcase,
   FileText,
-  HelpCircle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
@@ -39,6 +38,7 @@ import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { useCampusTheme } from '../CampusShell';
 import { TrustSeals } from '@/app/components/TrustSeals';
+import { FAQSection } from '@/app/components/FAQSection';
 import type { MaxymiaCourse, Locale } from '../../types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
@@ -149,7 +149,15 @@ export default function MaxymiaCourseDetail({ course }: Props) {
         tabs={
           <CourseTabs course={course} locale={locale} totalLessons={totalLessons} />
         }
-        belowContent={<CourseFAQSection course={course} locale={locale} />}
+        belowContent={
+          course.faqs && course.faqs.length > 0 ? (
+            <FAQSection
+              overline={locale === 'es' ? 'Resuelve tus dudas' : 'Got questions?'}
+              title={locale === 'es' ? 'PREGUNTAS {FRECUENTES}' : 'FREQUENTLY {ASKED}'}
+              faqs={course.faqs}
+            />
+          ) : null
+        }
       />
 
       {/* Sellos de confianza ESPECÍFICOS de este curso (relación en Strapi).
@@ -789,78 +797,6 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
   );
 }
 
-// ─── FAQ Section ────────────────────────────────────────────────
-
-function CourseFAQSection({ course, locale }: { course: MaxymiaCourse; locale: Locale }) {
-  const faqs = course.faqs ?? [];
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  // No FAQs configured for this course → render nothing. The capability is
-  // there; editors add Q&A pairs in the fallback data file (or a future
-  // Strapi field) and the section appears automatically.
-  if (faqs.length === 0) return null;
-
-  return (
-    <m.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.45, duration: 0.6 }}
-      className="mt-12 md:mt-16"
-    >
-      <div className="flex items-center gap-2 mb-6">
-        <HelpCircle size={18} className="text-mx-orange" />
-        <h2 className="text-heading-sm md:text-heading-md font-black tracking-tight text-mx-text">
-          {locale === 'es' ? 'Preguntas frecuentes' : 'Frequently asked questions'}
-        </h2>
-      </div>
-
-      <div className="space-y-3">
-        {faqs.map((faq, index) => {
-          const isOpen = openIndex === index;
-          return (
-            <div
-              key={faq.question}
-              className="bg-black/[0.02] border border-mx-border overflow-hidden rounded-lg"
-            >
-              <button
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="w-full p-5 md:p-6 flex items-center justify-between gap-4 text-left hover:bg-black/[0.03] duration-200 transition-colors group"
-                aria-expanded={isOpen}
-              >
-                <span className="text-body-sm md:text-body-md font-bold text-mx-text group-hover:text-mx-orange transition-colors">
-                  {faq.question}
-                </span>
-                <m.div
-                  animate={{ rotate: isOpen ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="shrink-0"
-                >
-                  <ChevronDown size={20} className="text-mx-text-muted" />
-                </m.div>
-              </button>
-
-              <AnimatePresence>
-                {isOpen && (
-                  <m.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-5 md:px-6 pb-5 md:pb-6 pt-1 text-body-sm text-mx-text-muted font-light leading-relaxed">
-                      {faq.answer}
-                    </div>
-                  </m.div>
-                )}
-              </AnimatePresence>
-            </div>
-          );
-        })}
-      </div>
-    </m.div>
-  );
-}
 
 // ─── Access Gate ─────────────────────────────────────────────────
 
