@@ -60,7 +60,7 @@ function DefaultCampusHeader() {
 
   return (
     <>
-      <header className="relative top-0 left-0 right-0 z-50 bg-[#0b1018] border-b border-white/5">
+      <header className="relative top-0 left-0 right-0 z-50 bg-mx-bg border-b border-mx-border">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-[128px] flex items-center justify-between py-4 md:py-6">
           {/* Logo + Nav */}
           <div className="flex items-center gap-16">
@@ -92,7 +92,7 @@ function DefaultCampusHeader() {
                     >
                       <span
                         className={`text-body-sm 2xl:text-body-md ${
-                          isActive ? 'font-medium text-white' : 'font-normal text-white/50 hover:text-white/70 transition-colors'
+                          isActive ? 'font-medium text-mx-text' : 'font-normal text-mx-text-muted hover:text-mx-text transition-colors'
                         }`}
                       >
                         {item.name}
@@ -111,17 +111,17 @@ function DefaultCampusHeader() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/"
-              className="hidden md:flex items-center gap-1 text-white/30 hover:text-mx-orange text-label-md transition-colors mr-2"
+              className="hidden md:flex items-center gap-1 text-mx-text-muted hover:text-mx-orange text-label-md transition-colors mr-2"
             >
               <span>Máxima Formación</span>
               <ArrowUpRight size={10} className="opacity-60" />
             </Link>
-            <div className="w-px h-4 bg-white/10 hidden md:block" />
+            <div className="w-px h-4 bg-mx-border hidden md:block" />
             {/* Search, notificaciones y avatar son propios del usuario:
                 ocultos para anónimos. */}
             <SignedIn>
-              <button className="p-2 sm:p-2.5 rounded-full hover:bg-white/5 transition-colors" aria-label="Search">
-                <Search size={16} className="text-white/60" />
+              <button className="p-2 sm:p-2.5 rounded-full hover:bg-black/[0.04] transition-colors" aria-label="Search">
+                <Search size={16} className="text-mx-text-muted" />
               </button>
               <NotificationBell courses={courses} />
               <div className="rounded-full p-px hidden md:block" suppressHydrationWarning>
@@ -150,13 +150,13 @@ function DefaultCampusHeader() {
             {/* Burger button — mobile only */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-full hover:bg-white/5 transition-colors"
+              className="md:hidden p-2 rounded-full hover:bg-black/[0.04] transition-colors"
               aria-label="Menu"
             >
               {menuOpen ? (
-                <X size={20} className="text-white/70" />
+                <X size={20} className="text-mx-text" />
               ) : (
-                <Menu size={20} className="text-white/70" />
+                <Menu size={20} className="text-mx-text" />
               )}
             </button>
           </div>
@@ -173,9 +173,9 @@ function DefaultCampusHeader() {
           />
 
           {/* Menu panel */}
-          <div className="absolute top-0 right-0 w-56 h-full bg-[#0f1520] border-l border-white/10 shadow-2xl shadow-black/50 flex flex-col">
+          <div className="absolute top-0 right-0 w-56 h-full bg-white border-l border-mx-border shadow-2xl shadow-black/50 flex flex-col">
             {/* Close + avatar */}
-            <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5" suppressHydrationWarning>
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-mx-border" suppressHydrationWarning>
               <SignedIn>
                 <UserButton
                   afterSignOutUrl="/maxymia"
@@ -189,13 +189,13 @@ function DefaultCampusHeader() {
                 />
               </SignedIn>
               <SignedOut>
-                <span className="text-white/70 text-label-md font-medium">Maxymia</span>
+                <span className="text-mx-text text-label-md font-medium">Maxymia</span>
               </SignedOut>
               <button
                 onClick={() => setMenuOpen(false)}
-                className="p-1.5 rounded-full hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-full hover:bg-black/[0.04] transition-colors"
               >
-                <X size={16} className="text-white/50" />
+                <X size={16} className="text-mx-text-muted" />
               </button>
             </div>
 
@@ -210,8 +210,8 @@ function DefaultCampusHeader() {
                       href={item.path}
                       className={`px-4 py-2.5 text-label-md font-medium transition-colors ${
                         isActive
-                          ? 'text-white bg-white/5 border-l-2 border-mx-blue'
-                          : 'text-white/50 hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent'
+                          ? 'text-mx-text bg-black/[0.04] border-l-2 border-mx-blue'
+                          : 'text-mx-text-muted hover:text-mx-text hover:bg-black/[0.03] border-l-2 border-transparent'
                       }`}
                     >
                       {item.name}
@@ -233,10 +233,10 @@ function DefaultCampusHeader() {
             </SignedOut>
 
             {/* Bottom link */}
-            <div className="mt-auto px-4 py-4 border-t border-white/5">
+            <div className="mt-auto px-4 py-4 border-t border-mx-border">
               <Link
                 href="/"
-                className="flex items-center gap-1.5 text-white/30 hover:text-mx-orange text-label-sm transition-colors"
+                className="flex items-center gap-1.5 text-mx-text-muted hover:text-mx-orange text-label-sm transition-colors"
               >
                 <span>Máxima Formación</span>
                 <ArrowUpRight size={9} className="opacity-60" />
@@ -335,7 +335,7 @@ export default function CampusShell({ children, courses = [] }: CampusShellProps
             position: sticky. `overflow-x: hidden` makes this a scroll
             container and pins sticky children to it instead of the viewport;
             `clip` prevents the horizontal scrollbar without that side effect. */}
-        <div className="min-h-screen bg-[#0b1018] text-white overflow-x-clip relative">
+        <div className={`min-h-screen overflow-x-clip relative ${isLessonPage ? 'bg-[#0b1018] text-white' : 'bg-mx-bg text-mx-text'}`}>
           <CampusHeader />
           <main className="relative z-10">
             {children}
