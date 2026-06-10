@@ -147,6 +147,10 @@ export interface MaxymiaCourse {
   careers?: string;
   objectives?: string;
   audiences?: string;
+  /** Duración manual (horas) editable desde Strapi. Si está, sustituye a la
+   *  duración autocalculada (suma de minutos de las lecciones), que para
+   *  cursos cortos quedaba demasiado baja. */
+  durationHours?: number;
   /** Preguntas frecuentes de la ficha. Opcional: la sección sólo se
    *  pinta cuando hay al menos una. Mismo formato pregunta/respuesta que
    *  las FAQ de los programas de Máxima, listo para alimentarse desde el
