@@ -100,13 +100,12 @@ export default function ProgramDetailClient({
             <>
               <ProgramTeachers program={program} />
               <ProgramFAQSection program={program} />
+              {/* Certificaciones en el MISMO contenedor (lg:col-span-2) que
+                  las FAQ. Componente compartido con la ficha de Maxymia. */}
+              <TrustSeals badges={program.badges} />
             </>
           }
         />
-
-        {/* Sellos de confianza específicos del programa (mismo componente
-            compartido que la ficha de Maxymia). Se oculta si no hay. */}
-        <TrustSeals badges={program.badges} />
 
         {/* Closing CTA stays full-width below the grid. Still gated: for
             isPro programs without access ProGateWrapper swaps it for the

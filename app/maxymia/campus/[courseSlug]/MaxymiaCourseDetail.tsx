@@ -150,19 +150,20 @@ export default function MaxymiaCourseDetail({ course }: Props) {
           <CourseTabs course={course} locale={locale} totalLessons={totalLessons} />
         }
         belowContent={
-          course.faqs && course.faqs.length > 0 ? (
-            <FAQSection
-              overline={locale === 'es' ? 'Resuelve tus dudas' : 'Got questions?'}
-              title={locale === 'es' ? 'PREGUNTAS {FRECUENTES}' : 'FREQUENTLY {ASKED}'}
-              faqs={course.faqs}
-            />
-          ) : null
+          <>
+            {course.faqs && course.faqs.length > 0 && (
+              <FAQSection
+                overline={locale === 'es' ? 'Resuelve tus dudas' : 'Got questions?'}
+                title={locale === 'es' ? 'PREGUNTAS {FRECUENTES}' : 'FREQUENTLY {ASKED}'}
+                faqs={course.faqs}
+              />
+            )}
+            {/* Certificaciones en el MISMO contenedor (lg:col-span-2) que las
+                FAQ. Componente compartido con la ficha de /programas. */}
+            <TrustSeals badges={course.badges} locale={locale} />
+          </>
         }
       />
-
-      {/* Sellos de confianza ESPECÍFICOS de este curso (relación en Strapi).
-          Componente compartido con la ficha de /programas. */}
-      <TrustSeals badges={course.badges} locale={locale} />
 
       {/* CTA Section */}
       <CourseCTASection locale={locale} />
