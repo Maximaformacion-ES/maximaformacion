@@ -2,47 +2,78 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { m } from 'framer-motion';
+import { StyledTitle } from './StyledTitle';
 
 /**
  * Sellos de confianza ESPECÍFICOS de un curso/programa (relación `badges` en
- * Strapi). Diseño compacto en tema claro — distinto del mosaico grande de la
- * home (BadgesSection). Compartido por la ficha de Maxymia y la de /programas.
- * Se oculta si el curso/programa no tiene sellos asignados.
+ * Strapi). Misma estructura de sección que el FAQSection (overline + título
+ * estilizado + contenido centrado) para que case visualmente con las FAQ,
+ * dentro del mismo contenedor lg:col-span-2. Compartido por la ficha de
+ * Maxymia y la de /programas. Se oculta si no hay sellos asignados.
  */
 export function TrustSeals({
   badges,
   locale = 'es',
+  overline,
+  title,
 }: {
   badges?: { name: string; imageUrl: string }[];
   locale?: 'es' | 'en';
+  overline?: string;
+  title?: string;
 }) {
   if (!badges || badges.length === 0) return null;
+
+  const ol = overline ?? (locale === 'es' ? 'Certificaciones y reconocimientos' : 'Certifications & awards');
+  const tt = title ?? (locale === 'es' ? 'CALIDAD {ACREDITADA}' : 'ACCREDITED {QUALITY}');
+
   return (
-    // Bloque de columna (vive dentro del contenedor lg:col-span-2 del hero,
-    // junto a las FAQ) — sin <section> full-width: la columna ya aporta ancho
-    // y padding. Mismo espaciado superior que el bloque de FAQ.
-    <div className="mt-12 md:mt-16 rounded-2xl border border-mx-border bg-black/[0.015] px-6 md:px-8 py-7 md:py-8 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10">
-      <p className="text-mx-text-muted text-label-sm md:text-label-md tracking-[0.2em] uppercase shrink-0 sm:max-w-[160px] leading-snug">
-        {locale === 'es' ? 'Certificaciones y reconocimientos' : 'Certifications & awards'}
-      </p>
-      <div className="flex flex-wrap items-center gap-6 md:gap-8">
-        {badges.map((b) => (
-          <div
-            key={b.name}
-            title={b.name}
-            className="relative h-12 w-16 md:h-14 md:w-20 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
-          >
-            <Image
-              src={b.imageUrl}
-              alt={b.name}
-              fill
-              unoptimized
-              className="object-contain"
-              sizes="80px"
-            />
-          </div>
-        ))}
+    <section className="relative py-16 md:py-32 overflow-hidden bg-transparent">
+      <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
+        <m.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-6 text-center"
+        >
+          {ol}
+        </m.p>
+
+        <m.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-mx-blue text-display-sm md:text-display-md font-black tracking-display leading-display mb-16 text-center"
+        >
+          <StyledTitle text={tt} color="blue" />
+        </m.h2>
+
+        <m.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-wrap items-center justify-center gap-8 md:gap-12"
+        >
+          {badges.map((b) => (
+            <div
+              key={b.name}
+              title={b.name}
+              className="relative h-16 w-24 md:h-20 md:w-28 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+            >
+              <Image
+                src={b.imageUrl}
+                alt={b.name}
+                fill
+                unoptimized
+                className="object-contain"
+                sizes="112px"
+              />
+            </div>
+          ))}
+        </m.div>
       </div>
-    </div>
+    </section>
   );
 }
