@@ -361,6 +361,21 @@ export interface Badge {
   importance: BadgeImportance;
 }
 
+// ============ Institution Types (clientes con logos) ============
+
+export interface StrapiInstitution {
+  id: number;
+  documentId: string;
+  name: string;
+  logo: StrapiMedia | null;
+  order: number | null;
+}
+
+export interface Institution {
+  name: string;
+  imageUrl: string;
+}
+
 // ============ Team Member Types ============
 
 export type TeamRole = 'CEO' | 'Docencia' | 'Comunicación';

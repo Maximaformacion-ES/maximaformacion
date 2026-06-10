@@ -40,6 +40,7 @@ import { useCampusTheme } from '../CampusShell';
 import { TrustSeals } from '@/app/components/TrustSeals';
 import { FAQSection } from '@/app/components/FAQSection';
 import type { MaxymiaCourse, Locale } from '../../types';
+import type { Institution } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
@@ -106,9 +107,11 @@ function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Lo
 
 interface Props {
   course: MaxymiaCourse;
+  /** Instituciones/clientes con logos (brand-level). */
+  institutions?: Institution[];
 }
 
-export default function MaxymiaCourseDetail({ course }: Props) {
+export default function MaxymiaCourseDetail({ course, institutions }: Props) {
   const { locale } = useLocale();
   // This is the public course *sales* ficha — paint the whole campus chrome
   // (header, footer, page bg) light + black logo while it's shown, and revert
@@ -159,6 +162,14 @@ export default function MaxymiaCourseDetail({ course }: Props) {
                 faqs={course.faqs}
               />
             )}
+            {/* Instituciones/clientes (brand-level) — reutiliza TrustSeals con
+                otros textos. */}
+            <TrustSeals
+              badges={institutions}
+              locale={locale}
+              overline={locale === 'es' ? 'Confían en nosotros' : 'They trust us'}
+              title={locale === 'es' ? 'GRANDES {INSTITUCIONES}' : 'LEADING {INSTITUTIONS}'}
+            />
             {/* Certificaciones en el MISMO contenedor (lg:col-span-2) que las
                 FAQ. Componente compartido con la ficha de /programas. */}
             <TrustSeals badges={course.badges} locale={locale} />

@@ -14,6 +14,7 @@ import type {
   StrapiSiteMetadata,
   StrapiLogo,
   StrapiBadge,
+  StrapiInstitution,
   StrapiHome,
   StrapiTeamMember,
   StrapiMaxymiaHome,
@@ -26,6 +27,7 @@ import type {
   SiteMetadata,
   Logo,
   Badge,
+  Institution,
   HomeData,
   MaxymiaHomeData,
   TeamMember,
@@ -1032,6 +1034,27 @@ export async function getBadges(): Promise<Badge[]> {
       }));
   } catch (error) {
     console.error('[getBadges] Error:', error);
+    return [];
+  }
+}
+
+// ============ Institution Queries (clientes con logos) ============
+
+export async function getInstitutions(): Promise<Institution[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiInstitution[]>>(
+      '/api/institutions?populate[logo]=true&fields[0]=name&fields[1]=order&pagination[pageSize]=100&sort=order:asc',
+      {
+        revalidate: 600,
+        tags: ['institutions'],
+      }
+    );
+
+    return response.data
+      .filter((i) => i.logo)
+      .map((i) => ({ name: i.name, imageUrl: getStrapiMediaUrl(i.logo!) }));
+  } catch (error) {
+    console.error('[getInstitutions] Error:', error);
     return [];
   }
 }

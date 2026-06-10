@@ -15,7 +15,7 @@ import { ProgramTeachers } from '../../components/ProgramTeachers';
 import { TrustSeals } from '../../components/TrustSeals';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
-import type { Program } from '@/lib/strapi/types';
+import type { Program, Institution } from '@/lib/strapi/types';
 import type { ProgramRichHtml } from './page';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -23,12 +23,15 @@ interface ProgramDetailClientProps {
   program: Program | null;
   richHtml: ProgramRichHtml;
   initialUserState?: ServerUserState;
+  /** Instituciones/clientes con logos (brand-level). */
+  institutions?: Institution[];
 }
 
 export default function ProgramDetailClient({
   program,
   richHtml,
   initialUserState,
+  institutions,
 }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -100,6 +103,12 @@ export default function ProgramDetailClient({
             <>
               <ProgramTeachers program={program} />
               <ProgramFAQSection program={program} />
+              {/* Instituciones/clientes (brand-level) — reutiliza TrustSeals. */}
+              <TrustSeals
+                badges={institutions}
+                overline="Confían en nosotros"
+                title="GRANDES {INSTITUCIONES}"
+              />
               {/* Certificaciones en el MISMO contenedor (lg:col-span-2) que
                   las FAQ. Componente compartido con la ficha de Maxymia. */}
               <TrustSeals badges={program.badges} />
