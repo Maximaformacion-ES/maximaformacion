@@ -85,7 +85,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   );
 
   return (
-    <section className="relative py-16 md:py-32 bg-mx-bg overflow-hidden bg-transparent">
+    <section className={`relative overflow-hidden bg-transparent ${compact ? 'py-8 md:py-12' : 'py-16 md:py-32 bg-mx-bg'}`}>
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}

@@ -29,7 +29,7 @@ export function TrustSeals({
   const tt = title ?? (locale === 'es' ? 'CALIDAD {ACREDITADA}' : 'ACCREDITED {QUALITY}');
 
   return (
-    <section className="relative py-16 md:py-32 overflow-hidden bg-transparent">
+    <section className="relative py-8 md:py-12 overflow-hidden bg-transparent">
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}
