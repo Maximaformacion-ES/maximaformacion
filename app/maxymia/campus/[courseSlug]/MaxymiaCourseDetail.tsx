@@ -394,7 +394,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
     { icon: Monitor, label: locale === 'es' ? 'Modalidad' : 'Format', value: 'Online' },
     { icon: Globe, label: locale === 'es' ? 'Idioma' : 'Language', value: LANGUAGE_LABELS[course.language] || course.language },
     { icon: BookOpen, label: locale === 'es' ? 'Lecciones' : 'Lessons', value: String(totalLessons) },
-    { icon: Clock, label: locale === 'es' ? 'Duración' : 'Duration', value: `${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}min` },
+    { icon: Clock, label: locale === 'es' ? 'Duración' : 'Duration', value: course.durationHours ? `${course.durationHours}h` : `${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}min` },
     { icon: FileQuestion, label: locale === 'es' ? 'Exámenes' : 'Exams', value: String(totalExams) },
     { icon: BarChart3, label: locale === 'es' ? 'Nivel' : 'Level', value: LEVEL_LABELS[course.level]?.[locale] },
   ];

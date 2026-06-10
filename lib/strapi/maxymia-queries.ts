@@ -63,6 +63,12 @@ const MAXYMIA_COURSES_LIST_QUERY = `
     }
   }
 `;
+// NOTE: durationHours/faqs are intentionally NOT requested in the LIST query.
+// They feed the course ficha (detail), which fetches via the DETAIL query
+// below. Keeping them out of the list keeps the home/catalog fetch decoupled
+// from the maxymia-course schema rollout (a GraphQL query can't ask for a
+// field the running Strapi doesn't have yet). Catalog cards fall back to the
+// computed duration via maxymiaCourseAsProgram.
 
 const MAXYMIA_COURSE_DETAIL_QUERY = `
   query MaxymiaCourseBySlug($slug: String!) {
@@ -81,6 +87,8 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         isPro
         haveDiscount
         tags
+        durationHours
+        faqs { question, answer }
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
@@ -443,6 +451,10 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     careers: course.careers ?? undefined,
     objectives: course.objectives ?? undefined,
     audiences: course.audiences ?? undefined,
+    durationHours: course.durationHours ?? undefined,
+    faqs: course.faqs?.length
+      ? course.faqs.map((f) => ({ question: f.question, answer: f.answer }))
+      : undefined,
   };
 }
 
