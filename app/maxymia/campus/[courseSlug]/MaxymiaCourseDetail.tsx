@@ -153,6 +153,7 @@ export default function MaxymiaCourseDetail({ course }: Props) {
           <>
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
+                compact
                 overline={locale === 'es' ? 'Resuelve tus dudas' : 'Got questions?'}
                 title={locale === 'es' ? 'PREGUNTAS {FRECUENTES}' : 'FREQUENTLY {ASKED}'}
                 faqs={course.faqs}
@@ -519,7 +520,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
                 ) : (
                   <>
                     <ShoppingCart size={18} />
-                    {locale === 'es' ? 'Comprar Ahora' : 'Buy Now'}
+                    {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
                   </>
                 )}
               </m.button>
@@ -975,7 +976,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               ) : (
                 <>
                   <ShoppingCart size={18} />
-                  {locale === 'es' ? 'Comprar ahora' : 'Buy now'}
+                  {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
                 </>
               )}
             </button>

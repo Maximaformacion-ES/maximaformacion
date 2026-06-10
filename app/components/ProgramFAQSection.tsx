@@ -13,6 +13,7 @@ export const ProgramFAQSection: React.FC<ProgramFAQSectionProps> = ({ program })
 
   return (
     <FAQSection
+      compact
       overline="Resuelve tus dudas"
       title="PREGUNTAS {FRECUENTES}"
       faqs={program.faqs}

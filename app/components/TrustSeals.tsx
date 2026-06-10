@@ -44,7 +44,7 @@ export function TrustSeals({
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-blue text-display-sm md:text-display-md font-black tracking-display leading-display mb-16 text-center"
+          className="text-mx-blue text-heading-md md:text-heading-lg font-black tracking-tight leading-tight mb-10 text-center"
         >
           <StyledTitle text={tt} color="blue" />
         </m.h2>
