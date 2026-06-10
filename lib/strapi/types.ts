@@ -127,6 +127,7 @@ export interface StrapiProgram {
   brochurePdf: StrapiMedia | null;
   videoUrl: string | null;
   faqs: { id?: number; question: string; answer: string }[] | null;
+  badges: { name: string; badge: StrapiMedia | null }[] | null;
   subjectArea: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
@@ -261,6 +262,8 @@ export interface Program {
   brochurePdfUrl?: string | null;
   videoUrl?: string | null;
   faqs?: { question: string; answer: string }[];
+  /** Sellos de confianza específicos del programa (relación `badge` en Strapi). */
+  badges?: { name: string; imageUrl: string }[];
   subjectArea?: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   modules: ProgramModule[];
   audience: string;

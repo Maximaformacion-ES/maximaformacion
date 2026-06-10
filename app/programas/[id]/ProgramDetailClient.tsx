@@ -12,6 +12,7 @@ import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import { ProgramTeachers } from '../../components/ProgramTeachers';
+import { TrustSeals } from '../../components/TrustSeals';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
 import type { Program } from '@/lib/strapi/types';
@@ -102,6 +103,10 @@ export default function ProgramDetailClient({
             </>
           }
         />
+
+        {/* Sellos de confianza específicos del programa (mismo componente
+            compartido que la ficha de Maxymia). Se oculta si no hay. */}
+        <TrustSeals badges={program.badges} />
 
         {/* Closing CTA stays full-width below the grid. Still gated: for
             isPro programs without access ProGateWrapper swaps it for the
