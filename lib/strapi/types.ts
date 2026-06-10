@@ -1065,6 +1065,7 @@ export interface StrapiMaxymiaCourse {
   audiences?: string | null;
   durationHours?: number | null;
   faqs?: { question: string; answer: string }[] | null;
+  badges?: { name: string; badge: { url: string } | null }[] | null;
 }
 
 // GraphQL response wrappers

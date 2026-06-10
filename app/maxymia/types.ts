@@ -151,6 +151,9 @@ export interface MaxymiaCourse {
    *  duración autocalculada (suma de minutos de las lecciones), que para
    *  cursos cortos quedaba demasiado baja. */
   durationHours?: number;
+  /** Sellos de confianza SELECCIONADOS para este curso (relación a `badge`
+   *  en Strapi). Específicos por curso, no los globales de la home. */
+  badges?: { name: string; imageUrl: string }[];
   /** Preguntas frecuentes de la ficha. Opcional: la sección sólo se
    *  pinta cuando hay al menos una. Mismo formato pregunta/respuesta que
    *  las FAQ de los programas de Máxima, listo para alimentarse desde el

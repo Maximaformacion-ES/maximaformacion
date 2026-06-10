@@ -89,6 +89,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         tags
         durationHours
         faqs { question, answer }
+        badges { name, badge { url } }
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
@@ -454,6 +455,11 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     durationHours: course.durationHours ?? undefined,
     faqs: course.faqs?.length
       ? course.faqs.map((f) => ({ question: f.question, answer: f.answer }))
+      : undefined,
+    badges: course.badges?.length
+      ? course.badges
+          .filter((b) => b.badge?.url)
+          .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge) }))
       : undefined,
   };
 }
