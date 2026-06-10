@@ -60,7 +60,7 @@ export function TrustSeals({
             <div
               key={b.name}
               title={b.name}
-              className="relative h-16 w-24 md:h-20 md:w-28 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+              className="relative h-16 w-24 md:h-20 md:w-28 hover:scale-[1.06] transition-transform duration-300"
             >
               <Image
                 src={b.imageUrl}

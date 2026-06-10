@@ -69,20 +69,20 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
   };
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-[#0b1018]/95 backdrop-blur-md border-t border-white/10 px-4 pt-3 safe-bottom">
+    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom">
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
           {includedInPro ? (
             <>
-              <span className="text-white/40 text-body-sm line-through">{course.price}€</span>
+              <span className="text-mx-text-muted text-body-sm line-through">{course.price}€</span>
               <span className="flex items-center gap-1 text-mx-orange text-heading-sm font-black">
                 <Crown size={14} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
               </span>
             </>
           ) : proDiscount ? (
             <>
-              <span className="text-white/40 text-body-sm line-through">{course.price}€</span>
+              <span className="text-mx-text-muted text-body-sm line-through">{course.price}€</span>
               <span className="text-mx-orange text-heading-sm font-black">{effectivePrice}€</span>
               <span className="flex items-center gap-1 text-label-sm font-bold text-mx-orange">
                 <Crown size={10} /> -20%
@@ -91,11 +91,11 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
           ) : (
             <>
               {course.originalPrice != null && (
-                <span className="text-white/40 text-body-sm line-through">
+                <span className="text-mx-text-muted text-body-sm line-through">
                   {course.originalPrice}€
                 </span>
               )}
-              <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-heading-sm font-black`}>
+              <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-mx-text'} text-heading-sm font-black`}>
                 {course.price}€
               </span>
               {course.originalPrice != null && (
@@ -138,10 +138,10 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
             <>
               <ShoppingCart size={16} />
               {/* Match the desktop CTA (MaxymiaCourseDetail), which always
-                  reads "Comprar Ahora". handlePurchase redirects to /sign-in
+                  reads "Matricúlate ahora". handlePurchase redirects to /sign-in
                   when there's no session, so the signed-out label doesn't
                   need to differ. */}
-              {locale === 'es' ? 'Comprar Ahora' : 'Buy Now'}
+              {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
             </>
           )}
         </button>
