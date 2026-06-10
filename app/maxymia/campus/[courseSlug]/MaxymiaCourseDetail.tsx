@@ -178,8 +178,8 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
       {/* Background image with dark overlays — clipped here, not on the
           <section>, so it doesn't break the sidebar's sticky. */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0b1018]/95 via-[#0b1018]/85 to-[#0b1018]/60 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1018] via-[#0b1018]/30 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-mx-bg/95 via-mx-bg/85 to-mx-bg/70 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-mx-bg via-mx-bg/40 to-transparent z-10" />
         <img
           src={course.image}
           alt={course.title[locale]}
@@ -192,12 +192,12 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
             {/* Breadcrumb (como en las fichas de /programas) */}
-            <nav aria-label="breadcrumb" className="mb-5 text-label-md text-white/40">
+            <nav aria-label="breadcrumb" className="mb-5 text-label-md text-mx-text-muted">
               <Link href="/" className="hover:text-mx-orange transition-colors">Inicio</Link>
               <span className="mx-2">/</span>
               <Link href="/maxymia" className="hover:text-mx-orange transition-colors">Maxymia</Link>
               <span className="mx-2">/</span>
-              <span className="text-white/70">{course.title[locale]}</span>
+              <span className="text-mx-text-muted">{course.title[locale]}</span>
             </nav>
 
             {/* Badges */}
@@ -210,7 +210,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
                 {CATEGORY_LABELS[course.category]?.[locale] ?? course.category}
               </span>
-              <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-white/10 text-white/70">
+              <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-black/[0.04] text-mx-text-muted">
                 {LEVEL_LABELS[course.level]?.[locale]}
               </span>
               {course.isPro && (
@@ -225,7 +225,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-heading-md md:text-heading-lg lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-white"
+              className="text-heading-md md:text-heading-lg lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
             >
               {course.title[locale]}
             </m.h1>
@@ -241,7 +241,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                 {course.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-white/10 backdrop-blur-md text-white/60 text-label-md font-medium rounded-full"
+                    className="px-3 py-1 bg-black/[0.04] backdrop-blur-md text-mx-text-muted text-label-md font-medium rounded-full"
                   >
                     {tag}
                   </span>
@@ -254,7 +254,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-body-md 2xl:text-body-lg text-white/60 font-light mb-6 max-w-2xl"
+              className="text-body-md 2xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {course.description[locale]}
             </m.p>
@@ -266,7 +266,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               transition={{ delay: 0.25, duration: 0.5 }}
               className="flex items-center gap-3 mb-6"
             >
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-black/[0.04] flex items-center justify-center overflow-hidden">
                 {course.instructor.avatar ? (
                   <Image
                     src={course.instructor.avatar}
@@ -276,12 +276,12 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User size={18} className="text-white/40" />
+                  <User size={18} className="text-mx-text-muted" />
                 )}
               </div>
               <div>
-                <p className="text-white text-body-sm font-medium">{course.instructor.name}</p>
-                <p className="text-white/40 text-label-md">{course.instructor.role}</p>
+                <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>
+                <p className="text-mx-text-muted text-label-md">{course.instructor.role}</p>
               </div>
             </m.div>
 
@@ -401,7 +401,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
 
   return (
     <div className="lg:sticky lg:top-24">
-      <div className="border border-white/15 bg-[#171c24] overflow-hidden rounded-lg">
+      <div className="border border-mx-border bg-white overflow-hidden rounded-lg">
         {/* Course Thumbnail */}
         <CourseThumbnail course={course} locale={locale} />
 
@@ -412,36 +412,36 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
               <div key={item.label} className="flex items-start gap-2">
                 <item.icon size={14} className="text-mx-orange shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-label-sm text-white/40 uppercase tracking-widest">{item.label}</div>
-                  <div className="text-white text-body-sm font-medium">{item.value}</div>
+                  <div className="text-label-sm text-mx-text-muted uppercase tracking-widest">{item.label}</div>
+                  <div className="text-mx-text text-body-sm font-medium">{item.value}</div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-white/10" />
+          <div className="border-t border-mx-border" />
 
           {/* Pricing */}
           <div>
             <div className="flex items-baseline gap-3">
               {includedInPro ? (
                 <>
-                  <span className="text-white/40 text-body-lg line-through">{course.price}€</span>
+                  <span className="text-mx-text-muted text-body-lg line-through">{course.price}€</span>
                   <span className="flex items-center gap-2 text-mx-orange text-heading-md font-black">
                     <Crown size={20} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
                   </span>
                 </>
               ) : proDiscount ? (
                 <>
-                  <span className="text-white/40 text-body-lg line-through">{course.price}€</span>
+                  <span className="text-mx-text-muted text-body-lg line-through">{course.price}€</span>
                   <span className="text-mx-orange text-display-sm font-black">{effectivePrice}€</span>
                 </>
               ) : (
                 <>
                   {course.originalPrice != null && (
-                    <span className="text-white/40 text-body-lg line-through">{course.originalPrice}€</span>
+                    <span className="text-mx-text-muted text-body-lg line-through">{course.originalPrice}€</span>
                   )}
-                  <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-white'} text-display-sm font-black`}>
+                  <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
                     {course.price}€
                   </span>
                 </>
@@ -463,7 +463,7 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
                 </div>
               )
             )}
-            <p className="text-white/40 text-label-md mt-1">
+            <p className="text-mx-text-muted text-label-md mt-1">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
             </p>
           </div>
@@ -546,10 +546,10 @@ function MarkdownContent({ content, className = '' }: { content: string; classNa
 
   return (
     <div
-      // markdown-on-dark flips the globals.css color rule from #000 (used
-      // on the program detail pages over the light background) to #fff so
-      // the copy reads on Maxymia's dark theme.
-      className={`markdown-content markdown-on-dark ${className}`}
+      // Light theme (MF-38): the ficha now matches the rest of the site, so
+      // markdown uses the default globals.css color rule (#000 over the light
+      // background) — no markdown-on-dark override.
+      className={`markdown-content ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -593,18 +593,18 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
     // de texto dentro del <li> no se parta en dos flex items con `gap` —
     // eso era lo que metía el hueco visible alrededor de la negrita. Mismo
     // patrón que ProgramTabs (BULLET_MARKDOWN_CLASS).
-    'text-body-sm sm:text-body-md text-white/60 font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:relative [&_li]:pl-5 sm:[&_li]:pl-6 [&_li]:before:content-[\'\'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
+    'text-body-sm sm:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:relative [&_li]:pl-5 sm:[&_li]:pl-6 [&_li]:before:content-[\'\'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4';
 
   return (
     <div>
       {/* Tab bar */}
-      <div className="relative flex border-b border-white/10 gap-1 sm:gap-6 lg:gap-8 w-full overflow-x-auto no-scrollbar -mx-2 px-2">
+      <div className="relative flex border-b border-mx-border gap-1 sm:gap-6 lg:gap-8 w-full overflow-x-auto no-scrollbar -mx-2 px-2">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
             className={`relative px-2 sm:px-3 py-3 text-label-md sm:text-body-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
-              activeTab === tab.value ? 'text-mx-orange' : 'text-white/40 hover:text-mx-orange'
+              activeTab === tab.value ? 'text-mx-orange' : 'text-mx-text-muted hover:text-mx-orange'
             }`}
           >
             <span className="flex items-center gap-1 sm:gap-2">
@@ -652,7 +652,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <div className="mb-4 text-white/40 text-body-sm">
+              <div className="mb-4 text-mx-text-muted text-body-sm">
                 {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} •{' '}
                 {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
               </div>
@@ -660,23 +660,23 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                 {course.blocks.map((block, index) => (
                   <div
                     key={block.id}
-                    className="bg-white/[0.03] border border-white/10 overflow-hidden rounded-lg"
+                    className="bg-black/[0.02] border border-mx-border overflow-hidden rounded-lg"
                   >
                     <button
                       onClick={() => setExpandedBlock(expandedBlock === index ? null : index)}
-                      className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-white/[0.02] duration-200 transition-colors group"
+                      className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-black/[0.03] duration-200 transition-colors group"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
                           <span className="text-mx-orange text-label-md font-bold">
                             {locale === 'es' ? 'Bloque' : 'Block'} {index + 1}
                           </span>
-                          <span className="flex items-center gap-1.5 text-white/30 text-label-md">
+                          <span className="flex items-center gap-1.5 text-mx-text-muted text-label-md">
                             <BookOpen size={12} />
                             {block.lessons.length} {locale === 'es' ? 'lecciones' : 'lessons'}
                           </span>
                         </div>
-                        <h3 className="text-body-md md:text-body-lg font-bold text-white group-hover:text-mx-orange transition-colors duration-300">
+                        <h3 className="text-body-md md:text-body-lg font-bold text-mx-text group-hover:text-mx-orange transition-colors duration-300">
                           {block.title[locale]}
                         </h3>
                       </div>
@@ -685,7 +685,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                         transition={{ duration: 0.3 }}
                         className="ml-4 shrink-0"
                       >
-                        <ChevronDown size={20} className="text-white/30" />
+                        <ChevronDown size={20} className="text-mx-text-muted" />
                       </m.div>
                     </button>
 
@@ -698,28 +698,28 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-white/10">
+                          <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-mx-border">
                             {block.lessons.map((lesson, lessonIndex) => (
                               <m.div
                                 key={lesson.id}
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: lessonIndex * 0.05 }}
-                                className="flex items-center justify-between py-3 border-b last:border-0 border-white/5"
+                                className="flex items-center justify-between py-3 border-b last:border-0 border-mx-border"
                               >
                                 <div className="flex items-start gap-3">
                                   <div className="w-1 h-1 rounded-full bg-mx-orange mt-2 shrink-0" />
-                                  <span className="font-light text-body-sm text-white/70">
+                                  <span className="font-light text-body-sm text-mx-text-muted">
                                     {lesson.title[locale]}
                                   </span>
                                 </div>
-                                <span className="text-white/30 text-label-md ml-4 shrink-0">
+                                <span className="text-mx-text-muted text-label-md ml-4 shrink-0">
                                   {lesson.estimatedMinutes} min
                                 </span>
                               </m.div>
                             ))}
                             {block.exams.map((exam) => (
-                              <div key={exam.id} className="flex items-center gap-3 py-3 text-purple-300/70">
+                              <div key={exam.id} className="flex items-center gap-3 py-3 text-purple-600">
                                 <FileQuestion size={14} className="shrink-0" />
                                 <span className="text-body-sm">{exam.title[locale]}</span>
                               </div>
@@ -795,7 +795,7 @@ function CourseFAQSection({ course, locale }: { course: MaxymiaCourse; locale: L
     >
       <div className="flex items-center gap-2 mb-6">
         <HelpCircle size={18} className="text-mx-orange" />
-        <h2 className="text-heading-sm md:text-heading-md font-black tracking-tight text-white">
+        <h2 className="text-heading-sm md:text-heading-md font-black tracking-tight text-mx-text">
           {locale === 'es' ? 'Preguntas frecuentes' : 'Frequently asked questions'}
         </h2>
       </div>
@@ -806,14 +806,14 @@ function CourseFAQSection({ course, locale }: { course: MaxymiaCourse; locale: L
           return (
             <div
               key={faq.question}
-              className="bg-white/[0.03] border border-white/10 overflow-hidden rounded-lg"
+              className="bg-black/[0.02] border border-mx-border overflow-hidden rounded-lg"
             >
               <button
                 onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="w-full p-5 md:p-6 flex items-center justify-between gap-4 text-left hover:bg-white/[0.02] duration-200 transition-colors group"
+                className="w-full p-5 md:p-6 flex items-center justify-between gap-4 text-left hover:bg-black/[0.03] duration-200 transition-colors group"
                 aria-expanded={isOpen}
               >
-                <span className="text-body-sm md:text-body-md font-bold text-white group-hover:text-mx-orange transition-colors">
+                <span className="text-body-sm md:text-body-md font-bold text-mx-text group-hover:text-mx-orange transition-colors">
                   {faq.question}
                 </span>
                 <m.div
@@ -821,7 +821,7 @@ function CourseFAQSection({ course, locale }: { course: MaxymiaCourse; locale: L
                   transition={{ duration: 0.3 }}
                   className="shrink-0"
                 >
-                  <ChevronDown size={20} className="text-white/30" />
+                  <ChevronDown size={20} className="text-mx-text-muted" />
                 </m.div>
               </button>
 
@@ -834,7 +834,7 @@ function CourseFAQSection({ course, locale }: { course: MaxymiaCourse; locale: L
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 md:px-6 pb-5 md:pb-6 pt-1 text-body-sm text-white/60 font-light leading-relaxed">
+                    <div className="px-5 md:px-6 pb-5 md:pb-6 pt-1 text-body-sm text-mx-text-muted font-light leading-relaxed">
                       {faq.answer}
                     </div>
                   </m.div>
@@ -944,7 +944,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
     new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
 
   return (
-    <section className="py-12 md:py-20 px-6 md:px-[128px] bg-gradient-to-b from-[#0b1018] to-[#060810]">
+    <section className="py-12 md:py-20 px-6 md:px-[128px] bg-mx-bg">
       <div className="max-w-4xl mx-auto">
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -961,10 +961,10 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             <Crown size={14} />
             {locale === 'es' ? 'Contenido Premium' : 'Premium Content'}
           </span>
-          <h2 className="text-heading-md md:text-heading-lg font-bold text-white mb-4">
+          <h2 className="text-heading-md md:text-heading-lg font-bold text-mx-text mb-4">
             {locale === 'es' ? 'Accede a' : 'Access'} &quot;{course.title[locale]}&quot;
           </h2>
-          <p className="text-white/60 font-light text-body-sm md:text-body-md mb-8 max-w-xl mx-auto">
+          <p className="text-mx-text-muted font-light text-body-sm md:text-body-md mb-8 max-w-xl mx-auto">
             {locale === 'es'
               ? 'Este curso es exclusivo. Elige la opción que mejor se adapte a ti.'
               : 'This course is exclusive. Choose the option that suits you best.'}
@@ -979,24 +979,24 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="p-6 bg-white/5 border border-white/10 hover:border-white/20 rounded-xl transition-all"
+            className="p-6 bg-black/[0.02] border border-mx-border hover:border-mx-border rounded-xl transition-all"
           >
             <div className="flex items-center justify-center gap-2 mb-3">
-              <ShoppingCart className="text-white" size={18} />
-              <span className="text-white font-semibold text-body-sm">
+              <ShoppingCart className="text-mx-text" size={18} />
+              <span className="text-mx-text font-semibold text-body-sm">
                 {locale === 'es' ? 'Comprar este curso' : 'Buy this course'}
               </span>
             </div>
 
             <div className="flex items-baseline justify-center gap-1 mb-1">
               {course.originalPrice != null && course.originalPrice > course.price && (
-                <span className="text-white/40 text-body-md line-through mr-2">
+                <span className="text-mx-text-muted text-body-md line-through mr-2">
                   {formatPrice(course.originalPrice)}
                 </span>
               )}
-              <span className="text-heading-md font-black text-white">{formatPrice(course.price)}</span>
+              <span className="text-heading-md font-black text-mx-text">{formatPrice(course.price)}</span>
             </div>
-            <p className="text-white/40 text-label-md mb-5 text-center">
+            <p className="text-mx-text-muted text-label-md mb-5 text-center">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
             </p>
 
@@ -1004,7 +1004,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               {courseFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Check className="text-green-500 flex-shrink-0" size={16} />
-                  <span className="text-white/70 text-body-sm">{feature}</span>
+                  <span className="text-mx-text-muted text-body-sm">{feature}</span>
                 </div>
               ))}
             </div>
@@ -1014,7 +1014,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             <button
               onClick={handlePurchase}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 bg-white hover:bg-white/90 text-black px-5 py-3 rounded-full text-body-sm font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-5 py-3 rounded-full text-body-sm font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -1050,10 +1050,10 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
             </div>
 
             <div className="flex items-baseline justify-center gap-1 mb-1">
-              <span className="text-heading-md font-black text-white">€18</span>
-              <span className="text-white/60 text-body-sm">/{locale === 'es' ? 'mes' : 'mo'}</span>
+              <span className="text-heading-md font-black text-mx-text">€18</span>
+              <span className="text-mx-text-muted text-body-sm">/{locale === 'es' ? 'mes' : 'mo'}</span>
             </div>
-            <p className="text-white/40 text-label-md mb-5 text-center">
+            <p className="text-mx-text-muted text-label-md mb-5 text-center">
               {locale === 'es' ? 'Cancela cuando quieras' : 'Cancel anytime'}
             </p>
 
@@ -1061,7 +1061,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               {proFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-3">
                   <Sparkles className="text-amber-500 flex-shrink-0" size={16} />
-                  <span className="text-white/70 text-body-sm">{feature}</span>
+                  <span className="text-mx-text-muted text-body-sm">{feature}</span>
                 </div>
               ))}
             </div>
@@ -1075,7 +1075,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
               <ArrowRight size={18} />
             </Link>
 
-            <p className="text-center text-white/40 text-label-md mt-4">
+            <p className="text-center text-mx-text-muted text-label-md mt-4">
               {locale === 'es' ? 'Acceso a +50 cursos y masters' : 'Access to 50+ courses and masters'}
             </p>
           </m.div>
@@ -1091,7 +1091,7 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
         >
           <Link
             href="/maxymia/campus/cursos"
-            className="text-white/60 hover:text-amber-500 transition-colors text-body-sm"
+            className="text-mx-text-muted hover:text-amber-500 transition-colors text-body-sm"
           >
             ← {locale === 'es' ? 'Volver al catálogo de cursos' : 'Back to course catalog'}
           </Link>
@@ -1119,7 +1119,7 @@ function CourseCTASection({ locale }: { locale: Locale }) {
               {locale === 'es' ? 'COMENZAR?' : 'START?'}
             </span>
           </h2>
-          <p className="text-body-md md:text-heading-sm text-white/40 font-light mb-8 md:mb-12 max-w-2xl mx-auto">
+          <p className="text-body-md md:text-heading-sm text-mx-text-muted font-light mb-8 md:mb-12 max-w-2xl mx-auto">
             {locale === 'es'
               ? 'Únete a cientos de profesionales que ya están transformando su carrera con este curso.'
               : 'Join hundreds of professionals already transforming their careers with this course.'}
@@ -1131,7 +1131,7 @@ function CourseCTASection({ locale }: { locale: Locale }) {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-8 text-white/40"
+          className="flex flex-col sm:flex-row items-center justify-center gap-8 text-mx-text-muted"
         >
           <a
             href="mailto:cursos@maximaformacion.es"
