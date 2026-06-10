@@ -37,6 +37,7 @@ import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
+import { useCampusTheme } from '../CampusShell';
 import type { MaxymiaCourse, Locale } from '../../types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
@@ -108,6 +109,14 @@ interface Props {
 
 export default function MaxymiaCourseDetail({ course }: Props) {
   const { locale } = useLocale();
+  // This is the public course *sales* ficha — paint the whole campus chrome
+  // (header, footer, page bg) light + black logo while it's shown, and revert
+  // to dark when it unmounts (e.g. the user buys and the student view loads).
+  const { setLight } = useCampusTheme();
+  useEffect(() => {
+    setLight(true);
+    return () => setLight(false);
+  }, [setLight]);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
 
   return (
