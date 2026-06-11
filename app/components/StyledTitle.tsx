@@ -18,9 +18,12 @@ interface StyledTitleProps {
   text: string;
   color?: string;
   mode?: string;
+  /** Si es true, las partes `{}` van en la MISMA línea (separadas por espacio)
+   *  en vez de saltar a una línea nueva. Por defecto false (cada bloque salta). */
+  inline?: boolean;
 }
 
-export function StyledTitle({ text, color = "orange", mode = "light" }: StyledTitleProps): React.ReactElement {
+export function StyledTitle({ text, color = "orange", mode = "light", inline = false }: StyledTitleProps): React.ReactElement {
   // Split by {content} keeping the delimiters
   const segments = text.split(/(\{[^}]+\})/);
   const result: React.ReactNode[] = [];
@@ -35,7 +38,7 @@ export function StyledTitle({ text, color = "orange", mode = "light" }: StyledTi
 
     result.push(
       <React.Fragment key={lineIndex}>
-        {lineIndex > 0 && <br />}
+        {lineIndex > 0 && (inline ? ' ' : <br />)}
         {isStroke ? (
           <span
             className="text-stroke"

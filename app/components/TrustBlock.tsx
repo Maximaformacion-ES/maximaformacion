@@ -36,7 +36,7 @@ export function TrustBlock({
 
   return (
     <section className="relative py-8 md:py-32 overflow-hidden bg-transparent">
-      <div className="max-w-[900px] px-6 md:px-12 relative">
+      <div className="max-w-[900px] relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ export function TrustBlock({
           viewport={{ once: true }}
           className="text-mx-blue text-heading-md md:text-heading-lg font-black tracking-tight leading-tight mb-10 text-left"
         >
-          <StyledTitle text={tt} color="blue" />
+          <StyledTitle text={tt} color="blue" inline />
         </m.h2>
 
         {/* Instituciones / clientes (solo logos) */}
