@@ -35,13 +35,13 @@ export function TrustBlock({
   const tt = title ?? (locale === 'es' ? 'POR QUÉ {CONFIAR}' : 'WHY {TRUST US}');
 
   return (
-    <section className="relative py-8 md:py-12 overflow-hidden bg-transparent">
-      <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
+    <section className="relative py-8 md:py-32 overflow-hidden bg-transparent">
+      <div className="max-w-[900px] px-6 md:px-12 relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-6 text-center"
+          className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-6 text-left"
         >
           {ol}
         </m.p>
@@ -50,7 +50,7 @@ export function TrustBlock({
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-blue text-heading-md md:text-heading-lg font-black tracking-tight leading-tight mb-10 text-center"
+          className="text-mx-blue text-heading-md md:text-heading-lg font-black tracking-tight leading-tight mb-10 text-left"
         >
           <StyledTitle text={tt} color="blue" />
         </m.h2>
@@ -62,7 +62,7 @@ export function TrustBlock({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="flex flex-wrap items-center justify-center gap-8 md:gap-12"
+            className="flex flex-wrap items-center justify-start gap-8 md:gap-12"
           >
             {institutions!.map((i) => (
               <div
@@ -79,7 +79,6 @@ export function TrustBlock({
         {/* Divisor con etiqueta "Certificaciones" (solo si hay ambos grupos) */}
         {hasInst && hasCert && (
           <div className="flex items-center gap-4 my-9 md:my-11">
-            <div className="h-px flex-1 bg-mx-border" />
             <span className="text-mx-text-muted text-label-sm tracking-[0.2em] uppercase shrink-0">
               {locale === 'es' ? 'Certificaciones' : 'Certifications'}
             </span>
@@ -94,7 +93,7 @@ export function TrustBlock({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className={`flex flex-wrap items-start justify-center gap-x-8 gap-y-7 md:gap-x-12 ${hasInst ? '' : 'mt-10'}`}
+            className={`flex flex-wrap items-start justify-start gap-x-8 gap-y-7 md:gap-x-12 ${hasInst ? '' : 'mt-10'}`}
           >
             {certifications!.map((c) => (
               <div key={c.name} className="flex flex-col items-center gap-2.5 w-20 md:w-24">
