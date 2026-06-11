@@ -99,13 +99,13 @@ export default function ProgramDetailClient({
           belowContent={
             <>
               <ProgramTeachers program={program} />
-              <ProgramFAQSection program={program} />
-              {/* Confianza unificada: instituciones + certificaciones en una
-                  sola sección. Mismo componente que la ficha de Maxymia. */}
+              {/* Confianza primero, FAQ después. Mismo componente que la ficha
+                  de Maxymia. */}
               <TrustBlock
                 institutions={program.institutions}
                 certifications={program.badges}
               />
+              <ProgramFAQSection program={program} />
             </>
           }
         />

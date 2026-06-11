@@ -151,6 +151,13 @@ export default function MaxymiaCourseDetail({ course }: Props) {
         }
         belowContent={
           <>
+            {/* Confianza primero, FAQ después. Mismo contenedor lg:col-span-2.
+                Componente compartido con la ficha de /programas. */}
+            <TrustBlock
+              institutions={course.institutions}
+              certifications={course.badges}
+              locale={locale}
+            />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
                 compact
@@ -159,14 +166,6 @@ export default function MaxymiaCourseDetail({ course }: Props) {
                 faqs={course.faqs}
               />
             )}
-            {/* Confianza unificada: instituciones + certificaciones en una
-                sola sección, dentro del contenedor lg:col-span-2 (junto a las
-                FAQ). Mismo componente que la ficha de /programas. */}
-            <TrustBlock
-              institutions={course.institutions}
-              certifications={course.badges}
-              locale={locale}
-            />
           </>
         }
       />
