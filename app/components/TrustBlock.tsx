@@ -6,6 +6,18 @@ import { m } from 'framer-motion';
 
 type Logo = { name: string; imageUrl: string };
 
+/** Etiqueta de grupo grande y "hueca" (text-stroke azul, relleno = fondo). */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      className="text-stroke text-heading-md md:text-heading-lg font-black tracking-tight uppercase shrink-0 leading-none"
+      style={{ '--stroke-color': 'var(--color-mx-blue)' } as React.CSSProperties}
+    >
+      {children}
+    </span>
+  );
+}
+
 /**
  * Bloque de confianza UNIFICADO para la ficha (Maxymia y /programas): dos
  * grupos —instituciones/clientes (logos) y certificaciones (sellos CON su
@@ -26,9 +38,6 @@ export function TrustBlock({
   const hasCert = !!certifications?.length;
   if (!hasInst && !hasCert) return null;
 
-  const labelClass =
-    'text-mx-blue text-label-md tracking-[0.2em] uppercase font-bold shrink-0';
-
   return (
     <section className="relative py-8 md:py-32 overflow-hidden bg-transparent">
       <div className="max-w-[900px] relative">
@@ -41,7 +50,7 @@ export function TrustBlock({
             transition={{ duration: 0.8 }}
           >
             <div className="flex items-center gap-4 mb-7 md:mb-9">
-              <span className={labelClass}>{locale === 'es' ? 'Instituciones' : 'Institutions'}</span>
+              <SectionLabel>{locale === 'es' ? 'Instituciones' : 'Institutions'}</SectionLabel>
               <div className="h-px flex-1 bg-mx-border" />
             </div>
             <div className="flex flex-wrap items-center justify-start gap-8 md:gap-12">
@@ -68,7 +77,7 @@ export function TrustBlock({
             className={hasInst ? 'mt-10 md:mt-14' : ''}
           >
             <div className="flex items-center gap-4 mb-7 md:mb-9">
-              <span className={labelClass}>{locale === 'es' ? 'Certificaciones' : 'Certifications'}</span>
+              <SectionLabel>{locale === 'es' ? 'Certificaciones' : 'Certifications'}</SectionLabel>
               <div className="h-px flex-1 bg-mx-border" />
             </div>
             <div className="flex flex-wrap items-start justify-start gap-x-8 gap-y-7 md:gap-x-12">
