@@ -12,7 +12,7 @@ import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import { ProgramTeachers } from '../../components/ProgramTeachers';
-import { TrustSeals } from '../../components/TrustSeals';
+import { TrustBlock } from '../../components/TrustBlock';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
 import type { Program } from '@/lib/strapi/types';
@@ -100,15 +100,12 @@ export default function ProgramDetailClient({
             <>
               <ProgramTeachers program={program} />
               <ProgramFAQSection program={program} />
-              {/* Instituciones/clientes (brand-level) — reutiliza TrustSeals. */}
-              <TrustSeals
-                badges={program.institutions}
-                overline="Confían en nosotros"
-                title="GRANDES {INSTITUCIONES}"
+              {/* Confianza unificada: instituciones + certificaciones en una
+                  sola sección. Mismo componente que la ficha de Maxymia. */}
+              <TrustBlock
+                institutions={program.institutions}
+                certifications={program.badges}
               />
-              {/* Certificaciones en el MISMO contenedor (lg:col-span-2) que
-                  las FAQ. Componente compartido con la ficha de Maxymia. */}
-              <TrustSeals badges={program.badges} />
             </>
           }
         />

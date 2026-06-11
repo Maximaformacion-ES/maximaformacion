@@ -37,7 +37,7 @@ import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { useCampusTheme } from '../CampusShell';
-import { TrustSeals } from '@/app/components/TrustSeals';
+import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
 import type { MaxymiaCourse, Locale } from '../../types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
@@ -159,17 +159,14 @@ export default function MaxymiaCourseDetail({ course }: Props) {
                 faqs={course.faqs}
               />
             )}
-            {/* Instituciones/clientes (brand-level) — reutiliza TrustSeals con
-                otros textos. */}
-            <TrustSeals
-              badges={course.institutions}
+            {/* Confianza unificada: instituciones + certificaciones en una
+                sola sección, dentro del contenedor lg:col-span-2 (junto a las
+                FAQ). Mismo componente que la ficha de /programas. */}
+            <TrustBlock
+              institutions={course.institutions}
+              certifications={course.badges}
               locale={locale}
-              overline={locale === 'es' ? 'Confían en nosotros' : 'They trust us'}
-              title={locale === 'es' ? 'GRANDES {INSTITUCIONES}' : 'LEADING {INSTITUTIONS}'}
             />
-            {/* Certificaciones en el MISMO contenedor (lg:col-span-2) que las
-                FAQ. Componente compartido con la ficha de /programas. */}
-            <TrustSeals badges={course.badges} locale={locale} />
           </>
         }
       />
