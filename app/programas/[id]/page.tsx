@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
-import { getProgramBySlug, getInstitutions } from '@/lib/strapi/queries';
+import { getProgramBySlug } from '@/lib/strapi/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema, courseSchema, faqSchema } from '@/lib/seo/jsonld';
@@ -63,10 +63,9 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   // Fetch the program and the visitor's auth state in parallel — the
   // Strapi call is cached (revalidate=60) so this only adds one DB
   // round-trip per request, not a full Strapi fetch.
-  const [program, initialUserState, institutions] = await Promise.all([
+  const [program, initialUserState] = await Promise.all([
     getProgramBySlug(slug, isDraft),
     getServerUserState(),
-    getInstitutions(),
   ]);
 
   const schemas = program
@@ -104,7 +103,6 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
         program={program}
         richHtml={richHtml}
         initialUserState={initialUserState}
-        institutions={institutions}
       />
     </>
   );

@@ -15,7 +15,7 @@ import { ProgramTeachers } from '../../components/ProgramTeachers';
 import { TrustSeals } from '../../components/TrustSeals';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
-import type { Program, Institution } from '@/lib/strapi/types';
+import type { Program } from '@/lib/strapi/types';
 import type { ProgramRichHtml } from './page';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -23,15 +23,12 @@ interface ProgramDetailClientProps {
   program: Program | null;
   richHtml: ProgramRichHtml;
   initialUserState?: ServerUserState;
-  /** Instituciones/clientes con logos (brand-level). */
-  institutions?: Institution[];
 }
 
 export default function ProgramDetailClient({
   program,
   richHtml,
   initialUserState,
-  institutions,
 }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -105,7 +102,7 @@ export default function ProgramDetailClient({
               <ProgramFAQSection program={program} />
               {/* Instituciones/clientes (brand-level) — reutiliza TrustSeals. */}
               <TrustSeals
-                badges={institutions}
+                badges={program.institutions}
                 overline="Confían en nosotros"
                 title="GRANDES {INSTITUCIONES}"
               />

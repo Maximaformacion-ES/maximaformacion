@@ -107,6 +107,11 @@ function transformProgram(strapi: StrapiProgram): Program {
           .filter((b) => b.badge)
           .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge) }))
       : undefined,
+    institutions: strapi.institutions?.length
+      ? strapi.institutions
+          .filter((i) => i.logo)
+          .map((i) => ({ name: i.name, imageUrl: getStrapiMediaUrl(i.logo) }))
+      : undefined,
     noIndex: !!strapi.noIndex,
   };
 }
@@ -355,7 +360,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[badges][populate]=badge&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -380,7 +385,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[badges][populate]=badge&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

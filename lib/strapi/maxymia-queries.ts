@@ -90,6 +90,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         durationHours
         faqs { question, answer }
         badges { name, badge { url } }
+        institutions { name, logo { url } }
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
@@ -460,6 +461,11 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
       ? course.badges
           .filter((b) => b.badge?.url)
           .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge) }))
+      : undefined,
+    institutions: course.institutions?.length
+      ? course.institutions
+          .filter((i) => i.logo?.url)
+          .map((i) => ({ name: i.name, imageUrl: getStrapiMediaUrl(i.logo) }))
       : undefined,
   };
 }
