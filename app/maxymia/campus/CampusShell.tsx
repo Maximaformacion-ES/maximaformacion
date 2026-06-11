@@ -53,6 +53,13 @@ function DefaultCampusHeader() {
   const { light } = useCampusTheme();
   const { logoMaxymia } = useSiteBranding();
   const logoSrc = light ? '/logo_maxymia_negro_sin_fondo.png' : logoMaxymia;
+  // Clerk's <SignedIn>/<SignedOut> render different trees on the server (no
+  // session, esp. with pk_test dev keys) vs the client (session present),
+  // which trips React's hydration check. Gate the auth-dependent header bits
+  // behind `mounted` so SSR and the first client paint match (both empty),
+  // then reveal the real auth UI after mount.
+  const [authMounted, setAuthMounted] = useState(false);
+  useEffect(() => setAuthMounted(true), []);
 
   // Close menu on route change
   useEffect(() => {
@@ -91,6 +98,7 @@ function DefaultCampusHeader() {
             {/* Las secciones del campus son privadas: solo se muestran a
                 usuarios logueados. Un anónimo (viendo una ficha pública) no las
                 ve. */}
+            {authMounted && (
             <SignedIn>
               <nav className="hidden md:flex items-center gap-1">
                 {CAMPUS_NAV.map((item) => {
@@ -116,6 +124,7 @@ function DefaultCampusHeader() {
                 })}
               </nav>
             </SignedIn>
+            )}
           </div>
 
           {/* Right side */}
@@ -130,6 +139,8 @@ function DefaultCampusHeader() {
             <div className={`w-px h-4 ${light ? 'bg-mx-border' : 'bg-white/10'} hidden md:block`} />
             {/* Search, notificaciones y avatar son propios del usuario:
                 ocultos para anónimos. */}
+            {authMounted && (
+            <>
             <SignedIn>
               <button className={`p-2 sm:p-2.5 rounded-full ${light ? 'hover:bg-black/[0.04]' : 'hover:bg-white/5'} transition-colors`} aria-label="Search">
                 <Search size={16} className={light ? 'text-mx-text-muted' : 'text-white/60'} />
@@ -157,6 +168,8 @@ function DefaultCampusHeader() {
                 Iniciar sesión
               </Link>
             </SignedOut>
+            </>
+            )}
 
             {/* Burger button — mobile only */}
             <button
