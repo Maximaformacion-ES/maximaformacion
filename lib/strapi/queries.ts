@@ -85,6 +85,9 @@ function transformProgram(strapi: StrapiProgram): Program {
     brochurePdfUrl,
     videoUrl: strapi.videoUrl ?? null,
     faqs: (strapi.faqs ?? []).map((f) => ({ question: f.question, answer: f.answer })),
+    comos: strapi.comos?.length
+      ? strapi.comos.map((c) => ({ question: c.question, answer: c.answer }))
+      : undefined,
     subjectArea: strapi.subjectArea ?? null,
     originalPrice: strapi.originalPrice || undefined,
     modules: modules.length > 0 ? modules : [],
@@ -360,7 +363,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -385,7 +388,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

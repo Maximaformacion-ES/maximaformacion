@@ -89,6 +89,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         tags
         durationHours
         faqs { question, answer }
+        comos { question, answer }
         badges { name, badge { url } }
         institutions { name, logo { url } }
         image { url, alternativeText }
@@ -456,6 +457,9 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     durationHours: course.durationHours ?? undefined,
     faqs: course.faqs?.length
       ? course.faqs.map((f) => ({ question: f.question, answer: f.answer }))
+      : undefined,
+    comos: course.comos?.length
+      ? course.comos.map((c) => ({ question: c.question, answer: c.answer }))
       : undefined,
     badges: course.badges?.length
       ? course.badges

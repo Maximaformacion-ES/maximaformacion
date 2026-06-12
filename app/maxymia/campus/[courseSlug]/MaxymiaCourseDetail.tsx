@@ -39,6 +39,7 @@ import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { useCampusTheme } from '../CampusShell';
 import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
+import { Comos } from '@/app/components/Comos';
 import type { MaxymiaCourse, Locale } from '../../types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
@@ -598,14 +599,20 @@ interface TabsProps {
 }
 
 function CourseTabs({ course, locale, totalLessons }: TabsProps) {
+  const hasComos = !!course.comos?.length;
   const hasDescription = !!course.description?.[locale]?.trim();
-  const [activeTab, setActiveTab] = useState(hasDescription ? 'descripcion' : 'contenido');
+  // Los "Cómos" sustituyen al contenido de la pestaña de Descripción (MF-41).
+  const hasIntro = hasComos || hasDescription;
+  const introLabel = hasComos
+    ? (locale === 'es' ? 'Cómo te ayuda' : 'How it helps')
+    : (locale === 'es' ? 'Descripción' : 'Description');
+  const [activeTab, setActiveTab] = useState(hasIntro ? 'descripcion' : 'contenido');
   const [expandedBlock, setExpandedBlock] = useState<number | null>(0);
 
   const tabs = useMemo<TabDef[]>(() => {
     const t: TabDef[] = [];
-    if (hasDescription)
-      t.push({ value: 'descripcion', label: locale === 'es' ? 'Descripción' : 'Description', icon: FileText });
+    if (hasIntro)
+      t.push({ value: 'descripcion', label: introLabel, icon: FileText });
     t.push({ value: 'contenido', label: locale === 'es' ? 'Temario' : 'Syllabus', icon: ListOrdered });
     if (course.objectives)
       t.push({ value: 'objetivos', label: locale === 'es' ? 'Objetivos' : 'Objectives', icon: Target });
@@ -614,7 +621,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
     if (course.careers)
       t.push({ value: 'salidas', label: locale === 'es' ? 'Salidas profesionales' : 'Career paths', icon: Briefcase });
     return t;
-  }, [locale, hasDescription, course.objectives, course.audiences, course.careers]);
+  }, [locale, hasIntro, introLabel, course.objectives, course.audiences, course.careers]);
 
   const markdownTabClasses =
     // Bullet posicionado en absoluto (no flex) para que un <strong> seguido
@@ -638,7 +645,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
             <span className="flex items-center gap-1 sm:gap-2">
               <tab.icon className="size-3.5 sm:size-4" />
               <span className="sm:hidden">
-                {tab.value === 'descripcion' && (locale === 'es' ? 'Descripción' : 'Description')}
+                {tab.value === 'descripcion' && introLabel}
                 {tab.value === 'contenido' && (locale === 'es' ? 'Temario' : 'Content')}
                 {tab.value === 'objetivos' && (locale === 'es' ? 'Objetivos' : 'Goals')}
                 {tab.value === 'audiencia' && (locale === 'es' ? 'Audiencia' : 'Audience')}
@@ -660,7 +667,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
       {/* Tab content */}
       <div className="pt-6 md:pt-4">
         <AnimatePresence mode="wait">
-          {activeTab === 'descripcion' && hasDescription && (
+          {activeTab === 'descripcion' && hasIntro && (
             <m.div
               key="descripcion"
               initial={{ opacity: 0, y: 12 }}
@@ -668,7 +675,11 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <MarkdownContent content={course.description[locale]} className={markdownTabClasses} />
+              {hasComos ? (
+                <Comos comos={course.comos!} />
+              ) : (
+                <MarkdownContent content={course.description[locale]} className={markdownTabClasses} />
+              )}
             </m.div>
           )}
 

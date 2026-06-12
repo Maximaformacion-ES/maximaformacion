@@ -162,6 +162,9 @@ export interface MaxymiaCourse {
    *  las FAQ de los programas de Máxima, listo para alimentarse desde el
    *  fallback (app/maxymia/data/courses.ts) o un futuro campo en Strapi. */
   faqs?: { question: string; answer: string }[];
+  /** "Cómos": pregunta-problema ("¿Cómo…?") + respuesta. Sustituye a la
+   *  Descripción en la ficha cuando hay alguno (más llamativo). */
+  comos?: { question: string; answer: string }[];
 }
 
 // ============ Exam Question Types ============
