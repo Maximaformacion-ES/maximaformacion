@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from '../i18n/LocaleProvider';
 import { getTranslation } from '../i18n/translations';
 import { useNewCourseNotifications } from '../hooks/useNewCourseNotifications';
+import { useCampusTheme } from '../campus/CampusShell';
 import type { MaxymiaCourse, Locale } from '../types';
 
 function formatRelativeDate(iso: string, locale: Locale, t: (key: string) => string): string {
@@ -28,6 +29,7 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { locale } = useLocale();
+  const { light } = useCampusTheme();
   const t = (key: string) => getTranslation(locale, key);
   const { newCourses, hasUnseen, markAsSeen, isLoaded } = useNewCourseNotifications(courses);
 
@@ -60,10 +62,10 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={handleToggle}
-        className="relative p-2.5 rounded-full hover:bg-white/5 transition-colors"
+        className={`relative p-2.5 rounded-full transition-colors ${light ? 'hover:bg-black/[0.04]' : 'hover:bg-white/5'}`}
         aria-label="Notifications"
       >
-        <Bell size={16} className="text-white/60" />
+        <Bell size={16} className={light ? 'text-mx-text-muted' : 'text-white/60'} />
         {isLoaded && hasUnseen && (
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-mx-orange rounded-full" />
         )}
@@ -76,11 +78,11 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-[26rem] rounded-xl overflow-hidden shadow-xl bg-[#0b1018] border border-white/10 z-50"
+            className={`absolute right-0 mt-2 w-[26rem] rounded-xl overflow-hidden shadow-xl z-50 border ${light ? 'bg-white border-mx-border' : 'bg-[#0b1018] border-white/10'}`}
           >
             {/* Header */}
-            <div className="px-4 py-3 border-b border-white/5">
-              <h3 className="text-body-sm font-medium text-white">
+            <div className={`px-4 py-3 border-b ${light ? 'border-mx-border' : 'border-white/5'}`}>
+              <h3 className={`text-body-sm font-medium ${light ? 'text-mx-text' : 'text-white'}`}>
                 {t('notifications.title')}
               </h3>
             </div>
@@ -89,8 +91,8 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
             <div className="max-h-80 overflow-y-auto">
               {newCourses.length === 0 ? (
                 <div className="px-4 py-8 text-center">
-                  <Bell size={24} className="mx-auto mb-2 text-white/20" />
-                  <p className="text-body-sm text-white/40">
+                  <Bell size={24} className={`mx-auto mb-2 ${light ? 'text-mx-text-muted/50' : 'text-white/20'}`} />
+                  <p className={`text-body-sm ${light ? 'text-mx-text-muted' : 'text-white/40'}`}>
                     {t('notifications.empty')}
                   </p>
                 </div>
@@ -105,7 +107,7 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
                     <Link
                       href={`/maxymia/campus/${course.slug}`}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0"
+                      className={`flex items-center gap-3 px-4 py-3 transition-colors border-b last:border-b-0 ${light ? 'hover:bg-black/[0.04] border-mx-border' : 'hover:bg-white/5 border-white/5'}`}
                     >
                       {/* Mini thumbnail matching card style */}
                       <div className="relative w-16 h-12 rounded-md overflow-hidden shrink-0 bg-[#527be7]">
@@ -136,10 +138,10 @@ export default function NotificationBell({ courses }: NotificationBellProps) {
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-body-sm font-medium text-white truncate">
+                        <p className={`text-body-sm font-medium truncate ${light ? 'text-mx-text' : 'text-white'}`}>
                           {course.title[locale]}
                         </p>
-                        <p className="text-label-md text-white/40 mt-0.5">
+                        <p className={`text-label-md mt-0.5 ${light ? 'text-mx-text-muted' : 'text-white/40'}`}>
                           {course.createdAt && formatRelativeDate(course.createdAt, locale, t)}
                         </p>
                       </div>

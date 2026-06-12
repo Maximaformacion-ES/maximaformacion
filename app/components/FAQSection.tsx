@@ -53,6 +53,9 @@ interface FAQSectionProps {
   overline?: string;
   title?: string;
   faqs?: FAQItem[];
+  /** Título más pequeño para usarlo dentro de una ficha (columna), en vez del
+   *  tamaño display grande de la home. */
+  compact?: boolean;
 }
 
 // Stable no-op subscribe for useSyncExternalStore (the FAQ "mounted" flag
@@ -63,6 +66,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   overline = 'Resolvemos tus dudas',
   title = 'PREGUNTAS {FRECUENTES}',
   faqs = DEFAULT_FAQS,
+  compact = false,
 }) => {
   const displayFaqs = faqs.length > 0 ? faqs : DEFAULT_FAQS;
 
@@ -81,7 +85,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   );
 
   return (
-    <section className="relative py-16 md:py-32 bg-mx-bg overflow-hidden bg-transparent">
+    <section className={`relative overflow-hidden bg-transparent ${compact ? 'py-8 md:py-12' : 'py-16 md:py-32 bg-mx-bg'}`}>
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <m.p
           initial={{ opacity: 0, y: 20 }}
@@ -96,7 +100,11 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-mx-blue text-display-sm md:text-display-md font-black tracking-display leading-display mb-16 text-center"
+          className={`text-mx-blue font-black text-center ${
+            compact
+              ? 'text-heading-md md:text-heading-lg tracking-tight leading-tight mb-10'
+              : 'text-display-sm md:text-display-md tracking-display leading-display mb-16'
+          }`}
         >
           <StyledTitle text={title} color="blue" />
         </m.h2>

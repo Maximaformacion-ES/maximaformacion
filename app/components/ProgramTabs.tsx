@@ -16,6 +16,7 @@ import {
 import type { Program } from "@/lib/strapi/types";
 import type { LucideIcon } from "lucide-react";
 import type { ProgramRichHtml } from "@/app/programas/[id]/page";
+import { Comos } from "./Comos";
 
 // Renders pre-rendered markdown HTML produced server-side. Previously this
 // did the markdown conversion in a useEffect, which meant SSR emitted
@@ -103,7 +104,8 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
 
   const tabs = useMemo<TabDef[]>(() => {
     const t: TabDef[] = [
-      { value: "descripcion", label: "Descripción", icon: BookOpen },
+      // Los "Cómos" sustituyen al contenido de la Descripción (MF-41).
+      { value: "descripcion", label: program.comos?.length ? "Cómo te ayuda" : "Descripción", icon: BookOpen },
       { value: "temario", label: "Temario", icon: ListOrdered },
     ];
     if (program.objectives)
@@ -119,7 +121,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
     if (program.videoUrl)
       t.push({ value: "video", label: "Vídeo", icon: PlayCircle });
     return t;
-  }, [program.objectives, program.audience, program.careers, program.videoUrl]);
+  }, [program.objectives, program.audience, program.careers, program.videoUrl, program.comos]);
 
   return (
     <div>
@@ -168,10 +170,14 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
             id="panel-descripcion"
             hidden={activeTab !== "descripcion"}
           >
-            <MarkdownHtml
-              html={richHtml.longDescription}
-              className={DESCRIPTION_MARKDOWN_CLASS}
-            />
+            {program.comos && program.comos.length > 0 ? (
+              <Comos comos={program.comos} />
+            ) : (
+              <MarkdownHtml
+                html={richHtml.longDescription}
+                className={DESCRIPTION_MARKDOWN_CLASS}
+              />
+            )}
           </div>
 
           <div

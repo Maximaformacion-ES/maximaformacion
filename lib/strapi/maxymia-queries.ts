@@ -55,6 +55,10 @@ const MAXYMIA_COURSES_LIST_QUERY = `
             title_en
             estimatedMinutes
             order
+            uid
+            topics {
+              uid
+            }
           }
           exam { id }
           exams { id }
@@ -89,6 +93,9 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         tags
         durationHours
         faqs { question, answer }
+        comos { question, answer }
+        badges { name, badge { url } }
+        institutions { name, logo { url } }
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
@@ -141,11 +148,13 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
             }
             estimatedMinutes
             order
+            uid
             topics {
               id
               title_es
               title_en
               anchorId
+              uid
               content {
                 __typename
                 ... on ComponentMaxymiaTextBlock { html }
@@ -381,17 +390,26 @@ function slugify(text: string | null | undefined): string {
 }
 
 function transformLesson(lesson: StrapiMaxymiaLesson, blockSlug: string): MaxymiaLesson {
+  const stableId = lessonStableId(lesson, blockSlug);
   return {
-    id: lessonStableId(lesson, blockSlug),
+    id: stableId,
+    // Durable per-unit id. Prefer the CMS-assigned `uid` (stable across saves
+    // and renames); fall back to a content-derived id only until the course is
+    // re-saved once and the lifecycle hook populates the real uids.
+    uid: lesson.uid || stableId,
     title: { es: lesson.title_es, en: lesson.title_en ?? lesson.title_es },
     description: { es: '', en: '' },
     intro: transformLessonIntro(lesson),
     content: transformLocalizedContent(lesson.topics),
     estimatedMinutes: lesson.estimatedMinutes ?? 0,
-    topics: (lesson.topics ?? []).map((t) => {
+    topics: (lesson.topics ?? []).map((t, ti) => {
       const topicBlocks = (t.content ?? []).map(transformContentBlock);
       return {
         id: String(t.id),
+        // Prefer the CMS uid. The fallback is index-based (NOT title-based) so the
+        // lean list query — which doesn't fetch topic titles — derives the same
+        // ids as the detail query until the real uids are populated by a save.
+        uid: t.uid || `${stableId}__t${ti}`,
         title: { es: t.title_es, en: t.title_en ?? t.title_es },
         anchorId: t.anchorId,
         // Each topic keeps its OWN content. Previously this was dropped and the
@@ -454,6 +472,19 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     durationHours: course.durationHours ?? undefined,
     faqs: course.faqs?.length
       ? course.faqs.map((f) => ({ question: f.question, answer: f.answer }))
+      : undefined,
+    comos: course.comos?.length
+      ? course.comos.map((c) => ({ question: c.question, answer: c.answer }))
+      : undefined,
+    badges: course.badges?.length
+      ? course.badges
+          .filter((b) => b.badge?.url)
+          .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge) }))
+      : undefined,
+    institutions: course.institutions?.length
+      ? course.institutions
+          .filter((i) => i.logo?.url)
+          .map((i) => ({ name: i.name, imageUrl: getStrapiMediaUrl(i.logo) }))
       : undefined,
   };
 }

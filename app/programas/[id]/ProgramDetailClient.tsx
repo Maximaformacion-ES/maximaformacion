@@ -12,6 +12,7 @@ import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import { ProgramTeachers } from '../../components/ProgramTeachers';
+import { TrustBlock } from '../../components/TrustBlock';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
 import type { Program } from '@/lib/strapi/types';
@@ -98,6 +99,12 @@ export default function ProgramDetailClient({
           belowContent={
             <>
               <ProgramTeachers program={program} />
+              {/* Confianza primero, FAQ después. Mismo componente que la ficha
+                  de Maxymia. */}
+              <TrustBlock
+                institutions={program.institutions}
+                certifications={program.badges}
+              />
               <ProgramFAQSection program={program} />
             </>
           }

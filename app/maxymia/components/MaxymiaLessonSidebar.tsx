@@ -13,7 +13,7 @@ import {
   FileQuestion,
 } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaTopic, Locale } from '../types';
-import { getCourseProgressStats } from '../data/queries';
+import { getCourseProgressStats, isLessonComplete } from '../data/queries';
 
 interface MaxymiaLessonSidebarProps {
   course: MaxymiaCourse;
@@ -129,7 +129,7 @@ export default function MaxymiaLessonSidebar({
 // ─── Sidebar Block ───────────────────────────────────────────────────
 
 interface SidebarBlockProps {
-  block: { id: string; title: Record<Locale, string>; lessons: { id: string; title: Record<Locale, string>; estimatedMinutes: number; topics?: MaxymiaTopic[] }[]; exams: { id: string; title: Record<Locale, string> }[] };
+  block: { id: string; title: Record<Locale, string>; lessons: { id: string; uid?: string; title: Record<Locale, string>; estimatedMinutes: number; topics?: MaxymiaTopic[] }[]; exams: { id: string; title: Record<Locale, string> }[] };
   courseSlug: string;
   currentLessonId: string;
   completedLessons: Set<string>;
@@ -146,7 +146,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
     () => new Set(hasCurrentLesson ? [currentLessonId] : [])
   );
 
-  const completedInBlock = block.lessons.filter((l) => completedLessons.has(l.id)).length;
+  const completedInBlock = block.lessons.filter((l) => isLessonComplete(l, completedLessons)).length;
 
   const toggleLesson = (lessonId: string) => {
     setExpandedLessons((prev) => {
@@ -181,7 +181,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
           >
             {block.lessons.map((lesson) => {
               const isCurrent = lesson.id === currentLessonId;
-              const isCompleted = completedLessons.has(lesson.id);
+              const isCompleted = isLessonComplete(lesson, completedLessons);
               const hasTopics = lesson.topics && lesson.topics.length > 0;
               const isLessonExpanded = expandedLessons.has(lesson.id);
 

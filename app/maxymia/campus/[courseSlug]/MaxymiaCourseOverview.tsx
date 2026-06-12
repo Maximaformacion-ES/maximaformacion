@@ -33,7 +33,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
-import { getCourseMeta, getCourseProgressStats } from '../../data/queries';
+import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
 import Certificate from '../../components/Certificate';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
@@ -178,7 +178,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
   const firstIncompleteLessonId = useMemo(() => {
     for (const block of course.blocks) {
       for (const lesson of block.lessons) {
-        if (!completedSet.has(lesson.id)) return lesson.id;
+        if (!isLessonComplete(lesson, completedSet)) return lesson.id;
       }
     }
     return course.blocks[0]?.lessons[0]?.id;
@@ -189,7 +189,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
     let foundCurrent = false;
     for (const block of course.blocks) {
       for (const lesson of block.lessons) {
-        if (!completedSet.has(lesson.id)) {
+        if (!isLessonComplete(lesson, completedSet)) {
           if (foundCurrent || completedSet.size === 0) return lesson.id;
           return lesson.id;
         }
@@ -666,7 +666,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
   const [expanded, setExpanded] = useState(blockIndex === 0);
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set());
   const total = block.lessons.length;
-  const completedInBlock = block.lessons.filter((l) => completedSet.has(l.id)).length;
+  const completedInBlock = block.lessons.filter((l) => isLessonComplete(l, completedSet)).length;
   const blockCompleted = completedInBlock === total && total > 0;
   const blockProgress = total > 0 ? Math.round((completedInBlock / total) * 100) : 0;
 
@@ -731,7 +731,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
           >
             <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-white/10 space-y-2">
               {block.lessons.map((lesson, lessonIndex) => {
-                const isCompleted = completedSet.has(lesson.id);
+                const isCompleted = isLessonComplete(lesson, completedSet);
                 const isCurrent = lesson.id === firstIncompleteLessonId;
                 const hasTopics = lesson.topics && lesson.topics.length > 0;
                 const isLessonExpanded = expandedLessons.has(lesson.id);

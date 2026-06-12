@@ -92,6 +92,9 @@ export interface MaxymiaExam {
 
 export interface MaxymiaTopic {
   id: string;
+  /** Durable progress id for this unit (stable across saves/renames). Strapi
+   *  always populates it; optional only for the static demo fallback (uses id). */
+  uid?: string;
   title: LocalizedString;
   anchorId: string;
   /** Content blocks that belong to THIS topic (per H3 section in the docx). */
@@ -100,6 +103,9 @@ export interface MaxymiaTopic {
 
 export interface MaxymiaLesson {
   id: string;
+  /** Durable progress id used when the lesson has NO topics (it is its own unit).
+   *  Strapi always populates it; optional only for the static demo fallback. */
+  uid?: string;
   title: LocalizedString;
   description: LocalizedString;
   intro?: LocalizedContent;
@@ -151,11 +157,20 @@ export interface MaxymiaCourse {
    *  duración autocalculada (suma de minutos de las lecciones), que para
    *  cursos cortos quedaba demasiado baja. */
   durationHours?: number;
+  /** Sellos de confianza SELECCIONADOS para este curso (relación a `badge`
+   *  en Strapi). Específicos por curso, no los globales de la home. */
+  badges?: { name: string; imageUrl: string }[];
+  /** Instituciones/clientes SELECCIONADOS para este curso (relación a
+   *  `institution` en Strapi). */
+  institutions?: { name: string; imageUrl: string }[];
   /** Preguntas frecuentes de la ficha. Opcional: la sección sólo se
    *  pinta cuando hay al menos una. Mismo formato pregunta/respuesta que
    *  las FAQ de los programas de Máxima, listo para alimentarse desde el
    *  fallback (app/maxymia/data/courses.ts) o un futuro campo en Strapi. */
   faqs?: { question: string; answer: string }[];
+  /** "Cómos": pregunta-problema ("¿Cómo…?") + respuesta. Sustituye a la
+   *  Descripción en la ficha cuando hay alguno (más llamativo). */
+  comos?: { question: string; answer: string }[];
 }
 
 // ============ Exam Question Types ============

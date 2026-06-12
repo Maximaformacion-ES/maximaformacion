@@ -7,7 +7,6 @@ import { m, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
-  CheckCircle,
   ChevronLeft,
   ChevronRight,
   PanelLeftClose,
@@ -17,6 +16,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../../../i18n/LocaleProvider';
 import LessonContentRenderer from '../../../../components/LessonContentRenderer';
 import MaxymiaLessonSidebar from '../../../../components/MaxymiaLessonSidebar';
+import { isLessonComplete } from '../../../../data/queries';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaLesson, MaxymiaTopic, LessonNavigation, ContentBlock, Locale } from '../../../../types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────
@@ -40,7 +40,9 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   const { locale } = useLocale();
   const router = useRouter();
   const { courseProgress, refetch } = useUserCampus();
-  const [markedComplete, setMarkedComplete] = useState(false);
+  // Optimistic set of unit uids marked complete locally this session (before the
+  // server refetch lands). Progress is tracked per unit, not per lesson.
+  const [localUnits, setLocalUnits] = useState<string[]>([]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   // Track which topic is selected (null = lesson index view)
@@ -83,11 +85,23 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   const completedSet = useMemo(() => {
     const data = courseProgress[course.id];
     const set = new Set(data?.completedLessons ?? []);
-    if (markedComplete) set.add(lesson.id);
+    for (const u of localUnits) set.add(u);
     return set;
-  }, [courseProgress, course.id, lesson.id, markedComplete]);
+  }, [courseProgress, course.id, localUnits]);
 
-  const isCompleted = completedSet.has(lesson.id);
+  // The lesson's ✓ is now DERIVED: complete only when all its units are done.
+  const isCompleted = isLessonComplete(lesson, completedSet);
+
+  // The unit the user is currently on: the selected topic, or the lesson itself
+  // when it has no topics. On the lesson index (topics not yet opened) there is
+  // nothing to mark.
+  const currentUnitUid = useMemo(() => {
+    if (selectedTopicId) {
+      const t = lesson.topics.find((t) => t.id === selectedTopicId);
+      return t ? (t.uid || t.id) : null;
+    }
+    return hasTopics ? null : (lesson.uid || lesson.id);
+  }, [selectedTopicId, hasTopics, lesson]);
 
   const nextIsExam = useMemo(() => {
     const lastLesson = block.lessons[block.lessons.length - 1];
@@ -118,7 +132,9 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     };
   }, [course, lesson.id]);
 
-  const handleMarkComplete = useCallback(async () => {
+  const markUnitComplete = useCallback(async (uid: string) => {
+    if (!uid) return;
+    setLocalUnits((prev) => (prev.includes(uid) ? prev : [...prev, uid]));
     try {
       await fetch('/api/progress', {
         method: 'POST',
@@ -126,18 +142,19 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
         body: JSON.stringify({
           action: 'complete',
           programId: course.id,
-          lessonId: lesson.id,
+          lessonId: uid,
         }),
       });
-      setMarkedComplete(true);
     } catch (err) {
-      console.error('Failed to mark lesson complete:', err);
+      console.error('Failed to mark unit complete:', err);
     }
-  }, [course.id, lesson.id]);
+  }, [course.id]);
 
   const handleAdvanceLesson = useCallback(async () => {
-    if (!isCompleted) {
-      await handleMarkComplete();
+    // Mark the current unit complete before leaving the lesson (the selected
+    // topic, or the lesson itself when it has no topics).
+    if (currentUnitUid) {
+      await markUnitComplete(currentUnitUid);
       await refetch();
     }
     if (nextIsExam) {
@@ -147,7 +164,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     } else {
       router.push(`/maxymia/campus/${course.slug}`);
     }
-  }, [nav, nextIsExam, lesson.id, isCompleted, handleMarkComplete, refetch, router, course.slug]);
+  }, [nav, nextIsExam, lesson.id, currentUnitUid, markUnitComplete, refetch, router, course.slug]);
 
   const handleSelectTopic = useCallback((topic: MaxymiaTopic) => {
     setSelectedTopicId(topic.id);
@@ -160,6 +177,12 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     window.history.replaceState(null, '', window.location.pathname);
   };
 
+  // Advancing to the next topic counts the CURRENT topic as completed.
+  const handleAdvanceToTopic = useCallback(async (next: MaxymiaTopic) => {
+    if (currentUnitUid) await markUnitComplete(currentUnitUid);
+    handleSelectTopic(next);
+  }, [currentUnitUid, markUnitComplete, handleSelectTopic]);
+
   // Advances through topics within the lesson before jumping to the next lesson.
   // On the lesson index view with topics, "Next" opens the first topic; on a
   // topic, it walks to the next one; on the last topic (or when the lesson has
@@ -169,7 +192,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
       const idx = topicSections.findIndex((s) => s.topic.id === selectedTopicId);
       const nextTopic = idx >= 0 ? topicSections[idx + 1] : null;
       if (nextTopic) {
-        handleSelectTopic(nextTopic.topic);
+        await handleAdvanceToTopic(nextTopic.topic);
         return;
       }
       await handleAdvanceLesson();
@@ -180,7 +203,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
       return;
     }
     await handleAdvanceLesson();
-  }, [selectedTopicId, topicSections, hasTopics, handleSelectTopic, handleAdvanceLesson]);
+  }, [selectedTopicId, topicSections, hasTopics, handleSelectTopic, handleAdvanceToTopic, handleAdvanceLesson]);
 
   return (
     <div className="flex h-[calc(100dvh-57px)] overflow-hidden">
@@ -342,6 +365,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               topicSections={topicSections}
               selectedTopicId={selectedTopicId!}
               onSelectTopic={handleSelectTopic}
+              onAdvanceToTopic={handleAdvanceToTopic}
               onBackToIndex={handleBackToIndex}
               onNextLesson={handleAdvanceLesson}
               prevLesson={nav.prev}
@@ -419,6 +443,7 @@ interface TopicNavigationProps {
   topicSections: { topic: MaxymiaTopic; blocks: ContentBlock[] }[];
   selectedTopicId: string;
   onSelectTopic: (topic: MaxymiaTopic) => void;
+  onAdvanceToTopic: (topic: MaxymiaTopic) => void;
   onBackToIndex: () => void;
   onNextLesson: () => void;
   prevLesson: { blockId: string; lessonId: string; title: { es: string; en: string } } | null;
@@ -431,6 +456,7 @@ function TopicNavigation({
   topicSections,
   selectedTopicId,
   onSelectTopic,
+  onAdvanceToTopic,
   onBackToIndex,
   onNextLesson,
   prevLesson,
@@ -480,7 +506,7 @@ function TopicNavigation({
       {/* Next */}
       {nextTopic ? (
         <button
-          onClick={() => onSelectTopic(nextTopic.topic)}
+          onClick={() => onAdvanceToTopic(nextTopic.topic)}
           className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
         >
           <span className="hidden sm:inline">{nextTopic.topic.title[locale]}</span>

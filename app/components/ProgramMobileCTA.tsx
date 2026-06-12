@@ -79,6 +79,9 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
   const proSavings = getProSavings(program, userHasPro);
+  // Curso gratis con Pro visto por alguien SIN Pro: mensaje clicable que
+  // invita a suscribirse (mismo criterio que el sidebar de escritorio).
+  const showProFree = !userHasPro && !!program.isPro;
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -193,14 +196,21 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
             </>
           )}
         </div>
-        {/* "Precio si fueras Pro" a la derecha del precio — mismo patrón que
-            la card del catálogo. */}
-        {!userHasPro && proSavings > 0 && (
+        {/* A la derecha del precio: gratis con Pro (clicable) o ahorro -20%. */}
+        {showProFree ? (
+          <Link
+            href="/pricing"
+            className="flex items-center gap-1 text-mx-orange text-label-sm font-bold whitespace-nowrap"
+          >
+            <Crown size={11} className="shrink-0" /> Gratis con Pro
+            <ArrowRight size={11} className="shrink-0" />
+          </Link>
+        ) : !userHasPro && proSavings > 0 ? (
           <p className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium whitespace-nowrap">
             <span className="text-body-sm font-bold">{program.price - proSavings}€</span>
             <Crown size={11} className="shrink-0" /> Ahorras {proSavings}€ con Pro
           </p>
-        )}
+        ) : null}
       </div>
 
       {/* Row 2: CTA button full width. If the page handed us a server-

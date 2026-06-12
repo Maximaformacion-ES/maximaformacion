@@ -127,6 +127,9 @@ export interface StrapiProgram {
   brochurePdf: StrapiMedia | null;
   videoUrl: string | null;
   faqs: { id?: number; question: string; answer: string }[] | null;
+  comos: { id?: number; question: string; answer: string }[] | null;
+  badges: { name: string; badge: StrapiMedia | null }[] | null;
+  institutions: { name: string; logo: StrapiMedia | null }[] | null;
   subjectArea: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
@@ -261,6 +264,13 @@ export interface Program {
   brochurePdfUrl?: string | null;
   videoUrl?: string | null;
   faqs?: { question: string; answer: string }[];
+  /** "Cómos": pregunta-problema + respuesta. Sustituye a la Descripción en la
+   *  ficha cuando hay alguno. */
+  comos?: { question: string; answer: string }[];
+  /** Sellos de confianza específicos del programa (relación `badge` en Strapi). */
+  badges?: { name: string; imageUrl: string }[];
+  /** Instituciones/clientes específicos del programa (relación `institution`). */
+  institutions?: { name: string; imageUrl: string }[];
   subjectArea?: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   modules: ProgramModule[];
   audience: string;
@@ -356,6 +366,21 @@ export interface Badge {
   name: string;
   imageUrl: string;
   importance: BadgeImportance;
+}
+
+// ============ Institution Types (clientes con logos) ============
+
+export interface StrapiInstitution {
+  id: number;
+  documentId: string;
+  name: string;
+  logo: StrapiMedia | null;
+  order: number | null;
+}
+
+export interface Institution {
+  name: string;
+  imageUrl: string;
 }
 
 // ============ Team Member Types ============
@@ -1000,6 +1025,8 @@ export interface StrapiMaxymiaTopic {
   title_es: string;
   title_en: string | null;
   anchorId: string;
+  /** Durable per-unit id assigned by the CMS lifecycle hook (null until saved). */
+  uid: string | null;
   content: StrapiMaxymiaContentBlock[];
 }
 
@@ -1011,6 +1038,8 @@ export interface StrapiMaxymiaLesson {
   content_en: StrapiMaxymiaContentBlock[] | null;
   estimatedMinutes: number | null;
   order: number;
+  /** Durable id for the lesson-as-unit (lessons with no topics). Null until saved. */
+  uid: string | null;
   topics: StrapiMaxymiaTopic[] | null;
 }
 
@@ -1065,6 +1094,9 @@ export interface StrapiMaxymiaCourse {
   audiences?: string | null;
   durationHours?: number | null;
   faqs?: { question: string; answer: string }[] | null;
+  comos?: { question: string; answer: string }[] | null;
+  badges?: { name: string; badge: { url: string } | null }[] | null;
+  institutions?: { name: string; logo: { url: string } | null }[] | null;
 }
 
 // GraphQL response wrappers
