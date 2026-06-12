@@ -1025,6 +1025,8 @@ export interface StrapiMaxymiaTopic {
   title_es: string;
   title_en: string | null;
   anchorId: string;
+  /** Durable per-unit id assigned by the CMS lifecycle hook (null until saved). */
+  uid: string | null;
   content: StrapiMaxymiaContentBlock[];
 }
 
@@ -1036,6 +1038,8 @@ export interface StrapiMaxymiaLesson {
   content_en: StrapiMaxymiaContentBlock[] | null;
   estimatedMinutes: number | null;
   order: number;
+  /** Durable id for the lesson-as-unit (lessons with no topics). Null until saved. */
+  uid: string | null;
   topics: StrapiMaxymiaTopic[] | null;
 }
 

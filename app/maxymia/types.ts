@@ -92,6 +92,9 @@ export interface MaxymiaExam {
 
 export interface MaxymiaTopic {
   id: string;
+  /** Durable progress id for this unit (stable across saves/renames). Strapi
+   *  always populates it; optional only for the static demo fallback (uses id). */
+  uid?: string;
   title: LocalizedString;
   anchorId: string;
   /** Content blocks that belong to THIS topic (per H3 section in the docx). */
@@ -100,6 +103,9 @@ export interface MaxymiaTopic {
 
 export interface MaxymiaLesson {
   id: string;
+  /** Durable progress id used when the lesson has NO topics (it is its own unit).
+   *  Strapi always populates it; optional only for the static demo fallback. */
+  uid?: string;
   title: LocalizedString;
   description: LocalizedString;
   intro?: LocalizedContent;
