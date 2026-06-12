@@ -20,22 +20,18 @@ export function Comos({
   comos: Como[];
   className?: string;
 }) {
-  const [open, setOpen] = useState<Set<number>>(new Set());
+  // Acordeón estricto: solo uno abierto a la vez (abrir uno cierra el resto).
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   if (!comos?.length) return null;
 
   const toggle = (i: number) =>
-    setOpen((prev) => {
-      const next = new Set(prev);
-      if (next.has(i)) next.delete(i);
-      else next.add(i);
-      return next;
-    });
+    setOpenIndex((prev) => (prev === i ? null : i));
 
   return (
-    <div className={`divide-y divide-mx-border border-y border-mx-border ${className}`}>
+    <div className={`divide-y divide-mx-border  border-mx-border ${className}`}>
       {comos.map((c, i) => {
-        const isOpen = open.has(i);
+        const isOpen = openIndex === i;
         return (
           <m.div
             key={`${c.question}-${i}`}
