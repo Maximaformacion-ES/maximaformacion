@@ -89,6 +89,10 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
   const proSavings = getProSavings(program, userHasPro);
+  // Curso incluido en Pro (isPro) visto por alguien SIN Pro: en vez del
+  // críptico "0€ · Ahorras X€", un mensaje claro y clicable junto al precio
+  // que invita a suscribirse a Pro (el curso le saldría gratis).
+  const showProFree = userStateKnown && !userHasPro && !!program.isPro;
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
@@ -252,14 +256,25 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                   </>
                 )}
                 </div>
-                {/* "Precio si fueras Pro" a la derecha del precio — mismo
-                    patrón que la card del catálogo (ProgramCard). */}
-                {proSavings > 0 && (
+                {/* A la derecha del precio: si el curso es gratis con Pro y el
+                    visitante no lo tiene, mensaje clicable "Gratis para
+                    usuarios Pro" → /pricing. Si no, el aviso de ahorro -20%. */}
+                {showProFree ? (
+                  <Link
+                    href="/pricing"
+                    title="Suscríbete a Pro y accede gratis"
+                    className="group inline-flex items-center gap-1.5 rounded-full border border-mx-orange/40 bg-mx-orange/10 px-3 py-1 text-mx-orange text-label-md font-bold hover:bg-mx-orange/20 transition-colors"
+                  >
+                    <Crown size={12} className="shrink-0" />
+                    Gratis para usuarios Pro
+                    <ArrowRight size={11} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                ) : proSavings > 0 ? (
                   <p className="flex items-center gap-1.5 text-mx-orange text-label-md font-medium">
                     <span className="text-body-md font-bold">{program.price - proSavings}€</span>
                     <Crown size={11} /> Ahorras {proSavings}€ con Pro
                   </p>
-                )}
+                ) : null}
               </div>
               {includedInPro ? (
                 <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold flex items-center gap-1">
