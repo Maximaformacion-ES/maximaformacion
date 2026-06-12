@@ -98,9 +98,9 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
   const currentUnitUid = useMemo(() => {
     if (selectedTopicId) {
       const t = lesson.topics.find((t) => t.id === selectedTopicId);
-      return t ? (t.uid ?? t.id) : null;
+      return t ? (t.uid || t.id) : null;
     }
-    return hasTopics ? null : (lesson.uid ?? lesson.id);
+    return hasTopics ? null : (lesson.uid || lesson.id);
   }, [selectedTopicId, hasTopics, lesson]);
 
   const nextIsExam = useMemo(() => {

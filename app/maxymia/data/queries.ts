@@ -180,9 +180,10 @@ export function getRecentCourses(courses: MaxymiaCourse[], limit = 10): MaxymiaC
  * `uid`), so adding a unit to a lesson correctly re-opens it as incomplete.
  */
 export function lessonUnitIds(lesson: UnitLesson): string[] {
-  return lesson.topics && lesson.topics.length > 0
-    ? lesson.topics.map((t) => t.uid ?? t.id)
-    : [lesson.uid ?? lesson.id];
+  if (lesson.topics && lesson.topics.length > 0) {
+    return lesson.topics.map((t) => t.uid || t.id);
+  }
+  return [lesson.uid || lesson.id];
 }
 
 /** A lesson is complete only when ALL of its units are completed. */
