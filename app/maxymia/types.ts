@@ -158,8 +158,9 @@ export interface MaxymiaCourse {
    *  cursos cortos quedaba demasiado baja. */
   durationHours?: number;
   /** Sellos de confianza SELECCIONADOS para este curso (relación a `badge`
-   *  en Strapi). Específicos por curso, no los globales de la home. */
-  badges?: { name: string; imageUrl: string }[];
+   *  en Strapi). Específicos por curso, no los globales de la home.
+   *  `category` agrupa los sellos en la ficha (p. ej. "Ciberseguridad"). */
+  badges?: { name: string; imageUrl: string; category?: string | null }[];
   /** Instituciones/clientes SELECCIONADOS para este curso (relación a
    *  `institution` en Strapi). */
   institutions?: { name: string; imageUrl: string }[];

@@ -108,7 +108,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     badges: strapi.badges?.length
       ? strapi.badges
           .filter((b) => b.badge)
-          .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge) }))
+          .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge), category: b.category ?? null }))
       : undefined,
     institutions: strapi.institutions?.length
       ? strapi.institutions
