@@ -11,17 +11,21 @@ type Logo = { name: string; imageUrl: string; category?: string | null };
 // (stroke) en la MISMA línea — ver StrokedTitle.
 const COPY = {
   es: {
+    instOverline: 'Grandes instituciones',
     instTitle: 'Instituciones de referencia\n{Confían en nosotros}',
     instDesc:
       'Equipos y profesionales de organismos como el CSIC, el Servicio Andaluz de Salud, el Banco de España o el Departament de Salut de la Generalitat de Catalunya ya se han formado con Máxima Formación.',
+    certOverline: 'Certificaciones',
     certTitle: 'Calidad Acreditada,\n{Confianza demostrada}',
     certDesc:
       'Certificaciones, valoraciones y reconocimientos que avalan nuestra forma de trabajar y la satisfacción de nuestros alumnos.',
   },
   en: {
+    instOverline: 'Leading institutions',
     instTitle: 'Leading institutions\n{that trust us}',
     instDesc:
       'Teams and professionals from organisations such as the CSIC, the Andalusian Health Service, the Bank of Spain or the Health Department of the Generalitat de Catalunya have already trained with Máxima Formación.',
+    certOverline: 'Certifications',
     certTitle: 'Accredited quality,\n{proven trust}',
     certDesc:
       'Certifications, ratings and recognitions that back our way of working and our students’ satisfaction.',
@@ -100,10 +104,13 @@ function StrokedTitle({ text }: { text: string }) {
   );
 }
 
-function TrustHeader({ title, description }: { title: string; description: string }) {
+function TrustHeader({ overline, title, description }: { overline: string; title: string; description: string }) {
   return (
-    <div className="flex flex-col gap-4 max-w-[812px]">
-      <h2 className="font-sans font-black text-mx-blue text-[28px] md:text-[36px] leading-[1.15] tracking-tight uppercase">
+    <div className="flex flex-col gap-2.5 max-w-[812px]">
+      <span className="font-sans font-medium text-mx-orange text-[13px] md:text-[14px] tracking-[4px] uppercase leading-none">
+        {overline}
+      </span>
+      <h2 className="font-sans font-black text-mx-blue text-[28px] md:text-[36px] leading-[1.15] tracking-tight uppercase mt-1">
         <StrokedTitle text={title} />
       </h2>
       <p className="font-body text-mx-text-muted text-[15px] md:text-[16px] leading-[1.4]">
@@ -167,7 +174,7 @@ export function TrustBlock({
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <TrustHeader title={t.instTitle} description={t.instDesc} />
+            <TrustHeader overline={t.instOverline} title={t.instTitle} description={t.instDesc} />
 
             {/* 4 destacadas, grandes */}
             <div className="mt-10 flex flex-wrap items-center justify-start gap-x-12 gap-y-8">
@@ -206,7 +213,7 @@ export function TrustBlock({
             transition={{ duration: 0.8 }}
             className={hasInst ? 'mt-16 md:mt-24' : ''}
           >
-            <TrustHeader title={t.certTitle} description={t.certDesc} />
+            <TrustHeader overline={t.certOverline} title={t.certTitle} description={t.certDesc} />
 
             <div className="mt-10 flex flex-col gap-10">
               {certByBlock.map(({ block, items }) => (
