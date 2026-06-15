@@ -47,8 +47,8 @@ export function Comos({
               className="group w-full flex items-center justify-between gap-4 text-left py-5 md:py-6"
             >
               <h3
-                className={`text-heading-sm md:text-body-lg font-bold leading-tight transition-colors ${
-                  isOpen ? 'text-mx-orange' : 'text-mx-text group-hover:text-mx-orange'
+                className={`text-heading-sm md:text-body-lg font-medium text- leading-tight transition-colors ${
+                  isOpen ? 'text-mx-orange' : 'text-mx-text/40 group-hover:text-mx-orange'
                 }`}
               >
                 {c.question}
@@ -72,7 +72,7 @@ export function Comos({
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <p className="text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed whitespace-pre-line pb-5 md:pb-6">
+                  <p className="font-body text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed whitespace-pre-line pb-5 md:pb-6">
                     {c.answer}
                   </p>
                 </m.div>
