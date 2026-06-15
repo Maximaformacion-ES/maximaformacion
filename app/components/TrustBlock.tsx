@@ -11,7 +11,7 @@ type Logo = { name: string; imageUrl: string; category?: string | null };
 // (stroke) en la MISMA línea — ver StrokedTitle.
 const COPY = {
   es: {
-    instTitle: 'Instituciones de referencia\n{Confían} en nuestra formación',
+    instTitle: 'Instituciones de referencia\n{Confían en nosotros}',
     instDesc:
       'Equipos y profesionales de organismos como el CSIC, el Servicio Andaluz de Salud, el Banco de España o el Departament de Salut de la Generalitat de Catalunya ya se han formado con Máxima Formación.',
     certTitle: 'Calidad Acreditada,\n{Confianza demostrada}',
@@ -19,7 +19,7 @@ const COPY = {
       'Certificaciones, valoraciones y reconocimientos que avalan nuestra forma de trabajar y la satisfacción de nuestros alumnos.',
   },
   en: {
-    instTitle: 'Leading institutions\n{trust} our training',
+    instTitle: 'Leading institutions\n{that trust us}',
     instDesc:
       'Teams and professionals from organisations such as the CSIC, the Andalusian Health Service, the Bank of Spain or the Health Department of the Generalitat de Catalunya have already trained with Máxima Formación.',
     certTitle: 'Accredited quality,\n{proven trust}',
