@@ -62,6 +62,9 @@
   --animate-accordion-down: accordion-down 0.3s ease-out;
   --animate-accordion-up: accordion-up 0.3s ease-out;
   --font-sans: var(--font-zt-nature), system-ui, sans-serif;
+  /* Inter para texto de cuerpo de las fichas (utility `font-body`). El display
+     y los rótulos siguen en ZT Nature (`font-sans`, fuente por defecto). */
+  --font-body: var(--font-inter), system-ui, sans-serif;
 
   /* Maxima Formación – Design System Colors */
   --color-mx-bg: #FFFEFC;
