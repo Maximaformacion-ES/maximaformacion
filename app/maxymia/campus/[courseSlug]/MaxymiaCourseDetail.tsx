@@ -221,7 +221,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
             {/* Breadcrumb (como en las fichas de /programas) */}
-            <nav aria-label="breadcrumb" className="mb-5 text-label-md text-mx-text-muted">
+            <nav aria-label="breadcrumb" className="mb-5 font-body text-label-md text-mx-text-muted">
               <Link href="/" className="hover:text-mx-orange transition-colors">Inicio</Link>
               <span className="mx-2">/</span>
               <Link href="/maxymia" className="hover:text-mx-orange transition-colors">Maxymia</Link>
@@ -283,7 +283,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-body-md 2xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
+              className="font-body text-body-md 2xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {course.description[locale]}
             </m.p>
@@ -310,7 +310,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               </div>
               <div>
                 <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>
-                <p className="text-mx-text-muted text-label-md">{course.instructor.role}</p>
+                <p className="font-body text-mx-text-muted text-label-md">{course.instructor.role}</p>
               </div>
             </m.div>
 
