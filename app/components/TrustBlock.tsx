@@ -7,20 +7,22 @@ import { m } from 'framer-motion';
 type Logo = { name: string; imageUrl: string; category?: string | null };
 
 /* ── Copy fijo de las secciones (lo pasó el cliente) ─────────────────────── */
+// Los títulos usan `\n` para el salto de línea y `{...}` para la parte hueca
+// (stroke) en la MISMA línea — ver StrokedTitle.
 const COPY = {
   es: {
-    instTitle: 'Instituciones de referencia confían en nuestra formación',
+    instTitle: 'Instituciones de referencia\n{Confían} en nuestra formación',
     instDesc:
       'Equipos y profesionales de organismos como el CSIC, el Servicio Andaluz de Salud, el Banco de España o el Departament de Salut de la Generalitat de Catalunya ya se han formado con Máxima Formación.',
-    certTitle: 'Calidad acreditada, confianza demostrada',
+    certTitle: 'Calidad Acreditada,\n{Confianza demostrada}',
     certDesc:
       'Certificaciones, valoraciones y reconocimientos que avalan nuestra forma de trabajar y la satisfacción de nuestros alumnos.',
   },
   en: {
-    instTitle: 'Leading institutions trust our training',
+    instTitle: 'Leading institutions\n{trust} our training',
     instDesc:
       'Teams and professionals from organisations such as the CSIC, the Andalusian Health Service, the Bank of Spain or the Health Department of the Generalitat de Catalunya have already trained with Máxima Formación.',
-    certTitle: 'Accredited quality, proven trust',
+    certTitle: 'Accredited quality,\n{proven trust}',
     certDesc:
       'Certifications, ratings and recognitions that back our way of working and our students’ satisfaction.',
   },
@@ -70,12 +72,39 @@ const CERT_BLOCKS = [
 
 const FEATURED_COUNT = 4;
 
-/** Encabezado de sección con titular de frase (ZT Nature, sin hueco) + texto. */
+/** Título de sección "como antes": ZT Nature Black azul, dos líneas con parte
+ *  hueca (text-stroke). Respeta `\n` (salto de línea) y `{...}` (hueco inline). */
+function StrokedTitle({ text }: { text: string }) {
+  return (
+    <>
+      {text.split('\n').map((line, li) => (
+        <React.Fragment key={li}>
+          {li > 0 && <br />}
+          {line.split(/(\{[^}]+\})/).map((seg, si) => {
+            const stroke = seg.match(/^\{(.+)\}$/);
+            return stroke ? (
+              <span
+                key={si}
+                className="text-stroke"
+                style={{ '--stroke-color': 'var(--color-mx-blue)' } as React.CSSProperties}
+              >
+                {stroke[1]}
+              </span>
+            ) : (
+              <React.Fragment key={si}>{seg}</React.Fragment>
+            );
+          })}
+        </React.Fragment>
+      ))}
+    </>
+  );
+}
+
 function TrustHeader({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex flex-col gap-3 max-w-[812px]">
-      <h2 className="font-sans font-black text-mx-blue text-[24px] md:text-[30px] leading-[1.15] tracking-tight">
-        {title}
+    <div className="flex flex-col gap-4 max-w-[812px]">
+      <h2 className="font-sans font-black text-mx-blue text-[28px] md:text-[36px] leading-[1.15] tracking-tight uppercase">
+        <StrokedTitle text={title} />
       </h2>
       <p className="font-body text-mx-text-muted text-[15px] md:text-[16px] leading-[1.4]">
         {description}
