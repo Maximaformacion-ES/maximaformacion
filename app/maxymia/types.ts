@@ -129,6 +129,9 @@ export interface MaxymiaInstructor {
   name: string;
   role: string;
   avatar?: string;
+  bio?: string;
+  linkedin?: string;
+  email?: string;
 }
 
 export interface MaxymiaCourse {

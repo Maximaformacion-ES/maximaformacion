@@ -43,7 +43,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
-        instructor { documentId, name, role, avatar { url } }
+        instructor { documentId, name, role, avatar { url }, bio, linkedin, email }
         blocks {
           id
           title_es
@@ -102,7 +102,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         careers
         objectives
         audiences
-        instructor { documentId, name, role, avatar { url } }
+        instructor { documentId, name, role, avatar { url }, bio, linkedin, email }
         blocks {
           id
           title_es
@@ -456,6 +456,9 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
       name: course.instructor?.name ?? '',
       role: course.instructor?.role ?? '',
       avatar: course.instructor?.avatar ? getStrapiMediaUrl(course.instructor.avatar) : undefined,
+      bio: course.instructor?.bio ?? undefined,
+      linkedin: course.instructor?.linkedin ?? undefined,
+      email: course.instructor?.email ?? undefined,
     },
     level: course.level as MaxymiaLevel,
     isPro: course.isPro ?? false,

@@ -1071,6 +1071,9 @@ export interface StrapiMaxymiaInstructor {
   name: string;
   role: string;
   avatar: { url: string } | null;
+  bio: string | null;
+  linkedin: string | null;
+  email: string | null;
 }
 
 export interface StrapiMaxymiaCourse {
