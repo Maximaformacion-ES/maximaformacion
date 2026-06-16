@@ -36,6 +36,10 @@ import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
+import { DocenteSection } from '@/app/components/DocenteSection';
+import { TeamCommitment } from '@/app/components/TeamCommitment';
+import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
+import { SectionHeader } from '@/app/components/SectionHeader';
 import { useCampusTheme } from '../CampusShell';
 import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
@@ -107,9 +111,13 @@ function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Lo
 
 interface Props {
   course: MaxymiaCourse;
+  /** Avatares del equipo docente para la sección de compromiso con el alumnado. */
+  teacherAvatars?: string[];
+  /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
+  recommended?: MaxymiaCourse[];
 }
 
-export default function MaxymiaCourseDetail({ course }: Props) {
+export default function MaxymiaCourseDetail({ course, teacherAvatars, recommended }: Props) {
   const { locale } = useLocale();
   // This is the public course *sales* ficha — paint the whole campus chrome
   // (header, footer, page bg) light + black logo while it's shown, and revert
@@ -159,6 +167,8 @@ export default function MaxymiaCourseDetail({ course }: Props) {
               certifications={course.badges}
               locale={locale}
             />
+            <TeamCommitment locale={locale} avatars={teacherAvatars} />
+            <DocenteSection docentes={course.docentes} locale={locale} courseTitle={course.title[locale]} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
                 compact
@@ -171,8 +181,12 @@ export default function MaxymiaCourseDetail({ course }: Props) {
         }
       />
 
-      {/* CTA Section */}
-      <CourseCTASection locale={locale} />
+      {/* Fila de cursos recomendados (sustituye al CTA "Listo para comenzar"). */}
+      {recommended && recommended.length > 0 ? (
+        <RecommendedCourses courses={recommended} locale={locale} />
+      ) : (
+        <CourseCTASection locale={locale} />
+      )}
 
       {/* Sticky mobile purchase bar */}
       <MaxymiaMobileCTA course={course} />
@@ -221,7 +235,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
           {/* Left: Hero content */}
           <div className="lg:col-span-2">
             {/* Breadcrumb (como en las fichas de /programas) */}
-            <nav aria-label="breadcrumb" className="mb-5 text-label-md text-mx-text-muted">
+            <nav aria-label="breadcrumb" className="mb-5 font-body text-label-md text-mx-text-muted">
               <Link href="/" className="hover:text-mx-orange transition-colors">Inicio</Link>
               <span className="mx-2">/</span>
               <Link href="/maxymia" className="hover:text-mx-orange transition-colors">Maxymia</Link>
@@ -283,7 +297,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-body-md 2xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
+              className="font-body text-body-md 2xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {course.description[locale]}
             </m.p>
@@ -302,6 +316,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                     alt={course.instructor.name}
                     width={40}
                     height={40}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -310,7 +325,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
               </div>
               <div>
                 <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>
-                <p className="text-mx-text-muted text-label-md">{course.instructor.role}</p>
+                <p className="font-body text-mx-text-muted text-label-md">{course.instructor.role}</p>
               </div>
             </m.div>
 
@@ -1069,6 +1084,24 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
 }
 
 // ─── CTA Section ────────────────────────────────────────────────
+
+function RecommendedCourses({ courses, locale }: { courses: MaxymiaCourse[]; locale: Locale }) {
+  return (
+    <section className="px-6 md:px-[128px] py-16 md:py-24">
+      <div className="max-w-[1800px] mx-auto">
+        <SectionHeader
+          overline={locale === 'es' ? 'También te puede interesar' : 'You might also like'}
+          title={locale === 'es' ? 'Otros alumnos {también compraron}' : 'Other students also {bought}'}
+        />
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {courses.map((c, i) => (
+            <MaxymiaCourseCard key={c.id} course={c} locale={locale} index={i} light />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function CourseCTASection({ locale }: { locale: Locale }) {
   return (

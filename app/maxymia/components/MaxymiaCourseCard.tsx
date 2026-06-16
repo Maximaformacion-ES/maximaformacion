@@ -13,6 +13,9 @@ interface MaxymiaCourseCardProps {
   progress?: MaxymiaCourseProgress;
   enrolled?: boolean;
   index?: number;
+  /** Versión clara (para la ficha de producto en tema light): tarjeta y popup
+   *  en blanco con texto oscuro. Por defecto, tema oscuro del campus. */
+  light?: boolean;
 }
 
 export default function MaxymiaCourseCard({
@@ -21,6 +24,7 @@ export default function MaxymiaCourseCard({
   progress,
   enrolled,
   index = 0,
+  light = false,
 }: MaxymiaCourseCardProps) {
   // The course ficha is a public landing now, so every visitor — signed in or
   // not, crawlers included — links straight to it (no detour through /sign-in).
@@ -55,6 +59,39 @@ export default function MaxymiaCourseCard({
     }
   }, []);
 
+  // Paleta según tema. El thumbnail (azul + texto blanco) se mantiene en ambos.
+  const c = light
+    ? {
+        cardBorder: 'border-mx-border',
+        content: 'bg-white',
+        title: 'text-mx-text',
+        divider: 'border-mx-border',
+        muted: 'text-mx-text-muted',
+        faint: 'text-mx-text-muted',
+        arrowBg: 'bg-black/[0.05]',
+        arrowIcon: 'text-mx-text',
+        track: 'bg-black/[0.06]',
+        popup: 'bg-white border-mx-border',
+        popupTitle: 'text-mx-text',
+        popupDesc: 'text-mx-text-muted',
+        popupDivider: 'border-mx-border',
+      }
+    : {
+        cardBorder: 'border-[#2e3339]',
+        content: 'bg-[#171c24]',
+        title: 'text-white',
+        divider: 'border-white/10',
+        muted: 'text-white/30',
+        faint: 'text-white/40',
+        arrowBg: 'bg-white/10',
+        arrowIcon: 'text-white',
+        track: 'bg-white/10',
+        popup: 'bg-[#171c24] border-white/40',
+        popupTitle: 'text-white',
+        popupDesc: 'text-white/50',
+        popupDivider: 'border-white/5',
+      };
+
   return (
     <m.div
       ref={cardRef}
@@ -66,7 +103,7 @@ export default function MaxymiaCourseCard({
       transition={{ delay: index * 0.06, duration: 0.5 }}
       className="group/card relative h-full"
     >
-      <Link href={campusHref} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-[#2e3339]'}`}>
+      <Link href={campusHref} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : c.cardBorder}`}>
         {/* Thumbnail area */}
         <div className={`relative h-[200px] overflow-hidden flex items-center justify-center ${isFullyCompleted ? 'bg-gradient-to-br from-amber-600 to-amber-800' : 'bg-[#527be7]'}`}>
           {/* Completion badge */}
@@ -119,18 +156,15 @@ export default function MaxymiaCourseCard({
           </div>
         </div>
 
-        {/* Orange accent bar */}
-        {/* <div className="h-[5px] bg-mx-orange" /> */}
-
-        {/* Content area — dark background */}
-        <div className="bg-[#171c24] px-4 py-4 flex flex-col flex-grow">
+        {/* Content area */}
+        <div className={`${c.content} px-4 py-4 flex flex-col flex-grow`}>
           {/* Title */}
-          <h3 className="text-white font-semibold text-body-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors">
+          <h3 className={`${c.title} font-semibold text-body-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors`}>
             {course.title[locale]}
           </h3>
 
           {/* Footer: Price or Progress */}
-          <div className="mt-auto pt-3 border-t border-white/10">
+          <div className={`mt-auto pt-3 border-t ${c.divider}`}>
             {enrolled || progress ? (
               <div>
                 {isFullyCompleted ? (
@@ -151,11 +185,11 @@ export default function MaxymiaCourseCard({
                       <span className="text-mx-orange text-label-md font-medium">
                         {progressPercent}%
                       </span>
-                      <span className="text-white/30 text-label-md">
+                      <span className={`${c.muted} text-label-md`}>
                         {completedCount}/{totalLessons}
                       </span>
                     </div>
-                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className={`w-full h-1.5 ${c.track} rounded-full overflow-hidden`}>
                       <div
                         className="h-full bg-gradient-to-r from-mx-orange to-amber-400 rounded-full transition-all duration-500"
                         style={{ width: `${progressPercent}%` }}
@@ -167,8 +201,8 @@ export default function MaxymiaCourseCard({
                     <span className="text-green-400 text-body-sm font-medium">
                       ✓ {locale === 'es' ? 'Comprado' : 'Purchased'}
                     </span>
-                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity">
-                      <ArrowUpRight size={14} className="text-white" />
+                    <div className={`w-7 h-7 rounded-full ${c.arrowBg} flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity`}>
+                      <ArrowUpRight size={14} className={c.arrowIcon} />
                     </div>
                   </div>
                 )}
@@ -177,7 +211,7 @@ export default function MaxymiaCourseCard({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {course.originalPrice && course.originalPrice > course.price && (
-                    <span className="text-white/30 text-body-sm line-through">
+                    <span className={`${c.muted} text-body-sm line-through`}>
                       {course.originalPrice}&euro;
                     </span>
                   )}
@@ -185,8 +219,8 @@ export default function MaxymiaCourseCard({
                     {course.price}&euro;
                   </span>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity">
-                  <ArrowUpRight size={14} className="text-white" />
+                <div className={`w-7 h-7 rounded-full ${c.arrowBg} flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity`}>
+                  <ArrowUpRight size={14} className={c.arrowIcon} />
                 </div>
               </div>
             )}
@@ -194,25 +228,25 @@ export default function MaxymiaCourseCard({
         </div>
       </Link>
 
-      {/* ── Hover detail popup ── */}
+      {/* ── Hover detail popup (tooltip con la descripción) ── */}
       <div className={`hidden lg:block absolute top-0 z-50 opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-opacity duration-200 ${
         popupSide === 'right' ? 'left-full pl-3' : 'right-full pr-3'
       }`}>
-        <div className="w-72 2xl:w-80 bg-[#171c24] border border-white/40 rounded-xl shadow-2xl shadow-black/40">
+        <div className={`w-72 2xl:w-80 ${c.popup} border rounded-xl shadow-2xl shadow-black/40`}>
           <div className="p-5">
             {/* Title + date */}
-            <h4 className="text-white font-bold text-body-sm leading-snug mb-2">
+            <h4 className={`${c.popupTitle} font-bold text-body-sm leading-snug mb-2`}>
               {course.title[locale]}
             </h4>
             {createdLabel && (
-              <span className="flex items-center gap-1 text-white/40 text-label-md mb-2">
+              <span className={`flex items-center gap-1 ${c.faint} text-label-md mb-2`}>
                 <Calendar size={10} />
                 {createdLabel}
               </span>
             )}
 
             {/* Description */}
-            <p className="text-white/50 text-label-md leading-relaxed mb-3 pb-3 border-b border-white/5">
+            <p className={`${c.popupDesc} text-label-md leading-relaxed mb-3 pb-3 border-b ${c.popupDivider}`}>
               {course.description[locale]}
             </p>
 
@@ -226,8 +260,8 @@ export default function MaxymiaCourseCard({
                 </div>
               )}
               <div>
-                <div className="text-white text-label-md font-medium">{course.instructor.name}</div>
-                <div className="text-white/40 text-label-sm">{course.instructor.role}</div>
+                <div className={`${c.popupTitle} text-label-md font-medium`}>{course.instructor.name}</div>
+                <div className={`${c.faint} text-label-sm`}>{course.instructor.role}</div>
               </div>
             </div>
           </div>

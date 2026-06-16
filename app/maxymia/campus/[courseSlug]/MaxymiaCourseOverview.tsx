@@ -58,9 +58,13 @@ interface Props {
    *  profile is still loading we trust this so a non-buyer sees the purchase
    *  view immediately instead of the student view flashing. */
   initialHasAccess?: boolean;
+  /** Avatares del equipo docente para la sección de compromiso con el alumnado. */
+  teacherAvatars?: string[];
+  /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
+  recommended?: MaxymiaCourse[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
@@ -213,7 +217,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
   if (!hasAccess) {
-    return <MaxymiaCourseDetail course={course} />;
+    return <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} />;
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [
@@ -293,6 +297,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess }: Prop
                       alt={course.instructor.name}
                       width={40}
                       height={40}
+                      unoptimized
                       className="w-full h-full object-cover"
                     />
                   ) : (

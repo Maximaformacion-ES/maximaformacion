@@ -43,7 +43,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
-        instructor { documentId, name, role, avatar { url } }
+        docentes { documentId, name, role, avatar { url }, avatarUrl }
         blocks {
           id
           title_es
@@ -94,7 +94,8 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         durationHours
         faqs { question, answer }
         comos { question, answer }
-        badges { name, badge { url } }
+        badges { name, category, badge { url } }
+        docentes { documentId, slug, name, role, roleDescription, avatar { url }, avatarUrl, bio, linkedin, email }
         institutions { name, logo { url } }
         image { url, alternativeText }
         thumbnailTitle
@@ -102,7 +103,6 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         careers
         objectives
         audiences
-        instructor { documentId, name, role, avatar { url } }
         blocks {
           id
           title_es
@@ -452,11 +452,26 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     blocks: sortedBlocks.map(transformBlock),
     price: course.price,
     language: (course.language ?? 'es') as Locale | 'bilingual',
+    // El "instructor" (chip del hero/cards/certificado) se deriva del primer
+    // docente (relación `author`); ya no existe el campo instructor en Strapi.
     instructor: {
-      name: course.instructor?.name ?? '',
-      role: course.instructor?.role ?? '',
-      avatar: course.instructor?.avatar ? getStrapiMediaUrl(course.instructor.avatar) : undefined,
+      name: course.docentes?.[0]?.name ?? '',
+      role: course.docentes?.[0]?.role ?? '',
+      avatar: course.docentes?.[0]?.avatar
+        ? getStrapiMediaUrl(course.docentes[0].avatar)
+        : course.docentes?.[0]?.avatarUrl ?? undefined,
     },
+    docentes: (course.docentes ?? []).map((d) => ({
+      documentId: d.documentId,
+      slug: d.slug ?? undefined,
+      name: d.name,
+      role: d.role,
+      roleDescription: d.roleDescription ?? undefined,
+      avatar: d.avatar ? getStrapiMediaUrl(d.avatar) : d.avatarUrl ?? undefined,
+      bio: d.bio ?? undefined,
+      linkedin: d.linkedin ?? undefined,
+      email: d.email ?? undefined,
+    })),
     level: course.level as MaxymiaLevel,
     isPro: course.isPro ?? false,
     haveDiscount: course.haveDiscount ?? false,
@@ -479,7 +494,7 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     badges: course.badges?.length
       ? course.badges
           .filter((b) => b.badge?.url)
-          .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge) }))
+          .map((b) => ({ name: b.name, imageUrl: getStrapiMediaUrl(b.badge), category: b.category ?? null }))
       : undefined,
     institutions: course.institutions?.length
       ? course.institutions

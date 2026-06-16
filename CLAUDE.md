@@ -150,4 +150,3 @@ STRAPI_PREVIEW_SECRET         # For preview mode
 | Campus E-Learning | https://maximaformacion.com.es/ |
 | Campus Data Science | https://www.maximacampus.es/ |
 | Maxymia | https://maxymia.com/ |
-| Biomáxima | https://biomaximainnovacion.es/ |

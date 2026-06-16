@@ -128,7 +128,7 @@ export interface StrapiProgram {
   videoUrl: string | null;
   faqs: { id?: number; question: string; answer: string }[] | null;
   comos: { id?: number; question: string; answer: string }[] | null;
-  badges: { name: string; badge: StrapiMedia | null }[] | null;
+  badges: { name: string; badge: StrapiMedia | null; category: string | null }[] | null;
   institutions: { name: string; logo: StrapiMedia | null }[] | null;
   subjectArea: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   format: 'Online' | 'Presencial' | 'Híbrido';
@@ -267,8 +267,9 @@ export interface Program {
   /** "Cómos": pregunta-problema + respuesta. Sustituye a la Descripción en la
    *  ficha cuando hay alguno. */
   comos?: { question: string; answer: string }[];
-  /** Sellos de confianza específicos del programa (relación `badge` en Strapi). */
-  badges?: { name: string; imageUrl: string }[];
+  /** Sellos de confianza específicos del programa (relación `badge` en Strapi).
+   *  `category` agrupa los sellos en la ficha (p. ej. "Ciberseguridad", "Docencia"). */
+  badges?: { name: string; imageUrl: string; category?: string | null }[];
   /** Instituciones/clientes específicos del programa (relación `institution`). */
   institutions?: { name: string; imageUrl: string }[];
   subjectArea?: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
@@ -359,6 +360,7 @@ export interface StrapiBadge {
   name: string;
   badge: StrapiMedia | null;
   importance: BadgeImportance | null;
+  category: string | null;
 }
 
 export interface Badge {
@@ -366,6 +368,7 @@ export interface Badge {
   name: string;
   imageUrl: string;
   importance: BadgeImportance;
+  category?: string | null;
 }
 
 // ============ Institution Types (clientes con logos) ============
@@ -1086,7 +1089,7 @@ export interface StrapiMaxymiaCourse {
   isPro: boolean | null;
   haveDiscount: boolean | null;
   tags: string[] | null; // JSON scalar
-  instructor: StrapiMaxymiaInstructor | null;
+  docentes?: StrapiAuthor[] | null;
   thumbnailTitle?: string | null;
   publishedAt?: string;
   careers?: string | null;
@@ -1095,7 +1098,7 @@ export interface StrapiMaxymiaCourse {
   durationHours?: number | null;
   faqs?: { question: string; answer: string }[] | null;
   comos?: { question: string; answer: string }[] | null;
-  badges?: { name: string; badge: { url: string } | null }[] | null;
+  badges?: { name: string; badge: { url: string } | null; category?: string | null }[] | null;
   institutions?: { name: string; logo: { url: string } | null }[] | null;
 }
 

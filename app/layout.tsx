@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { esES } from "@clerk/localizations";
 import Script from "next/script";
@@ -42,6 +43,15 @@ const ztNature = localFont({
     { path: "../public/fonts/ZTNature-BlackItalic.otf", weight: "900", style: "italic" },
   ],
   variable: "--font-zt-nature",
+  display: "swap",
+});
+
+// Inter para texto de cuerpo/párrafo de las fichas de producto (el display y los
+// rótulos siguen en ZT Nature). Se expone como variable y como token Tailwind
+// `font-inter` (ver globals.css); ZT Nature se mantiene como fuente por defecto.
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -171,7 +181,7 @@ export default async function RootLayout({
           />
         </head>
         <body
-          className={`${ztNature.variable} antialiased`}
+          className={`${ztNature.variable} ${inter.variable} antialiased`}
           style={{ fontFamily: "var(--font-zt-nature), system-ui, sans-serif" }}
         >
           {COOKIEBOT_ID && (

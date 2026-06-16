@@ -131,6 +131,20 @@ export interface MaxymiaInstructor {
   avatar?: string;
 }
 
+/** Docente de la ficha (sale de `author` en Strapi): perfil completo con bio. */
+export interface MaxymiaDocente {
+  documentId: string;
+  slug?: string;
+  name: string;
+  role: string;
+  roleDescription?: string;
+  avatar?: string;
+  /** Markdown (campo richtext `bio` del author). */
+  bio?: string;
+  linkedin?: string;
+  email?: string;
+}
+
 export interface MaxymiaCourse {
   id: string;
   slug: string;
@@ -141,6 +155,8 @@ export interface MaxymiaCourse {
   price: number;
   language: Locale | 'bilingual';
   instructor: MaxymiaInstructor;
+  /** Docente(s) de la sección "Docente" — relación a `author` en Strapi. */
+  docentes?: MaxymiaDocente[];
   level: MaxymiaLevel;
   isPro: boolean;
   /** Per-course toggle for the 20% Pro discount (opt-in). */
@@ -158,8 +174,9 @@ export interface MaxymiaCourse {
    *  cursos cortos quedaba demasiado baja. */
   durationHours?: number;
   /** Sellos de confianza SELECCIONADOS para este curso (relación a `badge`
-   *  en Strapi). Específicos por curso, no los globales de la home. */
-  badges?: { name: string; imageUrl: string }[];
+   *  en Strapi). Específicos por curso, no los globales de la home.
+   *  `category` agrupa los sellos en la ficha (p. ej. "Ciberseguridad"). */
+  badges?: { name: string; imageUrl: string; category?: string | null }[];
   /** Instituciones/clientes SELECCIONADOS para este curso (relación a
    *  `institution` en Strapi). */
   institutions?: { name: string; imageUrl: string }[];
