@@ -308,6 +308,7 @@ function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar
                     alt={course.instructor.name}
                     width={40}
                     height={40}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (
