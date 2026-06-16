@@ -59,11 +59,11 @@ export function MaxymiaFounderNote({ locale = 'es', photo }: { locale?: Locale; 
           />
           <figcaption className="mt-4 font-sans">
             <div className="font-bold text-mx-text text-[16px]">{FOUNDER.name}</div>
-            <div className="mt-0.5 text-mx-text-muted text-[13px]">{FOUNDER.role}</div>
+            <div className="mt-0.5 text-mx-text-muted text-[12px]">{FOUNDER.role}</div>
           </figcaption>
           <Quote size={24} className="mt-6 text-mx-orange/60" />
-          <blockquote className="mt-2 max-w-[640px] font-body text-mx-text text-[16px] md:text-[18px] leading-[1.6]">
-            {t.message}
+          <blockquote className="mt-2 max-w-[800px] font-body text-mx-text text-[16px] leading-[1.6] italic text-balance">
+            Cuando creé Máxima Formación lo hice con una idea clara: que nadie aprenda solo. Por eso, más allá del temario, te acompañamos de verdad: nuestros tutores resuelven tus dudas en menos de 24 horas, durante el curso y también cuando lo termines. <br/> Tu progreso nos importa tanto como a ti.
           </blockquote>
         </m.figure>
       </div>

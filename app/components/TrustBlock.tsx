@@ -107,13 +107,13 @@ function StrokedTitle({ text }: { text: string }) {
 function TrustHeader({ overline, title, description }: { overline: string; title: string; description: string }) {
   return (
     <div className="flex flex-col gap-2.5 max-w-[812px]">
-      <span className="font-sans font-medium text-mx-orange text-[13px] md:text-[14px] tracking-[4px] uppercase leading-none">
+      <span className="font-sans font-medium text-mx-orange text-[14px] tracking-[4px] uppercase leading-none">
         {overline}
       </span>
       <h2 className="font-sans font-black text-mx-blue text-[28px] md:text-[36px] leading-[1.15] tracking-tight uppercase mt-1">
         <StrokedTitle text={title} />
       </h2>
-      <p className="font-body text-mx-text-muted text-[15px] md:text-[16px] leading-[1.4]">
+      <p className="font-body text-mx-text-muted text-[14px] md:text-[16px] leading-[1.4]">
         {description}
       </p>
     </div>
@@ -250,12 +250,12 @@ export function TrustBlock({
               {certByBlock.map(({ block, items }) => (
                 <div key={block.key}>
                   <div className="flex items-center gap-4 mb-3">
-                    <span className="font-sans font-black text-mx-text text-[16px] md:text-[18px] tracking-tight shrink-0 leading-tight">
+                    <span className="font-sans font-black text-mx-text text-[16px] tracking-tight shrink-0 leading-tight">
                       {block[locale].title}
                     </span>
                     <div className="h-px flex-1 bg-mx-border" />
                   </div>
-                  <p className="font-body text-mx-text-muted text-[14px] md:text-[15px] leading-[1.4] max-w-[760px] mb-6">
+                  <p className="font-body text-mx-text-muted text-[14px] md:text-[16px] leading-[1.4] max-w-[760px] mb-6">
                     {block[locale].desc}
                   </p>
                   <div className="flex flex-wrap items-start justify-start gap-6">

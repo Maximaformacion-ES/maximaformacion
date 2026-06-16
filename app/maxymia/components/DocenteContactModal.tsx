@@ -122,10 +122,10 @@ export function DocenteContactModal({
               </div>
             ) : (
               <form onSubmit={submit}>
-                <h3 className="font-sans font-black text-mx-text text-[20px] md:text-[22px] pr-6">
+                <h3 className="font-sans font-black text-mx-text text-[20px] pr-6">
                   {t.title(docenteName)}
                 </h3>
-                <p className="mt-1.5 font-body text-mx-text-muted text-[13px] leading-relaxed">{t.subtitle}</p>
+                <p className="mt-1.5 font-body text-mx-text-muted text-[12px] leading-relaxed">{t.subtitle}</p>
 
                 <div className="mt-5 flex flex-col gap-3">
                   <input
@@ -154,7 +154,7 @@ export function DocenteContactModal({
                   />
                 </div>
 
-                {status === 'error' && <p className="mt-3 text-[13px] text-red-500">{err}</p>}
+                {status === 'error' && <p className="mt-3 text-[12px] text-red-500">{err}</p>}
 
                 <button
                   type="submit"

@@ -85,7 +85,7 @@ function DocenteCard({ docente, locale, courseTitle }: { docente: MaxymiaDocente
 
       {/* Derecha: nombre, rol, bio */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-sans font-black text-mx-text text-[22px] md:text-[24px] uppercase leading-tight">{docente.name}</h3>
+        <h3 className="font-sans font-black text-mx-text text-[20px] md:text-[24px] uppercase leading-tight">{docente.name}</h3>
         <p className="font-sans font-medium text-mx-text-muted text-[12px] mt-1.5">
           {docente.roleDescription || docente.role}
         </p>
@@ -99,7 +99,7 @@ function DocenteCard({ docente, locale, courseTitle }: { docente: MaxymiaDocente
               className="relative overflow-hidden"
             >
               <div
-                className="font-body text-mx-text-muted text-[14px] md:text-[15px] leading-[1.6] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                className="font-body text-mx-text-muted text-[14px] md:text-[16px] leading-[1.6] [&_p]:mb-3 [&_p:last-child]:mb-0"
                 dangerouslySetInnerHTML={{ __html: bioHtml }}
               />
               {/* "Peek": degradado que deja entrever el texto que falta */}
@@ -111,7 +111,7 @@ function DocenteCard({ docente, locale, courseTitle }: { docente: MaxymiaDocente
               <button
                 type="button"
                 onClick={() => setExpanded((v) => !v)}
-                className="font-sans font-medium text-mx-orange text-[15px] hover:underline cursor-pointer"
+                className="font-sans font-medium text-mx-orange text-[14px] hover:underline cursor-pointer"
               >
                 {expanded ? t.less : t.more}
               </button>

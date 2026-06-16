@@ -27,14 +27,14 @@ export function SectionHeader({
   const centered = align === 'center';
   return (
     <div className={`flex flex-col gap-2.5 ${centered ? 'items-center text-center' : 'items-start'} ${className}`}>
-      <span className="font-sans font-medium text-mx-orange text-[13px] md:text-[14px] tracking-[4px] uppercase leading-none">
+      <span className="font-sans font-medium text-mx-orange text-[14px] tracking-[4px] uppercase leading-none">
         {overline}
       </span>
-      <h2 className="font-sans font-black text-mx-blue text-[30px] md:text-[36px] tracking-tight uppercase leading-[1.15]">
+      <h2 className="font-sans font-black text-mx-blue text-[28px] md:text-[36px] tracking-tight uppercase leading-[1.15]">
         <StyledTitle text={title} color="blue" />
       </h2>
       {description && (
-        <p className="font-body text-mx-text-muted text-[15px] md:text-[16px] leading-[1.3] max-w-[812px] mt-2">
+        <p className="font-body text-mx-text-muted text-[14px] md:text-[16px] leading-[1.3] max-w-[812px] mt-2">
           {description}
         </p>
       )}
