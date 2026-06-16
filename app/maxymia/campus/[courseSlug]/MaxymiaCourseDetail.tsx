@@ -38,6 +38,8 @@ import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { MaxymiaDocenteSection } from '../../components/MaxymiaDocenteSection';
 import { MaxymiaFounderNote } from '../../components/MaxymiaFounderNote';
+import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
+import { SectionHeader } from '@/app/components/SectionHeader';
 import { useCampusTheme } from '../CampusShell';
 import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
@@ -111,9 +113,11 @@ interface Props {
   course: MaxymiaCourse;
   /** Foto del fundador (author Alfonso Lara) para la nota de compromiso. */
   founderPhoto?: string;
+  /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
+  recommended?: MaxymiaCourse[];
 }
 
-export default function MaxymiaCourseDetail({ course, founderPhoto }: Props) {
+export default function MaxymiaCourseDetail({ course, founderPhoto, recommended }: Props) {
   const { locale } = useLocale();
   // This is the public course *sales* ficha — paint the whole campus chrome
   // (header, footer, page bg) light + black logo while it's shown, and revert
@@ -177,8 +181,12 @@ export default function MaxymiaCourseDetail({ course, founderPhoto }: Props) {
         }
       />
 
-      {/* CTA Section */}
-      <CourseCTASection locale={locale} />
+      {/* Fila de cursos recomendados (sustituye al CTA "Listo para comenzar"). */}
+      {recommended && recommended.length > 0 ? (
+        <RecommendedCourses courses={recommended} locale={locale} />
+      ) : (
+        <CourseCTASection locale={locale} />
+      )}
 
       {/* Sticky mobile purchase bar */}
       <MaxymiaMobileCTA course={course} />
@@ -1076,6 +1084,25 @@ function CourseAccessGate({ course, locale }: AccessGateProps) {
 }
 
 // ─── CTA Section ────────────────────────────────────────────────
+
+function RecommendedCourses({ courses, locale }: { courses: MaxymiaCourse[]; locale: Locale }) {
+  return (
+    <section className="px-6 md:px-[128px] py-16 md:py-24">
+      <div className="max-w-[1800px] mx-auto">
+        <SectionHeader
+          overline={locale === 'es' ? 'Sigue aprendiendo' : 'Keep learning'}
+          title={locale === 'es' ? 'Cursos {recomendados}' : 'Recommended {courses}'}
+          align="center"
+        />
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {courses.map((c, i) => (
+            <MaxymiaCourseCard key={c.id} course={c} locale={locale} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function CourseCTASection({ locale }: { locale: Locale }) {
   return (

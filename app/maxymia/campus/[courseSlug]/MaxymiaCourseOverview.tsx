@@ -60,9 +60,11 @@ interface Props {
   initialHasAccess?: boolean;
   /** Foto del fundador (author) para la nota de compromiso de la ficha. */
   founderPhoto?: string;
+  /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
+  recommended?: MaxymiaCourse[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess, founderPhoto }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, founderPhoto, recommended }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
@@ -215,7 +217,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, founde
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
   if (!hasAccess) {
-    return <MaxymiaCourseDetail course={course} founderPhoto={founderPhoto} />;
+    return <MaxymiaCourseDetail course={course} founderPhoto={founderPhoto} recommended={recommended} />;
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [
