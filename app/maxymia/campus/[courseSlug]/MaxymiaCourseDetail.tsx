@@ -160,7 +160,7 @@ export default function MaxymiaCourseDetail({ course }: Props) {
               certifications={course.badges}
               locale={locale}
             />
-            <MaxymiaDocenteSection instructor={course.instructor} locale={locale} />
+            <MaxymiaDocenteSection docentes={course.docentes} locale={locale} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
                 compact

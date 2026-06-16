@@ -1071,9 +1071,6 @@ export interface StrapiMaxymiaInstructor {
   name: string;
   role: string;
   avatar: { url: string } | null;
-  bio: string | null;
-  linkedin: string | null;
-  email: string | null;
 }
 
 export interface StrapiMaxymiaCourse {
@@ -1093,6 +1090,7 @@ export interface StrapiMaxymiaCourse {
   haveDiscount: boolean | null;
   tags: string[] | null; // JSON scalar
   instructor: StrapiMaxymiaInstructor | null;
+  docentes?: StrapiAuthor[] | null;
   thumbnailTitle?: string | null;
   publishedAt?: string;
   careers?: string | null;

@@ -43,7 +43,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
-        instructor { documentId, name, role, avatar { url }, bio, linkedin, email }
+        instructor { documentId, name, role, avatar { url } }
         blocks {
           id
           title_es
@@ -95,6 +95,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         faqs { question, answer }
         comos { question, answer }
         badges { name, category, badge { url } }
+        docentes { documentId, name, role, roleDescription, avatar { url }, avatarUrl, bio, linkedin, email }
         institutions { name, logo { url } }
         image { url, alternativeText }
         thumbnailTitle
@@ -102,7 +103,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         careers
         objectives
         audiences
-        instructor { documentId, name, role, avatar { url }, bio, linkedin, email }
+        instructor { documentId, name, role, avatar { url } }
         blocks {
           id
           title_es
@@ -456,10 +457,17 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
       name: course.instructor?.name ?? '',
       role: course.instructor?.role ?? '',
       avatar: course.instructor?.avatar ? getStrapiMediaUrl(course.instructor.avatar) : undefined,
-      bio: course.instructor?.bio ?? undefined,
-      linkedin: course.instructor?.linkedin ?? undefined,
-      email: course.instructor?.email ?? undefined,
     },
+    docentes: (course.docentes ?? []).map((d) => ({
+      documentId: d.documentId,
+      name: d.name,
+      role: d.role,
+      roleDescription: d.roleDescription ?? undefined,
+      avatar: d.avatar ? getStrapiMediaUrl(d.avatar) : d.avatarUrl ?? undefined,
+      bio: d.bio ?? undefined,
+      linkedin: d.linkedin ?? undefined,
+      email: d.email ?? undefined,
+    })),
     level: course.level as MaxymiaLevel,
     isPro: course.isPro ?? false,
     haveDiscount: course.haveDiscount ?? false,

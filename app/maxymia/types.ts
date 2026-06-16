@@ -129,6 +129,16 @@ export interface MaxymiaInstructor {
   name: string;
   role: string;
   avatar?: string;
+}
+
+/** Docente de la ficha (sale de `author` en Strapi): perfil completo con bio. */
+export interface MaxymiaDocente {
+  documentId: string;
+  name: string;
+  role: string;
+  roleDescription?: string;
+  avatar?: string;
+  /** Markdown (campo richtext `bio` del author). */
   bio?: string;
   linkedin?: string;
   email?: string;
@@ -144,6 +154,8 @@ export interface MaxymiaCourse {
   price: number;
   language: Locale | 'bilingual';
   instructor: MaxymiaInstructor;
+  /** Docente(s) de la sección "Docente" — relación a `author` en Strapi. */
+  docentes?: MaxymiaDocente[];
   level: MaxymiaLevel;
   isPro: boolean;
   /** Per-course toggle for the 20% Pro discount (opt-in). */
