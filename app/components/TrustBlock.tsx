@@ -19,6 +19,7 @@ const COPY = {
     certTitle: 'Calidad Acreditada,\n{Confianza demostrada}',
     certDesc:
       'Certificaciones, valoraciones y reconocimientos que avalan nuestra forma de trabajar y la satisfacción de nuestros alumnos.',
+    certOtros: 'Otros sellos',
   },
   en: {
     instOverline: 'Leading institutions',
@@ -29,6 +30,7 @@ const COPY = {
     certTitle: 'Accredited quality,\n{proven trust}',
     certDesc:
       'Certifications, ratings and recognitions that back our way of working and our students’ satisfaction.',
+    certOtros: 'Other badges',
   },
 } as const;
 
@@ -204,16 +206,29 @@ export function TrustBlock({
   }
   const secondary = allInst.filter((_, i) => !usedIdx.has(i));
 
-  // Reparte los sellos del curso en los 3 bloques fijos según su categoría.
+  // Reparte los sellos en los 3 bloques fijos según su categoría, y manda los
+  // que NO tengan categoría (o no casen) a un bloque "Otros sellos", para que
+  // SIEMPRE aparezcan todos aunque no estén categorizados en Strapi.
   const certByBlock = useMemo(() => {
-    return CERT_BLOCKS.map((block) => {
-      const items = (certifications ?? []).filter((c) => {
+    const all = certifications ?? [];
+    const assigned = new Set<Logo>();
+    const blocks: { key: string; title: string; desc?: string; items: Logo[] }[] = [];
+    for (const block of CERT_BLOCKS) {
+      const items = all.filter((c) => {
         const cat = (c.category ?? '').toLowerCase();
         return cat && block.match.some((m) => cat.includes(m));
       });
-      return { block, items };
-    }).filter((b) => b.items.length > 0);
-  }, [certifications]);
+      items.forEach((i) => assigned.add(i));
+      if (items.length > 0) {
+        blocks.push({ key: block.key, title: block[locale].title, desc: block[locale].desc, items });
+      }
+    }
+    const leftover = all.filter((c) => !assigned.has(c));
+    if (leftover.length > 0) {
+      blocks.push({ key: 'otros', title: t.certOtros, items: leftover });
+    }
+    return blocks;
+  }, [certifications, locale, t]);
 
   if (!hasInst && !hasCert) return null;
 
@@ -270,17 +285,19 @@ export function TrustBlock({
             <TrustHeader overline={t.certOverline} title={t.certTitle} description={t.certDesc} />
 
             <div className="mt-10 flex flex-col gap-10">
-              {certByBlock.map(({ block, items }) => (
-                <div key={block.key}>
+              {certByBlock.map(({ key, title, desc, items }) => (
+                <div key={key}>
                   <div className="flex items-center gap-4 mb-3">
                     <span className="font-sans font-black text-mx-text text-[16px] tracking-tight shrink-0 leading-tight">
-                      {block[locale].title}
+                      {title}
                     </span>
                     <div className="h-px flex-1 bg-mx-border" />
                   </div>
-                  <p className="font-body text-mx-text-muted text-[14px] md:text-[16px] leading-[1.4] max-w-[760px] mb-6">
-                    {block[locale].desc}
-                  </p>
+                  {desc && (
+                    <p className="font-body text-mx-text-muted text-[14px] md:text-[16px] leading-[1.4] max-w-[760px] mb-6">
+                      {desc}
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-start justify-start gap-6">
                     {items.map((c) => (
                       <Seal key={c.name} logo={c} />
