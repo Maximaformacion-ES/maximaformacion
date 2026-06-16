@@ -37,6 +37,7 @@ import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../d
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
 import Certificate from '../../components/Certificate';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
+import type { Badge, Institution } from '@/lib/strapi/types';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   beginner: { es: 'Principiante', en: 'Beginner' },
@@ -62,9 +63,12 @@ interface Props {
   teacherAvatars?: string[];
   /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
   recommended?: MaxymiaCourse[];
+  /** Set GLOBAL de sellos/instituciones: TODOS en todas las fichas. */
+  allBadges?: Badge[];
+  allInstitutions?: Institution[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
@@ -217,7 +221,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
   if (!hasAccess) {
-    return <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} />;
+    return <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} allBadges={allBadges} allInstitutions={allInstitutions} />;
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [

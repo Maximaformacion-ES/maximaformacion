@@ -1025,7 +1025,7 @@ export async function getLogos(limit = 100): Promise<Logo[]> {
 export async function getBadges(): Promise<Badge[]> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiBadge[]>>(
-      '/api/badges?populate[badge]=true&fields[0]=name&fields[1]=importance&pagination[pageSize]=100&sort=name:asc',
+      '/api/badges?populate[badge]=true&fields[0]=name&fields[1]=importance&fields[2]=category&pagination[pageSize]=100&sort=name:asc',
       {
         revalidate: 600,
         tags: ['badges'],
@@ -1039,6 +1039,7 @@ export async function getBadges(): Promise<Badge[]> {
         name: b.name,
         imageUrl: getStrapiMediaUrl(b.badge!),
         importance: b.importance ?? 'Medium',
+        category: b.category ?? null,
       }));
   } catch (error) {
     console.error('[getBadges] Error:', error);
