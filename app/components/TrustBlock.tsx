@@ -153,7 +153,7 @@ function Marquee({ items, reverse = false }: { items: Logo[]; reverse?: boolean 
               fill
               unoptimized
               sizes="140px"
-              className="object-contain grayscale opacity-60 transition duration-300 group-hover/logo:grayscale-0 group-hover/logo:opacity-100"
+              className="object-contain grayscale opacity-60 transition duration-300 group-hover/logo:grayscale-0 group-hover/logo:opacity-100 group-hover/logo:scale-110"
             />
             <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-mx-text px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/logo:opacity-100">
               {i.name}
