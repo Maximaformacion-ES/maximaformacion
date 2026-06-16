@@ -37,6 +37,7 @@ import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { MaxymiaDocenteSection } from '../../components/MaxymiaDocenteSection';
+import { MaxymiaFounderNote } from '../../components/MaxymiaFounderNote';
 import { useCampusTheme } from '../CampusShell';
 import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
@@ -160,6 +161,7 @@ export default function MaxymiaCourseDetail({ course }: Props) {
               certifications={course.badges}
               locale={locale}
             />
+            <MaxymiaFounderNote locale={locale} />
             <MaxymiaDocenteSection docentes={course.docentes} locale={locale} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
