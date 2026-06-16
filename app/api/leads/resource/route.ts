@@ -74,23 +74,33 @@ export async function POST(request: NextRequest) {
   const utmSource = body.utmSource || null;
   const referer = body.referer || request.headers.get('referer') || null;
 
-  // 1. Append-only safety net.
-  const [logRow] = await db
-    .insert(leadCaptureLog)
-    .values({
-      source: 'resource_download',
+  // 1. Append-only safety net. Best-effort: a DB hiccup must NEVER 500 the
+  //    request and block the download — the user only needs the resource URL.
+  let logRow: { id: string } | undefined;
+  try {
+    [logRow] = await db
+      .insert(leadCaptureLog)
+      .values({
+        source: 'resource_download',
+        email,
+        name: name || null,
+        resourceSlug: resource.slug,
+        resourceTitle: resource.title,
+        consent,
+        utmSource,
+        referer,
+        ipPrefix,
+        userAgent,
+        payload: { name, email, slug, consent, utmSource, referer },
+      })
+      .returning({ id: leadCaptureLog.id });
+  } catch (err) {
+    console.error('[lead-capture] db insert failed (resource)', {
       email,
-      name: name || null,
-      resourceSlug: resource.slug,
-      resourceTitle: resource.title,
-      consent,
-      utmSource,
-      referer,
-      ipPrefix,
-      userAgent,
-      payload: { name, email, slug, consent, utmSource, referer },
-    })
-    .returning({ id: leadCaptureLog.id });
+      slug,
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
 
   // 2. Best-effort Klaviyo sync. Failure must NOT block the download.
   // If no API key configured yet, leave klaviyo_synced_at NULL — a future cron
