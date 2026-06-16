@@ -43,7 +43,7 @@ const MAXYMIA_COURSES_LIST_QUERY = `
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
-        instructor { documentId, name, role, avatar { url } }
+        docentes { documentId, name, role, avatar { url }, avatarUrl }
         blocks {
           id
           title_es
@@ -103,7 +103,6 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         careers
         objectives
         audiences
-        instructor { documentId, name, role, avatar { url } }
         blocks {
           id
           title_es
@@ -453,10 +452,14 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     blocks: sortedBlocks.map(transformBlock),
     price: course.price,
     language: (course.language ?? 'es') as Locale | 'bilingual',
+    // El "instructor" (chip del hero/cards/certificado) se deriva del primer
+    // docente (relación `author`); ya no existe el campo instructor en Strapi.
     instructor: {
-      name: course.instructor?.name ?? '',
-      role: course.instructor?.role ?? '',
-      avatar: course.instructor?.avatar ? getStrapiMediaUrl(course.instructor.avatar) : undefined,
+      name: course.docentes?.[0]?.name ?? '',
+      role: course.docentes?.[0]?.role ?? '',
+      avatar: course.docentes?.[0]?.avatar
+        ? getStrapiMediaUrl(course.docentes[0].avatar)
+        : course.docentes?.[0]?.avatarUrl ?? undefined,
     },
     docentes: (course.docentes ?? []).map((d) => ({
       documentId: d.documentId,

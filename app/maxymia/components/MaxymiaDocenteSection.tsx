@@ -91,21 +91,32 @@ function DocenteCard({ docente, locale }: { docente: MaxymiaDocente; locale: Loc
         </p>
 
         {bioHtml && (
-          <>
-            <div
-              className={`font-body text-mx-text-muted text-[14px] md:text-[15px] leading-[1.6] mt-4 [&_p]:mb-3 [&_p:last-child]:mb-0 ${
-                expanded ? '' : 'line-clamp-5'
-              }`}
-              dangerouslySetInnerHTML={{ __html: bioHtml }}
-            />
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              className="mt-3 font-sans font-medium text-mx-orange text-[15px] hover:underline"
+          <div className="mt-4">
+            <m.div
+              initial={false}
+              animate={{ height: expanded ? 'auto' : 150 }}
+              transition={{ duration: 0.45, ease: 'easeInOut' }}
+              className="relative overflow-hidden"
             >
-              {expanded ? t.less : t.more}
-            </button>
-          </>
+              <div
+                className="font-body text-mx-text-muted text-[14px] md:text-[15px] leading-[1.6] [&_p]:mb-3 [&_p:last-child]:mb-0"
+                dangerouslySetInnerHTML={{ __html: bioHtml }}
+              />
+              {/* "Peek": degradado que deja entrever el texto que falta */}
+              {!expanded && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-mx-bg to-transparent" />
+              )}
+            </m.div>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                className="font-sans font-medium text-mx-orange text-[15px] hover:underline"
+              >
+                {expanded ? t.less : t.more}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
