@@ -176,11 +176,22 @@ export function TrustBlock({
           >
             <TrustHeader overline={t.instOverline} title={t.instTitle} description={t.instDesc} />
 
-            {/* 4 destacadas, grandes */}
-            <div className="mt-10 flex flex-wrap items-center justify-start gap-x-12 gap-y-8">
+            {/* 4 destacadas, en tarjetas (muro de confianza) */}
+            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
               {featured.map((i) => (
-                <div key={i.name} title={i.name} className="relative h-14 md:h-16 hover:scale-[1.05] transition-transform duration-300">
-                  <Image src={i.imageUrl} alt={i.name} width={220} height={64} unoptimized className="h-14 md:h-16 w-auto object-contain" />
+                <div
+                  key={i.name}
+                  title={i.name}
+                  className="flex items-center justify-center h-24 md:h-28 rounded-xl border border-mx-border bg-white px-5 hover:border-mx-orange/40 hover:shadow-[0_10px_28px_-14px_rgba(0,0,0,0.18)] transition-all duration-300"
+                >
+                  <Image
+                    src={i.imageUrl}
+                    alt={i.name}
+                    width={200}
+                    height={96}
+                    unoptimized
+                    className="max-h-12 md:max-h-16 w-auto object-contain"
+                  />
                 </div>
               ))}
             </div>
