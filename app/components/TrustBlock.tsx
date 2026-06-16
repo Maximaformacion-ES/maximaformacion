@@ -82,10 +82,21 @@ const CERT_BLOCKS = [
  * Strapi. 'salut' (catalán) no choca con 'salud' (Servicio Andaluz de Salud). */
 const FEATURED_INSTITUTIONS: { match: string[] }[] = [
   { match: ['csic'] },
-  { match: ['andaluz', ' sas', 'sas '] }, // Servicio Andaluz de Salud
-  { match: ['banco de espa'] }, // Banco de España (cubre ñ/n)
+  { match: ['andaluz', 'sas'] }, // Servicio Andaluz de Salud
+  { match: ['banco'] }, // Banco de España (robusto a "de"/ñ/espacios; es el único banco)
   { match: ['salut', 'departament'] }, // Departament de Salut (Generalitat de Catalunya)
 ];
+
+/** Normaliza para casar: minúsculas, sin acentos, espacios colapsados. Así
+ *  "Banco de España", "BANCO DE ESPAÑA" o "Banco  de  Espana" casan igual. */
+function normName(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 /** Título de sección "como antes": ZT Nature Black azul, dos líneas con parte
  *  hueca (text-stroke). Respeta `\n` (salto de línea) y `{...}` (hueco inline). */
@@ -197,7 +208,7 @@ export function TrustBlock({
   const usedIdx = new Set<number>();
   for (const f of FEATURED_INSTITUTIONS) {
     const idx = allInst.findIndex(
-      (inst, i) => !usedIdx.has(i) && f.match.some((m) => inst.name.toLowerCase().includes(m)),
+      (inst, i) => !usedIdx.has(i) && f.match.some((m) => normName(inst.name).includes(m)),
     );
     if (idx >= 0) {
       featured.push(allInst[idx]);
