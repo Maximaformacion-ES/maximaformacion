@@ -1025,7 +1025,10 @@ export async function getLogos(limit = 100): Promise<Logo[]> {
 export async function getBadges(): Promise<Badge[]> {
   try {
     const response = await strapiRequest<StrapiResponse<StrapiBadge[]>>(
-      '/api/badges?populate[badge]=true&fields[0]=name&fields[1]=importance&fields[2]=category&pagination[pageSize]=100&sort=name:asc',
+      // Sin whitelist de `fields` a propósito: así Strapi devuelve todos los
+      // campos escalares (incluido `category` si está desplegado) y NO da 400
+      // si el campo aún no existe en ese entorno. Robusto al orden de deploy.
+      '/api/badges?populate[badge]=true&pagination[pageSize]=100&sort=name:asc',
       {
         revalidate: 600,
         tags: ['badges'],
