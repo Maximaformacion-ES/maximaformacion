@@ -42,33 +42,29 @@ export function MaxymiaFounderNote({ locale = 'es', photo }: { locale?: Locale; 
   return (
     <section className="py-10 md:py-20">
       <div className="max-w-[812px]">
-        <SectionHeader overline={t.overline} title={t.title} />
+        <SectionHeader overline={t.overline} title={t.title} align="center" />
 
         <m.figure
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-8 rounded-2xl border border-mx-border bg-white p-6 md:p-8"
+          className="mt-8 flex flex-col items-center text-center"
         >
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={founderPhoto}
-              alt={FOUNDER.name}
-              className="size-16 md:size-20 shrink-0 rounded-full object-cover"
-            />
-            <div className="min-w-0">
-              <Quote size={22} className="mb-2 text-mx-orange/70" />
-              <blockquote className="font-body text-mx-text text-[15px] md:text-[17px] leading-[1.6]">
-                {t.message}
-              </blockquote>
-              <figcaption className="mt-4 font-sans">
-                <span className="font-bold text-mx-text text-[14px]">{FOUNDER.name}</span>
-                <span className="text-mx-text-muted text-[13px]"> · {FOUNDER.role}</span>
-              </figcaption>
-            </div>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={founderPhoto}
+            alt={FOUNDER.name}
+            className="size-24 md:size-28 rounded-full object-cover"
+          />
+          <figcaption className="mt-4 font-sans">
+            <div className="font-bold text-mx-text text-[16px]">{FOUNDER.name}</div>
+            <div className="mt-0.5 text-mx-text-muted text-[13px]">{FOUNDER.role}</div>
+          </figcaption>
+          <Quote size={24} className="mt-6 text-mx-orange/60" />
+          <blockquote className="mt-2 max-w-[640px] font-body text-mx-text text-[16px] md:text-[18px] leading-[1.6]">
+            {t.message}
+          </blockquote>
         </m.figure>
       </div>
     </section>
