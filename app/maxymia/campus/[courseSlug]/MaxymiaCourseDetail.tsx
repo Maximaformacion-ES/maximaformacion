@@ -1091,11 +1091,11 @@ function RecommendedCourses({ courses, locale }: { courses: MaxymiaCourse[]; loc
       <div className="max-w-[1800px] mx-auto">
         <SectionHeader
           overline={locale === 'es' ? 'También te puede interesar' : 'You might also like'}
-          title={locale === 'es' ? 'Otros alumnos también {compraron}' : 'Other students also {bought}'}
+          title={locale === 'es' ? 'Otros alumnos {también compraron}' : 'Other students also {bought}'}
         />
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {courses.map((c, i) => (
-            <MaxymiaCourseCard key={c.id} course={c} locale={locale} index={i} />
+            <MaxymiaCourseCard key={c.id} course={c} locale={locale} index={i} light />
           ))}
         </div>
       </div>
