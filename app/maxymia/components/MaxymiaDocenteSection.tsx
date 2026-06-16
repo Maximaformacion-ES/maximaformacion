@@ -6,6 +6,7 @@ import { m } from 'framer-motion';
 import { Linkedin, Mail, User } from 'lucide-react';
 import { SectionHeader } from '@/app/components/SectionHeader';
 import { markdownToHtml } from '@/lib/markdown';
+import { DocenteContactModal } from './DocenteContactModal';
 import type { MaxymiaDocente, Locale } from '../types';
 
 const COPY = {
@@ -23,10 +24,11 @@ const COPY = {
   },
 } as const;
 
-function DocenteCard({ docente, locale }: { docente: MaxymiaDocente; locale: Locale }) {
+function DocenteCard({ docente, locale, courseTitle }: { docente: MaxymiaDocente; locale: Locale; courseTitle?: string }) {
   const t = COPY[locale];
   const [expanded, setExpanded] = useState(false);
   const [bioHtml, setBioHtml] = useState('');
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     if (docente.bio) markdownToHtml(docente.bio).then(setBioHtml);
@@ -40,7 +42,8 @@ function DocenteCard({ docente, locale }: { docente: MaxymiaDocente; locale: Loc
     : null;
 
   return (
-    <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
+    <>
+      <div className="flex flex-col sm:flex-row gap-6 md:gap-8">
       {/* Izquierda: foto + enlaces */}
       <div className="w-full sm:w-[181px] shrink-0">
         <div className="relative aspect-square w-full sm:size-[181px] overflow-hidden rounded-[18px] border border-mx-border bg-black/[0.03]">
@@ -67,13 +70,14 @@ function DocenteCard({ docente, locale }: { docente: MaxymiaDocente; locale: Loc
               </a>
             )}
             {docente.email && (
-              <a
-                href={`mailto:${docente.email}`}
+              <button
+                type="button"
+                onClick={() => setContactOpen(true)}
                 className="flex items-center gap-3 rounded-[10px] border border-mx-border bg-white px-4 py-2.5 text-mx-text hover:border-mx-orange/40 transition-colors"
               >
                 <Mail size={16} className="text-mx-orange" />
                 <span className="font-sans font-medium text-[12px]">Email</span>
-              </a>
+              </button>
             )}
           </div>
         )}
@@ -115,7 +119,16 @@ function DocenteCard({ docente, locale }: { docente: MaxymiaDocente; locale: Loc
           </div>
         )}
       </div>
-    </div>
+      </div>
+      <DocenteContactModal
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+        docenteSlug={docente.slug}
+        docenteName={docente.name}
+        courseTitle={courseTitle}
+        locale={locale}
+      />
+    </>
   );
 }
 
@@ -128,9 +141,11 @@ function DocenteCard({ docente, locale }: { docente: MaxymiaDocente; locale: Loc
 export function MaxymiaDocenteSection({
   docentes,
   locale = 'es',
+  courseTitle,
 }: {
   docentes?: MaxymiaDocente[];
   locale?: Locale;
+  courseTitle?: string;
 }) {
   const t = COPY[locale];
   if (!docentes?.length) return null;
@@ -149,7 +164,7 @@ export function MaxymiaDocenteSection({
           className="mt-10 flex flex-col gap-12"
         >
           {docentes.map((d) => (
-            <DocenteCard key={d.documentId} docente={d} locale={locale} />
+            <DocenteCard key={d.documentId} docente={d} locale={locale} courseTitle={courseTitle} />
           ))}
         </m.div>
       </div>

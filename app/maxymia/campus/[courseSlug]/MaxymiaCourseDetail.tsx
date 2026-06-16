@@ -164,7 +164,7 @@ export default function MaxymiaCourseDetail({ course, founderPhoto }: Props) {
               locale={locale}
             />
             <MaxymiaFounderNote locale={locale} photo={founderPhoto} />
-            <MaxymiaDocenteSection docentes={course.docentes} locale={locale} />
+            <MaxymiaDocenteSection docentes={course.docentes} locale={locale} courseTitle={course.title[locale]} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
                 compact

@@ -95,7 +95,7 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
         faqs { question, answer }
         comos { question, answer }
         badges { name, category, badge { url } }
-        docentes { documentId, name, role, roleDescription, avatar { url }, avatarUrl, bio, linkedin, email }
+        docentes { documentId, slug, name, role, roleDescription, avatar { url }, avatarUrl, bio, linkedin, email }
         institutions { name, logo { url } }
         image { url, alternativeText }
         thumbnailTitle
@@ -463,6 +463,7 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
     },
     docentes: (course.docentes ?? []).map((d) => ({
       documentId: d.documentId,
+      slug: d.slug ?? undefined,
       name: d.name,
       role: d.role,
       roleDescription: d.roleDescription ?? undefined,

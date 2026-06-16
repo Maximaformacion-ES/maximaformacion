@@ -134,6 +134,7 @@ export interface MaxymiaInstructor {
 /** Docente de la ficha (sale de `author` en Strapi): perfil completo con bio. */
 export interface MaxymiaDocente {
   documentId: string;
+  slug?: string;
   name: string;
   role: string;
   roleDescription?: string;
