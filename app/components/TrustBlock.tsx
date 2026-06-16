@@ -74,7 +74,16 @@ const CERT_BLOCKS = [
   },
 ] as const;
 
-const FEATURED_COUNT = 4;
+/* Las 4 instituciones que deben ir DESTACADAS (muro de confianza), en este
+ * orden fijo. El resto van a los carruseles. Se casan por subcadena del nombre
+ * (insensible a mayúsculas), así que da igual cómo estén escritas exactamente en
+ * Strapi. 'salut' (catalán) no choca con 'salud' (Servicio Andaluz de Salud). */
+const FEATURED_INSTITUTIONS: { match: string[] }[] = [
+  { match: ['csic'] },
+  { match: ['andaluz', ' sas', 'sas '] }, // Servicio Andaluz de Salud
+  { match: ['banco de espa'] }, // Banco de España (cubre ñ/n)
+  { match: ['salut', 'departament'] }, // Departament de Salut (Generalitat de Catalunya)
+];
 
 /** Título de sección "como antes": ZT Nature Black azul, dos líneas con parte
  *  hueca (text-stroke). Respeta `\n` (salto de línea) y `{...}` (hueco inline). */
@@ -178,8 +187,22 @@ export function TrustBlock({
   const hasInst = !!institutions?.length;
   const hasCert = !!certifications?.length;
 
-  const featured = (institutions ?? []).slice(0, FEATURED_COUNT);
-  const secondary = (institutions ?? []).slice(FEATURED_COUNT);
+  // Destacadas: exactamente las 4 de FEATURED_INSTITUTIONS (en su orden),
+  // casadas por nombre. El resto van a los carruseles. Si alguna no está en
+  // los datos, simplemente no se muestra (no se rellena con otras).
+  const allInst = institutions ?? [];
+  const featured: Logo[] = [];
+  const usedIdx = new Set<number>();
+  for (const f of FEATURED_INSTITUTIONS) {
+    const idx = allInst.findIndex(
+      (inst, i) => !usedIdx.has(i) && f.match.some((m) => inst.name.toLowerCase().includes(m)),
+    );
+    if (idx >= 0) {
+      featured.push(allInst[idx]);
+      usedIdx.add(idx);
+    }
+  }
+  const secondary = allInst.filter((_, i) => !usedIdx.has(i));
 
   // Reparte los sellos del curso en los 3 bloques fijos según su categoría.
   const certByBlock = useMemo(() => {
