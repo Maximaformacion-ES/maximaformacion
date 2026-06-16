@@ -13,6 +13,8 @@ type Como = { question: string; answer: string };
  * web (tema claro). Sustituye al contenido de la pestaña de Descripción.
  * Compartido por Maxymia y /programas.
  */
+const VISIBLE = 5;
+
 export function Comos({
   comos,
   className = '',
@@ -22,15 +24,21 @@ export function Comos({
 }) {
   // Acordeón estricto: solo uno abierto a la vez (abrir uno cierra el resto).
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   if (!comos?.length) return null;
 
   const toggle = (i: number) =>
     setOpenIndex((prev) => (prev === i ? null : i));
 
+  const hasMore = comos.length > VISIBLE;
+  const shown = expanded ? comos : comos.slice(0, VISIBLE);
+  const peek = !expanded && hasMore ? comos[VISIBLE] : null;
+
   return (
-    <div className={`divide-y divide-mx-border  border-mx-border ${className}`}>
-      {comos.map((c, i) => {
+    <div className={className}>
+      <div className="divide-y divide-mx-border border-mx-border">
+      {shown.map((c, i) => {
         const isOpen = openIndex === i;
         return (
           <m.div
@@ -81,6 +89,29 @@ export function Comos({
           </m.div>
         );
       })}
+
+      {/* Peek: deja entrever el siguiente Cómo, difuminado */}
+      {peek && (
+        <div className="relative max-h-12 overflow-hidden pt-5 pointer-events-none select-none">
+          <h3 className="text-heading-sm md:text-body-lg font-medium leading-tight text-mx-text/40">
+            {peek.question}
+          </h3>
+          <div className="absolute inset-0 bg-gradient-to-t from-mx-bg to-transparent" />
+        </div>
+      )}
+      </div>
+
+      {hasMore && (
+        <div className="mt-4 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="font-sans font-medium text-mx-orange text-[15px] hover:underline cursor-pointer"
+          >
+            {expanded ? 'Ver menos' : 'Ver más'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
