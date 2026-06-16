@@ -18,7 +18,7 @@ import { SectionHeader } from '../../components/SectionHeader';
 import { ProgramCard } from '../../components/ProgramCard';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
-import type { Program } from '@/lib/strapi/types';
+import type { Program, Badge, Institution } from '@/lib/strapi/types';
 import type { ProgramRichHtml } from './page';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -32,6 +32,10 @@ interface ProgramDetailClientProps {
   teacherAvatars?: string[];
   /** Programas recomendados (relacionados) para la fila al pie de la ficha. */
   recommended?: Program[];
+  /** Set GLOBAL de sellos: se muestran TODOS en todas las fichas. */
+  allBadges?: Badge[];
+  /** Set GLOBAL de instituciones: se muestran TODAS en todas las fichas. */
+  allInstitutions?: Institution[];
 }
 
 /** "Otros alumnos también compraron": fila de programas recomendados al pie. */
@@ -62,6 +66,8 @@ export default function ProgramDetailClient({
   docentes,
   teacherAvatars,
   recommended,
+  allBadges,
+  allInstitutions,
 }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -134,8 +140,8 @@ export default function ProgramDetailClient({
               {/* Mismas secciones que la ficha de Maxymia: confianza →
                   compromiso con el alumnado → docentes → FAQ. */}
               <TrustBlock
-                institutions={program.institutions}
-                certifications={program.badges}
+                institutions={allInstitutions}
+                certifications={allBadges}
               />
               <TeamCommitment avatars={teacherAvatars} />
               <DocenteSection

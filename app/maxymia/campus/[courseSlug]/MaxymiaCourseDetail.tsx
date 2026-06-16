@@ -45,6 +45,7 @@ import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
 import { Comos } from '@/app/components/Comos';
 import type { MaxymiaCourse, Locale } from '../../types';
+import type { Badge, Institution } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
@@ -115,9 +116,12 @@ interface Props {
   teacherAvatars?: string[];
   /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
   recommended?: MaxymiaCourse[];
+  /** Set GLOBAL de sellos/instituciones: TODOS en todas las fichas. */
+  allBadges?: Badge[];
+  allInstitutions?: Institution[];
 }
 
-export default function MaxymiaCourseDetail({ course, teacherAvatars, recommended }: Props) {
+export default function MaxymiaCourseDetail({ course, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
   const { locale } = useLocale();
   // This is the public course *sales* ficha — paint the whole campus chrome
   // (header, footer, page bg) light + black logo while it's shown, and revert
@@ -163,8 +167,8 @@ export default function MaxymiaCourseDetail({ course, teacherAvatars, recommende
             {/* Confianza primero, FAQ después. Mismo contenedor lg:col-span-2.
                 Componente compartido con la ficha de /programas. */}
             <TrustBlock
-              institutions={course.institutions}
-              certifications={course.badges}
+              institutions={allInstitutions}
+              certifications={allBadges}
               locale={locale}
             />
             <TeamCommitment locale={locale} avatars={teacherAvatars} />

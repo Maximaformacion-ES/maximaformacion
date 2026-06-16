@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
-import { getProgramBySlug, getTeachers, getPrograms } from '@/lib/strapi/queries';
+import { getProgramBySlug, getTeachers, getPrograms, getBadges, getInstitutions } from '@/lib/strapi/queries';
 import type { Docente } from '@/app/components/DocenteSection';
 import { markdownToHtml } from '@/lib/markdown';
 import { JsonLd } from '@/app/components/JsonLd';
@@ -67,12 +67,17 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   // El equipo docente (avatares para la sección de compromiso + perfil
   // completo para enriquecer los docentes del programa) y el catálogo de
   // programas (para los recomendados) también van cacheados (revalidate=60).
-  const [program, initialUserState, teachers, programsRes] = await Promise.all([
-    getProgramBySlug(slug, isDraft),
-    getServerUserState(),
-    getTeachers(),
-    getPrograms({ limit: 100 }),
-  ]);
+  const [program, initialUserState, teachers, programsRes, allBadges, allInstitutions] =
+    await Promise.all([
+      getProgramBySlug(slug, isDraft),
+      getServerUserState(),
+      getTeachers(),
+      getPrograms({ limit: 100 }),
+      // Set GLOBAL de sellos e instituciones: se muestran TODOS en todas las
+      // fichas (no por relación del programa en Strapi).
+      getBadges(),
+      getInstitutions(),
+    ]);
 
   // Avatares del equipo docente completo (sección "Atención al alumnado").
   const teacherAvatars = teachers
@@ -146,6 +151,8 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
         docentes={docentes}
         teacherAvatars={teacherAvatars}
         recommended={recommended}
+        allBadges={allBadges}
+        allInstitutions={allInstitutions}
       />
     </>
   );
