@@ -11,7 +11,7 @@ type Logo = { name: string; imageUrl: string; category?: string | null };
 // (stroke) en la MISMA línea — ver StrokedTitle.
 const COPY = {
   es: {
-    instOverline: 'Grandes instituciones',
+    instOverline: 'Grandes Organizaciones Nacionales',
     instTitle: 'Instituciones de referencia\n{Confían en nosotros}',
     instDesc:
       'Equipos y profesionales de organismos como el CSIC, el Servicio Andaluz de Salud, el Banco de España o el Departament de Salut de la Generalitat de Catalunya ya se han formado con Máxima Formación.',

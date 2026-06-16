@@ -182,7 +182,7 @@ export default function CourseAccessGate({
               ) : (
                 <>
                   <ShoppingCart size={18} />
-                  {isSignedIn ? 'Comprar ahora' : 'Iniciar sesión para comprar'}
+                  Matricúlate ahora
                 </>
               )}
             </button>
