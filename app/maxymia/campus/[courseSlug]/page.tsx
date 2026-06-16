@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { fetchMaxymiaCourseBySlug, fetchMaxymiaCourses } from '../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
-import { getAuthorBySlug } from '@/lib/strapi/queries';
+import { getTeachers } from '@/lib/strapi/queries';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
 
 interface PageProps {
@@ -19,13 +19,16 @@ export default async function CourseOverviewPage({ params }: PageProps) {
   // instead of the student view ("Comenzar curso") flashing while the
   // client-side profile loads. The client hook still revalidates after
   // hydration (e.g. a checkout just completed in another tab).
-  // Foto del fundador (author Alfonso Lara) para la nota de compromiso, y el
-  // catálogo para los cursos recomendados.
-  const [{ hasAccess: initialHasAccess }, founder, allCourses] = await Promise.all([
+  // Equipo docente (authors isTeacher) para la sección de compromiso con el
+  // alumnado — el acompañamiento se personifica en TODO el equipo, no en una
+  // sola persona. Y el catálogo para los cursos recomendados.
+  const [{ hasAccess: initialHasAccess }, teachers, allCourses] = await Promise.all([
     getCourseAccess(course.id, course.isPro),
-    getAuthorBySlug('alfonso-lara'),
+    getTeachers(),
     fetchMaxymiaCourses(),
   ]);
+
+  const teacherAvatars = teachers.map((t) => t.avatarUrl).filter((url): url is string => !!url);
 
   // Recomendados: misma categoría primero, luego el resto. (Relación a perfilar.)
   const others = allCourses.filter((c) => c.id !== course.id);
@@ -36,7 +39,7 @@ export default async function CourseOverviewPage({ params }: PageProps) {
     <MaxymiaCourseOverview
       course={course}
       initialHasAccess={initialHasAccess}
-      founderPhoto={founder?.avatarUrl}
+      teacherAvatars={teacherAvatars}
       recommended={recommended}
     />
   );

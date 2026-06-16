@@ -37,7 +37,7 @@ import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { MaxymiaDocenteSection } from '../../components/MaxymiaDocenteSection';
-import { MaxymiaFounderNote } from '../../components/MaxymiaFounderNote';
+import { MaxymiaTeamCommitment } from '../../components/MaxymiaTeamCommitment';
 import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
 import { SectionHeader } from '@/app/components/SectionHeader';
 import { useCampusTheme } from '../CampusShell';
@@ -111,13 +111,13 @@ function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Lo
 
 interface Props {
   course: MaxymiaCourse;
-  /** Foto del fundador (author Alfonso Lara) para la nota de compromiso. */
-  founderPhoto?: string;
+  /** Avatares del equipo docente para la sección de compromiso con el alumnado. */
+  teacherAvatars?: string[];
   /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
   recommended?: MaxymiaCourse[];
 }
 
-export default function MaxymiaCourseDetail({ course, founderPhoto, recommended }: Props) {
+export default function MaxymiaCourseDetail({ course, teacherAvatars, recommended }: Props) {
   const { locale } = useLocale();
   // This is the public course *sales* ficha — paint the whole campus chrome
   // (header, footer, page bg) light + black logo while it's shown, and revert
@@ -167,7 +167,7 @@ export default function MaxymiaCourseDetail({ course, founderPhoto, recommended 
               certifications={course.badges}
               locale={locale}
             />
-            <MaxymiaFounderNote locale={locale} photo={founderPhoto} />
+            <MaxymiaTeamCommitment locale={locale} avatars={teacherAvatars} />
             <MaxymiaDocenteSection docentes={course.docentes} locale={locale} courseTitle={course.title[locale]} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
