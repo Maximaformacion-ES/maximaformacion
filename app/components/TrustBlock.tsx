@@ -134,6 +134,27 @@ function Seal({ logo }: { logo: Logo }) {
   );
 }
 
+/** Hilera de logos secundarios en marquee continuo (lento). `reverse` invierte
+ *  el sentido para combinar dos filas en direcciones opuestas. */
+function Marquee({ items, reverse = false, duration = 50 }: { items: Logo[]; reverse?: boolean; duration?: number }) {
+  if (!items.length) return null;
+  return (
+    <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      <m.div
+        className="flex items-center gap-12 w-max opacity-60"
+        animate={{ x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
+        transition={{ duration, ease: 'linear', repeat: Infinity }}
+      >
+        {[...items, ...items].map((i, idx) => (
+          <div key={`${i.name}-${idx}`} title={i.name} className="relative h-8 md:h-9 shrink-0">
+            <Image src={i.imageUrl} alt={i.name} width={140} height={36} unoptimized className="h-8 md:h-9 w-auto object-contain grayscale" />
+          </div>
+        ))}
+      </m.div>
+    </div>
+  );
+}
+
 export function TrustBlock({
   institutions,
   certifications,
@@ -196,20 +217,11 @@ export function TrustBlock({
               ))}
             </div>
 
-            {/* Resto, secundarias, en marquee continuo */}
+            {/* Resto, secundarias: dos hileras en sentidos opuestos, lentas */}
             {secondary.length > 0 && (
-              <div className="mt-10 relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-                <m.div
-                  className="flex items-center gap-12 w-max opacity-60"
-                  animate={{ x: ['0%', '-50%'] }}
-                  transition={{ duration: 28, ease: 'linear', repeat: Infinity }}
-                >
-                  {[...secondary, ...secondary].map((i, idx) => (
-                    <div key={`${i.name}-${idx}`} title={i.name} className="relative h-8 md:h-9 shrink-0">
-                      <Image src={i.imageUrl} alt={i.name} width={140} height={36} unoptimized className="h-8 md:h-9 w-auto object-contain grayscale" />
-                    </div>
-                  ))}
-                </m.div>
+              <div className="mt-10 flex flex-col gap-6">
+                <Marquee items={secondary.slice(0, Math.ceil(secondary.length / 2))} />
+                <Marquee items={secondary.slice(Math.ceil(secondary.length / 2))} reverse />
               </div>
             )}
           </m.div>
