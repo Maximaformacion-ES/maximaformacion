@@ -146,8 +146,11 @@ function Marquee({ items, reverse = false, duration = 50 }: { items: Logo[]; rev
         transition={{ duration, ease: 'linear', repeat: Infinity }}
       >
         {[...items, ...items].map((i, idx) => (
-          <div key={`${i.name}-${idx}`} title={i.name} className="relative h-8 md:h-9 shrink-0">
-            <Image src={i.imageUrl} alt={i.name} width={140} height={36} unoptimized className="h-8 md:h-9 w-auto object-contain grayscale" />
+          <div key={`${i.name}-${idx}`} className="group relative h-9 w-28 shrink-0">
+            <Image src={i.imageUrl} alt={i.name} fill unoptimized className="object-contain grayscale" sizes="140px" />
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-mx-text px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+              {i.name}
+            </span>
           </div>
         ))}
       </m.div>
@@ -197,22 +200,20 @@ export function TrustBlock({
           >
             <TrustHeader overline={t.instOverline} title={t.instTitle} description={t.instDesc} />
 
-            {/* 4 destacadas, en tarjetas (muro de confianza) */}
+            {/* 4 destacadas, en tarjetas (muro de confianza). Caja interior fija
+                para que todos los logos ocupen el mismo tamaño. */}
             <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
               {featured.map((i) => (
                 <div
                   key={i.name}
-                  title={i.name}
-                  className="flex items-center justify-center h-24 md:h-28 rounded-xl border border-mx-border bg-white px-5 hover:border-mx-orange/40 hover:shadow-[0_10px_28px_-14px_rgba(0,0,0,0.18)] transition-all duration-300"
+                  className="group relative flex items-center justify-center h-24 md:h-28 rounded-xl border border-mx-border bg-white px-5 hover:border-mx-orange/40 hover:shadow-[0_10px_28px_-14px_rgba(0,0,0,0.18)] transition-all duration-300"
                 >
-                  <Image
-                    src={i.imageUrl}
-                    alt={i.name}
-                    width={200}
-                    height={96}
-                    unoptimized
-                    className="max-h-12 md:max-h-16 w-auto object-contain"
-                  />
+                  <div className="relative w-full h-11 md:h-12">
+                    <Image src={i.imageUrl} alt={i.name} fill unoptimized className="object-contain" sizes="200px" />
+                  </div>
+                  <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-mx-text px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+                    {i.name}
+                  </span>
                 </div>
               ))}
             </div>
