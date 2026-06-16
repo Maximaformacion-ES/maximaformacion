@@ -138,15 +138,50 @@ export async function POST(request: Request) {
         );
       }
 
-      // Create an ad-hoc Stripe price from the course price
-      const stripePrice = await stripe.prices.create({
-        currency: 'eur',
-        unit_amount: Math.round(course.price * 100),
-        product_data: {
-          name: course.title.es,
-          metadata: { courseId: course.id, slug: course.slug, type: 'maxymia-course' },
-        },
-      });
+      // Reuse the course's existing Stripe product instead of creating a NEW
+      // catalog product on every checkout. The old code used `product_data`,
+      // which spawned a fresh product + price on each purchase — that was the
+      // source of the duplicate "IA para Científicos" products AND why
+      // product-restricted coupons failed (the charged product was always a
+      // brand-new one, not in the coupon). We find the product by its stable
+      // `slug` metadata and reuse a matching active price; we only create one
+      // the very first time.
+      const amountCents = Math.round(course.price * 100);
+      let courseProductId: string | null = null;
+      try {
+        const found = await stripe.products.search({
+          query: `active:'true' AND metadata['slug']:'${course.slug}' AND metadata['type']:'maxymia-course'`,
+          limit: 1,
+        });
+        if (found.data[0]) courseProductId = found.data[0].id;
+      } catch {
+        // Search unavailable/eventually-consistent → fall through to create.
+      }
+
+      let stripePriceId: string | null = null;
+      if (courseProductId) {
+        const prices = await stripe.prices.list({ product: courseProductId, active: true, limit: 100 });
+        const match = prices.data.find((p) => p.unit_amount === amountCents && p.currency === 'eur');
+        if (match) stripePriceId = match.id;
+      }
+      if (!stripePriceId) {
+        const newPrice = courseProductId
+          ? await stripe.prices.create({
+              product: courseProductId,
+              currency: 'eur',
+              unit_amount: amountCents,
+              metadata: { courseId: course.id, slug: course.slug, type: 'maxymia-course' },
+            })
+          : await stripe.prices.create({
+              currency: 'eur',
+              unit_amount: amountCents,
+              product_data: {
+                name: course.title.es,
+                metadata: { courseId: course.id, slug: course.slug, type: 'maxymia-course' },
+              },
+            });
+        stripePriceId = newPrice.id;
+      }
 
       // Apply Pro discounts:
       //   - 100% if course.isPro (included in Pro)
@@ -165,7 +200,7 @@ export async function POST(request: Request) {
       const maxymiaAccountTaxIds = await getAccountTaxIds(stripe);
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        line_items: [{ price: stripePrice.id, quantity: 1 }],
+        line_items: [{ price: stripePriceId, quantity: 1 }],
         success_url: `${baseUrl}/maxymia/campus/${course.slug}?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/maxymia/campus/${course.slug}?canceled=true`,
         customer_email: user?.emailAddresses?.[0]?.emailAddress,
