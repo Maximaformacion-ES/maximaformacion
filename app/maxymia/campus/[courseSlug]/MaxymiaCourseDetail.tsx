@@ -109,9 +109,11 @@ function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Lo
 
 interface Props {
   course: MaxymiaCourse;
+  /** Foto del fundador (author Alfonso Lara) para la nota de compromiso. */
+  founderPhoto?: string;
 }
 
-export default function MaxymiaCourseDetail({ course }: Props) {
+export default function MaxymiaCourseDetail({ course, founderPhoto }: Props) {
   const { locale } = useLocale();
   // This is the public course *sales* ficha — paint the whole campus chrome
   // (header, footer, page bg) light + black logo while it's shown, and revert
@@ -161,7 +163,7 @@ export default function MaxymiaCourseDetail({ course }: Props) {
               certifications={course.badges}
               locale={locale}
             />
-            <MaxymiaFounderNote locale={locale} />
+            <MaxymiaFounderNote locale={locale} photo={founderPhoto} />
             <MaxymiaDocenteSection docentes={course.docentes} locale={locale} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection

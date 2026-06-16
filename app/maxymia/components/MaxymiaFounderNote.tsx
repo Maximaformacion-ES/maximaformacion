@@ -11,7 +11,8 @@ import type { Locale } from '../types';
 const FOUNDER = {
   name: 'Alfonso Lara',
   role: 'Fundador y director de Máxima Formación',
-  photo: 'https://www.maximaformacion.es/wp-content/uploads/2021/02/Alfonso-Lara-Nunez-Maxima-Formacion-300x300.jpg',
+  // Fallback (la foto real llega por prop desde Strapi). URL R2 del avatar actual.
+  photo: 'https://pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev/alfonso_ceo_073db6c23d.avif',
 };
 
 const COPY = {
@@ -35,8 +36,9 @@ const COPY = {
  * diferenciador frente a marketplaces. Sección de marca (fija/global), se coloca
  * justo antes del bloque de Docente en la ficha.
  */
-export function MaxymiaFounderNote({ locale = 'es' }: { locale?: Locale }) {
+export function MaxymiaFounderNote({ locale = 'es', photo }: { locale?: Locale; photo?: string }) {
   const t = COPY[locale];
+  const founderPhoto = photo || FOUNDER.photo;
   return (
     <section className="py-10 md:py-20">
       <div className="max-w-[812px]">
@@ -52,7 +54,7 @@ export function MaxymiaFounderNote({ locale = 'es' }: { locale?: Locale }) {
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={FOUNDER.photo}
+              src={founderPhoto}
               alt={FOUNDER.name}
               className="size-16 md:size-20 shrink-0 rounded-full object-cover"
             />

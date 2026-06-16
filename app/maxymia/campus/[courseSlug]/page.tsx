@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { fetchMaxymiaCourseBySlug } from '../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
+import { getAuthorBySlug } from '@/lib/strapi/queries';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
 
 interface PageProps {
@@ -18,7 +19,17 @@ export default async function CourseOverviewPage({ params }: PageProps) {
   // instead of the student view ("Comenzar curso") flashing while the
   // client-side profile loads. The client hook still revalidates after
   // hydration (e.g. a checkout just completed in another tab).
-  const { hasAccess: initialHasAccess } = await getCourseAccess(course.id, course.isPro);
+  // Foto del fundador (author Alfonso Lara) para la nota de compromiso.
+  const [{ hasAccess: initialHasAccess }, founder] = await Promise.all([
+    getCourseAccess(course.id, course.isPro),
+    getAuthorBySlug('alfonso-lara'),
+  ]);
 
-  return <MaxymiaCourseOverview course={course} initialHasAccess={initialHasAccess} />;
+  return (
+    <MaxymiaCourseOverview
+      course={course}
+      initialHasAccess={initialHasAccess}
+      founderPhoto={founder?.avatarUrl}
+    />
+  );
 }
