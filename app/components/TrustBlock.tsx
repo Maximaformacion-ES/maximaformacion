@@ -135,22 +135,32 @@ function Seal({ logo }: { logo: Logo }) {
 }
 
 /** Hilera de logos secundarios en marquee continuo (lento). `reverse` invierte
- *  el sentido para combinar dos filas en direcciones opuestas. */
-function Marquee({ items, reverse = false, duration = 50 }: { items: Logo[]; reverse?: boolean; duration?: number }) {
+ *  el sentido. Se pausa al pasar el ratón; cada logo recupera el color y muestra
+ *  un tooltip con su nombre (mismo estilo que las destacadas). El `pt-10` deja
+ *  sitio para que el tooltip no lo recorte el overflow del carrusel. */
+function Marquee({ items, reverse = false }: { items: Logo[]; reverse?: boolean }) {
   if (!items.length) return null;
   return (
-    <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-      <m.div
-        className="flex items-center gap-12 w-max opacity-60"
-        animate={{ x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
-        transition={{ duration, ease: 'linear', repeat: Infinity }}
+    <div className="group relative overflow-hidden pt-10 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+      <div
+        className={`flex w-max items-center gap-12 ${reverse ? 'animate-marquee-reverse' : 'animate-marquee'} group-hover:[animation-play-state:paused]`}
       >
         {[...items, ...items].map((i, idx) => (
-          <div key={`${i.name}-${idx}`} title={i.name} className="relative h-9 w-28 shrink-0">
-            <Image src={i.imageUrl} alt={i.name} fill unoptimized className="object-contain grayscale" sizes="140px" />
+          <div key={`${i.name}-${idx}`} className="group/logo relative h-9 w-28 shrink-0">
+            <Image
+              src={i.imageUrl}
+              alt={i.name}
+              fill
+              unoptimized
+              sizes="140px"
+              className="object-contain grayscale opacity-60 transition duration-300 group-hover/logo:grayscale-0 group-hover/logo:opacity-100"
+            />
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-mx-text px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/logo:opacity-100">
+              {i.name}
+            </span>
           </div>
         ))}
-      </m.div>
+      </div>
     </div>
   );
 }
@@ -217,7 +227,7 @@ export function TrustBlock({
 
             {/* Resto, secundarias: dos hileras en sentidos opuestos, lentas */}
             {secondary.length > 0 && (
-              <div className="mt-10 flex flex-col gap-6">
+              <div className="mt-6 flex flex-col gap-1">
                 <Marquee items={secondary.slice(0, Math.ceil(secondary.length / 2))} />
                 <Marquee items={secondary.slice(Math.ceil(secondary.length / 2))} reverse />
               </div>

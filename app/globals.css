@@ -48,6 +48,17 @@
   }
 }
 
+/* Marquee continuo (carrusel de logos). Se duplica el contenido y se desplaza
+   -50% para un bucle sin costuras; pausable con animation-play-state. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -61,6 +72,8 @@
 @theme inline {
   --animate-accordion-down: accordion-down 0.3s ease-out;
   --animate-accordion-up: accordion-up 0.3s ease-out;
+  --animate-marquee: marquee 50s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 50s linear infinite;
   --font-sans: var(--font-zt-nature), system-ui, sans-serif;
   /* Inter para texto de cuerpo de las fichas (utility `font-body`). El display
      y los rótulos siguen en ZT Nature (`font-sans`, fuente por defecto). */
