@@ -4,7 +4,8 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Quote } from 'lucide-react';
 import { SectionHeader } from '@/app/components/SectionHeader';
-import type { Locale } from '../types';
+
+type Locale = 'es' | 'en';
 
 const MAX_AVATARS = 7;
 
@@ -29,9 +30,10 @@ const COPY = {
  * "Compromiso con la atención al alumnado": el acompañamiento personificado en
  * TODO el equipo docente (no en una sola persona), para que el alumno sienta que
  * le arropa el equipo. Cluster de avatares del equipo + mensaje en voz del
- * equipo + firma. Sección de marca (fija/global), antes del bloque de Docente.
+ * equipo + firma. Sección de marca (fija/global) compartida por las fichas de
+ * Maxymia y de /programas.
  */
-export function MaxymiaTeamCommitment({
+export function TeamCommitment({
   locale = 'es',
   avatars = [],
   totalTeachers,

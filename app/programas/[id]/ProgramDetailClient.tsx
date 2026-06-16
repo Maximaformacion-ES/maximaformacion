@@ -11,8 +11,11 @@ import { ProgramSidebar, SIDEBAR_CTA_ANCHOR_ID } from '../../components/ProgramS
 import { ProgramFAQSection } from '../../components/ProgramFAQSection';
 import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
-import { ProgramTeachers } from '../../components/ProgramTeachers';
 import { TrustBlock } from '../../components/TrustBlock';
+import { TeamCommitment } from '../../components/TeamCommitment';
+import { DocenteSection, type Docente } from '../../components/DocenteSection';
+import { SectionHeader } from '../../components/SectionHeader';
+import { ProgramCard } from '../../components/ProgramCard';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
 import type { Program } from '@/lib/strapi/types';
@@ -23,12 +26,42 @@ interface ProgramDetailClientProps {
   program: Program | null;
   richHtml: ProgramRichHtml;
   initialUserState?: ServerUserState;
+  /** Docentes del programa enriquecidos con el perfil del author (bio, email, LinkedIn). */
+  docentes?: Docente[];
+  /** Avatares del equipo docente completo (sección "Atención al alumnado"). */
+  teacherAvatars?: string[];
+  /** Programas recomendados (relacionados) para la fila al pie de la ficha. */
+  recommended?: Program[];
+}
+
+/** "Otros alumnos también compraron": fila de programas recomendados al pie. */
+function RecommendedPrograms({ programs }: { programs: Program[] }) {
+  if (!programs.length) return null;
+  return (
+    <section className="py-16 md:py-24 px-6 md:px-12">
+      <div className="max-w-[1400px] mx-auto">
+        <SectionHeader
+          overline="También te puede interesar"
+          title="Otros alumnos también {compraron}"
+          align="left"
+        />
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {programs.map((p, i) => (
+            <ProgramCard key={p.slug} program={p} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default function ProgramDetailClient({
   program,
   richHtml,
   initialUserState,
+  docentes,
+  teacherAvatars,
+  recommended,
 }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -98,12 +131,18 @@ export default function ProgramDetailClient({
           tabs={<ProgramTabs program={program} richHtml={richHtml} />}
           belowContent={
             <>
-              <ProgramTeachers program={program} />
-              {/* Confianza primero, FAQ después. Mismo componente que la ficha
-                  de Maxymia. */}
+              {/* Mismas secciones que la ficha de Maxymia: confianza →
+                  compromiso con el alumnado → docentes → FAQ. */}
               <TrustBlock
                 institutions={program.institutions}
                 certifications={program.badges}
+              />
+              <TeamCommitment avatars={teacherAvatars} />
+              <DocenteSection
+                docentes={docentes}
+                courseTitle={program.title}
+                overline="Profesorado"
+                title="Quién {imparte}"
               />
               <ProgramFAQSection program={program} />
             </>
@@ -116,6 +155,11 @@ export default function ProgramDetailClient({
         <ProGateWrapper program={program} initialUserState={initialUserState}>
           <ProgramCTASection program={program} />
         </ProGateWrapper>
+
+        {/* Fila de recomendados, igual que la ficha de Maxymia. */}
+        {recommended && recommended.length > 0 && (
+          <RecommendedPrograms programs={recommended} />
+        )}
       </main>
 
       <Footer />

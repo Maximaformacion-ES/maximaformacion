@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { X, Send, Check, Loader2 } from 'lucide-react';
-import type { Locale } from '../types';
+
+type Locale = 'es' | 'en';
 
 const COPY = {
   es: {
@@ -32,6 +33,9 @@ const COPY = {
   },
 } as const;
 
+/** Formulario de contacto que escribe al docente (resuelto en servidor por slug,
+ *  vía /api/docente-contact — anti-relay). Compartido por las fichas de Maxymia
+ *  y de /programas. `courseTitle` añade contexto en el email. */
 export function DocenteContactModal({
   open,
   onClose,

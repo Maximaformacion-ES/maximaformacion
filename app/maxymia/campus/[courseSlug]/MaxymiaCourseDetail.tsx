@@ -36,8 +36,8 @@ import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
-import { MaxymiaDocenteSection } from '../../components/MaxymiaDocenteSection';
-import { MaxymiaTeamCommitment } from '../../components/MaxymiaTeamCommitment';
+import { DocenteSection } from '@/app/components/DocenteSection';
+import { TeamCommitment } from '@/app/components/TeamCommitment';
 import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
 import { SectionHeader } from '@/app/components/SectionHeader';
 import { useCampusTheme } from '../CampusShell';
@@ -167,8 +167,8 @@ export default function MaxymiaCourseDetail({ course, teacherAvatars, recommende
               certifications={course.badges}
               locale={locale}
             />
-            <MaxymiaTeamCommitment locale={locale} avatars={teacherAvatars} />
-            <MaxymiaDocenteSection docentes={course.docentes} locale={locale} courseTitle={course.title[locale]} />
+            <TeamCommitment locale={locale} avatars={teacherAvatars} />
+            <DocenteSection docentes={course.docentes} locale={locale} courseTitle={course.title[locale]} />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
                 compact
