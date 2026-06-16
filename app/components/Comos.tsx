@@ -42,7 +42,7 @@ export function Comos({
           className="group w-full flex items-center justify-between gap-4 text-left py-5 md:py-6"
         >
           <h3
-            className={`text-heading-sm md:text-body-lg font-medium leading-tight transition-colors ${
+            className={`text-[16px] md:text-[18px] lg:text-[20px] font-medium leading-tight transition-colors ${
               isOpen ? 'text-mx-orange' : 'text-mx-text/40 group-hover:text-mx-orange'
             }`}
           >
@@ -100,7 +100,7 @@ export function Comos({
       {/* Peek: deja entrever el siguiente Cómo cuando está plegado */}
       {!expanded && hasMore && (
         <div className="relative max-h-12 overflow-hidden pt-5 border-t border-mx-border pointer-events-none select-none">
-          <h3 className="text-heading-sm md:text-body-lg font-medium leading-tight text-mx-text/40">
+          <h3 className="text-[16px] md:text-[18px] lg:text-[20px] font-medium leading-tight text-mx-text/40">
             {comos[VISIBLE].question}
           </h3>
           <div className="absolute inset-0 bg-gradient-to-t from-mx-bg to-transparent" />
