@@ -1090,9 +1090,8 @@ function RecommendedCourses({ courses, locale }: { courses: MaxymiaCourse[]; loc
     <section className="px-6 md:px-[128px] py-16 md:py-24">
       <div className="max-w-[1800px] mx-auto">
         <SectionHeader
-          overline={locale === 'es' ? 'Sigue aprendiendo' : 'Keep learning'}
-          title={locale === 'es' ? 'Cursos {recomendados}' : 'Recommended {courses}'}
-          align="center"
+          overline={locale === 'es' ? 'También te puede interesar' : 'You might also like'}
+          title={locale === 'es' ? 'Otros alumnos también {compraron}' : 'Other students also {bought}'}
         />
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {courses.map((c, i) => (
