@@ -19,7 +19,6 @@ const COPY = {
     certTitle: 'Calidad Acreditada,\n{Confianza demostrada}',
     certDesc:
       'Certificaciones, valoraciones y reconocimientos que avalan nuestra forma de trabajar y la satisfacción de nuestros alumnos.',
-    certOtros: 'Otros sellos',
   },
   en: {
     instOverline: 'Leading institutions',
@@ -30,7 +29,6 @@ const COPY = {
     certTitle: 'Accredited quality,\n{proven trust}',
     certDesc:
       'Certifications, ratings and recognitions that back our way of working and our students’ satisfaction.',
-    certOtros: 'Other badges',
   },
 } as const;
 
@@ -217,29 +215,22 @@ export function TrustBlock({
   }
   const secondary = allInst.filter((_, i) => !usedIdx.has(i));
 
-  // Reparte los sellos en los 3 bloques fijos según su categoría, y manda los
-  // que NO tengan categoría (o no casen) a un bloque "Otros sellos", para que
-  // SIEMPRE aparezcan todos aunque no estén categorizados en Strapi.
+  // Reparte los sellos en los 3 bloques fijos según su categoría. Un sello sin
+  // categoría (o que no casa con ninguno) NO se muestra.
   const certByBlock = useMemo(() => {
     const all = certifications ?? [];
-    const assigned = new Set<Logo>();
     const blocks: { key: string; title: string; desc?: string; items: Logo[] }[] = [];
     for (const block of CERT_BLOCKS) {
       const items = all.filter((c) => {
         const cat = (c.category ?? '').toLowerCase();
         return cat && block.match.some((m) => cat.includes(m));
       });
-      items.forEach((i) => assigned.add(i));
       if (items.length > 0) {
         blocks.push({ key: block.key, title: block[locale].title, desc: block[locale].desc, items });
       }
     }
-    const leftover = all.filter((c) => !assigned.has(c));
-    if (leftover.length > 0) {
-      blocks.push({ key: 'otros', title: t.certOtros, items: leftover });
-    }
     return blocks;
-  }, [certifications, locale, t]);
+  }, [certifications, locale]);
 
   if (!hasInst && !hasCert) return null;
 
