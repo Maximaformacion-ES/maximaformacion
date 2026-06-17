@@ -145,11 +145,11 @@ function TrustHeader({ overline, title, description }: { overline: string; title
 /** Un sello con su nombre debajo (imagen 80×56 + etiqueta). */
 function Seal({ logo }: { logo: Logo }) {
   return (
-    <div className="flex flex-col items-center gap-2.5 w-24">
-      <div className="relative h-14 w-20">
-        <Image src={logo.imageUrl} alt={logo.name} fill unoptimized className="object-contain" sizes="80px" />
+    <div className="flex flex-col items-center gap-3 w-32 md:w-40">
+      <div className="relative h-20 w-28 md:h-24 md:w-36">
+        <Image src={logo.imageUrl} alt={logo.name} fill unoptimized className="object-contain" sizes="144px" />
       </div>
-      <span className="font-sans font-medium text-mx-text-muted text-[10px] text-center leading-[12.5px]">
+      <span className="font-sans font-medium text-mx-text-muted text-[11px] md:text-[12px] text-center leading-tight">
         {logo.name}
       </span>
     </div>
@@ -309,7 +309,7 @@ export function TrustBlock({
                       {desc}
                     </p>
                   )}
-                  <div className="flex flex-wrap items-start justify-start gap-6">
+                  <div className="flex flex-wrap items-start justify-center gap-6">
                     {items.map((c) => (
                       <Seal key={c.name} logo={c} />
                     ))}
