@@ -25,15 +25,15 @@ const CHANGE_LABEL = {
   en: { new: 'New content', updated: 'Updated content' },
 } as const;
 
-/** Estrella ("nuevo") o icono de refresco ("actualizado"), con su etiqueta. */
-function ChangeBadge({ change, locale, compact }: { change: UnitChange; locale: Locale; compact?: boolean }) {
+/** Solo icono (compacto): estrella ("nuevo") o refresco ("actualizado"); el texto
+ *  va en el tooltip para no partir a dos líneas en el índice estrecho. */
+function ChangeBadge({ change, locale }: { change: UnitChange; locale: Locale }) {
   const label = CHANGE_LABEL[locale][change];
   const color = change === 'new' ? 'text-amber-300' : 'text-sky-300';
   const Icon = change === 'new' ? Star : RefreshCw;
   return (
-    <span className={`flex items-center gap-1 ${color} text-[10px] font-medium flex-shrink-0`} title={label}>
-      <Icon size={compact ? 13 : 11} className={change === 'new' ? 'fill-amber-300/40' : ''} />
-      {!compact && <span className="hidden sm:inline">{label}</span>}
+    <span className={`${color} flex-shrink-0`} title={label} aria-label={label}>
+      <Icon size={13} className={change === 'new' ? 'fill-amber-300/40' : ''} />
     </span>
   );
 }
@@ -233,7 +233,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
                     {isCompleted ? (
                       <CheckCircle size={13} className="text-mx-orange flex-shrink-0" />
                     ) : lessonChange ? (
-                      <ChangeBadge change={lessonChange} locale={locale} compact />
+                      <ChangeBadge change={lessonChange} locale={locale} />
                     ) : (
                       <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
                     )}
