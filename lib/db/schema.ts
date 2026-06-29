@@ -110,6 +110,16 @@ export const courseUpdates = campusSchema.table('course_updates', {
   index('idx_course_updates_program').on(table.programDocumentId),
 ]);
 
+// ─── Course Snapshots ──────────────────────────────────────────────────
+// Baseline de hashes de contenido por unidad, para detectar al recargar qué
+// cambió (alta de unidad / contenido actualizado) y generar `course_updates`.
+export const courseSnapshots = campusSchema.table('course_snapshots', {
+  programDocumentId: text('program_document_id').primaryKey(),
+  courseStamp: text('course_stamp'), // publishedAt del curso: solo reconciliamos cuando cambia
+  versions: jsonb('versions').notNull().default({}), // { [unitUid]: contentHash }
+  updatedAt: timestamp('updated_at', tz).defaultNow().notNull(),
+});
+
 // ─── Course Update Reads ───────────────────────────────────────────────
 export const courseUpdateReads = campusSchema.table('course_update_reads', {
   id: uuid('id').primaryKey().defaultRandom(),

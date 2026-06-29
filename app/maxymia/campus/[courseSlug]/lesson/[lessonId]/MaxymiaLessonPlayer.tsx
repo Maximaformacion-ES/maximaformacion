@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { m, AnimatePresence } from 'framer-motion';
@@ -34,9 +34,11 @@ interface Props {
   course: MaxymiaCourse;
   block: MaxymiaBlock;
   lesson: MaxymiaLesson;
+  /** Por unidad (uid): cambio NO leído desde el changelog ("nuevo"/"actualizado"). */
+  updatedUnits?: Record<string, { type: 'new' | 'updated'; ids: string[] }>;
 }
 
-export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
+export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnits = {} }: Props) {
   const { locale } = useLocale();
   const router = useRouter();
   const { courseProgress, refetch } = useUserCampus();
@@ -102,6 +104,28 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
     }
     return hasTopics ? null : (lesson.uid || lesson.id);
   }, [selectedTopicId, hasTopics, lesson]);
+
+  // Avisos "Contenido nuevo/actualizado" por unidad (changelog). Al VER una unidad
+  // marcamos sus avisos como leídos (desaparecen del índice, en vivo + en BD).
+  const [updates, setUpdates] = useState(updatedUnits);
+  const updatesRef = useRef(updatedUnits);
+  const markUnitRead = useCallback((uid: string | null) => {
+    if (!uid) return;
+    const u = updatesRef.current[uid];
+    if (!u) return;
+    const next = { ...updatesRef.current };
+    delete next[uid];
+    updatesRef.current = next;
+    setUpdates(next);
+    fetch('/api/maxymia/updates/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: u.ids }),
+    }).catch(() => {});
+  }, []);
+  useEffect(() => {
+    markUnitRead(currentUnitUid);
+  }, [currentUnitUid, markUnitRead]);
 
   const nextIsExam = useMemo(() => {
     const lastLesson = block.lessons[block.lessons.length - 1];
@@ -221,6 +245,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson }: Props) {
               course={course}
               currentLessonId={lesson.id}
               completedLessons={completedSet}
+              updatedUnits={updates}
               locale={locale}
               onSelectTopic={handleSelectTopic}
               onSelectLesson={handleBackToIndex}

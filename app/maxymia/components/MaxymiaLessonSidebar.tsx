@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { m, AnimatePresence } from 'framer-motion';
 import {
@@ -8,20 +8,41 @@ import {
   ChevronUp,
   CheckCircle,
   Star,
+  RefreshCw,
   X,
   Menu,
   BookOpen,
   FileQuestion,
 } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaTopic, Locale } from '../types';
-import { getCourseProgressStats, isLessonComplete, lessonUnitIds, newUnitIds } from '../data/queries';
+import { getCourseProgressStats, isLessonComplete, lessonUnitIds } from '../data/queries';
 
-const NEW_CONTENT_LABEL = { es: 'Contenido nuevo', en: 'New content' } as const;
+type UnitChange = 'new' | 'updated';
+export type UpdatedUnits = Record<string, { type: UnitChange; ids: string[] }>;
+
+const CHANGE_LABEL = {
+  es: { new: 'Contenido nuevo', updated: 'Contenido actualizado' },
+  en: { new: 'New content', updated: 'Updated content' },
+} as const;
+
+/** Estrella ("nuevo") o icono de refresco ("actualizado"), con su etiqueta. */
+function ChangeBadge({ change, locale, compact }: { change: UnitChange; locale: Locale; compact?: boolean }) {
+  const label = CHANGE_LABEL[locale][change];
+  const color = change === 'new' ? 'text-amber-300' : 'text-sky-300';
+  const Icon = change === 'new' ? Star : RefreshCw;
+  return (
+    <span className={`flex items-center gap-1 ${color} text-[10px] font-medium flex-shrink-0`} title={label}>
+      <Icon size={compact ? 13 : 11} className={change === 'new' ? 'fill-amber-300/40' : ''} />
+      {!compact && <span className="hidden sm:inline">{label}</span>}
+    </span>
+  );
+}
 
 interface MaxymiaLessonSidebarProps {
   course: MaxymiaCourse;
   currentLessonId: string;
   completedLessons: Set<string>;
+  updatedUnits?: UpdatedUnits;
   locale: Locale;
   onSelectTopic?: (topic: MaxymiaTopic) => void;
   onSelectLesson?: () => void;
@@ -32,6 +53,7 @@ export default function MaxymiaLessonSidebar({
   course,
   currentLessonId,
   completedLessons,
+  updatedUnits = {},
   locale,
   onSelectTopic,
   onSelectLesson,
@@ -41,9 +63,6 @@ export default function MaxymiaLessonSidebar({
 
   const { completed: completedCount, total: totalLessons, percent: progressPercent } =
     getCourseProgressStats(course, completedLessons);
-
-  // Unidades "nuevas" (contenido añadido tras una actualización) → estrella.
-  const newUnits = useMemo(() => newUnitIds(course, completedLessons), [course, completedLessons]);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -72,7 +91,7 @@ export default function MaxymiaLessonSidebar({
             courseSlug={course.slug}
             currentLessonId={currentLessonId}
             completedLessons={completedLessons}
-            newUnits={newUnits}
+            updatedUnits={updatedUnits}
             locale={locale}
             onSelectTopic={onSelectTopic}
             onSelectLesson={onSelectLesson}
@@ -140,14 +159,14 @@ interface SidebarBlockProps {
   courseSlug: string;
   currentLessonId: string;
   completedLessons: Set<string>;
-  newUnits: Set<string>;
+  updatedUnits: UpdatedUnits;
   locale: Locale;
   onSelectTopic?: (topic: MaxymiaTopic) => void;
   onSelectLesson?: () => void;
   selectedTopicId?: string | null;
 }
 
-function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, newUnits, locale, onSelectTopic, onSelectLesson, selectedTopicId }: SidebarBlockProps) {
+function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, updatedUnits, locale, onSelectTopic, onSelectLesson, selectedTopicId }: SidebarBlockProps) {
   const hasCurrentLesson = block.lessons.some((l) => l.id === currentLessonId);
   const [open, setOpen] = useState(hasCurrentLesson);
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(
@@ -190,7 +209,14 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, ne
             {block.lessons.map((lesson) => {
               const isCurrent = lesson.id === currentLessonId;
               const isCompleted = isLessonComplete(lesson, completedLessons);
-              const lessonHasNew = !isCompleted && lessonUnitIds(lesson).some((u) => newUnits.has(u));
+              const lessonChanges = isCompleted
+                ? []
+                : (lessonUnitIds(lesson).map((u) => updatedUnits[u]?.type).filter(Boolean) as UnitChange[]);
+              const lessonChange: UnitChange | null = lessonChanges.includes('new')
+                ? 'new'
+                : lessonChanges.includes('updated')
+                ? 'updated'
+                : null;
               const hasTopics = lesson.topics && lesson.topics.length > 0;
               const isLessonExpanded = expandedLessons.has(lesson.id);
 
@@ -206,14 +232,8 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, ne
                   }`}>
                     {isCompleted ? (
                       <CheckCircle size={13} className="text-mx-orange flex-shrink-0" />
-                    ) : lessonHasNew ? (
-                      <Star
-                        size={13}
-                        className="text-amber-300 fill-amber-300/40 flex-shrink-0"
-                        aria-label={NEW_CONTENT_LABEL[locale]}
-                      >
-                        <title>{NEW_CONTENT_LABEL[locale]}</title>
-                      </Star>
+                    ) : lessonChange ? (
+                      <ChangeBadge change={lessonChange} locale={locale} compact />
                     ) : (
                       <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
                     )}
@@ -248,11 +268,10 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, ne
                       >
                         {lesson.topics!.map((topic, topicIdx) => {
                           const isSelected = selectedTopicId === topic.id;
-                          const topicIsNew = newUnits.has(topic.uid || topic.id);
-                          const newStar = topicIsNew ? (
-                            <span className="ml-auto flex items-center gap-1 text-amber-300 text-[10px] font-medium flex-shrink-0" title={NEW_CONTENT_LABEL[locale]}>
-                              <Star size={11} className="fill-amber-300/40" />
-                              <span className="hidden sm:inline">{NEW_CONTENT_LABEL[locale]}</span>
+                          const topicChange = updatedUnits[topic.uid || topic.id]?.type;
+                          const newStar = topicChange ? (
+                            <span className="ml-auto">
+                              <ChangeBadge change={topicChange} locale={locale} />
                             </span>
                           ) : null;
                           return isCurrent && onSelectTopic ? (
