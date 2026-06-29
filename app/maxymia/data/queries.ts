@@ -196,6 +196,57 @@ export function isLessonComplete(
 }
 
 /**
+ * Units that are "new content" to flag after a course update: an INCOMPLETE
+ * unit that the student had clearly already passed. Two cases (the agreed
+ * criterion):
+ *   1. A topic inserted into an otherwise-completed lesson (rest of the lesson
+ *      is done).
+ *   2. A whole new lesson/module that's entirely incomplete while EVERY unit in
+ *      all prior lessons is complete (added after the student finished them).
+ * Returns the set of "new" unit uids. The player shows a star instead of the tick.
+ */
+export function newUnitIds(
+  course: MaxymiaCourse,
+  completed: Set<string>
+): Set<string> {
+  const order: string[] = [];
+  for (const block of course.blocks)
+    for (const lesson of block.lessons)
+      for (const u of lessonUnitIds(lesson)) order.push(u);
+
+  const isNew = new Set<string>();
+  let cursor = 0;
+  for (const block of course.blocks) {
+    for (const lesson of block.lessons) {
+      const units = lessonUnitIds(lesson);
+      const firstIdx = cursor;
+      cursor += units.length;
+      if (units.length === 0) continue;
+
+      const lessonComplete = units.every((u) => completed.has(u));
+      if (lessonComplete) continue;
+
+      const entirelyIncomplete = units.every((u) => !completed.has(u));
+      const allPriorComplete = order.slice(0, firstIdx).every((u) => completed.has(u));
+      if (entirelyIncomplete && allPriorComplete) {
+        // Caso 2: lección/módulo nuevo añadido tras completar los anteriores.
+        units.forEach((u) => isNew.add(u));
+        continue;
+      }
+      // Caso 1: tema añadido a una lección por lo demás completada.
+      if (units.length > 1) {
+        for (const u of units) {
+          if (!completed.has(u) && units.every((x) => x === u || completed.has(x))) {
+            isNew.add(u);
+          }
+        }
+      }
+    }
+  }
+  return isNew;
+}
+
+/**
  * Compute valid progress stats for a course at UNIT granularity, ignoring
  * orphan completed ids (units deleted or restructured in Strapi). Caps at 100.
  */

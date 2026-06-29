@@ -1,19 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { m, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown,
   ChevronUp,
   CheckCircle,
+  Star,
   X,
   Menu,
   BookOpen,
   FileQuestion,
 } from 'lucide-react';
 import type { MaxymiaCourse, MaxymiaTopic, Locale } from '../types';
-import { getCourseProgressStats, isLessonComplete } from '../data/queries';
+import { getCourseProgressStats, isLessonComplete, lessonUnitIds, newUnitIds } from '../data/queries';
+
+const NEW_CONTENT_LABEL = { es: 'Contenido nuevo', en: 'New content' } as const;
 
 interface MaxymiaLessonSidebarProps {
   course: MaxymiaCourse;
@@ -38,6 +41,9 @@ export default function MaxymiaLessonSidebar({
 
   const { completed: completedCount, total: totalLessons, percent: progressPercent } =
     getCourseProgressStats(course, completedLessons);
+
+  // Unidades "nuevas" (contenido añadido tras una actualización) → estrella.
+  const newUnits = useMemo(() => newUnitIds(course, completedLessons), [course, completedLessons]);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -66,6 +72,7 @@ export default function MaxymiaLessonSidebar({
             courseSlug={course.slug}
             currentLessonId={currentLessonId}
             completedLessons={completedLessons}
+            newUnits={newUnits}
             locale={locale}
             onSelectTopic={onSelectTopic}
             onSelectLesson={onSelectLesson}
@@ -133,13 +140,14 @@ interface SidebarBlockProps {
   courseSlug: string;
   currentLessonId: string;
   completedLessons: Set<string>;
+  newUnits: Set<string>;
   locale: Locale;
   onSelectTopic?: (topic: MaxymiaTopic) => void;
   onSelectLesson?: () => void;
   selectedTopicId?: string | null;
 }
 
-function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, locale, onSelectTopic, onSelectLesson, selectedTopicId }: SidebarBlockProps) {
+function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, newUnits, locale, onSelectTopic, onSelectLesson, selectedTopicId }: SidebarBlockProps) {
   const hasCurrentLesson = block.lessons.some((l) => l.id === currentLessonId);
   const [open, setOpen] = useState(hasCurrentLesson);
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(
@@ -182,6 +190,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
             {block.lessons.map((lesson) => {
               const isCurrent = lesson.id === currentLessonId;
               const isCompleted = isLessonComplete(lesson, completedLessons);
+              const lessonHasNew = !isCompleted && lessonUnitIds(lesson).some((u) => newUnits.has(u));
               const hasTopics = lesson.topics && lesson.topics.length > 0;
               const isLessonExpanded = expandedLessons.has(lesson.id);
 
@@ -197,6 +206,14 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                   }`}>
                     {isCompleted ? (
                       <CheckCircle size={13} className="text-mx-orange flex-shrink-0" />
+                    ) : lessonHasNew ? (
+                      <Star
+                        size={13}
+                        className="text-amber-300 fill-amber-300/40 flex-shrink-0"
+                        aria-label={NEW_CONTENT_LABEL[locale]}
+                      >
+                        <title>{NEW_CONTENT_LABEL[locale]}</title>
+                      </Star>
                     ) : (
                       <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
                     )}
@@ -231,6 +248,13 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                       >
                         {lesson.topics!.map((topic, topicIdx) => {
                           const isSelected = selectedTopicId === topic.id;
+                          const topicIsNew = newUnits.has(topic.uid || topic.id);
+                          const newStar = topicIsNew ? (
+                            <span className="ml-auto flex items-center gap-1 text-amber-300 text-[10px] font-medium flex-shrink-0" title={NEW_CONTENT_LABEL[locale]}>
+                              <Star size={11} className="fill-amber-300/40" />
+                              <span className="hidden sm:inline">{NEW_CONTENT_LABEL[locale]}</span>
+                            </span>
+                          ) : null;
                           return isCurrent && onSelectTopic ? (
                             <button
                               key={topic.id}
@@ -243,6 +267,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                             >
                               <span className={`text-[10px] flex-shrink-0 ${isSelected ? 'text-mx-orange' : 'text-white/20'}`}>{topicIdx + 1}.</span>
                               <span className="line-clamp-1">{topic.title[locale]}</span>
+                              {newStar}
                             </button>
                           ) : (
                             <Link
@@ -252,6 +277,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, lo
                             >
                               <span className="text-[10px] text-white/20 flex-shrink-0">{topicIdx + 1}.</span>
                               <span className="line-clamp-1">{topic.title[locale]}</span>
+                              {newStar}
                             </Link>
                           );
                         })}
