@@ -1,6 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
+import { auth } from '@clerk/nextjs/server';
 import { fetchLesson } from '../../../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
+import { reconcileCourseUpdates, getUserUnitUpdates, type UnitChange } from '@/lib/maxymia/course-updates';
 import MaxymiaLessonPlayer from './MaxymiaLessonPlayer';
 
 interface PageProps {
@@ -23,11 +25,24 @@ export default async function LessonPage({ params }: PageProps) {
     redirect(`/maxymia/campus/${courseSlug}`);
   }
 
+  // Changelog (Opción 2): detecta cambios desde el snapshot y marca por unidad
+  // "Contenido nuevo / actualizado" hasta que el alumno lo lee. Best-effort.
+  await reconcileCourseUpdates(result.course);
+  const { userId } = await auth();
+  const updatedUnits: Record<string, { type: UnitChange; ids: string[] }> = {};
+  if (userId) {
+    const map = await getUserUnitUpdates(userId, result.course.id);
+    map.forEach((v, uid) => {
+      updatedUnits[uid] = v;
+    });
+  }
+
   return (
     <MaxymiaLessonPlayer
       course={result.course}
       block={result.block}
       lesson={result.lesson}
+      updatedUnits={updatedUnits}
     />
   );
 }
