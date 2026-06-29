@@ -1,11 +1,12 @@
 import { createHash } from 'node:crypto';
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNull } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import {
   courseUpdates,
   courseUpdateReads,
   courseSnapshots,
   courseActivity,
+  lessonProgress,
 } from '@/lib/db/schema';
 import type { MaxymiaCourse } from '@/app/maxymia/types';
 
@@ -183,6 +184,33 @@ export async function getUserUnitUpdates(
     console.error('[course-updates] getUserUnitUpdates failed', err);
   }
   return result;
+}
+
+/**
+ * "Des-completa" (re-abre) unas unidades para un usuario: borra sus filas de
+ * lesson_progress. Se usa cuando el CONTENIDO de una unidad ya completada se
+ * actualiza → vuelve a estar incompleta para que el alumno la repase, y el
+ * progreso de su lección/curso se recalcula solo. Best-effort.
+ */
+export async function unmarkUnits(
+  clerkId: string,
+  programDocumentId: string,
+  unitUids: string[]
+): Promise<void> {
+  if (unitUids.length === 0) return;
+  try {
+    await db
+      .delete(lessonProgress)
+      .where(
+        and(
+          eq(lessonProgress.clerkId, clerkId),
+          eq(lessonProgress.programDocumentId, programDocumentId),
+          inArray(lessonProgress.lessonDocumentId, unitUids)
+        )
+      );
+  } catch (err) {
+    console.error('[course-updates] unmarkUnits failed', err);
+  }
 }
 
 /** Marca como leídas (para el usuario) las updates de unas unidades. Best-effort. */

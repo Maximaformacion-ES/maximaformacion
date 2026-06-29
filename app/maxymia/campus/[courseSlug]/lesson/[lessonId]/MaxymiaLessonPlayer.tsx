@@ -105,8 +105,10 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
     return hasTopics ? null : (lesson.uid || lesson.id);
   }, [selectedTopicId, hasTopics, lesson]);
 
-  // Avisos "Contenido nuevo/actualizado" por unidad (changelog). Al VER una unidad
-  // marcamos sus avisos como leídos (desaparecen del índice, en vivo + en BD).
+  // Avisos "Contenido nuevo/actualizado" por unidad (changelog). El aviso se limpia
+  // cuando el alumno COMPLETA la unidad (re-hace el contenido nuevo/actualizado),
+  // no solo al verla. Las unidades "actualizadas" llegan ya des-completadas desde
+  // el servidor, así que el alumno debe repasarlas y volver a completarlas.
   const [updates, setUpdates] = useState(updatedUnits);
   const updatesRef = useRef(updatedUnits);
   const markUnitRead = useCallback((uid: string | null) => {
@@ -123,9 +125,6 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
       body: JSON.stringify({ ids: u.ids }),
     }).catch(() => {});
   }, []);
-  useEffect(() => {
-    markUnitRead(currentUnitUid);
-  }, [currentUnitUid, markUnitRead]);
 
   const nextIsExam = useMemo(() => {
     const lastLesson = block.lessons[block.lessons.length - 1];
@@ -159,6 +158,8 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
   const markUnitComplete = useCallback(async (uid: string) => {
     if (!uid) return;
     setLocalUnits((prev) => (prev.includes(uid) ? prev : [...prev, uid]));
+    // Al completar, limpiamos el aviso "nuevo/actualizado" de esta unidad.
+    markUnitRead(uid);
     try {
       await fetch('/api/progress', {
         method: 'POST',
@@ -172,7 +173,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
     } catch (err) {
       console.error('Failed to mark unit complete:', err);
     }
-  }, [course.id]);
+  }, [course.id, markUnitRead]);
 
   const handleAdvanceLesson = useCallback(async () => {
     // Mark the current unit complete before leaving the lesson (the selected

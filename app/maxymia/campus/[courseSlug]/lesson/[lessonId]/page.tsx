@@ -2,7 +2,12 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
 import { fetchLesson } from '../../../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
-import { reconcileCourseUpdates, getUserUnitUpdates, type UnitChange } from '@/lib/maxymia/course-updates';
+import {
+  reconcileCourseUpdates,
+  getUserUnitUpdates,
+  unmarkUnits,
+  type UnitChange,
+} from '@/lib/maxymia/course-updates';
 import MaxymiaLessonPlayer from './MaxymiaLessonPlayer';
 
 interface PageProps {
@@ -35,6 +40,13 @@ export default async function LessonPage({ params }: PageProps) {
     map.forEach((v, uid) => {
       updatedUnits[uid] = v;
     });
+    // Si el CONTENIDO de una unidad ya completada se actualizó, la re-abrimos
+    // (la des-completamos) para que el alumno la repase; el progreso de su
+    // lección/curso se recalcula solo al caer esa unidad del set de completadas.
+    const reopen = Object.entries(updatedUnits)
+      .filter(([, v]) => v.type === 'updated')
+      .map(([uid]) => uid);
+    await unmarkUnits(userId, result.course.id, reopen);
   }
 
   return (
