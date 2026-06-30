@@ -98,6 +98,7 @@ const NAV_ITEMS: NavItem[] = [
           links: [
             { label: 'Blog', href: '/blog', description: 'Artículos del equipo' },
             { label: 'Recursos descargables', href: '/recursos', description: 'PDFs, guías, TFMs' },
+            { label: 'Contenido PRO', href: '/pro-content', description: 'Apps, datos y plantillas para suscriptores PRO' },
           ],
         },
         {
