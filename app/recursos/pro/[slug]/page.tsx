@@ -53,10 +53,13 @@ export default async function ProResourcePage({ params }: PageProps) {
             <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-mx-orange/15 flex items-center justify-center">
               <Lock size={24} className="text-mx-orange" />
             </div>
-            <h1 className="text-2xl font-bold mb-2">Contenido exclusivo PRO</h1>
-            <p className="text-mx-text/60 mb-7">
-              <span className="text-mx-text/90 font-medium">{resource.title}</span> está disponible
-              solo para suscriptores PRO. Hazte PRO para acceder a este y al resto de recursos premium.
+            <h1 className="text-2xl font-bold mb-2">{resource.title}</h1>
+            {resource.description && (
+              <p className="text-mx-text/70 mb-4 whitespace-pre-line">{resource.description}</p>
+            )}
+            <p className="text-mx-text/55 mb-7 text-sm">
+              Este recurso es <span className="text-mx-orange font-medium">exclusivo PRO</span>. Hazte
+              PRO para acceder a este y al resto de contenido premium.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
