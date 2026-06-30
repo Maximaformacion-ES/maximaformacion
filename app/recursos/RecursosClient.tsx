@@ -9,13 +9,20 @@ import { ResourcesHeader } from '../components/ResourcesHeader';
 import { ResourcesFilterBar, type CategoryFilter } from '../components/ResourcesFilterBar';
 import { ResourcesGrid } from '../components/ResourcesGrid';
 import { ResourcesTopicTabs, type TopicTab, type TopicTabValue } from '../components/ResourcesTopicTabs';
-import type { Resource } from '@/lib/strapi/types';
+import ProResourcesSection from './ProResourcesSection';
+import type { Resource, ProResourceCard } from '@/lib/strapi/types';
 
 interface RecursosClientProps {
   initialResources: Resource[];
+  proResources?: ProResourceCard[];
+  hasPro?: boolean;
 }
 
-export default function RecursosClient({ initialResources }: RecursosClientProps) {
+export default function RecursosClient({
+  initialResources,
+  proResources = [],
+  hasPro = false,
+}: RecursosClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTopic, setActiveTopic] = useState<TopicTabValue>('Todos');
   const [activeFilter, setActiveFilter] = useState('Todos');
@@ -98,6 +105,8 @@ export default function RecursosClient({ initialResources }: RecursosClientProps
 
       <main className="pt-32 pb-24 px-6 md:px-12 max-w-[1800px] mx-auto relative z-10 overflow-x-hidden">
         <ResourcesHeader />
+
+        <ProResourcesSection resources={proResources} hasPro={hasPro} />
 
         <m.div
           initial={{ opacity: 0, y: 20 }}

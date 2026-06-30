@@ -503,6 +503,54 @@ export interface ResourceQueryOptions {
   draft?: boolean;
 }
 
+// ============ Pro Resource Types (contenido premium para suscriptores PRO) ====
+
+export interface StrapiProResource {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  category: string;
+  kind: 'download' | 'embed';
+  files: StrapiMedia[] | null;
+  embedUrl: string | null;
+  htmlFile: StrapiMedia | null;
+  thumbnail: StrapiMedia | null;
+  featured: boolean;
+  order: number;
+}
+
+export interface ProResourceFile {
+  id: number;
+  url: string;
+  name: string;
+  mime: string;
+  sizeKB: number;
+}
+
+/** Datos de tarjeta (grid público): NO incluye URLs de ficheros ni embed, para
+ *  no filtrarlos a usuarios no-PRO. El contenido real se sirve en la ruta
+ *  gateada /recursos/pro/[slug]. */
+export interface ProResourceCard {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+  kind: 'download' | 'embed';
+  thumbnailUrl: string | null;
+  featured: boolean;
+}
+
+/** Recurso PRO completo (solo en la ruta gateada): incluye ficheros y embed. */
+export interface ProResource extends ProResourceCard {
+  files: ProResourceFile[];
+  embedUrl: string | null;
+  htmlFileUrl: string | null;
+}
+
 // ============ Lesson System Types ============
 
 // Frontend Lesson type
