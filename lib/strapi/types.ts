@@ -531,7 +531,7 @@ export interface ProResourceFile {
 
 /** Datos de tarjeta (grid público): NO incluye URLs de ficheros ni embed, para
  *  no filtrarlos a usuarios no-PRO. El contenido real se sirve en la ruta
- *  gateada /recursos/pro/[slug]. */
+ *  gateada /pro-content/[slug]. */
 export interface ProResourceCard {
   id: number;
   documentId: string;

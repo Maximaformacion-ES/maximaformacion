@@ -21,10 +21,10 @@ function TopBar({ title }: { title: string }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 md:px-8 py-3 border-b border-white/10 bg-mx-bg/95 backdrop-blur">
       <Link
-        href="/recursos"
+        href="/pro-content"
         className="text-sm text-mx-text/70 hover:text-mx-orange inline-flex items-center gap-2 flex-shrink-0"
       >
-        <ArrowLeft size={16} /> Recursos
+        <ArrowLeft size={16} /> Contenido PRO
       </Link>
       <span className="font-semibold truncate text-sm md:text-base">{title}</span>
       <span className="px-2 py-0.5 rounded-full bg-mx-orange/15 text-mx-orange text-[11px] font-semibold uppercase tracking-wider flex-shrink-0">
@@ -69,10 +69,10 @@ export default async function ProResourcePage({ params }: PageProps) {
                 Hazte PRO
               </Link>
               <Link
-                href="/recursos"
+                href="/pro-content"
                 className="px-6 py-3 rounded-full border border-white/15 hover:border-white/30 transition"
               >
-                Volver a recursos
+                Volver
               </Link>
             </div>
           </div>
