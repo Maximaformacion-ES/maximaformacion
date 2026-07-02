@@ -512,6 +512,8 @@ export interface StrapiProResource {
   slug: string;
   description: string | null;
   category: string;
+  subjectArea: string | null;
+  subcategory: string | null;
   kind: 'download' | 'embed';
   files: StrapiMedia[] | null;
   embedUrl: string | null;
@@ -539,6 +541,8 @@ export interface ProResourceCard {
   slug: string;
   description: string;
   category: string;
+  subjectArea: string | null;
+  subcategory: string | null;
   kind: 'download' | 'embed';
   thumbnailUrl: string | null;
   featured: boolean;

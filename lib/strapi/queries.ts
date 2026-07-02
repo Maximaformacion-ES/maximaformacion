@@ -839,6 +839,8 @@ function transformProResourceCard(s: StrapiProResource): ProResourceCard {
     slug: s.slug,
     description: s.description || '',
     category: s.category,
+    subjectArea: s.subjectArea || null,
+    subcategory: s.subcategory || null,
     kind: s.kind,
     thumbnailUrl: s.thumbnail ? getStrapiMediaUrl(s.thumbnail) : null,
     featured: !!s.featured,

@@ -25,7 +25,7 @@ export default function ProResourcesGrid({ resources, hasPro }: ProResourcesGrid
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {resources.map((r, i) => (
         <m.div
           key={r.id}
@@ -35,7 +35,7 @@ export default function ProResourcesGrid({ resources, hasPro }: ProResourcesGrid
         >
           <Link
             href={`/pro-content/${r.slug}`}
-            className="group relative flex flex-col h-full rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden hover:border-mx-orange/50 transition-colors"
+            className="group relative flex flex-col h-full rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden hover:border-mx-orange/50 transition-colors"
           >
             <div className="aspect-[16/9] bg-white/[0.03] relative overflow-hidden">
               {r.thumbnailUrl ? (
@@ -47,26 +47,26 @@ export default function ProResourcesGrid({ resources, hasPro }: ProResourcesGrid
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-mx-text/20">
-                  {r.kind === 'embed' ? <ExternalLink size={34} /> : <Download size={34} />}
+                  {r.kind === 'embed' ? <ExternalLink size={26} /> : <Download size={26} />}
                 </div>
               )}
               {!hasPro && (
                 <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center">
-                  <Lock size={22} className="text-white/85" />
+                  <Lock size={18} className="text-white/85" />
                 </div>
               )}
               <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-white/90 text-[10px]">
                 {r.category}
               </span>
             </div>
-            <div className="p-4 flex flex-col gap-1 flex-1">
-              <h3 className="font-semibold leading-snug group-hover:text-mx-orange transition-colors">
+            <div className="p-3 flex flex-col gap-1 flex-1">
+              <h3 className="text-sm font-semibold leading-snug group-hover:text-mx-orange transition-colors line-clamp-2">
                 {r.title}
               </h3>
               {r.description && (
-                <p className="text-sm text-mx-text/55 line-clamp-2">{r.description}</p>
+                <p className="text-xs text-mx-text/55 line-clamp-2">{r.description}</p>
               )}
-              <span className="mt-2 inline-flex items-center gap-1 text-xs text-mx-orange">
+              <span className="mt-1.5 inline-flex items-center gap-1 text-xs text-mx-orange">
                 {r.kind === 'embed' ? (
                   <>
                     <ExternalLink size={13} /> Abrir

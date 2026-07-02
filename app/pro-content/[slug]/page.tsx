@@ -10,6 +10,15 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Previews inline soportados: PDF (iframe nativo del navegador) e imágenes.
+// El resto de formatos (Excel, Word, zip, datasets…) se quedan como descarga.
+// Se comprueba por mime y, como respaldo, por la extensión del nombre.
+type PreviewFile = { mime: string; name: string };
+const isPdfFile = (f: PreviewFile) =>
+  f.mime === 'application/pdf' || /\.pdf$/i.test(f.name);
+const isImageFile = (f: PreviewFile) =>
+  f.mime.startsWith('image/') || /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(f.name);
+
 export const metadata: Metadata = {
   title: 'Recurso PRO | Máxima Formación',
   robots: { index: false, follow: false },
@@ -104,7 +113,7 @@ export default async function ProResourcePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text flex flex-col">
       <TopBar title={resource.title} />
-      <main className="flex-1 px-6 py-14 max-w-2xl mx-auto w-full">
+      <main className="flex-1 px-6 py-14 max-w-4xl mx-auto w-full">
         <h1 className="text-3xl font-bold mb-2">{resource.title}</h1>
         {resource.description && (
           <p className="text-mx-text/60 mb-8 whitespace-pre-line">{resource.description}</p>
@@ -113,29 +122,54 @@ export default async function ProResourcePage({ params }: PageProps) {
         {resource.files.length === 0 ? (
           <p className="text-mx-text/50">Este recurso aún no tiene ficheros disponibles.</p>
         ) : (
-          <ul className="flex flex-col gap-3">
-            {resource.files.map((f) => (
-              <li key={f.id}>
-                <a
-                  href={f.url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 hover:border-mx-orange/50 transition-colors"
+          <ul className="flex flex-col gap-6">
+            {resource.files.map((f) => {
+              const pdf = isPdfFile(f);
+              const image = isImageFile(f);
+              return (
+                <li
+                  key={f.id}
+                  className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden"
                 >
-                  <FileText size={22} className="text-mx-text/40 flex-shrink-0" />
-                  <span className="flex-1 min-w-0">
-                    <span className="block font-medium truncate group-hover:text-mx-orange transition-colors">
-                      {f.name}
+                  <div className="flex items-center gap-4 p-4">
+                    <FileText size={22} className="text-mx-text/40 flex-shrink-0" />
+                    <span className="flex-1 min-w-0">
+                      <span className="block font-medium truncate">{f.name}</span>
+                      <span className="block text-xs text-mx-text/45">
+                        {f.mime} · {f.sizeKB} KB
+                      </span>
                     </span>
-                    <span className="block text-xs text-mx-text/45">
-                      {f.mime} · {f.sizeKB} KB
-                    </span>
-                  </span>
-                  <Download size={18} className="text-mx-orange flex-shrink-0" />
-                </a>
-              </li>
-            ))}
+                    <a
+                      href={f.url}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 text-sm text-mx-orange hover:border-mx-orange/50 transition-colors flex-shrink-0"
+                    >
+                      <Download size={16} /> Descargar
+                    </a>
+                  </div>
+
+                  {pdf && (
+                    <iframe
+                      src={f.url}
+                      title={f.name}
+                      className="w-full h-[75vh] border-0 border-t border-white/10 bg-white"
+                    />
+                  )}
+                  {!pdf && image && (
+                    <div className="border-t border-white/10 bg-black/30 flex items-center justify-center p-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={f.url}
+                        alt={f.name}
+                        className="max-w-full max-h-[75vh] object-contain"
+                      />
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </main>

@@ -109,8 +109,10 @@ export interface PaginationProps {
 
 export interface FilterBarProps {
   variant?: FilterVariant;
-  filtersExpanded: boolean;
-  onToggleFilters: () => void;
+  /** When false, the "Filtros" toggle button and its expandable panel are not rendered. Defaults to true. */
+  showFilterToggle?: boolean;
+  filtersExpanded?: boolean;
+  onToggleFilters?: () => void;
   hasActiveFilters?: boolean;
   filtersLabel?: string;
   /** Optional content at the start of the toolbar's left group (e.g. a type selector). */

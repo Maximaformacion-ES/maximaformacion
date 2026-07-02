@@ -8,7 +8,8 @@ import type { FilterBarProps } from './types';
 
 export function FilterBar({
   variant = 'dark',
-  filtersExpanded,
+  showFilterToggle = true,
+  filtersExpanded = false,
   onToggleFilters,
   hasActiveFilters = false,
   filtersLabel = 'Filtros',
@@ -40,15 +41,17 @@ export function FilterBar({
         {/* Left: optional leading slot + filter toggle + sort */}
         <div className="flex flex-wrap items-center gap-2">
           {leadingSlot}
-          <button
-            onClick={onToggleFilters}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm transition-all ${
-              filtersExpanded || hasActiveFilters ? tc.btnActive : tc.btn
-            }`}
-          >
-            <SlidersHorizontal size={14} />
-            <span>{filtersLabel}</span>
-          </button>
+          {showFilterToggle && (
+            <button
+              onClick={onToggleFilters}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm transition-all ${
+                filtersExpanded || hasActiveFilters ? tc.btnActive : tc.btn
+              }`}
+            >
+              <SlidersHorizontal size={14} />
+              <span>{filtersLabel}</span>
+            </button>
+          )}
 
           {sortSlot}
         </div>
@@ -62,7 +65,7 @@ export function FilterBar({
 
       {/* Expanded filter pills row */}
       <AnimatePresence>
-        {filtersExpanded && (
+        {showFilterToggle && filtersExpanded && (
           <motion.div
             initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
             animate={{ opacity: 1, height: 'auto', overflow: 'visible', transitionEnd: { overflow: 'visible' } }}
