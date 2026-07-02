@@ -35,6 +35,9 @@ import type {
   BlogQueryOptions,
   ProgramModule,
   BlogAuthor,
+  StrapiProResource,
+  ProResourceCard,
+  ProResource,
 } from './types';
 import type { ContentBlock } from '@/app/maxymia/types';
 
@@ -823,6 +826,85 @@ export async function getResources(
   } catch (error) {
     console.error('Error fetching resources:', error);
     return { resources: [], total: 0, pageCount: 0 };
+  }
+}
+
+// ── Pro resources (contenido premium para suscriptores PRO) ──────────────────
+
+function transformProResourceCard(s: StrapiProResource): ProResourceCard {
+  return {
+    id: s.id,
+    documentId: s.documentId,
+    title: s.title,
+    slug: s.slug,
+    description: s.description || '',
+    category: s.category,
+    subjectArea: s.subjectArea || null,
+    subcategory: s.subcategory || null,
+    kind: s.kind,
+    thumbnailUrl: s.thumbnail ? getStrapiMediaUrl(s.thumbnail) : null,
+    featured: !!s.featured,
+  };
+}
+
+function transformProResource(s: StrapiProResource): ProResource {
+  return {
+    ...transformProResourceCard(s),
+    files: (s.files || []).map((f) => ({
+      id: f.id,
+      url: getStrapiMediaUrl(f),
+      name: f.name,
+      mime: f.mime,
+      sizeKB: Math.round(f.size),
+    })),
+    embedUrl: s.embedUrl || null,
+    htmlFileUrl: s.htmlFile ? getStrapiMediaUrl(s.htmlFile) : null,
+  };
+}
+
+/** Tarjetas para el grid público de /recursos (sin URLs de ficheros/embed). */
+export async function getProResources(
+  options: { draft?: boolean } = {}
+): Promise<ProResourceCard[]> {
+  try {
+    const params = new URLSearchParams();
+    params.set('populate[thumbnail]', 'true');
+    params.set('sort[0]', 'featured:desc');
+    params.set('sort[1]', 'order:asc');
+    params.set('sort[2]', 'title:asc');
+    params.set('pagination[pageSize]', '100');
+    const response = await strapiRequest<StrapiResponse<StrapiProResource[]>>(
+      `/api/pro-resources?${params.toString()}`,
+      { revalidate: 60, tags: ['pro-resources'], draft: options.draft }
+    );
+    return response.data.map(transformProResourceCard);
+  } catch (error) {
+    console.error('Error fetching pro-resources:', error);
+    return [];
+  }
+}
+
+/** Recurso PRO completo por slug (ficheros + embed). Solo para la ruta gateada. */
+export async function getProResourceBySlug(
+  slug: string,
+  options: { draft?: boolean } = {}
+): Promise<ProResource | null> {
+  try {
+    const params = new URLSearchParams();
+    params.set('filters[slug][$eq]', slug);
+    params.set('populate[thumbnail]', 'true');
+    params.set('populate[files]', 'true');
+    params.set('populate[htmlFile]', 'true');
+    params.set('pagination[pageSize]', '1');
+    const response = await strapiRequest<StrapiResponse<StrapiProResource[]>>(
+      `/api/pro-resources?${params.toString()}`,
+      { revalidate: 60, tags: ['pro-resources'], draft: options.draft }
+    );
+    const item = response.data[0];
+    return item ? transformProResource(item) : null;
+  } catch (error) {
+    console.error('Error fetching pro-resource by slug:', error);
+    return null;
   }
 }
 

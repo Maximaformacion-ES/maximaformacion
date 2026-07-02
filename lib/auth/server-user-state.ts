@@ -60,22 +60,29 @@ export async function getServerUserState(): Promise<ServerUserState> {
   }
 
   const { getUserByClerkId, getUserEnrollments, getSubscriptionByClerkId } = await import('@/lib/db/queries');
-  const [dbUser, userEnrollments, subscription] = await Promise.all([
-    getUserByClerkId(userId),
-    getUserEnrollments(userId),
-    getSubscriptionByClerkId(userId),
-  ]);
+  try {
+    const [dbUser, userEnrollments, subscription] = await Promise.all([
+      getUserByClerkId(userId),
+      getUserEnrollments(userId),
+      getSubscriptionByClerkId(userId),
+    ]);
 
-  return {
-    isSignedIn: true,
-    hasPro: dbUser?.plan === 'pro',
-    isTrialing: subscription?.status === 'trialing',
-    // The 1€ trial is hidden only for users who have actually been Pro at some
-    // point (durable hasBeenPro flag). The old heuristic (any subscription row
-    // with startedAt) wrongly tripped on the placeholder rows created on
-    // single-course purchases. Mirrors /api/user/profile so client and server
-    // agree. The field stays named hasUsedTrial to avoid a frontend change.
-    hasUsedTrial: !!dbUser?.hasBeenPro,
-    enrolledProgramDocumentIds: userEnrollments.map((e) => e.programDocumentId),
-  };
+    return {
+      isSignedIn: true,
+      hasPro: dbUser?.plan === 'pro',
+      isTrialing: subscription?.status === 'trialing',
+      // The 1€ trial is hidden only for users who have actually been Pro at some
+      // point (durable hasBeenPro flag). The old heuristic (any subscription row
+      // with startedAt) wrongly tripped on the placeholder rows created on
+      // single-course purchases. Mirrors /api/user/profile so client and server
+      // agree. The field stays named hasUsedTrial to avoid a frontend change.
+      hasUsedTrial: !!dbUser?.hasBeenPro,
+      enrolledProgramDocumentIds: userEnrollments.map((e) => e.programDocumentId),
+    };
+  } catch (err) {
+    // BD inaccesible (corte/arranque): no tumbar la página. Tratamos al
+    // visitante como "logueado sin PRO" hasta que el hook de cliente refresque.
+    console.error('[server-user-state] DB unavailable, degrading to signed-in/no-pro:', err);
+    return { ...EMPTY, isSignedIn: true };
+  }
 }

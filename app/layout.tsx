@@ -78,7 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if (!siteMetadata) {
     return {
       metadataBase,
-      title: "Maximaformación - Formación Profesional experta",
+      title: "Máxima Formación — Cursos y másters en datos, IA, estadística y salud",
       description: "Lleva tu carrera al siguiente nivel con nuestra formación especializada. Másters, cursos y programas ejecutivos de élite.",
       alternates: { canonical: '/' },
       robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },

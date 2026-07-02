@@ -8,23 +8,16 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  LayoutGrid,
-  Tag,
-  Monitor,
-  Hourglass,
 } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { CatalogGrid } from '../components/CatalogGrid';
-import { TopicFilterTrigger, TopicBadgesRow } from '../components/TopicFilter';
 import {
   FilterBar,
-  FilterDropdown,
-  RangeFilterDropdown,
   SortDropdown,
 } from '@/app/components/filters';
-import type { FilterOption, SortOption } from '@/app/components/filters';
+import type { SortOption } from '@/app/components/filters';
 import type { Program, Topic } from '@/lib/strapi/types';
 import { trackViewItemList } from '@/lib/analytics';
 import { useUser } from '@clerk/nextjs';
@@ -77,7 +70,7 @@ function resolveType(raw: string | null): 'all' | 'Curso' | 'Master' {
   return 'all';
 }
 
-export default function ProgramsClient({ initialPrograms, availableTopics, initialPage = 1 }: ProgramsClientProps) {
+export default function ProgramsClient({ initialPrograms, initialPage = 1 }: ProgramsClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isSignedIn } = useUser();
   const { hasPro } = useUserCampus();
@@ -94,15 +87,8 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
   const [search, setSearch] = useState('');
   const [activeTypeTab, setActiveTypeTab] = useState<'all' | 'Curso' | 'Master'>(initialType);
   const [subjectAreaFilter, setSubjectAreaFilter] = useState<string | null>(initialArea);
-  const [typeFilter, setTypeFilter] = useState<string | null>(null);
-  const [formatFilter, setFormatFilter] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
-  const [durationRange, setDurationRange] = useState<[number, number]>([0, 2000]);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>('relevance');
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [filtersExpanded, setFiltersExpanded] = useState(false);
-  const [topicsOpen, setTopicsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // URL-aware page navigation — keeps URL in sync with currentPage so Google
@@ -161,7 +147,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, activeTypeTab, subjectAreaFilter, typeFilter, formatFilter, priceRange, durationRange, selectedTopics, sortBy]);
+  }, [search, activeTypeTab, subjectAreaFilter, sortBy]);
 
   // Sync filters when the URL params change (e.g., user clicks a mega-menu
   // link while already on /programas — SPA navigation doesn't remount the
@@ -197,31 +183,6 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
       result = result.filter(p => p.subjectArea === subjectAreaFilter);
     }
 
-    // Type (legacy filter — kept for backwards compat)
-    if (typeFilter) {
-      result = result.filter(p => p.type === typeFilter);
-    }
-
-    // Format
-    if (formatFilter) {
-      result = result.filter(p => p.format === formatFilter);
-    }
-
-    // Price range
-    if (priceRange[0] !== 0 || priceRange[1] !== 5000) {
-      result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-    }
-
-    // Duration range
-    if (durationRange[0] !== 0 || durationRange[1] !== 2000) {
-      result = result.filter(p => p.duration >= durationRange[0] && p.duration <= durationRange[1]);
-    }
-
-    // Topics
-    if (selectedTopics.length > 0) {
-      result = result.filter(p => p.topics?.some(t => selectedTopics.includes(t.name)));
-    }
-
     // Sort
     result.sort((a, b) => {
       switch (sortBy) {
@@ -237,7 +198,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
     });
 
     return result;
-  }, [initialPrograms, search, activeTypeTab, subjectAreaFilter, typeFilter, formatFilter, priceRange, durationRange, selectedTopics, sortBy]);
+  }, [initialPrograms, search, activeTypeTab, subjectAreaFilter, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filteredPrograms.length / ITEMS_PER_PAGE));
   const paginatedPrograms = filteredPrograms.slice(
@@ -262,19 +223,6 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
   }, [paginatedPrograms, currentPage, userHasPro]);
 
   // Options
-  const typeOptions: FilterOption[] = [
-    { value: 'all', label: 'Todos' },
-    { value: 'Master', label: 'Master' },
-    { value: 'Curso', label: 'Curso' },
-  ];
-
-  const formatOptions: FilterOption[] = [
-    { value: 'all', label: 'Todos' },
-    { value: 'Online', label: 'Online' },
-    { value: 'Presencial', label: 'Presencial' },
-    { value: 'Híbrido', label: 'Híbrido' },
-  ];
-
   const sortOptions: SortOption<SortBy>[] = [
     { value: 'relevance', label: 'Relevancia' },
     { value: 'price-asc', label: 'Precio: menor a mayor' },
@@ -285,18 +233,6 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
   function toggleDropdown(id: string) {
     setOpenDropdown((prev) => (prev === id ? null : id));
   }
-
-  function toggleTopic(name: string) {
-    setSelectedTopics(prev =>
-      prev.includes(name) ? prev.filter(t => t !== name) : [...prev, name]
-    );
-  }
-
-  const hasActiveFilters = !!(
-    typeFilter || formatFilter || selectedTopics.length > 0 ||
-    priceRange[0] !== 0 || priceRange[1] !== 5000 ||
-    durationRange[0] !== 0 || durationRange[1] !== 2000
-  );
 
   // Type selector (Todos / Másteres / Cursos) — rendered inside the toolbar.
   const typeSelector = (
@@ -392,15 +328,9 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
           <div className="sticky top-24 z-30 bg-mx-bg/80 backdrop-blur-md py-4 mb-8" ref={filtersRef}>
             <FilterBar
               variant="light"
+              showFilterToggle={false}
               leadingSlot={typeSelector}
               secondaryRow={categoryStrip}
-              filtersExpanded={filtersExpanded}
-              onToggleFilters={() => {
-                setFiltersExpanded(prev => !prev);
-                if (filtersExpanded) setOpenDropdown(null);
-              }}
-              hasActiveFilters={hasActiveFilters}
-              filtersLabel="Filtros"
               resultsCount={filteredPrograms.length}
               resultsLabel={`MOSTRANDO ${filteredPrograms.length} RESULTADOS`}
               sortSlot={
@@ -485,77 +415,7 @@ export default function ProgramsClient({ initialPrograms, availableTopics, initi
                   />
                 </div>
               }
-            >
-              <FilterDropdown
-                id="type"
-                icon={<LayoutGrid size={14} />}
-                label="Tipo"
-                options={typeOptions}
-                value={typeFilter}
-                onChange={setTypeFilter}
-                isOpen={openDropdown === 'type'}
-                onToggle={() => toggleDropdown('type')}
-                variant="light"
-              />
-              <RangeFilterDropdown
-                id="price"
-                icon={<Tag size={14} />}
-                label="Precio"
-                min={0}
-                max={5000}
-                step={100}
-                value={priceRange}
-                onChange={setPriceRange}
-                formatValue={(v) => `${v}\u20AC`}
-                isOpen={openDropdown === 'price'}
-                onToggle={() => toggleDropdown('price')}
-                variant="light"
-              />
-              <FilterDropdown
-                id="format"
-                icon={<Monitor size={14} />}
-                label="Formato"
-                options={formatOptions}
-                value={formatFilter}
-                onChange={setFormatFilter}
-                isOpen={openDropdown === 'format'}
-                onToggle={() => toggleDropdown('format')}
-                variant="light"
-              />
-              <RangeFilterDropdown
-                id="duration"
-                icon={<Hourglass size={14} />}
-                label="Duración"
-                min={0}
-                max={2000}
-                step={50}
-                value={durationRange}
-                onChange={setDurationRange}
-                formatValue={(v) => `${v}h`}
-                isOpen={openDropdown === 'duration'}
-                onToggle={() => toggleDropdown('duration')}
-                variant="light"
-              />
-              {availableTopics.length > 0 && (
-                <>
-                  <div className="w-px h-6 bg-mx-border mx-1" />
-                  <TopicFilterTrigger
-                    isOpen={topicsOpen}
-                    toggle={() => setTopicsOpen(!topicsOpen)}
-                    selectedCount={selectedTopics.length}
-                  />
-                </>
-              )}
-            </FilterBar>
-
-            {availableTopics.length > 0 && (
-              <TopicBadgesRow
-                isOpen={topicsOpen && filtersExpanded}
-                topics={availableTopics}
-                selectedTopics={selectedTopics}
-                onToggle={toggleTopic}
-              />
-            )}
+            />
           </div>
         </m.div>
 
