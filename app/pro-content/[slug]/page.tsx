@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
-import { ArrowLeft, Lock, Download, FileText } from 'lucide-react';
+import { ArrowLeft, Download, FileText } from 'lucide-react';
 import { getProResourceBySlug } from '@/lib/strapi/queries';
 import { getServerUserState } from '@/lib/auth/server-user-state';
 
@@ -52,42 +52,10 @@ export default async function ProResourcePage({ params }: PageProps) {
 
   const { hasPro } = await getServerUserState();
 
-  // ── No-PRO: upsell (nunca se sirven las URLs reales) ───────────────────────
+  // ── No-PRO: a la página de planes. Nunca se sirven las URLs reales; en vez de
+  //    un upsell inline, redirigimos directamente a /pricing ("hazte PRO"). ────
   if (!hasPro) {
-    return (
-      <div className="min-h-screen bg-mx-bg text-mx-text flex flex-col">
-        <TopBar title={resource.title} />
-        <main className="flex-1 flex items-center justify-center px-6 py-20">
-          <div className="max-w-md text-center">
-            <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-mx-orange/15 flex items-center justify-center">
-              <Lock size={24} className="text-mx-orange" />
-            </div>
-            <h1 className="text-2xl font-bold mb-2">{resource.title}</h1>
-            {resource.description && (
-              <p className="text-mx-text/70 mb-4 whitespace-pre-line">{resource.description}</p>
-            )}
-            <p className="text-mx-text/55 mb-7 text-sm">
-              Este recurso es <span className="text-mx-orange font-medium">exclusivo PRO</span>. Hazte
-              PRO para acceder a este y al resto de contenido premium.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/pricing"
-                className="px-6 py-3 rounded-full bg-mx-orange text-black font-semibold hover:opacity-90 transition"
-              >
-                Hazte PRO
-              </Link>
-              <Link
-                href="/pro-content"
-                className="px-6 py-3 rounded-full border border-white/15 hover:border-white/30 transition"
-              >
-                Volver
-              </Link>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
+    redirect('/pricing');
   }
 
   // ── PRO + embebido (app web / HTML interactivo): iframe a pantalla ─────────
