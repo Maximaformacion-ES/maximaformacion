@@ -36,6 +36,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Payment not completed' }, { status: 400 });
     }
 
+    // Datos del comprador para conversiones mejoradas (Enhanced Conversions).
+    // Vienen de la sesión de Stripe (billing entrado en el checkout, incluye
+    // dirección/DNI). Se devuelven al cliente, que los adjunta al evento
+    // `purchase` para que GTM los mapee y envíe con la conversión.
+    const cd = session.customer_details;
+    const nameParts = (cd?.name || '').trim().split(/\s+/).filter(Boolean);
+    const customer = {
+      email: cd?.email || session.customer_email || undefined,
+      phone_number: cd?.phone || undefined,
+      first_name: nameParts[0] || undefined,
+      last_name: nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined,
+      street: cd?.address?.line1 || undefined,
+      city: cd?.address?.city || undefined,
+      region: cd?.address?.state || undefined,
+      postal_code: cd?.address?.postal_code || undefined,
+      country: cd?.address?.country || undefined,
+    };
+    const amountTotal = (session.amount_total || 0) / 100;
+
     const paymentType = session.metadata?.type;
 
     // Handle subscription / trial: update Clerk metadata to plan: 'pro'
@@ -77,7 +96,7 @@ export async function POST(request: Request) {
             }
           }
 
-          return NextResponse.json({ success: true, upgraded: true });
+          return NextResponse.json({ success: true, upgraded: true, customer });
         } catch (dbError) {
           console.warn('DB subscription update failed, falling back to Clerk:', dbError);
         }
@@ -99,7 +118,7 @@ export async function POST(request: Request) {
         },
       });
 
-      return NextResponse.json({ success: true, upgraded: true });
+      return NextResponse.json({ success: true, upgraded: true, customer });
     }
 
     if (paymentType !== 'maxymia-course' && paymentType !== 'course') {
@@ -135,7 +154,7 @@ export async function POST(request: Request) {
         });
 
         console.log(`Verified purchase for user ${userId}: ${title} (${documentId})`);
-        return NextResponse.json({ success: true, enrolled: true });
+        return NextResponse.json({ success: true, enrolled: true, customer, amountTotal });
       } catch (dbError) {
         console.warn('DB enrollment failed, falling back to Clerk:', dbError);
       }
@@ -177,7 +196,7 @@ export async function POST(request: Request) {
       });
     }
 
-    return NextResponse.json({ success: true, enrolled: true });
+    return NextResponse.json({ success: true, enrolled: true, customer, amountTotal });
   } catch (error) {
     console.error('Checkout verify error:', error);
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });

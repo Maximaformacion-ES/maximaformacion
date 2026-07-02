@@ -12,7 +12,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { StyledTitle } from '../components/StyledTitle';
-import { trackBeginCheckout, trackPurchaseOnce, type AnalyticsItem } from '@/lib/analytics';
+import { trackBeginCheckout, trackPurchaseOnce, stripeCustomerToUserData, type AnalyticsItem, type AnalyticsUserData } from '@/lib/analytics';
 import type { LucideIcon } from 'lucide-react';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -401,7 +401,7 @@ function PricingContent({ initialUserState }: { initialUserState?: ServerUserSta
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const {
     hasPro: hookHasPro,
     isTrialing: hookIsTrialing,
@@ -423,6 +423,23 @@ function PricingContent({ initialUserState }: { initialUserState?: ServerUserSta
     })
       .then(async (res) => {
         if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          // Datos de usuario para conversiones mejoradas (fallback a Clerk).
+          let userData: AnalyticsUserData | undefined = stripeCustomerToUserData(data.customer);
+          if (!userData?.email) {
+            const email = user?.primaryEmailAddress?.emailAddress;
+            if (email) {
+              userData = {
+                ...userData,
+                email,
+                address: {
+                  ...userData?.address,
+                  first_name: userData?.address?.first_name ?? user?.firstName ?? undefined,
+                  last_name: userData?.address?.last_name ?? user?.lastName ?? undefined,
+                },
+              };
+            }
+          }
           const proPlan = PLANS.find((p) => p.id === 'pro');
           if (proPlan) {
             const isYearly = billingPeriod === 'yearly';
@@ -443,6 +460,7 @@ function PricingContent({ initialUserState }: { initialUserState?: ServerUserSta
             trackPurchaseOnce(sessionId, {
               items: [item],
               value: item.price,
+              userData,
             });
           }
           // Reload so Clerk metadata refreshes and the UI reflects Pro
@@ -450,7 +468,7 @@ function PricingContent({ initialUserState }: { initialUserState?: ServerUserSta
         }
       })
       .catch((err) => console.error('Verify failed:', err));
-  }, [success, sessionId, isTrialSuccess, billingPeriod]);
+  }, [success, sessionId, isTrialSuccess, billingPeriod, user]);
 
   // During the brief window where Clerk + campus profile are loading,
   // prefer the server-resolved state so we don't briefly show the

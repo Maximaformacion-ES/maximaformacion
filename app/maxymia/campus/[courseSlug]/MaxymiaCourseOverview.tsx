@@ -30,6 +30,7 @@ import {
   X,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { trackPurchaseOnce, stripeCustomerToUserData, type AnalyticsUserData } from '@/lib/analytics';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
@@ -112,13 +113,42 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
         .then((res) => res.json())
         .then((data) => {
           if (data.enrolled) {
+            // Conversión GA4 + datos de usuario para conversiones mejoradas.
+            let userData = stripeCustomerToUserData(data.customer);
+            if (!userData?.email) {
+              const email = user?.primaryEmailAddress?.emailAddress;
+              if (email) {
+                userData = {
+                  ...userData,
+                  email,
+                  address: {
+                    ...userData?.address,
+                    first_name: userData?.address?.first_name ?? user?.firstName ?? undefined,
+                    last_name: userData?.address?.last_name ?? user?.lastName ?? undefined,
+                  },
+                };
+              }
+            }
+            const value: number = data.amountTotal ?? course.price;
+            trackPurchaseOnce(sessionId, {
+              items: [
+                {
+                  item_id: course.slug,
+                  item_name: course.title[locale],
+                  item_category: 'maxymia-course',
+                  price: value,
+                },
+              ],
+              value,
+              userData,
+            });
             window.history.replaceState({}, '', window.location.pathname);
             refetch();
           }
         })
         .catch(console.error);
     }
-  }, [searchParams, refetch]);
+  }, [searchParams, refetch, user, course, locale]);
 
   // Build progress from courseProgress
   const progress: MaxymiaCourseProgress | null = useMemo(() => {
