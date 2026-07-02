@@ -40,6 +40,8 @@ const isPublicRoute = createRouteMatcher([
   '/politica-de-privacidad(.*)',
   '/aviso-legal(.*)',
   '/politica-de-cookies(.*)',
+  '/sapo-privacy-policy(.*)',
+  '/sapo-terms-of-service(.*)',
   '/profesorado(.*)',
   '/autores(.*)',
   '/sitemap-autores.xml',
