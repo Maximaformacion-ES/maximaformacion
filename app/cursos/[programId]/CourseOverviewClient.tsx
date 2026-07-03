@@ -28,7 +28,7 @@ import type {
   ModuleWithLessons,
 } from '@/lib/strapi/types';
 import { formatTotalDuration, formatDuration } from '@/lib/cloudflare/stream';
-import { trackViewItem, trackPurchaseOnce } from '@/lib/analytics';
+import { trackViewItem, trackPurchaseOnce, stripeCustomerToUserData, type AnalyticsUserData } from '@/lib/analytics';
 import { getEffectivePrice } from '@/lib/pricing';
 
 // ─── Sub-components (lesson list — only used when internal lessons exist) ────
@@ -222,7 +222,7 @@ export default function CourseOverviewClient({
   richHtml,
   initialUserState,
 }: CourseOverviewClientProps) {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
   const {
     hasPro,
     hasAccess: checkAccess,
@@ -281,22 +281,58 @@ export default function CourseOverviewClient({
     });
   }, [program, userHasPro]);
 
-  // GA4 purchase
+  // GA4 purchase + datos de usuario para conversiones mejoradas. Recuperamos
+  // el comprador de Stripe vía /api/checkout/verify (email, nombre, dirección);
+  // si falla, caemos a los datos de Clerk (email + nombre). trackPurchaseOnce
+  // deduplica por sessionId, así que el reintento del efecto no dispara doble.
   useEffect(() => {
     if (!showSuccessMessage || !checkoutSessionId || !program?.slug) return;
-    const effective = getEffectivePrice(program, userHasPro);
-    trackPurchaseOnce(checkoutSessionId, {
-      items: [
-        {
-          item_id: program.slug,
-          item_name: program.title,
-          item_category: program.type,
-          price: effective,
-        },
-      ],
-      value: effective,
-    });
-  }, [showSuccessMessage, checkoutSessionId, program, userHasPro]);
+    let cancelled = false;
+    (async () => {
+      let userData: AnalyticsUserData | undefined;
+      try {
+        const res = await fetch('/api/checkout/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: checkoutSessionId }),
+        });
+        if (res.ok) userData = stripeCustomerToUserData((await res.json()).customer);
+      } catch {
+        /* seguimos con el fallback de Clerk */
+      }
+      if (!userData?.email) {
+        const email = user?.primaryEmailAddress?.emailAddress;
+        if (email) {
+          userData = {
+            ...userData,
+            email,
+            address: {
+              ...userData?.address,
+              first_name: userData?.address?.first_name ?? user?.firstName ?? undefined,
+              last_name: userData?.address?.last_name ?? user?.lastName ?? undefined,
+            },
+          };
+        }
+      }
+      if (cancelled) return;
+      const effective = getEffectivePrice(program, userHasPro);
+      trackPurchaseOnce(checkoutSessionId, {
+        items: [
+          {
+            item_id: program.slug,
+            item_name: program.title,
+            item_category: program.type,
+            price: effective,
+          },
+        ],
+        value: effective,
+        userData,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [showSuccessMessage, checkoutSessionId, program, userHasPro, user]);
 
   const toggleModule = (index: number) => {
     setExpandedModules((prev) => {
