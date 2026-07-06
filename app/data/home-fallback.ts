@@ -1,7 +1,7 @@
 import type { HomeData } from '@/lib/strapi/types';
 
 export const HOME_FALLBACK: HomeData = {
-  heroOverline: 'Formación Profesional experta',
+  heroOverline: 'Formación superior online',
   heroTitle: 'TRANSFORMA {TU FUTURO}',
   heroDescription: 'Formación especializada que impulsa tu carrera profesional al siguiente nivel',
   numericSection: {
