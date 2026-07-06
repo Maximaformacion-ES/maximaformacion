@@ -50,8 +50,8 @@ export const Footer: React.FC = () => {
               )}
             </Link>
             <p className="text-mx-text-muted text-body-sm font-light mt-4 max-w-xs leading-relaxed">
-              Formación profesional experta para impulsar tu carrera al
-              siguiente nivel.
+              Formación superior online que supera tus expectativas, en todos
+              los sentidos.
             </p>
 
             {/* Social links */}
