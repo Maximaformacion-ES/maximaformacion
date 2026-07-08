@@ -14,7 +14,7 @@ const COPY = {
     overline: 'Nuestro compromiso',
     title: 'Tu progreso nos importa {tanto como a ti}',
     message:
-      'En Máxima Formación no aprendes solo/a. Detrás de cada curso hay un equipo docente real que te acompaña: resolvemos tus dudas en menos de 24 horas, durante el curso y también cuando lo termines. Tu progreso nos importa tanto como a nosotros.',
+      'En Máxima Formación no aprendes solo/a. Detrás de cada curso hay un equipo docente real que te acompaña: resolvemos tus dudas en menos de 24 horas, durante el curso y también cuando lo termines. Tu progreso nos importa tanto como a ti.',
     sign: 'Equipo docente de Máxima Formación',
   },
   en: {
