@@ -130,7 +130,10 @@ export default async function RootLayout({
   ]);
   const branding = {
     logoMaximaformacion: siteMetadata?.logoMaximaformacion || '',
-    logoMaxymia: siteMetadata?.logoMaxymia || '',
+    // El logo de Maxymia se sirve como asset estático (versión blanca, para las
+    // cabeceras/footer oscuros de Maxymia). El campo `logoMaxymia` del Site
+    // Metadata de Strapi apunta por error al logo de Máxima (logo_completo).
+    logoMaxymia: '/logo_maxymia_blanco_sin_fondo.png',
   };
 
   // Group programs by subjectArea for the desktop megamenu. Ordering and
