@@ -532,9 +532,12 @@ const MaxymiaSection = () => {
       {ownedMaxymiaCourses.map((course) => {
         const progress = courseProgress[course.id];
         const completedCount = progress?.completedLessons.length ?? 0;
-        const pct = course.meta.totalLessons > 0
+        // Prefer the unit-based percent computed server-side (matches the
+        // campus). Fall back to a lessons-based estimate only when there's no
+        // snapshot yet for the course.
+        const pct = progress?.progressPercent ?? (course.meta.totalLessons > 0
           ? Math.round((completedCount / course.meta.totalLessons) * 100)
-          : 0;
+          : 0);
 
         return (
           <Link

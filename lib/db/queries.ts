@@ -1,6 +1,6 @@
 import { eq, and, sql, avg, count, isNull, desc, inArray } from 'drizzle-orm';
 import { db } from './client';
-import { users, subscriptions, enrollments, lessonProgress, courseActivity, courseReviews, courseUpdates, courseUpdateReads } from './schema';
+import { users, subscriptions, enrollments, lessonProgress, courseActivity, courseReviews, courseUpdates, courseUpdateReads, courseSnapshots } from './schema';
 
 // ─── Users ──────────────────────────────────────────────────────────────────
 
@@ -214,6 +214,7 @@ export async function getAllCourseProgress(clerkId: string) {
     currentLessonId: string | null;
     lastAccessedAt: string | null;
     startedAt: string | null;
+    progressPercent?: number;
   }> = {};
 
   for (const lesson of lessons) {
@@ -240,6 +241,32 @@ export async function getAllCourseProgress(clerkId: string) {
     progressMap[activity.programDocumentId].currentLessonId = activity.currentLessonId;
     progressMap[activity.programDocumentId].lastAccessedAt = activity.lastAccessedAt.toISOString();
     progressMap[activity.programDocumentId].startedAt = activity.startedAt.toISOString();
+  }
+
+  // Enrich with a unit-based progress percent using course_snapshots as the
+  // source of truth for the total units per course (`versions` holds one key
+  // per unit uid). This matches the campus's per-unit calc so every surface
+  // (profile, "Mis Cursos"…) shows the same %. Courses without a snapshot are
+  // left without a percent and the caller keeps its own fallback estimate.
+  const docIds = Object.keys(progressMap);
+  if (docIds.length > 0) {
+    const snapshots = await db
+      .select({
+        programDocumentId: courseSnapshots.programDocumentId,
+        versions: courseSnapshots.versions,
+      })
+      .from(courseSnapshots)
+      .where(inArray(courseSnapshots.programDocumentId, docIds));
+
+    for (const snap of snapshots) {
+      const entry = progressMap[snap.programDocumentId];
+      if (!entry) continue;
+      const unitKeys = Object.keys((snap.versions as Record<string, unknown>) ?? {});
+      if (unitKeys.length === 0) continue;
+      const unitSet = new Set(unitKeys);
+      const completed = entry.completedLessons.filter((u) => unitSet.has(u)).length;
+      entry.progressPercent = Math.min(100, Math.round((completed / unitKeys.length) * 100));
+    }
   }
 
   return progressMap;

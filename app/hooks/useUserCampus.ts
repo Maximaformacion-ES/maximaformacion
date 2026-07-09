@@ -27,6 +27,9 @@ interface CourseProgressData {
   currentLessonId: string | null;
   lastAccessedAt: string | null;
   startedAt: string | null;
+  // Unit-based percent (completed units / total units) computed server-side
+  // from course_snapshots, so every surface shows the same % as the campus.
+  progressPercent?: number;
 }
 
 interface CampusProfile {
