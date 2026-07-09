@@ -293,7 +293,12 @@ export function getLesson(courseSlug: string, lessonId: string) {
   if (!course) return null;
 
   for (const block of course.blocks) {
-    const lesson = block.lessons.find((l) => l.id === lessonId);
+    const lesson = block.lessons.find(
+      (l) =>
+        l.id === lessonId ||
+        l.uid === lessonId ||
+        (l.topics ?? []).some((t) => t.uid === lessonId)
+    );
     if (lesson) return { lesson, block, course };
   }
 
@@ -306,7 +311,16 @@ export async function fetchLesson(courseSlug: string, lessonId: string) {
   if (!course) return null;
 
   for (const block of course.blocks) {
-    const lesson = block.lessons.find((l) => l.id === lessonId);
+    // Resolve by the stable slug id (used in lesson links) OR by a durable uid
+    // — either the lesson's own uid or one of its topic uids. `course_activity`
+    // stores the last-viewed unit by uid, so the "Continuar" link from the
+    // profile carries a uid; without this it 404s (the route only matched id).
+    const lesson = block.lessons.find(
+      (l) =>
+        l.id === lessonId ||
+        l.uid === lessonId ||
+        (l.topics ?? []).some((t) => t.uid === lessonId)
+    );
     if (lesson) return { lesson, block, course };
   }
 
