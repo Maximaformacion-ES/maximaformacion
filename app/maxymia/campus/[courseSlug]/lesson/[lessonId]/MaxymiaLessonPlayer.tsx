@@ -228,12 +228,16 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
     document.getElementById('lesson-content-area')?.scrollTo({ top: 0 });
   }, [currentLessonId, course.slug]);
 
-  const handleAdvanceLesson = useCallback(async () => {
-    // Mark the current unit complete before leaving the lesson (the selected
-    // topic, or the lesson itself when it has no topics).
+  const handleAdvanceLesson = useCallback(() => {
+    // Marca la unidad actual como completada en SEGUNDO PLANO. `markUnitComplete`
+    // ya hace el update optimista síncrono (el ✓ aparece al instante), así que NO
+    // bloqueamos la navegación esperando la red — eso era lo que hacía lento el
+    // botón "Siguiente" frente al clic directo (que no marca progreso).
     if (currentUnitUid) {
-      await markUnitComplete(currentUnitUid);
-      await refetch();
+      void (async () => {
+        await markUnitComplete(currentUnitUid);
+        await refetch();
+      })();
     }
     if (nextIsExam) {
       // El examen es una ruta/página aparte del servidor → navegación real.
@@ -257,8 +261,9 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
   };
 
   // Advancing to the next topic counts the CURRENT topic as completed.
-  const handleAdvanceToTopic = useCallback(async (next: MaxymiaTopic) => {
-    if (currentUnitUid) await markUnitComplete(currentUnitUid);
+  const handleAdvanceToTopic = useCallback((next: MaxymiaTopic) => {
+    // Progreso en segundo plano (optimista); navegamos al tema de inmediato.
+    if (currentUnitUid) void markUnitComplete(currentUnitUid);
     handleSelectTopic(next);
   }, [currentUnitUid, markUnitComplete, handleSelectTopic]);
 
