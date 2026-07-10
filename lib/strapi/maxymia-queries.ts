@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { strapiGraphQL, getStrapiMediaUrl } from './client';
 import type {
   StrapiMaxymiaContentBlock,
@@ -518,12 +519,23 @@ export async function getMaxymiaCoursesFromStrapi(): Promise<MaxymiaCourse[]> {
 export async function getMaxymiaCourseBySlugFromStrapi(
   slug: string
 ): Promise<MaxymiaCourse | null> {
-  const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(
-    MAXYMIA_COURSE_DETAIL_QUERY,
-    { slug },
+  // Cachear el curso completo por slug. Cada navegación entre lecciones vuelve a
+  // pedir el MISMO curso (query grande al Strapi self-hosted, por VPN). El Data
+  // Cache de Next no cachea POST de forma fiable, así que memoizamos el resultado
+  // con unstable_cache: misma curso = 1 fetch y luego cache-hit. Revalida a los
+  // 60s y por tags (el webhook de Strapi ya revalida 'maxymia-courses').
+  const load = unstable_cache(
+    async (s: string): Promise<MaxymiaCourse | null> => {
+      const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(
+        MAXYMIA_COURSE_DETAIL_QUERY,
+        { slug: s }
+      );
+      const node = data.maxymiaCourses_connection.nodes[0];
+      if (!node) return null;
+      return transformCourse(node);
+    },
+    ['maxymia-course-detail', slug],
     { revalidate: 60, tags: ['maxymia-courses', `maxymia-course-${slug}`] }
   );
-  const node = data.maxymiaCourses_connection.nodes[0];
-  if (!node) return null;
-  return transformCourse(node);
+  return load(slug);
 }

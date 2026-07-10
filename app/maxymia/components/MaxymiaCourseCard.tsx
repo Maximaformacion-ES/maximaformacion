@@ -105,7 +105,7 @@ export default function MaxymiaCourseCard({
     >
       <Link href={campusHref} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : c.cardBorder}`}>
         {/* Thumbnail area */}
-        <div className={`relative h-[200px] overflow-hidden flex items-center justify-center ${isFullyCompleted ? 'bg-gradient-to-br from-amber-600 to-amber-800' : 'bg-[#527be7]'}`}>
+        <div className={`relative h-[240px] overflow-hidden flex items-center justify-center ${isFullyCompleted ? 'bg-gradient-to-br from-amber-600 to-amber-800' : 'bg-[#527be7]'}`}>
           {/* Completion badge */}
           {isFullyCompleted && (
             <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-500/30">
