@@ -407,7 +407,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   </div>
                   <div className="relative px-12 text-center">
                     <p className="text-white text-body-md font-black uppercase tracking-tight leading-tight">
-                      {course.title[locale]}
+                      {course.thumbnailTitle?.[locale] || course.title[locale]}
                     </p>
                   </div>
                 </div>
