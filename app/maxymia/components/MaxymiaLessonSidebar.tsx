@@ -44,8 +44,9 @@ interface MaxymiaLessonSidebarProps {
   completedLessons: Set<string>;
   updatedUnits?: UpdatedUnits;
   locale: Locale;
-  onSelectTopic?: (topic: MaxymiaTopic) => void;
-  onSelectLesson?: () => void;
+  /** Navegación EN CLIENTE: cambia de lección (y opcionalmente selecciona un tema)
+   *  sin ir al servidor. El player pinta desde el curso ya cargado. */
+  onNavigate?: (lessonId: string, topic?: MaxymiaTopic) => void;
   selectedTopicId?: string | null;
 }
 
@@ -55,11 +56,16 @@ export default function MaxymiaLessonSidebar({
   completedLessons,
   updatedUnits = {},
   locale,
-  onSelectTopic,
-  onSelectLesson,
+  onNavigate,
   selectedTopicId,
 }: MaxymiaLessonSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Al navegar desde el sidebar cerramos el drawer móvil (en desktop es no-op).
+  const handleNavigate = (lessonId: string, topic?: MaxymiaTopic) => {
+    onNavigate?.(lessonId, topic);
+    setMobileOpen(false);
+  };
 
   const { completed: completedCount, total: totalLessons, percent: progressPercent } =
     getCourseProgressStats(course, completedLessons);
@@ -93,8 +99,7 @@ export default function MaxymiaLessonSidebar({
             completedLessons={completedLessons}
             updatedUnits={updatedUnits}
             locale={locale}
-            onSelectTopic={onSelectTopic}
-            onSelectLesson={onSelectLesson}
+            onNavigate={handleNavigate}
             selectedTopicId={selectedTopicId}
           />
         ))}
@@ -161,17 +166,31 @@ interface SidebarBlockProps {
   completedLessons: Set<string>;
   updatedUnits: UpdatedUnits;
   locale: Locale;
-  onSelectTopic?: (topic: MaxymiaTopic) => void;
-  onSelectLesson?: () => void;
+  onNavigate?: (lessonId: string, topic?: MaxymiaTopic) => void;
   selectedTopicId?: string | null;
 }
 
-function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, updatedUnits, locale, onSelectTopic, onSelectLesson, selectedTopicId }: SidebarBlockProps) {
+function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, updatedUnits, locale, onNavigate, selectedTopicId }: SidebarBlockProps) {
   const hasCurrentLesson = block.lessons.some((l) => l.id === currentLessonId);
   const [open, setOpen] = useState(hasCurrentLesson);
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(
     () => new Set(hasCurrentLesson ? [currentLessonId] : [])
   );
+
+  // Con navegación en cliente el sidebar NO se remonta al cambiar de lección, así
+  // que abrimos el bloque y expandimos la lección actual cuando pasa a estar aquí
+  // (sin colapsar lo que el usuario haya abierto manualmente). Ajuste de estado
+  // durante el render con el id previo (patrón oficial de React), no un effect.
+  const [prevLessonId, setPrevLessonId] = useState(currentLessonId);
+  if (currentLessonId !== prevLessonId) {
+    setPrevLessonId(currentLessonId);
+    if (hasCurrentLesson) {
+      setOpen(true);
+      setExpandedLessons((prev) =>
+        prev.has(currentLessonId) ? prev : new Set(prev).add(currentLessonId)
+      );
+    }
+  }
 
   const completedInBlock = block.lessons.filter((l) => isLessonComplete(l, completedLessons)).length;
 
@@ -237,13 +256,12 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
                     ) : (
                       <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
                     )}
-                    <Link
-                      href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}`}
-                      onClick={isCurrent && onSelectLesson ? (e) => { e.preventDefault(); onSelectLesson(); } : undefined}
-                      className="line-clamp-1 flex-1"
+                    <button
+                      onClick={() => onNavigate?.(lesson.id)}
+                      className="line-clamp-1 flex-1 text-left"
                     >
                       {lesson.title[locale]}
-                    </Link>
+                    </button>
                     {hasTopics && (
                       <button
                         onClick={() => toggleLesson(lesson.id)}
@@ -267,37 +285,29 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
                         className="overflow-hidden"
                       >
                         {lesson.topics!.map((topic, topicIdx) => {
-                          const isSelected = selectedTopicId === topic.id;
+                          const isSelected = isCurrent && selectedTopicId === topic.id;
                           const topicChange = updatedUnits[topic.uid || topic.id]?.type;
                           const newStar = topicChange ? (
                             <span className="ml-auto">
                               <ChangeBadge change={topicChange} locale={locale} />
                             </span>
                           ) : null;
-                          return isCurrent && onSelectTopic ? (
+                          return (
                             <button
                               key={topic.id}
-                              onClick={() => onSelectTopic(topic)}
+                              onClick={() => onNavigate?.(lesson.id, topic)}
                               className={`w-full flex items-center gap-2 pl-14 pr-4 py-1.5 text-label-sm transition-colors text-left ${
-                                isSelected
-                                  ? 'text-mx-orange font-medium'
-                                  : 'text-mx-orange/60 hover:text-mx-orange'
+                                isCurrent
+                                  ? isSelected
+                                    ? 'text-mx-orange font-medium'
+                                    : 'text-mx-orange/60 hover:text-mx-orange'
+                                  : 'text-white/35 hover:text-white/60'
                               }`}
                             >
                               <span className={`text-[10px] flex-shrink-0 ${isSelected ? 'text-mx-orange' : 'text-white/20'}`}>{topicIdx + 1}.</span>
                               <span className="line-clamp-1">{topic.title[locale]}</span>
                               {newStar}
                             </button>
-                          ) : (
-                            <Link
-                              key={topic.id}
-                              href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}#${topic.anchorId}`}
-                              className="flex items-center gap-2 pl-14 pr-4 py-1.5 text-label-sm transition-colors text-white/35 hover:text-white/60"
-                            >
-                              <span className="text-[10px] text-white/20 flex-shrink-0">{topicIdx + 1}.</span>
-                              <span className="line-clamp-1">{topic.title[locale]}</span>
-                              {newStar}
-                            </Link>
                           );
                         })}
                       </m.div>

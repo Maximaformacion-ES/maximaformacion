@@ -38,7 +38,7 @@ interface Props {
   updatedUnits?: Record<string, { type: 'new' | 'updated'; ids: string[] }>;
 }
 
-export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnits = {} }: Props) {
+export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesson: initialLesson, updatedUnits = {} }: Props) {
   const { locale } = useLocale();
   const router = useRouter();
   const { courseProgress, refetch } = useUserCampus();
@@ -49,6 +49,27 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
   const [sidebarOpen, setSidebarOpen] = useState(true);
   // Track which topic is selected (null = lesson index view)
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+
+  // ─── Navegación de lección EN CLIENTE ────────────────────────────────
+  // El player ya recibe el curso COMPLETO (todas las lecciones y su contenido),
+  // así que moverse entre lecciones no necesita una ida al servidor — igual que
+  // ya pasa con los temas. Guardamos la lección actual y derivamos su bloque/
+  // lección desde `course`; la URL se mantiene con history.pushState (deep-links
+  // y botón atrás/adelante). Resultado: cambiar de lección es instantáneo, sin
+  // skeleton ni re-fetch.
+  const [currentLessonId, setCurrentLessonId] = useState(initialLesson.id);
+  // Derivación directa (el React Compiler la memoiza): los objetos vienen de
+  // `course`, estable, así que su referencia solo cambia cuando cambia la lección.
+  let block = initialBlock;
+  let lesson = initialLesson;
+  for (const b of course.blocks) {
+    const found = b.lessons.find((x) => x.id === currentLessonId);
+    if (found) {
+      block = b;
+      lesson = found;
+      break;
+    }
+  }
 
   // Read hash on mount and on hash change to select topic
   useEffect(() => {
@@ -70,6 +91,21 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
   useEffect(() => {
     if (!window.location.hash) setSelectedTopicId(null);
   }, [lesson.id]);
+
+  // Botón atrás/adelante: la URL la manejamos con pushState, así que al navegar
+  // por el historial sincronizamos la lección desde el path (client-side, sin
+  // re-fetch). Si el id no está en el curso, dejamos que el router haga su nav.
+  useEffect(() => {
+    const onPop = () => {
+      const match = window.location.pathname.match(/\/lesson\/([^/]+)/);
+      const id = match ? decodeURIComponent(match[1]) : null;
+      if (!id) return;
+      const exists = course.blocks.some((b) => b.lessons.some((l) => l.id === id));
+      if (exists) setCurrentLessonId(id);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [course]);
 
   const hasTopics = lesson.topics && lesson.topics.length > 0;
   const introBlocks: ContentBlock[] = lesson.intro ? lesson.intro[locale] : [];
@@ -175,6 +211,23 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
     }
   }, [course.id, markUnitRead]);
 
+  // Cambia de lección (o de tema dentro de una lección) EN CLIENTE. Misma lección
+  // → replaceState (no ensuciar el historial con cada tema). Otra lección →
+  // pushState (para que el botón atrás vuelva a la anterior). El contenido se pinta
+  // desde `course`, ya cargado, así que es instantáneo.
+  const navigateToLesson = useCallback((lessonId: string, topic?: MaxymiaTopic) => {
+    const hash = topic ? `#${topic.anchorId}` : '';
+    const url = `/maxymia/campus/${course.slug}/lesson/${lessonId}${hash}`;
+    if (lessonId === currentLessonId) {
+      window.history.replaceState(null, '', url);
+    } else {
+      setCurrentLessonId(lessonId);
+      window.history.pushState(null, '', url);
+    }
+    setSelectedTopicId(topic ? topic.id : null);
+    document.getElementById('lesson-content-area')?.scrollTo({ top: 0 });
+  }, [currentLessonId, course.slug]);
+
   const handleAdvanceLesson = useCallback(async () => {
     // Mark the current unit complete before leaving the lesson (the selected
     // topic, or the lesson itself when it has no topics).
@@ -183,13 +236,14 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
       await refetch();
     }
     if (nextIsExam) {
+      // El examen es una ruta/página aparte del servidor → navegación real.
       router.push(`/maxymia/campus/${course.slug}/lesson/${lesson.id}/exam?index=0`);
     } else if (nav?.next) {
-      router.push(`/maxymia/campus/${course.slug}/lesson/${nav.next.lessonId}`);
+      navigateToLesson(nav.next.lessonId);
     } else {
       router.push(`/maxymia/campus/${course.slug}`);
     }
-  }, [nav, nextIsExam, lesson.id, currentUnitUid, markUnitComplete, refetch, router, course.slug]);
+  }, [nav, nextIsExam, lesson.id, currentUnitUid, markUnitComplete, refetch, router, course.slug, navigateToLesson]);
 
   const handleSelectTopic = useCallback((topic: MaxymiaTopic) => {
     setSelectedTopicId(topic.id);
@@ -248,8 +302,7 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
               completedLessons={completedSet}
               updatedUnits={updates}
               locale={locale}
-              onSelectTopic={handleSelectTopic}
-              onSelectLesson={handleBackToIndex}
+              onNavigate={navigateToLesson}
               selectedTopicId={selectedTopicId}
             />
           </m.div>
@@ -299,14 +352,14 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
               </span>
             )}
             {nav?.prev && (
-              <Link
-                href={`/maxymia/campus/${course.slug}/lesson/${nav.prev.lessonId}`}
+              <button
+                onClick={() => navigateToLesson(nav.prev!.lessonId)}
                 title={locale === 'es' ? 'Lección anterior' : 'Previous lesson'}
                 aria-label={locale === 'es' ? 'Lección anterior' : 'Previous lesson'}
                 className="w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-white/60 hover:text-mx-orange hover:border-mx-orange/30 active:scale-90 active:bg-mx-orange/10 transition-all duration-150"
               >
                 <ChevronLeft size={16} />
-              </Link>
+              </button>
             )}
             {(nav?.next || nextIsExam || hasTopics) && (
               <button
@@ -394,8 +447,8 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
               onAdvanceToTopic={handleAdvanceToTopic}
               onBackToIndex={handleBackToIndex}
               onNextLesson={handleAdvanceLesson}
+              onNavigateLesson={navigateToLesson}
               prevLesson={nav.prev}
-              courseSlug={course.slug}
               locale={locale}
               nextIsExam={nextIsExam}
             />
@@ -403,14 +456,14 @@ export default function MaxymiaLessonPlayer({ course, block, lesson, updatedUnit
             /* ─── Lesson-level navigation ─── */
             <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
               {nav.prev ? (
-                <Link
-                  href={`/maxymia/campus/${course.slug}/lesson/${nav.prev.lessonId}`}
+                <button
+                  onClick={() => navigateToLesson(nav.prev!.lessonId)}
                   className="flex items-center gap-2 text-white/50 hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
                 >
                   <ArrowLeft size={16} />
                   <span className="hidden sm:inline">{nav.prev.title[locale]}</span>
                   <span className="sm:hidden">{locale === 'es' ? 'Anterior' : 'Previous'}</span>
-                </Link>
+                </button>
               ) : (
                 <div />
               )}
@@ -472,8 +525,8 @@ interface TopicNavigationProps {
   onAdvanceToTopic: (topic: MaxymiaTopic) => void;
   onBackToIndex: () => void;
   onNextLesson: () => void;
+  onNavigateLesson: (lessonId: string) => void;
   prevLesson: { blockId: string; lessonId: string; title: { es: string; en: string } } | null;
-  courseSlug: string;
   locale: 'es' | 'en';
   nextIsExam?: boolean;
 }
@@ -485,8 +538,8 @@ function TopicNavigation({
   onAdvanceToTopic,
   onBackToIndex,
   onNextLesson,
+  onNavigateLesson,
   prevLesson,
-  courseSlug,
   locale,
   nextIsExam,
 }: TopicNavigationProps) {
@@ -509,14 +562,14 @@ function TopicNavigation({
           <span className="sm:hidden">{locale === 'es' ? 'Anterior' : 'Previous'}</span>
         </button>
       ) : isFirst && prevLesson ? (
-        <Link
-          href={`/maxymia/campus/${courseSlug}/lesson/${prevLesson.lessonId}`}
+        <button
+          onClick={() => onNavigateLesson(prevLesson.lessonId)}
           className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
         >
           <ArrowLeft size={16} />
           <span className="hidden sm:inline">{prevLesson.title[locale]}</span>
           <span className="sm:hidden">{locale === 'es' ? 'Lección anterior' : 'Previous lesson'}</span>
-        </Link>
+        </button>
       ) : isFirst ? (
         <button
           onClick={onBackToIndex}
