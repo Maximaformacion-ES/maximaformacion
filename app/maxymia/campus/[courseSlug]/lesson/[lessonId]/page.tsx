@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { fetchLesson } from '../../../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
@@ -16,38 +17,57 @@ interface PageProps {
 
 export default async function LessonPage({ params }: PageProps) {
   const { courseSlug, lessonId } = await params;
-  const result = await fetchLesson(courseSlug, lessonId);
+
+  // Curso (cacheado en el edge por Cloudflare) + sesión, EN PARALELO.
+  const [result, { userId }] = await Promise.all([
+    fetchLesson(courseSlug, lessonId),
+    auth(),
+  ]);
 
   if (!result) notFound();
 
-  // Server-side access gate. The campus layout only requires the visitor to
-  // be signed in — it does NOT verify they bought *this* course, so without
-  // this any logged-in user could open any lesson by URL. Bounce a
-  // non-entitled visitor to the course page (which shows the purchase view)
-  // before the player content is ever sent. Enrollment is keyed by course id.
-  const { hasAccess } = await getCourseAccess(result.course.id, result.course.isPro);
+  // Gate de acceso + updates del alumno EN PARALELO (ambos solo dependen del curso
+  // ya cargado). El acceso se valida en servidor: la layout del campus solo exige
+  // estar logueado, no haber comprado ESTE curso, así que sin esto cualquiera
+  // podría abrir una lección por URL. Enrollment va por course id.
+  const [{ hasAccess }, unitUpdates] = await Promise.all([
+    getCourseAccess(result.course.id, result.course.isPro),
+    userId
+      ? getUserUnitUpdates(userId, result.course.id)
+      : Promise.resolve(new Map<string, { type: UnitChange; ids: string[] }>()),
+  ]);
+
   if (!hasAccess) {
     redirect(`/maxymia/campus/${courseSlug}`);
   }
 
-  // Changelog (Opción 2): detecta cambios desde el snapshot y marca por unidad
-  // "Contenido nuevo / actualizado" hasta que el alumno lo lee. Best-effort.
-  await reconcileCourseUpdates(result.course);
-  const { userId } = await auth();
+  // Changelog (Opción 2): "Contenido nuevo / actualizado" por unidad hasta leerlo.
   const updatedUnits: Record<string, { type: UnitChange; ids: string[] }> = {};
+  unitUpdates.forEach((v, uid) => {
+    updatedUnits[uid] = v;
+  });
   if (userId) {
-    const map = await getUserUnitUpdates(userId, result.course.id);
-    map.forEach((v, uid) => {
-      updatedUnits[uid] = v;
-    });
     // Si el CONTENIDO de una unidad ya completada se actualizó, la re-abrimos
-    // (la des-completamos) para que el alumno la repase; el progreso de su
-    // lección/curso se recalcula solo al caer esa unidad del set de completadas.
+    // (la des-completamos) para que el alumno la repase.
     const reopen = Object.entries(updatedUnits)
       .filter(([, v]) => v.type === 'updated')
       .map(([uid]) => uid);
-    await unmarkUnits(userId, result.course.id, reopen);
+    if (reopen.length > 0) {
+      await unmarkUnits(userId, result.course.id, reopen);
+    }
   }
+
+  // Reconcilia el snapshot en SEGUNDO PLANO (tras enviar la respuesta): hashear las
+  // ~280 unidades + leer el snapshot en CADA navegación pesaba en el camino crítico
+  // y casi nunca hay cambios. Ahora no bloquea el render; un cambio de contenido se
+  // detecta para la siguiente visita (best-effort).
+  after(async () => {
+    try {
+      await reconcileCourseUpdates(result.course);
+    } catch {
+      // best-effort
+    }
+  });
 
   return (
     <MaxymiaLessonPlayer

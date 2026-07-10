@@ -1,4 +1,5 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
+import { purgeStrapiEdgeCache } from '@/lib/cloudflare-purge';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -107,9 +108,16 @@ export async function POST(request: NextRequest) {
     revalidatePath('/programas');
     revalidatePath('/blog');
 
+    // Purga el edge cache de Cloudflare del Strapi self-hosted, para que el
+    // cambio se vea al instante (el Worker cachea GraphQL con TTL largo). Best-
+    // effort: no bloquea la respuesta del webhook si falla.
+    const purge = await purgeStrapiEdgeCache();
+    console.log(`[Strapi Webhook] Cloudflare ${purge.message}`);
+
     return NextResponse.json({
       revalidated: true,
       tags: tagsToRevalidate,
+      edgeCache: purge.message,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
