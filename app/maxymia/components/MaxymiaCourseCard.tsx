@@ -37,10 +37,6 @@ export default function MaxymiaCourseCard({
     completed: completedCount,
   } = getCourseProgressStats(course, progress?.completedLessons);
 
-  const thumbnailLines = course.thumbnailTitle
-    ? course.thumbnailTitle[locale].split('\n')
-    : [course.title[locale].split(' ').slice(0, 2).join(' ')];
-
   const createdLabel = course.createdAt
     ? new Date(course.createdAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', { month: 'short', year: 'numeric' })
     : null;
@@ -104,8 +100,8 @@ export default function MaxymiaCourseCard({
       className="group/card relative h-full"
     >
       <Link href={campusHref} className={`flex flex-col h-full overflow-hidden rounded-xl border ${isFullyCompleted ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : c.cardBorder}`}>
-        {/* Thumbnail area */}
-        <div className={`relative h-[240px] overflow-hidden flex items-center justify-center ${isFullyCompleted ? 'bg-gradient-to-br from-amber-600 to-amber-800' : 'bg-[#527be7]'}`}>
+        {/* Thumbnail — solo la imagen del curso */}
+        <div className="relative h-[240px] overflow-hidden">
           {/* Completion badge */}
           {isFullyCompleted && (
             <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-amber-500/30">
@@ -115,45 +111,11 @@ export default function MaxymiaCourseCard({
               </span>
             </div>
           )}
-          {/* Course image at 10% opacity behind everything */}
           <img
             src={course.image}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-20"
+            alt={course.title[locale]}
+            className="w-full h-full object-cover"
           />
-
-          {/* Dark cloud/glow behind chevrons + text for contrast */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-full h-[60%] bg-[#0b1018]/50 blur-[30px]" />
-          </div>
-
-          {/* Left chevron */}
-          <div className="absolute left-1 top-1/2 -translate-y-1/2 z-10">
-            <img src="/iconBlue.svg" alt="" className="w-8 h-auto" />
-          </div>
-
-          {/* Right chevron */}
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 z-10">
-            <img src="/iconOrange.svg" alt="" className="w-8 h-auto" />
-          </div>
-
-          {/* Thumbnail title centered */}
-          <div className="relative z-10 text-center px-12">
-            {thumbnailLines.length > 1 ? (
-              <>
-                <p className="text-white/70 text-label-md tracking-widest uppercase font-medium shadow-2xl">
-                  {thumbnailLines[0]}
-                </p>
-                <p className="text-white text-heading-md font-black tracking-tight leading-tight shadow-2xl">
-                  {thumbnailLines.slice(1).join(' ')}
-                </p>
-              </>
-            ) : (
-              <p className="text-white text-heading-sm font-black tracking-tight leading-tight uppercase shadow-2xl">
-                {thumbnailLines[0]}
-              </p>
-            )}
-          </div>
         </div>
 
         {/* Content area */}

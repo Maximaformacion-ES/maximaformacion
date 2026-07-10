@@ -382,9 +382,9 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
         {/* Content */}
         <m.div
           key={selectedTopicId || 'index'}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
           className="px-6 md:px-12 lg:px-16 py-10 max-w-4xl mx-auto"
         >
           {selectedSection ? (
