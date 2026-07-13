@@ -190,3 +190,22 @@ export const examResults = campusSchema.table('exam_results', {
   uniqueIndex('idx_exam_results_unique').on(table.clerkId, table.examId),
   index('idx_exam_results_course').on(table.clerkId, table.courseId),
 ]);
+
+// ─── Admin Audit ───────────────────────────────────────────────────────
+// Registro inmutable de las mutaciones del panel admin (Fase 1). El panel opera
+// datos de usuario/PII (dar acceso, PRO, provisioning…), así que la seguridad se
+// apoya en requireAdmin() + ESTA auditoría + confirmación en destructivas.
+export const adminAudit = campusSchema.table('admin_audit', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clerkIdActor: text('clerk_id_actor').notNull(),      // admin que ejecutó la acción
+  action: text('action').notNull(),                    // 'grant_access' | 'revoke_access' | 'set_pro' | 'reprovision' | …
+  entityType: text('entity_type'),                     // 'enrollment' | 'plan' | 'moodle' | …
+  entityId: text('entity_id'),                         // documentId / courseId afectado
+  targetClerkId: text('target_clerk_id'),              // alumno afectado
+  diff: jsonb('diff'),                                 // payload / antes-después de la acción
+  source: text('source').default('panel').notNull(),   // 'panel' | 'assistant' | 'script'
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  index('idx_admin_audit_target').on(table.targetClerkId),
+  index('idx_admin_audit_created').on(table.createdAt),
+]);

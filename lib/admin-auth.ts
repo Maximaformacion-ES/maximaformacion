@@ -36,3 +36,15 @@ export async function requireAdmin(): Promise<
     email: me?.emailAddresses?.[0]?.emailAddress ?? null,
   };
 }
+
+/**
+ * Boolean variant for gating **pages** (server components) instead of API
+ * handlers. Use in `/admin` layouts/pages: `if (!(await isAdmin())) notFound()`.
+ * Same membership rule as requireAdmin (`role === 'admin'` in Clerk metadata).
+ */
+export async function isAdmin(): Promise<boolean> {
+  const { userId } = await auth();
+  if (!userId) return false;
+  const me = await currentUser();
+  return (me?.publicMetadata as { role?: string } | undefined)?.role === 'admin';
+}

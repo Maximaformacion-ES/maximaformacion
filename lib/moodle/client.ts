@@ -184,6 +184,24 @@ export async function enrolUserInCourse(
 }
 
 /**
+ * Manually unenrol a user from a course — the reverse of enrolUserInCourse.
+ * Uses the Manual enrolments web service `enrol_manual_unenrol_users`, which
+ * must be enabled on the token's external service for this instance (if it is
+ * not, Moodle throws and the caller falls back to "unenrol manually").
+ */
+export async function unenrolUserFromCourse(
+  instance: MoodleInstance,
+  userId: number,
+  courseId: number
+): Promise<void> {
+  // enrol_manual_unenrol_users returns null on success
+  await moodleRequest<null>(instance, 'enrol_manual_unenrol_users', {
+    'enrolments[0][userid]': String(userId),
+    'enrolments[0][courseid]': String(courseId),
+  });
+}
+
+/**
  * Generate a secure random password meeting Moodle's default policy:
  * 8+ chars, 1 lowercase, 1 uppercase, 1 digit, 1 non-alphanumeric.
  */

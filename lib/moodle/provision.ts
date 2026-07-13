@@ -12,6 +12,7 @@
 import {
   createMoodleUser,
   enrolUserInCourse,
+  unenrolUserFromCourse,
   generateSecurePassword,
   getMoodleUrl,
   getMoodleUserByEmail,
@@ -147,4 +148,47 @@ export async function provisionMoodleAccess(
   }
 
   return { userId: user.id, username: user.username, wasNewUser };
+}
+
+interface UnprovisionParams {
+  email: string;
+  moodleInstance: MoodleInstance;
+  moodleCourseId: number;
+}
+
+interface UnprovisionResult {
+  /** ¿Existía el usuario en Moodle? Si no, no hay nada que dar de baja. */
+  found: boolean;
+  userId?: number;
+  /** ¿Se ejecutó el des-enrol? */
+  unenrolled: boolean;
+}
+
+/**
+ * Da de baja a un alumno de un curso de Moodle (reverso de
+ * `provisionMoodleAccess`). No borra la cuenta Moodle, solo el enrol del curso.
+ * Si el usuario no existe en Moodle, no hace nada (`found: false`). Errores del
+ * web service se re-lanzan etiquetados por fase para que el llamante decida el
+ * fallback (p.ej. "dar de baja a mano").
+ */
+export async function unprovisionMoodleAccess(
+  params: UnprovisionParams
+): Promise<UnprovisionResult> {
+  const { email, moodleInstance, moodleCourseId } = params;
+
+  const user = await runPhase('moodle:lookup', () =>
+    getMoodleUserByEmail(moodleInstance, email)
+  );
+  if (!user) {
+    console.log(`[unprovision] No Moodle user for ${email} on ${moodleInstance} — nothing to unenrol`);
+    return { found: false, unenrolled: false };
+  }
+
+  await runPhase('moodle:unenrol', () =>
+    unenrolUserFromCourse(moodleInstance, user.id, moodleCourseId)
+  );
+  console.log(
+    `[unprovision] Unenrolled user ${user.id} from course ${moodleCourseId} on ${moodleInstance}`
+  );
+  return { found: true, userId: user.id, unenrolled: true };
 }
