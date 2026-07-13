@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Menu, X, ChevronDown, User, Crown, GraduationCap } from 'lucide-react';
+import { ArrowUpRight, Menu, X, ChevronDown, User, Crown, GraduationCap, Shield } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -210,9 +210,10 @@ function getProUserButtonAppearance(
 interface DesktopAuthButtonsProps {
   isDark: boolean;
   userHasPro: boolean | undefined;
+  isAdmin: boolean;
 }
 
-function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
+function DesktopAuthButtons({ isDark, userHasPro, isAdmin }: DesktopAuthButtonsProps) {
   return (
     <>
       <SignedOut>
@@ -263,6 +264,13 @@ function DesktopAuthButtons({ isDark, userHasPro }: DesktopAuthButtonsProps) {
               }
             >
               <UserButton.MenuItems>
+                {isAdmin && (
+                  <UserButton.Link
+                    label="Admin"
+                    labelIcon={<Shield size={16} />}
+                    href="/admin"
+                  />
+                )}
                 <UserButton.Link
                   label="Mis Cursos"
                   labelIcon={<GraduationCap size={16} />}
@@ -815,11 +823,13 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
 export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, variant = 'default', navItems }) => {
   const isDark = variant === 'maxymia';
   const pathname = usePathname();
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const { hasPro } = useUserCampus();
   const branding = useSiteBranding();
 
   const userHasPro = isSignedIn && hasPro;
+  // Opción "Admin" en el menú del avatar, solo para role==='admin' en Clerk.
+  const isAdmin = (user?.publicMetadata as { role?: string } | undefined)?.role === 'admin';
   const megaMenu = useMegaMenu();
 
   // Replace the static "Formación" megamenu columns with one column per
@@ -940,7 +950,7 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
             </div>
 
             <div className="flex items-center gap-3">
-              <DesktopAuthButtons isDark={isDark} userHasPro={userHasPro} />
+              <DesktopAuthButtons isDark={isDark} userHasPro={userHasPro} isAdmin={isAdmin} />
               <CampusDropdown isDark={isDark} />
 
               {/* Mobile: user avatar + burger */}
@@ -971,6 +981,13 @@ export const Header: React.FC<HeaderProps> = ({ isMenuOpen, setIsMenuOpen, varia
                       }}
                     >
                       <UserButton.MenuItems>
+                        {isAdmin && (
+                          <UserButton.Link
+                            label="Admin"
+                            labelIcon={<Shield size={16} />}
+                            href="/admin"
+                          />
+                        )}
                         <UserButton.Link
                           label="Mis Cursos"
                           labelIcon={<GraduationCap size={16} />}

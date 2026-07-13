@@ -30,7 +30,7 @@ export default async function StudentPage({
 
   return (
     <div>
-      <Link href="/admin/alumnos" className="text-sm text-zinc-500 hover:text-zinc-300">
+      <Link href="/admin/alumnos" className="text-sm text-zinc-500 hover:text-zinc-800">
         ← Alumnos
       </Link>
 
@@ -40,24 +40,24 @@ export default async function StudentPage({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={s.imageUrl} alt="" className="w-14 h-14 rounded-full object-cover" />
         ) : (
-          <div className="w-14 h-14 rounded-full bg-zinc-800" />
+          <div className="w-14 h-14 rounded-full bg-zinc-200" />
         )}
         <div className="flex-1">
           <h1 className="text-xl font-semibold">{s.name}</h1>
-          <p className="text-zinc-400 text-sm">{s.email ?? '—'}</p>
+          <p className="text-zinc-500 text-sm">{s.email ?? '—'}</p>
           <div className="mt-2 flex items-center gap-2 text-xs">
             <span
               className={
                 s.plan === 'pro'
-                  ? 'rounded-full bg-amber-500/15 text-amber-300 px-2 py-0.5 font-medium'
-                  : 'rounded-full bg-zinc-800 text-zinc-400 px-2 py-0.5'
+                  ? 'rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 font-medium'
+                  : 'rounded-full bg-zinc-100 text-zinc-600 px-2 py-0.5'
               }
             >
               plan: {s.plan}
             </span>
-            {s.hasBeenPro && <span className="text-zinc-500">fue PRO alguna vez</span>}
+            {s.hasBeenPro && <span className="text-zinc-400">fue PRO alguna vez</span>}
             {s.subscription && (
-              <span className="text-zinc-500">
+              <span className="text-zinc-400">
                 suscripción: {s.subscription.status} ({s.subscription.plan})
               </span>
             )}
@@ -73,11 +73,11 @@ export default async function StudentPage({
         {s.certificates.length === 0 ? (
           <Empty>Sin certificados.</Empty>
         ) : (
-          <ul className="divide-y divide-zinc-800/70">
+          <ul className="divide-y divide-zinc-100">
             {s.certificates.map((c) => (
               <li key={c.id} className="py-2 flex items-center justify-between text-sm">
                 <span>{c.courseTitle}</span>
-                <span className={c.revokedAt ? 'text-red-400' : 'text-zinc-500'}>
+                <span className={c.revokedAt ? 'text-red-600' : 'text-zinc-500'}>
                   {c.revokedAt ? `revocado ${fmtDate(c.revokedAt)}` : `emitido ${fmtDate(c.issuedAt)}`}
                 </span>
               </li>
@@ -91,13 +91,13 @@ export default async function StudentPage({
         {s.exams.length === 0 ? (
           <Empty>Sin exámenes.</Empty>
         ) : (
-          <ul className="divide-y divide-zinc-800/70">
+          <ul className="divide-y divide-zinc-100">
             {s.exams.map((ex) => (
               <li key={ex.id} className="py-2 flex items-center justify-between text-sm">
-                <span className="text-zinc-300">
+                <span className="text-zinc-600">
                   {ex.courseId} · bloque {ex.blockId}
                 </span>
-                <span className={ex.passed ? 'text-green-400' : 'text-red-400'}>
+                <span className={ex.passed ? 'text-green-600' : 'text-red-600'}>
                   {ex.score} — {ex.passed ? 'aprobado' : 'suspenso'}
                 </span>
               </li>
@@ -112,12 +112,12 @@ export default async function StudentPage({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-8">
-      <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide mb-2">{title}</h2>
-      <div className="rounded-lg border border-zinc-800 p-4">{children}</div>
+      <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-2">{title}</h2>
+      <div className="rounded-lg border border-zinc-200 p-4">{children}</div>
     </section>
   );
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-zinc-500">{children}</p>;
+  return <p className="text-sm text-zinc-400">{children}</p>;
 }

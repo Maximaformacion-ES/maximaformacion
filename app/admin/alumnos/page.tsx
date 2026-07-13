@@ -29,16 +29,16 @@ export default async function AlumnosPage({
           name="q"
           defaultValue={q}
           placeholder="Buscar por nombre o email…"
-          className="w-full max-w-sm rounded-md bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600"
+          className="w-full max-w-sm rounded-md bg-white border border-zinc-300 px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-300"
         />
-        <button type="submit" className="rounded-md bg-amber-500 text-black px-4 py-2 text-sm font-medium">
+        <button type="submit" className="rounded-md bg-amber-500 text-white px-4 py-2 text-sm font-medium hover:bg-amber-600 transition-colors">
           Buscar
         </button>
       </form>
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-800">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200">
         <table className="w-full text-sm">
-          <thead className="bg-zinc-900 text-zinc-400">
+          <thead className="bg-zinc-50 text-zinc-500">
             <tr>
               <th className="text-left font-medium px-4 py-2.5">Alumno</th>
               <th className="text-left font-medium px-4 py-2.5">Email</th>
@@ -49,31 +49,31 @@ export default async function AlumnosPage({
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-zinc-500">
+                <td colSpan={4} className="px-4 py-8 text-center text-zinc-400">
                   Sin resultados.
                 </td>
               </tr>
             ) : (
               items.map((s) => (
-                <tr key={s.clerkId} className="border-t border-zinc-800/70 hover:bg-zinc-900/50">
+                <tr key={s.clerkId} className="border-t border-zinc-100 hover:bg-zinc-50">
                   <td className="px-4 py-2.5">
-                    <Link href={`/admin/alumnos/${s.clerkId}`} className="text-amber-400 hover:underline">
+                    <Link href={`/admin/alumnos/${s.clerkId}`} className="text-amber-600 hover:underline font-medium">
                       {s.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-2.5 text-zinc-300">{s.email ?? '—'}</td>
+                  <td className="px-4 py-2.5 text-zinc-600">{s.email ?? '—'}</td>
                   <td className="px-4 py-2.5">
                     <span
                       className={
                         s.plan === 'pro'
-                          ? 'rounded-full bg-amber-500/15 text-amber-300 px-2 py-0.5 text-xs font-medium'
-                          : 'text-zinc-500 text-xs'
+                          ? 'rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-medium'
+                          : 'text-zinc-400 text-xs'
                       }
                     >
                       {s.plan}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-right text-zinc-300">{s.enrollmentCount}</td>
+                  <td className="px-4 py-2.5 text-right text-zinc-600">{s.enrollmentCount}</td>
                 </tr>
               ))
             )}
@@ -95,12 +95,12 @@ export default async function AlumnosPage({
 }
 
 function PageLink({ q, page, disabled, label }: { q: string; page: number; disabled: boolean; label: string }) {
-  if (disabled) return <span className="text-zinc-700">{label}</span>;
+  if (disabled) return <span className="text-zinc-300">{label}</span>;
   const params = new URLSearchParams();
   if (q) params.set('q', q);
   params.set('page', String(page));
   return (
-    <Link href={`/admin/alumnos?${params.toString()}`} className="text-zinc-300 hover:text-white">
+    <Link href={`/admin/alumnos?${params.toString()}`} className="text-zinc-600 hover:text-zinc-900">
       {label}
     </Link>
   );
