@@ -1,23 +1,56 @@
 import Link from 'next/link';
+import { Users, GraduationCap, Crown, Award, ArrowUpRight } from 'lucide-react';
+import { getAdminMetrics } from '@/lib/admin/metrics';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function AdminHome() {
+export const dynamic = 'force-dynamic';
+
+export default async function AdminHome() {
+  const m = await getAdminMetrics();
+
+  const stats = [
+    { label: 'Alumnos', value: m.students, icon: Users },
+    { label: 'Matrículas', value: m.enrollments, icon: GraduationCap },
+    { label: 'Alumnos PRO', value: m.pro, icon: Crown },
+    { label: 'Certificados', value: m.certificates, icon: Award },
+  ];
+
   return (
-    <div>
-      <h1 className="text-xl font-semibold mb-2">Panel de administración</h1>
-      <p className="text-zinc-500 mb-6 text-sm">
-        Back-office de negocio (Fase 1: alumnos). Strapi sigue siendo el CMS de contenido.
-      </p>
-      <div className="grid gap-4 sm:grid-cols-2 max-w-xl">
-        <Link
-          href="/admin/alumnos"
-          className="rounded-lg border border-mx-border hover:border-mx-orange/50 hover:shadow-sm p-5 transition-all"
-        >
-          <div className="font-medium mb-1">Alumnos</div>
-          <div className="text-sm text-mx-text-muted">
-            Buscar, ver ficha 360, conceder/revocar acceso, PRO, re-provisionar Moodle.
-          </div>
-        </Link>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground text-sm">
+          Resumen del back-office. Strapi sigue siendo el CMS de contenido.
+        </p>
       </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((s) => (
+          <Card key={s.label}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{s.label}</CardTitle>
+              <s.icon className="h-4 w-4 text-mx-orange" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{s.value.toLocaleString('es-ES')}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Link href="/admin/alumnos" className="block">
+        <Card className="transition-colors hover:border-mx-orange/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle className="text-base">Alumnos</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Buscar, ficha 360, conceder/revocar acceso, PRO, re-provisionar Moodle.
+              </p>
+            </div>
+            <ArrowUpRight className="h-5 w-5 text-mx-blue" />
+          </CardHeader>
+        </Card>
+      </Link>
     </div>
   );
 }
