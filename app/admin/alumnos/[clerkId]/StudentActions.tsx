@@ -131,8 +131,8 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
           disabled={busy === 'pro'}
           className={`rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50 transition-colors ${
             isPro
-              ? 'bg-zinc-100 text-zinc-700 border border-zinc-200 hover:bg-zinc-200'
-              : 'bg-amber-500 text-white hover:bg-amber-600'
+              ? 'bg-black/[0.04] text-mx-text border border-mx-border hover:bg-black/[0.07]'
+              : 'bg-mx-orange text-white hover:bg-mx-orange-dark'
           }`}
         >
           {busy === 'pro' ? '…' : isPro ? 'Quitar PRO' : 'Dar PRO'}
@@ -145,7 +145,7 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
               value={grantDocId}
               onChange={(e) => setGrantDocId(e.target.value)}
               placeholder="documentId del programa o curso Maxymia"
-              className="w-72 rounded-md bg-white border border-zinc-300 px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-300"
+              className="w-72 rounded-md bg-white border border-mx-border px-3 py-2 text-sm placeholder:text-mx-text-muted/60 focus:outline-none focus:border-mx-blue focus:ring-1 focus:ring-mx-blue/30"
             />
           </div>
           <label className="flex items-center gap-1.5 text-xs text-zinc-500 pb-2.5">
@@ -155,7 +155,7 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
           <button
             onClick={grant}
             disabled={busy === 'grant' || !grantDocId.trim()}
-            className="rounded-md bg-zinc-900 text-white hover:bg-zinc-700 px-4 py-2 text-sm font-medium disabled:opacity-50 transition-colors"
+            className="rounded-md bg-mx-blue text-white hover:bg-mx-blue/90 px-4 py-2 text-sm font-medium disabled:opacity-50 transition-colors"
           >
             {busy === 'grant' ? '…' : 'Conceder'}
           </button>
@@ -187,7 +187,7 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
                       onClick={() => reprovision(e.documentId)}
                       disabled={busy === `reprov:${e.documentId}`}
                       title="Re-ejecutar alta en Moodle (solo programas)"
-                      className="rounded-md border border-zinc-300 text-zinc-600 hover:bg-zinc-50 px-2.5 py-1.5 text-xs disabled:opacity-50 transition-colors"
+                      className="rounded-md border border-mx-blue/40 text-mx-blue hover:bg-mx-blue/5 px-2.5 py-1.5 text-xs disabled:opacity-50 transition-colors"
                     >
                       {busy === `reprov:${e.documentId}` ? '…' : 'Re-provisionar'}
                     </button>

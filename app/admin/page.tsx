@@ -10,10 +10,10 @@ export default function AdminHome() {
       <div className="grid gap-4 sm:grid-cols-2 max-w-xl">
         <Link
           href="/admin/alumnos"
-          className="rounded-lg border border-zinc-200 hover:border-zinc-400 hover:shadow-sm p-5 transition-all"
+          className="rounded-lg border border-mx-border hover:border-mx-orange/50 hover:shadow-sm p-5 transition-all"
         >
           <div className="font-medium mb-1">Alumnos</div>
-          <div className="text-sm text-zinc-500">
+          <div className="text-sm text-mx-text-muted">
             Buscar, ver ficha 360, conceder/revocar acceso, PRO, re-provisionar Moodle.
           </div>
         </Link>

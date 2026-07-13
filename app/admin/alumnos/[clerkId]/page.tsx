@@ -49,8 +49,8 @@ export default async function StudentPage({
             <span
               className={
                 s.plan === 'pro'
-                  ? 'rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 font-medium'
-                  : 'rounded-full bg-zinc-100 text-zinc-600 px-2 py-0.5'
+                  ? 'rounded-full bg-mx-orange/10 text-mx-orange-dark px-2 py-0.5 font-medium'
+                  : 'rounded-full bg-black/[0.05] text-mx-text-muted px-2 py-0.5'
               }
             >
               plan: {s.plan}

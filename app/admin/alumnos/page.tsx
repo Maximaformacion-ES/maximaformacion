@@ -29,9 +29,9 @@ export default async function AlumnosPage({
           name="q"
           defaultValue={q}
           placeholder="Buscar por nombre o email…"
-          className="w-full max-w-sm rounded-md bg-white border border-zinc-300 px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-300"
+          className="w-full max-w-sm rounded-md bg-white border border-mx-border px-3 py-2 text-sm placeholder:text-mx-text-muted/60 focus:outline-none focus:border-mx-blue focus:ring-1 focus:ring-mx-blue/30"
         />
-        <button type="submit" className="rounded-md bg-amber-500 text-white px-4 py-2 text-sm font-medium hover:bg-amber-600 transition-colors">
+        <button type="submit" className="rounded-md bg-mx-orange text-white px-4 py-2 text-sm font-medium hover:bg-mx-orange-dark transition-colors">
           Buscar
         </button>
       </form>
@@ -57,7 +57,7 @@ export default async function AlumnosPage({
               items.map((s) => (
                 <tr key={s.clerkId} className="border-t border-zinc-100 hover:bg-zinc-50">
                   <td className="px-4 py-2.5">
-                    <Link href={`/admin/alumnos/${s.clerkId}`} className="text-amber-600 hover:underline font-medium">
+                    <Link href={`/admin/alumnos/${s.clerkId}`} className="text-mx-blue hover:underline font-medium">
                       {s.name}
                     </Link>
                   </td>
@@ -66,8 +66,8 @@ export default async function AlumnosPage({
                     <span
                       className={
                         s.plan === 'pro'
-                          ? 'rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-medium'
-                          : 'text-zinc-400 text-xs'
+                          ? 'rounded-full bg-mx-orange/10 text-mx-orange-dark px-2 py-0.5 text-xs font-medium'
+                          : 'text-mx-text-muted text-xs'
                       }
                     >
                       {s.plan}
