@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import CoursePicker, { type CourseOption } from './CoursePicker';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +35,7 @@ interface Props {
 export default function StudentActions({ clerkId, plan, enrollments }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
-  const [grantDocId, setGrantDocId] = useState('');
+  const [course, setCourse] = useState<CourseOption | null>(null);
   const [notify, setNotify] = useState(true);
 
   const base = `/api/admin/students/${clerkId}`;
@@ -65,18 +64,17 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
   }
 
   function grant() {
-    const documentId = grantDocId.trim();
-    if (!documentId) return;
+    if (!course) return;
     run(
       'grant',
       () =>
         fetch(`${base}/access`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ documentId, notify }),
+          body: JSON.stringify({ documentId: course.documentId, notify }),
         }),
-      'Acceso concedido'
-    ).then((ok) => ok && setGrantDocId(''));
+      `Acceso concedido a «${course.title}»`
+    ).then((ok) => ok && setCourse(null));
   }
 
   function togglePro() {
@@ -131,16 +129,8 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
 
         <div className="flex items-end gap-2">
           <div className="space-y-1.5">
-            <Label htmlFor="grant-doc" className="text-xs text-muted-foreground">
-              Conceder acceso (documentId de Strapi)
-            </Label>
-            <Input
-              id="grant-doc"
-              value={grantDocId}
-              onChange={(e) => setGrantDocId(e.target.value)}
-              placeholder="documentId del programa o curso Maxymia"
-              className="w-72"
-            />
+            <span className="block text-xs text-muted-foreground">Conceder acceso a un curso</span>
+            <CoursePicker value={course} onChange={setCourse} />
           </div>
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground pb-2.5">
             <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
@@ -148,7 +138,7 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
           </label>
           <Button
             onClick={grant}
-            disabled={busy === 'grant' || !grantDocId.trim()}
+            disabled={busy === 'grant' || !course}
             className="bg-mx-blue text-white hover:bg-mx-blue/90"
           >
             Conceder
