@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CoursePicker, { type CourseOption } from './CoursePicker';
 import {
@@ -35,7 +37,7 @@ interface Props {
 export default function StudentActions({ clerkId, plan, enrollments }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
-  const [course, setCourse] = useState<CourseOption | null>(null);
+  const [courses, setCourses] = useState<CourseOption[]>([]);
   const [notify, setNotify] = useState(true);
 
   const base = `/api/admin/students/${clerkId}`;
@@ -64,17 +66,21 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
   }
 
   function grant() {
-    if (!course) return;
+    if (courses.length === 0) return;
+    const okMsg =
+      courses.length === 1
+        ? `Acceso concedido a «${courses[0].title}»`
+        : `Acceso concedido a ${courses.length} cursos`;
     run(
       'grant',
       () =>
         fetch(`${base}/access`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ documentId: course.documentId, notify }),
+          body: JSON.stringify({ documentIds: courses.map((c) => c.documentId), notify }),
         }),
-      `Acceso concedido a «${course.title}»`
-    ).then((ok) => ok && setCourse(null));
+      okMsg
+    ).then((ok) => ok && setCourses([]));
   }
 
   function togglePro() {
@@ -117,32 +123,51 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
   return (
     <div className="space-y-6">
       {/* PRO + conceder acceso */}
-      <div className="flex flex-wrap items-end gap-4">
-        <Button
-          onClick={togglePro}
-          disabled={busy === 'pro'}
-          variant={isPro ? 'outline' : 'default'}
-          className={isPro ? '' : 'bg-mx-orange text-white hover:bg-mx-orange-dark'}
-        >
-          {isPro ? 'Quitar PRO' : 'Dar PRO'}
-        </Button>
-
-        <div className="flex items-end gap-2">
-          <div className="space-y-1.5">
-            <span className="block text-xs text-muted-foreground">Conceder acceso a un curso</span>
-            <CoursePicker value={course} onChange={setCourse} />
-          </div>
-          <label className="flex items-center gap-1.5 text-xs text-muted-foreground pb-2.5">
-            <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
-            avisar
-          </label>
+      <div className="space-y-4">
+        <div>
           <Button
-            onClick={grant}
-            disabled={busy === 'grant' || !course}
-            className="bg-mx-blue text-white hover:bg-mx-blue/90"
+            onClick={togglePro}
+            disabled={busy === 'pro'}
+            variant={isPro ? 'outline' : 'default'}
+            className={isPro ? '' : 'bg-mx-orange text-white hover:bg-mx-orange-dark'}
           >
-            Conceder
+            {isPro ? 'Quitar PRO' : 'Dar PRO'}
           </Button>
+        </div>
+
+        <div className="space-y-2">
+          <span className="block text-xs text-muted-foreground">Conceder acceso a cursos</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <CoursePicker value={courses} onChange={setCourses} />
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+              avisar
+            </label>
+            <Button
+              onClick={grant}
+              disabled={busy === 'grant' || courses.length === 0}
+              className="bg-mx-blue text-white hover:bg-mx-blue/90"
+            >
+              Conceder{courses.length > 1 ? ` (${courses.length})` : ''}
+            </Button>
+          </div>
+          {courses.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {courses.map((c) => (
+                <Badge key={c.documentId} variant="secondary" className="gap-1 pr-1">
+                  <span className="max-w-[220px] truncate">{c.title}</span>
+                  <button
+                    type="button"
+                    onClick={() => setCourses(courses.filter((x) => x.documentId !== c.documentId))}
+                    className="rounded-sm hover:text-destructive"
+                    aria-label={`Quitar ${c.title}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -221,6 +246,11 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
 function summarizeWarnings(data: unknown): string | null {
   if (data && typeof data === 'object') {
     const d = data as Record<string, unknown>;
+    // Concesión múltiple: { granted, total }
+    if (typeof d.total === 'number' && typeof d.granted === 'number') {
+      return d.granted < d.total ? `${d.granted}/${d.total} concedidos; ${d.total - d.granted} fallaron.` : null;
+    }
+    // Resultado con pasos (revoke).
     if ('steps' in d && Array.isArray(d.steps)) {
       const failed = (d.steps as { step: string; ok: boolean }[]).filter((s) => !s.ok);
       if (failed.length > 0) return `Fallaron: ${failed.map((s) => s.step).join(', ')}.`;

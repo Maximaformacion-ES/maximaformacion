@@ -25,8 +25,8 @@ export default function CoursePicker({
   value,
   onChange,
 }: {
-  value: CourseOption | null;
-  onChange: (c: CourseOption | null) => void;
+  value: CourseOption[];
+  onChange: (next: CourseOption[]) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [courses, setCourses] = useState<CourseOption[]>([]);
@@ -50,6 +50,19 @@ export default function CoursePicker({
     }
   }
 
+  function toggle(c: CourseOption) {
+    const exists = value.some((v) => v.documentId === c.documentId);
+    onChange(exists ? value.filter((v) => v.documentId !== c.documentId) : [...value, c]);
+    // NO cerramos el popover: es multiselección.
+  }
+
+  const label =
+    value.length === 0
+      ? 'Buscar cursos o programas…'
+      : value.length === 1
+        ? value[0].title
+        : `${value.length} cursos seleccionados`;
+
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
@@ -59,7 +72,7 @@ export default function CoursePicker({
           aria-expanded={open}
           className="w-80 justify-between font-normal"
         >
-          <span className="truncate">{value ? value.title : 'Buscar curso o programa…'}</span>
+          <span className="truncate">{label}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -73,27 +86,20 @@ export default function CoursePicker({
               <>
                 <CommandEmpty>Sin resultados.</CommandEmpty>
                 <CommandGroup>
-                  {courses.map((c) => (
-                    <CommandItem
-                      key={c.documentId}
-                      value={c.title}
-                      onSelect={() => {
-                        onChange(c);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          'mr-2 h-4 w-4 shrink-0',
-                          value?.documentId === c.documentId ? 'opacity-100' : 'opacity-0'
-                        )}
-                      />
-                      <div className="min-w-0">
-                        <div className="truncate">{c.title}</div>
-                        <div className="text-xs text-muted-foreground">{c.subtitle}</div>
-                      </div>
-                    </CommandItem>
-                  ))}
+                  {courses.map((c) => {
+                    const selected = value.some((v) => v.documentId === c.documentId);
+                    return (
+                      <CommandItem key={c.documentId} value={c.title} onSelect={() => toggle(c)}>
+                        <Check
+                          className={cn('mr-2 h-4 w-4 shrink-0', selected ? 'opacity-100' : 'opacity-0')}
+                        />
+                        <div className="min-w-0">
+                          <div className="truncate">{c.title}</div>
+                          <div className="text-xs text-muted-foreground">{c.subtitle}</div>
+                        </div>
+                      </CommandItem>
+                    );
+                  })}
                 </CommandGroup>
               </>
             )}

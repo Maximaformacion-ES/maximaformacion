@@ -15,18 +15,31 @@ export async function POST(
   if (gate instanceof NextResponse) return gate;
 
   const { clerkId } = await params;
-  const body = (await request.json().catch(() => ({}))) as { documentId?: string; notify?: boolean };
-  if (!body.documentId) {
-    return NextResponse.json({ error: 'documentId es obligatorio' }, { status: 400 });
+  const body = (await request.json().catch(() => ({}))) as {
+    documentId?: string;
+    documentIds?: string[];
+    notify?: boolean;
+  };
+
+  // Acepta uno (documentId) o varios (documentIds). Se conceden SECUENCIALMENTE
+  // para no pisar el metadata de Clerk (purchasedCourses es read-modify-write).
+  const ids = (body.documentIds?.length ? body.documentIds : body.documentId ? [body.documentId] : [])
+    .map((s) => s?.trim())
+    .filter((s): s is string => !!s);
+  if (ids.length === 0) {
+    return NextResponse.json({ error: 'documentId(s) obligatorio(s)' }, { status: 400 });
   }
 
-  const result = await grantAccess({
-    actor: gate.userId,
-    targetClerkId: clerkId,
-    documentId: body.documentId,
-    notify: body.notify !== false,
-  });
-  return NextResponse.json(result, { status: result.ok ? 200 : 422 });
+  const notify = body.notify !== false;
+  const results = [];
+  for (const documentId of ids) {
+    results.push(await grantAccess({ actor: gate.userId, targetClerkId: clerkId, documentId, notify }));
+  }
+  const granted = results.filter((r) => r.ok).length;
+  return NextResponse.json(
+    { results, granted, total: ids.length },
+    { status: granted === ids.length ? 200 : 207 }
+  );
 }
 
 export async function DELETE(
