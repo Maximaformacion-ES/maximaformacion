@@ -57,6 +57,7 @@ export default function EmailComposer() {
     recipients: { name: string; email: string }[];
     truncated: boolean;
   }>({ count: null, recipients: [], truncated: false });
+  const [page, setPage] = useState(1);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [busy, setBusy] = useState<null | 'test' | 'send'>(null);
 
@@ -73,13 +74,14 @@ export default function EmailComposer() {
         body: JSON.stringify({ segment: seg }),
       })
         .then((r) => r.json())
-        .then((d) =>
+        .then((d) => {
           setPreview({
             count: typeof d?.count === 'number' ? d.count : null,
             recipients: Array.isArray(d?.recipients) ? d.recipients : [],
             truncated: !!d?.truncated,
-          })
-        )
+          });
+          setPage(1);
+        })
         .catch(() => setPreview({ count: null, recipients: [], truncated: false }))
         .finally(() => setLoadingPreview(false));
     }, 300);
@@ -91,6 +93,12 @@ export default function EmailComposer() {
   const count = preview.count;
   const previewName = preview.recipients[0]?.name || 'Nombre';
   const previewBody = bodyHtml.replaceAll('{nombre}', previewName);
+
+  // Paginación de la lista de destinatarios: 10 por página.
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(preview.recipients.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = preview.recipients.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   async function sendTest() {
     if (!canCompose) {
@@ -282,19 +290,40 @@ export default function EmailComposer() {
               </div>
 
               {count != null && count > 0 && (
-                <div className="max-h-56 divide-y overflow-y-auto rounded-md border text-sm">
-                  {preview.recipients.map((r, i) => (
-                    <div
-                      key={`${r.email}-${i}`}
-                      className="flex items-center justify-between gap-3 px-3 py-1.5"
-                    >
-                      <span className="truncate">{r.name}</span>
-                      <span className="truncate text-xs text-muted-foreground">{r.email}</span>
-                    </div>
-                  ))}
-                  {preview.truncated && (
-                    <div className="px-3 py-1.5 text-xs text-muted-foreground">
-                      …y {(count - preview.recipients.length).toLocaleString('es-ES')} más
+                <div className="space-y-2">
+                  <div className="divide-y rounded-md border text-sm">
+                    {pageItems.map((r, i) => (
+                      <div
+                        key={`${r.email}-${i}`}
+                        className="flex items-center justify-between gap-3 px-3 py-1.5"
+                      >
+                        <span className="truncate">{r.name}</span>
+                        <span className="truncate text-xs text-muted-foreground">{r.email}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={safePage <= 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      >
+                        ← Anterior
+                      </Button>
+                      <span className="text-muted-foreground">
+                        Página {safePage} de {totalPages}
+                        {preview.truncated ? ' · primeros 2000' : ''}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={safePage >= totalPages}
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      >
+                        Siguiente →
+                      </Button>
                     </div>
                   )}
                 </div>

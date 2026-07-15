@@ -134,5 +134,9 @@ export async function buildAudience(segment: Segment): Promise<Recipient[]> {
     byId.set(id, { clerkId: id, email, name: email.split('@')[0] });
   }
 
-  return Array.from(byId.values());
+  // Orden ESTABLE (por nombre, luego email): sin esto el orden dependería del
+  // scan de Postgres (selectDistinct sin ORDER BY) y "cambiaba" en cada consulta.
+  return Array.from(byId.values()).sort(
+    (a, b) => a.name.localeCompare(b.name, 'es') || a.email.localeCompare(b.email)
+  );
 }

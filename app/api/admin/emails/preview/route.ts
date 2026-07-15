@@ -14,9 +14,9 @@ export async function POST(request: Request) {
   }
 
   const audience = await buildAudience(segment);
-  // Devolvemos la lista de destinatarios (nombre+email), capada para no inflar el
-  // payload; `count` es el total real y `truncated` avisa si hay más de los listados.
-  const LIMIT = 500;
+  // Devolvemos la lista (ordenada) de destinatarios; el cliente pagina de 10 en 10.
+  // Cap = tope de envío (2000); `count` es el total real y `truncated` avisa si hay más.
+  const LIMIT = 2000;
   const recipients = audience.slice(0, LIMIT).map((r) => ({ name: r.name, email: r.email }));
   return NextResponse.json({
     count: audience.length,
