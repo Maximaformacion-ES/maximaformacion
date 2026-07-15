@@ -1,13 +1,14 @@
-import type { ReactNode } from 'react';
-import { notFound } from 'next/navigation';
-import { isAdmin } from '@/lib/admin-auth';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
-import { Separator } from '@/components/ui/separator';
-import { Toaster } from '@/components/ui/sonner';
-import AppSidebar from './AppSidebar';
+import type { ReactNode } from "react";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import { isAdmin } from "@/lib/admin-auth";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import { AppSidebar } from "@/components/admin/app-sidebar";
+import { AdminHeader } from "@/components/admin/admin-header";
 
 export const metadata = {
-  title: 'Admin · Máxima Formación',
+  title: "Admin · Máxima Formación",
   robots: { index: false, follow: false },
 };
 
@@ -16,15 +17,15 @@ export const metadata = {
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   if (!(await isAdmin())) notFound();
 
+  // Persistencia del estado colapsado del sidebar por cookie (como el Admin Kit).
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
+
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <span className="text-sm font-medium">Panel de administración</span>
-        </header>
+        <AdminHeader />
         <div className="p-4 md:p-6">{children}</div>
       </SidebarInset>
       <Toaster richColors position="top-right" />
