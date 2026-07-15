@@ -258,8 +258,8 @@ export default function EmailComposer() {
             {/* El email tal cual se enviará */}
             <div className="mx-auto max-w-[600px] overflow-hidden rounded-2xl border border-[#ececec] bg-white shadow-sm">
               <div className="px-6 py-5" style={{ borderBottom: '3px solid #F7A000' }}>
-                <span className="text-xl font-extrabold tracking-tight text-[#171717]">Máxima</span>
-                <span className="text-xl font-extrabold tracking-tight text-mx-orange"> Formación</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-maxima.png" alt="Máxima Formación" className="h-7 w-auto" />
               </div>
               <div className="px-6 py-7">
                 {bodyEmpty ? (

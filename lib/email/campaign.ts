@@ -11,6 +11,11 @@ const MAX_AUDIENCE = 2000;
 // maximaformacion.es → el remitente elegido debe estar en ese dominio.
 const VERIFIED_DOMAIN = 'maximaformacion.es';
 
+// Logo alojado en R2 (URL pública permanente): los clientes de correo lo cargan
+// desde cualquier sitio (dev y prod), a diferencia de /logo-maxima.png que en dev
+// apuntaría a localhost. Subido a bucket "maxima" bajo email/logo-maxima.png.
+const EMAIL_LOGO_URL = 'https://pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev/email/logo-maxima.png';
+
 /** Extrae el dominio del email de un remitente en formato "Nombre <a@b>" o "a@b". */
 function fromDomain(from: string): string | null {
   const m = from.match(/<([^>]+)>/);
@@ -70,8 +75,8 @@ export function renderEmail({
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f5;">
     <tr><td align="center" style="padding:32px 12px;">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #ececec;font-family:${font};">
-        <tr><td style="padding:26px 36px 22px;border-bottom:3px solid #F7A000;">
-          <span style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#171717;">Máxima</span><span style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#F7A000;"> Formación</span>
+        <tr><td style="padding:24px 36px 20px;border-bottom:3px solid #F7A000;">
+          <img src="${EMAIL_LOGO_URL}" alt="Máxima Formación" height="30" style="height:30px;width:auto;display:block;border:0;outline:none;text-decoration:none;" />
         </td></tr>
         <tr><td style="padding:32px 36px;">
           <div class="mx-body">${body}</div>
