@@ -52,10 +52,11 @@ export default function EmailComposer() {
   const [kind, setKind] = useState<Kind>('all');
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [days, setDays] = useState(30);
-  const [preview, setPreview] = useState<{ count: number | null; sample: { name: string; email: string } | null }>({
-    count: null,
-    sample: null,
-  });
+  const [preview, setPreview] = useState<{
+    count: number | null;
+    recipients: { name: string; email: string }[];
+    truncated: boolean;
+  }>({ count: null, recipients: [], truncated: false });
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [busy, setBusy] = useState<null | 'test' | 'send'>(null);
 
@@ -72,8 +73,14 @@ export default function EmailComposer() {
         body: JSON.stringify({ segment: seg }),
       })
         .then((r) => r.json())
-        .then((d) => setPreview({ count: typeof d?.count === 'number' ? d.count : null, sample: d?.sample ?? null }))
-        .catch(() => setPreview({ count: null, sample: null }))
+        .then((d) =>
+          setPreview({
+            count: typeof d?.count === 'number' ? d.count : null,
+            recipients: Array.isArray(d?.recipients) ? d.recipients : [],
+            truncated: !!d?.truncated,
+          })
+        )
+        .catch(() => setPreview({ count: null, recipients: [], truncated: false }))
         .finally(() => setLoadingPreview(false));
     }, 300);
     return () => clearTimeout(t);
@@ -82,7 +89,7 @@ export default function EmailComposer() {
   const bodyEmpty = bodyIsEmpty(bodyHtml);
   const canCompose = subject.trim().length > 0 && !bodyEmpty;
   const count = preview.count;
-  const previewName = preview.sample?.name || 'Nombre';
+  const previewName = preview.recipients[0]?.name || 'Nombre';
   const previewBody = bodyHtml.replaceAll('{nombre}', previewName);
 
   async function sendTest() {
@@ -256,21 +263,41 @@ export default function EmailComposer() {
 
         <Card>
           <CardContent className="space-y-3 pt-6">
-            <div className="text-sm">
-              {loadingPreview ? (
-                <span className="text-muted-foreground">Calculando destinatarios…</span>
-              ) : count == null ? (
-                <span className="text-muted-foreground">
-                  {kind === 'course' ? 'Elige uno o más cursos.' : 'Selecciona un segmento.'}
-                </span>
-              ) : (
-                <span>
-                  Se enviará a <strong>{count.toLocaleString('es-ES')}</strong>{' '}
-                  {count === 1 ? 'alumno' : 'alumnos'}
-                  {preview.sample && (
-                    <span className="text-muted-foreground"> · p.ej. {preview.sample.name}</span>
+            <div className="space-y-2">
+              <div className="text-sm">
+                {loadingPreview ? (
+                  <span className="text-muted-foreground">Calculando destinatarios…</span>
+                ) : count == null ? (
+                  <span className="text-muted-foreground">
+                    {kind === 'course' ? 'Elige uno o más cursos.' : 'Selecciona un segmento.'}
+                  </span>
+                ) : count === 0 ? (
+                  <span className="text-muted-foreground">Ningún alumno coincide con este segmento.</span>
+                ) : (
+                  <span>
+                    Se enviará a estos <strong>{count.toLocaleString('es-ES')}</strong>{' '}
+                    {count === 1 ? 'alumno' : 'alumnos'}:
+                  </span>
+                )}
+              </div>
+
+              {count != null && count > 0 && (
+                <div className="max-h-56 divide-y overflow-y-auto rounded-md border text-sm">
+                  {preview.recipients.map((r, i) => (
+                    <div
+                      key={`${r.email}-${i}`}
+                      className="flex items-center justify-between gap-3 px-3 py-1.5"
+                    >
+                      <span className="truncate">{r.name}</span>
+                      <span className="truncate text-xs text-muted-foreground">{r.email}</span>
+                    </div>
+                  ))}
+                  {preview.truncated && (
+                    <div className="px-3 py-1.5 text-xs text-muted-foreground">
+                      …y {(count - preview.recipients.length).toLocaleString('es-ES')} más
+                    </div>
                   )}
-                </span>
+                </div>
               )}
             </div>
 
