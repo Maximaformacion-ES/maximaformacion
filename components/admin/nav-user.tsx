@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ChevronsUpDown, Home, LogOut, User as UserIcon } from "lucide-react";
 import { useUser, useClerk } from "@clerk/nextjs";
@@ -33,7 +34,19 @@ function initials(name: string): string {
   );
 }
 
+// `false` en servidor y en el PRIMER render de cliente; `true` tras hidratar.
+// Sin useEffect (evita el warning set-state-in-effect).
+const emptySubscribe = () => () => {};
+function useHydrated() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 export function NavUser() {
+  const hydrated = useHydrated();
   const { isMobile } = useSidebar();
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -41,6 +54,27 @@ export function NavUser() {
   const name = user?.fullName || user?.firstName || "Admin";
   const email = user?.primaryEmailAddress?.emailAddress ?? "";
   const avatar = user?.imageUrl ?? undefined;
+
+  // Placeholder ESTABLE en SSR + primer render de cliente: sin Radix (DropdownMenu)
+  // ni datos de Clerk, así el árbol coincide y no hay mismatch de hidratación por
+  // el `useId` de Radix. Tras hidratar se muestra el menú real.
+  if (!hydrated) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg">
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarFallback className="rounded-lg">··</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">Cuenta</span>
+            </div>
+            <ChevronsUpDown className="ml-auto size-4" />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
