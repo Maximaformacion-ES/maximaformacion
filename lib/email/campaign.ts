@@ -8,6 +8,29 @@ import { buildAudience, type Segment } from './audiences';
 
 const MAX_AUDIENCE = 2000;
 
+// Resend solo envía desde un dominio VERIFICADO. El del proyecto es
+// maximaformacion.es → el remitente elegido debe estar en ese dominio.
+const VERIFIED_DOMAIN = 'maximaformacion.es';
+
+/** Extrae el dominio del email de un remitente en formato "Nombre <a@b>" o "a@b". */
+function fromDomain(from: string): string | null {
+  const m = from.match(/<([^>]+)>/);
+  const addr = (m ? m[1] : from).trim();
+  const at = addr.lastIndexOf('@');
+  return at >= 0 ? addr.slice(at + 1).toLowerCase().replace(/>$/, '') : null;
+}
+
+/** Valida que el remitente (si se indica) esté en el dominio verificado en Resend. */
+export function assertVerifiedFrom(from?: string): void {
+  if (!from || !from.trim()) return; // vacío → usa el default del cliente
+  const domain = fromDomain(from);
+  if (domain !== VERIFIED_DOMAIN) {
+    throw new Error(
+      `El remitente debe ser una dirección @${VERIFIED_DOMAIN} (el dominio verificado en Resend). Recibido: "${from}".`
+    );
+  }
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -62,13 +85,18 @@ export async function sendTestEmail({
   subject,
   bodyHtml,
   to,
+  from,
+  replyTo,
 }: {
   subject: string;
   bodyHtml: string;
   to: string;
+  from?: string;
+  replyTo?: string;
 }): Promise<void> {
+  assertVerifiedFrom(from);
   const { html, text } = renderEmail({ subject, bodyHtml, name: 'Nombre' });
-  await sendEmail({ to, subject: `[PRUEBA] ${subject}`, html, text });
+  await sendEmail({ to, subject: `[PRUEBA] ${subject}`, html, text, from, replyTo });
 }
 
 /**
@@ -81,14 +109,17 @@ export async function sendCampaign({
   subject,
   bodyHtml,
   segment,
+  from,
   replyTo,
 }: {
   actor: string;
   subject: string;
   bodyHtml: string;
   segment: Segment;
+  from?: string;
   replyTo?: string;
 }): Promise<{ campaignId: string | null; total: number; sent: number; failed: number }> {
+  assertVerifiedFrom(from);
   const audience = await buildAudience(segment);
   if (audience.length === 0) {
     throw new Error('La audiencia está vacía: no hay alumnos que coincidan con ese segmento.');
@@ -111,6 +142,7 @@ export async function sendCampaign({
         subject,
         bodyHtml,
         segment: segment as never,
+        fromAddr: from ?? null,
         replyTo: replyTo ?? null,
         total,
         status: 'sending',
@@ -146,7 +178,7 @@ export async function sendCampaign({
       batch.map(async (r) => {
         const { html, text } = renderEmail({ subject, bodyHtml, name: r.name });
         try {
-          await sendEmail({ to: r.email, subject, html, text, replyTo });
+          await sendEmail({ to: r.email, subject, html, text, from, replyTo });
           sent++;
           if (campaignId) {
             try {

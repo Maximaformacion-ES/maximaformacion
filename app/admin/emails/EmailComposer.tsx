@@ -45,6 +45,8 @@ function bodyIsEmpty(html: string): boolean {
 export default function EmailComposer() {
   const router = useRouter();
   const [subject, setSubject] = useState('');
+  const [from, setFrom] = useState('Máxima Formación <cursos@maximaformacion.es>');
+  const [replyTo, setReplyTo] = useState('');
   const [bodyHtml, setBodyHtml] = useState('');
   const [editorKey, setEditorKey] = useState(0);
   const [kind, setKind] = useState<Kind>('all');
@@ -93,7 +95,7 @@ export default function EmailComposer() {
       const res = await fetch('/api/admin/emails/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, bodyHtml }),
+        body: JSON.stringify({ subject, bodyHtml, from, replyTo }),
       });
       const d = await res.json().catch(() => ({}));
       if (res.ok) toast.success(`Prueba enviada a ${d.to}`);
@@ -113,7 +115,7 @@ export default function EmailComposer() {
       const res = await fetch('/api/admin/emails/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, bodyHtml, segment: seg }),
+        body: JSON.stringify({ subject, bodyHtml, segment: seg, from, replyTo }),
       });
       const d = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -153,6 +155,33 @@ export default function EmailComposer() {
               placeholder="Asunto del email"
             />
           </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="from">Remitente</Label>
+              <Input
+                id="from"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                placeholder="Nombre <cuenta@maximaformacion.es>"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="replyto">
+                Responder a <span className="font-normal text-muted-foreground">(opcional)</span>
+              </Label>
+              <Input
+                id="replyto"
+                value={replyTo}
+                onChange={(e) => setReplyTo(e.target.value)}
+                placeholder="cuenta@maximaformacion.es"
+              />
+            </div>
+          </div>
+          <p className="-mt-2 text-xs text-muted-foreground">
+            El remitente debe ser una dirección <span className="font-mono">@maximaformacion.es</span> (dominio
+            verificado en Resend).
+          </p>
 
           <div className="space-y-1.5">
             <Label>Cuerpo</Label>
@@ -206,7 +235,8 @@ export default function EmailComposer() {
                 <img src="/logo-maxima.png" alt="Máxima Formación" className="h-6 w-auto" />
               </div>
               <div className="p-4">
-                <div className="mb-2 text-sm font-semibold">{subject || '(sin asunto)'}</div>
+                <div className="mb-0.5 text-sm font-semibold">{subject || '(sin asunto)'}</div>
+                <div className="mb-3 text-xs text-muted-foreground">De: {from || '—'}</div>
                 {bodyEmpty ? (
                   <p className="text-sm text-muted-foreground">El cuerpo del email aparecerá aquí…</p>
                 ) : (

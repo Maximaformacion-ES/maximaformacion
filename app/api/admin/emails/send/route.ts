@@ -16,10 +16,12 @@ export async function POST(request: Request) {
     subject?: string;
     bodyHtml?: string;
     segment?: unknown;
+    from?: string;
     replyTo?: string;
   };
   const subject = typeof body.subject === 'string' ? body.subject.trim() : '';
   const bodyHtml = typeof body.bodyHtml === 'string' ? body.bodyHtml : '';
+  const from = typeof body.from === 'string' && body.from.trim() ? body.from.trim() : undefined;
   const replyTo = typeof body.replyTo === 'string' && body.replyTo.trim() ? body.replyTo.trim() : undefined;
   const segment = resolveSegment(body.segment);
 
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await sendCampaign({ actor: gate.userId, subject, bodyHtml, segment, replyTo });
+    const result = await sendCampaign({ actor: gate.userId, subject, bodyHtml, segment, from, replyTo });
     // 200 si envió algo; 500 si no se envió ninguno.
     return NextResponse.json(result, { status: result.sent === 0 ? 500 : 200 });
   } catch (e) {

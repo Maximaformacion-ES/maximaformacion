@@ -7,9 +7,16 @@ export async function POST(request: Request) {
   const gate = await requireAdmin();
   if (gate instanceof NextResponse) return gate;
 
-  const body = (await request.json().catch(() => ({}))) as { subject?: string; bodyHtml?: string };
+  const body = (await request.json().catch(() => ({}))) as {
+    subject?: string;
+    bodyHtml?: string;
+    from?: string;
+    replyTo?: string;
+  };
   const subject = typeof body.subject === 'string' ? body.subject.trim() : '';
   const bodyHtml = typeof body.bodyHtml === 'string' ? body.bodyHtml : '';
+  const from = typeof body.from === 'string' && body.from.trim() ? body.from.trim() : undefined;
+  const replyTo = typeof body.replyTo === 'string' && body.replyTo.trim() ? body.replyTo.trim() : undefined;
   if (!subject || !bodyHtml || bodyHtml === '<p></p>') {
     return NextResponse.json({ error: 'Asunto y cuerpo son obligatorios' }, { status: 400 });
   }
@@ -18,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await sendTestEmail({ subject, bodyHtml, to: gate.email });
+    await sendTestEmail({ subject, bodyHtml, to: gate.email, from, replyTo });
     return NextResponse.json({ ok: true, to: gate.email });
   } catch (e) {
     return NextResponse.json(
