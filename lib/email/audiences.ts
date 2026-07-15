@@ -120,12 +120,18 @@ export async function buildAudience(segment: Segment): Promise<Recipient[]> {
       }
     } catch (e) {
       console.warn('[audiences] Clerk chunk failed, using fallback emails:', e);
-      for (const id of chunk) {
-        const email = fallbackEmail.get(id);
-        if (!email) continue;
-        byId.set(id, { clerkId: id, email, name: email.split('@')[0] });
-      }
     }
+  }
+
+  // Fallback: cualquier clerkId que Clerk NO haya devuelto (Clerk de desarrollo
+  // distinto al de prod, usuario borrado en Clerk, o fallo de lote) usa el email
+  // del espejo `campus.users`. Sin esto, en dev (pk_test) la audiencia salía vacía
+  // porque los clerkId de la BD no existen en la instancia de test.
+  for (const id of clerkIds) {
+    if (byId.has(id)) continue;
+    const email = fallbackEmail.get(id);
+    if (!email) continue;
+    byId.set(id, { clerkId: id, email, name: email.split('@')[0] });
   }
 
   return Array.from(byId.values());
