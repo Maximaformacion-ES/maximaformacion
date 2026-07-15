@@ -56,8 +56,14 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
         return rows.map((r) => r.clerkId);
       }
       case 'all': {
-        const rows = await db.selectDistinct({ clerkId: enrollments.clerkId }).from(enrollments);
-        return rows.map((r) => r.clerkId);
+        // "Todos los alumnos" = quien tiene MATRÍCULA ∪ quien es PRO. Así PRO y
+        // matriculados son subconjuntos de "Todos" (antes solo miraba matrículas,
+        // y un PRO sin matrícula no aparecía aquí pero sí en el segmento PRO).
+        const [enr, pro] = await Promise.all([
+          db.selectDistinct({ clerkId: enrollments.clerkId }).from(enrollments),
+          db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro')),
+        ]);
+        return Array.from(new Set([...enr.map((r) => r.clerkId), ...pro.map((r) => r.clerkId)]));
       }
       case 'inactive': {
         // Alumnos CON matrícula cuya última actividad es anterior al corte (o sin
