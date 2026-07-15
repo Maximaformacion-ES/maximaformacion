@@ -2,7 +2,6 @@ import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { emailCampaigns, emailCampaignRecipients } from '@/lib/db/schema';
 import { sendEmail } from '@/lib/email/client';
-import { getSiteUrl } from '@/lib/site-url';
 import { writeAudit } from '@/lib/admin/audit';
 import { buildAudience, type Segment } from './audiences';
 
@@ -51,19 +50,41 @@ export function renderEmail({
   name: string;
 }): { html: string; text: string } {
   const body = bodyHtml.replaceAll('{nombre}', escapeHtml(name));
-  const logo = `${getSiteUrl()}/logo-maxima.png`;
+  const font = `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif`;
 
-  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${escapeHtml(subject)}</title></head>
-<body style="margin:0;background:#f5f5f5;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1a1a1a;">
-  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e5e5;">
-    <div style="padding:20px 24px;border-bottom:1px solid #eeeeee;">
-      <img src="${logo}" alt="Máxima Formación" style="height:28px;width:auto;display:block;" />
-    </div>
-    <div style="padding:24px;font-size:15px;line-height:1.65;">${body}</div>
-    <div style="padding:16px 24px;border-top:1px solid #eeeeee;color:#999999;font-size:12px;line-height:1.5;">
-      Máxima Formación · Has recibido este email como alumno de la plataforma.
-    </div>
-  </div>
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${escapeHtml(subject)}</title>
+<style>
+  .mx-body { font-size:16px; line-height:1.65; color:#2b2b2b; }
+  .mx-body p { margin:0 0 16px; }
+  .mx-body a { color:#F7A000; text-decoration:underline; }
+  .mx-body h1,.mx-body h2 { font-size:20px; line-height:1.3; font-weight:700; color:#171717; margin:24px 0 12px; }
+  .mx-body h3 { font-size:17px; line-height:1.35; font-weight:700; color:#171717; margin:20px 0 10px; }
+  .mx-body ul,.mx-body ol { margin:0 0 16px; padding-left:22px; }
+  .mx-body li { margin:4px 0; }
+  .mx-body strong,.mx-body b { color:#171717; }
+  .mx-body img { max-width:100%; height:auto; border-radius:8px; }
+  .mx-body > :first-child { margin-top:0; }
+  .mx-body > :last-child { margin-bottom:0; }
+</style></head>
+<body style="margin:0;padding:0;background:#f4f4f5;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f5;">
+    <tr><td align="center" style="padding:32px 12px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #ececec;font-family:${font};">
+        <tr><td style="padding:26px 36px 22px;border-bottom:3px solid #F7A000;">
+          <span style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#171717;">Máxima</span><span style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#F7A000;"> Formación</span>
+        </td></tr>
+        <tr><td style="padding:32px 36px;">
+          <div class="mx-body">${body}</div>
+        </td></tr>
+        <tr><td style="padding:20px 36px;border-top:1px solid #f0f0f0;background:#fafafa;color:#9a9a9a;font-size:12px;line-height:1.5;font-family:${font};">
+          Has recibido este email como alumno de <strong style="color:#6b6b6b;">Máxima Formación</strong>.
+        </td></tr>
+      </table>
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+        <tr><td style="padding:14px 36px;text-align:center;color:#bfbfbf;font-size:11px;font-family:${font};">© Máxima Formación</td></tr>
+      </table>
+    </td></tr>
+  </table>
 </body></html>`;
 
   const text = body

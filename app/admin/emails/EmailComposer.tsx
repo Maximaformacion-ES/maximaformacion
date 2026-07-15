@@ -244,26 +244,37 @@ export default function EmailComposer() {
             <CardTitle className="text-base">Vista previa</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-hidden rounded-lg border bg-white">
-              <div className="border-b p-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-maxima.png" alt="Máxima Formación" className="h-6 w-auto" />
+            {/* Meta tipo bandeja de entrada */}
+            <div className="mb-3 rounded-md bg-muted/40 px-3 py-2 text-xs">
+              <div>
+                <span className="text-muted-foreground">Asunto:</span>{' '}
+                <span className="font-medium">{subject || '(sin asunto)'}</span>
               </div>
-              <div className="p-4">
-                <div className="mb-0.5 text-sm font-semibold">{subject || '(sin asunto)'}</div>
-                <div className="mb-3 text-xs text-muted-foreground">De: {from || '—'}</div>
+              <div>
+                <span className="text-muted-foreground">De:</span> {from || '—'}
+              </div>
+            </div>
+
+            {/* El email tal cual se enviará */}
+            <div className="mx-auto max-w-[600px] overflow-hidden rounded-2xl border border-[#ececec] bg-white shadow-sm">
+              <div className="px-6 py-5" style={{ borderBottom: '3px solid #F7A000' }}>
+                <span className="text-xl font-extrabold tracking-tight text-[#171717]">Máxima</span>
+                <span className="text-xl font-extrabold tracking-tight text-mx-orange"> Formación</span>
+              </div>
+              <div className="px-6 py-7">
                 {bodyEmpty ? (
                   <p className="text-sm text-muted-foreground">El cuerpo del email aparecerá aquí…</p>
                 ) : (
                   <div
-                    className="tiptap-editor text-sm"
+                    className="tiptap-editor text-[15px] leading-relaxed text-[#2b2b2b] [&_a]:text-mx-orange [&_a]:underline"
                     // Contenido del propio admin (confiable). Sustituye {nombre}.
                     dangerouslySetInnerHTML={{ __html: previewBody }}
                   />
                 )}
               </div>
-              <div className="border-t p-3 text-xs text-muted-foreground">
-                Máxima Formación · Has recibido este email como alumno.
+              <div className="border-t bg-neutral-50 px-6 py-4 text-xs text-neutral-400">
+                Has recibido este email como alumno de{' '}
+                <strong className="text-neutral-500">Máxima Formación</strong>.
               </div>
             </div>
           </CardContent>
