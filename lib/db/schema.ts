@@ -209,3 +209,35 @@ export const adminAudit = campusSchema.table('admin_audit', {
   index('idx_admin_audit_target').on(table.targetClerkId),
   index('idx_admin_audit_created').on(table.createdAt),
 ]);
+
+// ─── Email Campaigns (Fase 2) ──────────────────────────────────────────
+// Emails operativos/relacionales a alumnos enviados desde el panel (Resend).
+// El marketing masivo NO va por aquí (eso es Klaviyo, con baja/consentimiento).
+export const emailCampaigns = campusSchema.table('email_campaigns', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clerkIdActor: text('clerk_id_actor'),                // admin que envió
+  subject: text('subject').notNull(),
+  bodyHtml: text('body_html').notNull(),
+  segment: jsonb('segment'),                           // { kind, ... } de la audiencia
+  fromAddr: text('from_addr'),
+  replyTo: text('reply_to'),
+  total: integer('total').default(0).notNull(),
+  sent: integer('sent').default(0).notNull(),
+  failed: integer('failed').default(0).notNull(),
+  status: text('status').default('draft').notNull(),   // draft | sending | done | failed
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+  sentAt: timestamp('sent_at', tz),
+});
+
+export const emailCampaignRecipients = campusSchema.table('email_campaign_recipients', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  campaignId: uuid('campaign_id').notNull().references(() => emailCampaigns.id),
+  clerkId: text('clerk_id'),
+  email: text('email'),
+  status: text('status').default('pending').notNull(), // pending | sent | failed
+  resendId: text('resend_id'),
+  error: text('error'),
+  sentAt: timestamp('sent_at', tz),
+}, (table) => [
+  index('idx_email_campaign_recipients_campaign').on(table.campaignId),
+]);
