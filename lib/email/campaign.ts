@@ -113,15 +113,18 @@ export async function sendTestEmail({
   to,
   from,
   replyTo,
+  name,
 }: {
   subject: string;
   bodyHtml: string;
   to: string;
   from?: string;
   replyTo?: string;
+  /** Nombre para sustituir {nombre} en la prueba (p.ej. el del propio admin). */
+  name?: string;
 }): Promise<void> {
   assertVerifiedFrom(from);
-  const { html, text } = renderEmail({ subject, bodyHtml, name: 'Nombre' });
+  const { html, text } = renderEmail({ subject, bodyHtml, name: name || 'alumno' });
   await sendEmail({ to, subject: `[PRUEBA] ${subject}`, html, text, from, replyTo });
 }
 

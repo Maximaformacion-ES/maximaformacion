@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { clerkClient } from '@clerk/nextjs/server';
 import { requireAdmin } from '@/lib/admin-auth';
 import { sendTestEmail } from '@/lib/email/campaign';
 
@@ -24,8 +25,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Tu usuario admin no tiene email en Clerk' }, { status: 400 });
   }
 
+  // Nombre del propio admin (para que {nombre} en la PRUEBA salga personalizado).
+  let name = gate.email.split('@')[0];
   try {
-    await sendTestEmail({ subject, bodyHtml, to: gate.email, from, replyTo });
+    const cc = await clerkClient();
+    const u = await cc.users.getUser(gate.userId);
+    name = u.firstName || u.fullName || name;
+  } catch {
+    /* si falla, usamos el prefijo del email */
+  }
+
+  try {
+    await sendTestEmail({ subject, bodyHtml, to: gate.email, from, replyTo, name });
     return NextResponse.json({ ok: true, to: gate.email });
   } catch (e) {
     return NextResponse.json(
