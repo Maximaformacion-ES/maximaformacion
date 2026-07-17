@@ -57,6 +57,10 @@ const isPublicRoute = createRouteMatcher([
 // Define routes that should bypass Clerk auth (they use their own verification)
 const isWebhookRoute = createRouteMatcher([
   '/api/webhooks/stripe(.*)',
+  // El webhook de Strapi verifica con su propio secreto (x-webhook-secret). Sin
+  // esta exención, Clerk lo reescribía a 404 → el handler nunca corría → NO se
+  // revalidaba ni se purgaba la caché al editar en Strapi (los cambios no salían).
+  '/api/webhooks/strapi(.*)',
   '/api/preview(.*)',
 ]);
 
