@@ -243,13 +243,16 @@ export async function getAllCourseProgress(clerkId: string) {
     progressMap[activity.programDocumentId].startedAt = activity.startedAt.toISOString();
   }
 
-  // Enrich with a unit-based progress percent using course_snapshots as the
-  // source of truth for the total units per course (`versions` holds one key
-  // per unit uid). This matches the campus's per-unit calc so every surface
-  // (profile, "Mis Cursos"…) shows the same %. Courses without a snapshot are
-  // left without a percent and the caller keeps its own fallback estimate.
+  // Percent de progreso por UNIDAD, consistente en todas las superficies (perfil
+  // "Mis Cursos", campus, "Continuar"…). Dos capas:
+  //   1) Base: course_snapshots (DB, siempre disponible) — red de seguridad.
+  //   2) Preferido: recalcular con la ESTRUCTURA VIVA del curso (Strapi), que es
+  //      exactamente lo que hace el campus con getCourseProgressStats. La viva no
+  //      se desfasa tras reimportar (los snapshots sí), así que gana cuando está.
+  // Todo capado a 100 (el bug del 267% venía de dividir unidades ÷ lecciones).
   const docIds = Object.keys(progressMap);
   if (docIds.length > 0) {
+    // (1) Base snapshot.
     const snapshots = await db
       .select({
         programDocumentId: courseSnapshots.programDocumentId,
@@ -266,6 +269,26 @@ export async function getAllCourseProgress(clerkId: string) {
       const unitSet = new Set(unitKeys);
       const completed = entry.completedLessons.filter((u) => unitSet.has(u)).length;
       entry.progressPercent = Math.min(100, Math.round((completed / unitKeys.length) * 100));
+    }
+
+    // (2) Recalcular con la estructura viva (misma fórmula que el campus). Si
+    //     Strapi falla, se queda el % del snapshot de (1).
+    try {
+      const { getMaxymiaCoursesFromStrapi } = await import('@/lib/strapi/maxymia-queries');
+      const { getCourseProgressStats } = await import('@/app/maxymia/data/queries');
+      const byId = new Map(
+        (await getMaxymiaCoursesFromStrapi()).map((c) => [c.id, c])
+      );
+      for (const docId of docIds) {
+        const course = byId.get(docId);
+        if (!course) continue; // no es curso Maxymia (o sin publicar) → deja el snapshot
+        progressMap[docId].progressPercent = getCourseProgressStats(
+          course,
+          progressMap[docId].completedLessons
+        ).percent;
+      }
+    } catch {
+      // Strapi caído → nos quedamos con el % del snapshot (capa 1).
     }
   }
 
