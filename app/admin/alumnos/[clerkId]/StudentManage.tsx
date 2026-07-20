@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -266,7 +268,13 @@ export default function StudentManage({ clerkId, purchases, subscription, enroll
                 <li key={c.documentId} className="flex items-center justify-between gap-3 py-2 first:pt-0">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="truncate text-sm">{c.title}</span>
+                      <Link
+                        href={`/admin/alumnos/${clerkId}/progreso/${c.documentId}`}
+                        className="inline-flex min-w-0 items-center gap-1 text-sm font-medium hover:text-mx-blue hover:underline"
+                      >
+                        <span className="truncate">{c.title}</span>
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-50" />
+                      </Link>
                       {!c.enrolled && (
                         <Badge variant="secondary" className="shrink-0 text-[10px]">sin matrícula</Badge>
                       )}
