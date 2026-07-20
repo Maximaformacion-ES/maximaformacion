@@ -90,11 +90,11 @@ export default async function StudentPage({
           <p className="text-muted-foreground text-sm">{s.email ?? '—'}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
             {s.plan === 'pro' ? (
-              <Badge className="bg-mx-orange/10 text-mx-orange-dark hover:bg-mx-orange/10 border-transparent">
-                plan: pro
+              <Badge className="bg-mx-orange/10 text-mx-orange-dark hover:bg-mx-orange/10 border-transparent font-semibold">
+                PRO
               </Badge>
             ) : (
-              <Badge variant="secondary">plan: free</Badge>
+              <Badge variant="secondary" className="font-semibold">FREE</Badge>
             )}
             {s.hasBeenPro && <span className="text-muted-foreground">fue PRO alguna vez</span>}
             {s.subscription && (
