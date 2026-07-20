@@ -263,9 +263,12 @@ export default function StudentManage({ clerkId, purchases, subscription, enroll
           {progress.length === 0 ? (
             <p className="text-sm text-muted-foreground">Sin actividad en ningún curso.</p>
           ) : (
-            <ul className="divide-y">
+            <ul className="space-y-0.5">
               {progress.map((c) => (
-                <li key={c.documentId} className="flex items-center justify-between gap-3 py-2 first:pt-0">
+                <li
+                  key={c.documentId}
+                  className="flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-mx-blue/10"
+                >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <Link

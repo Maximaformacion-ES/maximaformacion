@@ -1,14 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { getStudent360 } from '@/lib/admin/students';
 import { getAllCourseProgress, getLessonProgress } from '@/lib/db/queries';
 import { resolveContent } from '@/lib/admin/content';
 import { getMaxymiaCourseBySlugFromStrapi } from '@/lib/strapi/maxymia-queries';
 import { lessonUnitIds, isLessonComplete, getCourseProgressStats } from '@/app/maxymia/data/queries';
-import type { MaxymiaCourse, MaxymiaLesson, LocalizedString } from '@/app/maxymia/types';
+import type { MaxymiaCourse, LocalizedString } from '@/app/maxymia/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import BlocksAccordion from './BlocksAccordion';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,19 +32,6 @@ function Bar({ percent }: { percent: number }) {
   return (
     <div className="h-2 w-full overflow-hidden rounded-full bg-black/[0.06]">
       <div className="h-full rounded-full bg-mx-orange transition-all" style={{ width: `${percent}%` }} />
-    </div>
-  );
-}
-
-function UnitRow({ label, done, sub }: { label: string; done: boolean; sub?: boolean }) {
-  return (
-    <div className={`flex items-center gap-2 py-1.5 ${sub ? 'pl-7' : ''}`}>
-      {done ? (
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-      ) : (
-        <Circle className="h-4 w-4 shrink-0 text-muted-foreground/40" />
-      )}
-      <span className={`text-sm ${done ? '' : 'text-muted-foreground'}`}>{label || '(sin título)'}</span>
     </div>
   );
 }
@@ -108,48 +95,29 @@ export default async function ProgresoDetallePage({
         </CardContent>
       </Card>
 
-      {/* Desglose */}
+      {/* Desglose por bloque (acordeón: uno abierto) */}
       {course ? (
-        <div className="space-y-4">
-          {course.blocks.map((block) => {
+        <BlocksAccordion
+          blocks={course.blocks.map((block) => {
             const units = block.lessons.flatMap((l) => lessonUnitIds(l));
-            const done = units.filter((u) => completed.has(u)).length;
-            return (
-              <Card key={block.id}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <CardTitle className="text-sm">{t(block.title)}</CardTitle>
-                    <Badge variant={done === units.length && units.length > 0 ? 'default' : 'secondary'} className={done === units.length && units.length > 0 ? 'border-transparent bg-green-600/10 text-green-700' : ''}>
-                      {done}/{units.length}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="divide-y">
-                    {block.lessons.map((lesson: MaxymiaLesson) => {
-                      const hasTopics = lesson.topics && lesson.topics.length > 0;
-                      const lessonDone = isLessonComplete(lesson, completed);
-                      return (
-                        <div key={lesson.id} className="py-1">
-                          <UnitRow label={t(lesson.title)} done={lessonDone} />
-                          {hasTopics &&
-                            lesson.topics.map((topic) => (
-                              <UnitRow
-                                key={topic.id}
-                                sub
-                                label={t(topic.title)}
-                                done={completed.has(topic.uid || topic.id)}
-                              />
-                            ))}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            );
+            return {
+              id: block.id,
+              title: t(block.title),
+              done: units.filter((u) => completed.has(u)).length,
+              total: units.length,
+              lessons: block.lessons.map((lesson) => ({
+                id: lesson.id,
+                title: t(lesson.title),
+                done: isLessonComplete(lesson, completed),
+                topics: (lesson.topics ?? []).map((topic) => ({
+                  id: topic.id,
+                  title: t(topic.title),
+                  done: completed.has(topic.uid || topic.id),
+                })),
+              })),
+            };
           })}
-        </div>
+        />
       ) : content?.type === 'program' ? (
         <ProgramSummary clerkId={clerkId} documentId={documentId} completedCount={completed.size} />
       ) : (
