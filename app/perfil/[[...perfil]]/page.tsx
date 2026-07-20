@@ -535,8 +535,10 @@ const MaxymiaSection = () => {
         // Prefer the unit-based percent computed server-side (matches the
         // campus). Fall back to a lessons-based estimate only when there's no
         // snapshot yet for the course.
+        // El % correcto (por unidad, estructura viva) llega en progressPercent desde
+        // el servidor. El fallback solo actúa si faltara; capado a 100 por seguridad.
         const pct = progress?.progressPercent ?? (course.meta.totalLessons > 0
-          ? Math.round((completedCount / course.meta.totalLessons) * 100)
+          ? Math.min(100, Math.round((completedCount / course.meta.totalLessons) * 100))
           : 0);
 
         return (

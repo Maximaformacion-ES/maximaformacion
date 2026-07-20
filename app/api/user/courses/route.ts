@@ -48,7 +48,7 @@ export async function GET() {
 
     let userHasPro = false;
     let purchasedList: { programId: number | null; programDocumentId: string; purchasedAt?: string }[] = [];
-    let courseProgressMap: Record<string, { completedLessons: string[]; currentLessonId: string | null; lastAccessedAt: string | null; startedAt: string | null }> = {};
+    let courseProgressMap: Record<string, { completedLessons: string[]; currentLessonId: string | null; lastAccessedAt: string | null; startedAt: string | null; progressPercent?: number }> = {};
 
     // Try PostgreSQL first
     if (isDbConfigured()) {
@@ -117,9 +117,9 @@ export async function GET() {
         if (progress) {
           const fullProgram = await safeGetProgramWithLessons(program.documentId);
           if (fullProgram && fullProgram.totalLessons > 0) {
-            progressPercent = Math.round(
+            progressPercent = Math.min(100, Math.round(
               (progress.completedLessons.length / fullProgram.totalLessons) * 100
-            );
+            ));
           }
         }
 
@@ -162,9 +162,9 @@ export async function GET() {
 
           let progressPercent = 0;
           if (progress && program.totalLessons > 0) {
-            progressPercent = Math.round(
+            progressPercent = Math.min(100, Math.round(
               (progress.completedLessons.length / program.totalLessons) * 100
-            );
+            ));
           }
 
           userCourses.push({
@@ -187,16 +187,9 @@ export async function GET() {
           const maxymiaCourse = maxymiaById.get(purchase.programDocumentId);
           if (maxymiaCourse) {
             const progress = courseProgressMap[purchase.programDocumentId];
-            const totalLessons = maxymiaCourse.blocks.reduce(
-              (sum, b) => sum + b.lessons.length,
-              0
-            );
-            let progressPercent = 0;
-            if (progress && totalLessons > 0) {
-              progressPercent = Math.round(
-                (progress.completedLessons.length / totalLessons) * 100
-              );
-            }
+            // % por unidad calculado con la estructura viva en getAllCourseProgress
+            // (mismo valor que el campus). Antes se dividía unidades ÷ lecciones aquí
+            // → daba >100% (el bug del 267%).
             userCourses.push({
               program: maxymiaCourseAsProgram(maxymiaCourse),
               purchased: true,
@@ -207,7 +200,7 @@ export async function GET() {
                     lastAccessedAt: progress.lastAccessedAt || new Date().toISOString(),
                     completedLessons: progress.completedLessons,
                     currentLessonId: progress.currentLessonId || undefined,
-                    progressPercent,
+                    progressPercent: progress.progressPercent ?? 0,
                   }
                 : undefined,
               accessType: 'purchased',
