@@ -16,6 +16,10 @@ import {
 
 const LABELS: Record<string, string> = {
   alumnos: "Alumnos",
+  emails: "Emails",
+  leads: "Leads",
+  auditoria: "Auditoría",
+  progreso: "Progreso",
 };
 
 interface Crumb {
@@ -24,16 +28,20 @@ interface Crumb {
 }
 
 function crumbsFor(pathname: string): Crumb[] {
-  const rest = pathname.replace(/^\/admin\/?/, "");
-  const segments = rest.split("/").filter(Boolean);
+  const segments = pathname.replace(/^\/admin\/?/, "").split("/").filter(Boolean);
 
   if (segments.length === 0) return [{ label: "Dashboard" }];
 
+  // Ocultamos los ids crudos (uuid) que siguen a un segmento "de detalle": el id
+  // de alumno se muestra como "Ficha", y el id de curso tras "progreso" no se
+  // muestra (el nombre del curso ya está en el H1 de la página).
+  const visible = segments.map((_, i) => i).filter((i) => segments[i - 1] !== "progreso");
+
   const crumbs: Crumb[] = [{ label: "Panel", href: "/admin" }];
-  segments.forEach((seg, i) => {
-    const isLast = i === segments.length - 1;
-    // El id de alumno (segmento bajo /alumnos/) se muestra como "Ficha".
+  visible.forEach((i, vi) => {
+    const seg = segments[i];
     const label = LABELS[seg] ?? (segments[i - 1] === "alumnos" ? "Ficha" : seg);
+    const isLast = vi === visible.length - 1;
     crumbs.push({ label, href: isLast ? undefined : `/admin/${segments.slice(0, i + 1).join("/")}` });
   });
   return crumbs;
