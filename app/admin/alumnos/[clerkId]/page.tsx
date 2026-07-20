@@ -1,18 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getStudent360 } from '@/lib/admin/students';
+import { getPayments } from '@/lib/admin/payments';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StudentActions from './StudentActions';
+import StudentManage from './StudentManage';
 
 export const dynamic = 'force-dynamic';
-
-function fmtDate(d: Date | string | null | undefined): string {
-  if (!d) return '—';
-  const date = typeof d === 'string' ? new Date(d) : d;
-  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-}
 
 function initials(name: string): string {
   return name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
@@ -26,6 +21,7 @@ export default async function StudentPage({
   const { clerkId } = await params;
   const s = await getStudent360(clerkId);
   if (!s) notFound();
+  const payments = await getPayments(clerkId);
 
   const enrollments = s.enrollments.map((e) => ({
     documentId: e.programDocumentId,
@@ -33,6 +29,23 @@ export default async function StudentPage({
     accessType: e.accessType,
     purchasedAt: e.purchasedAt ? e.purchasedAt.toISOString() : null,
     percent: s.progress[e.programDocumentId]?.progressPercent ?? null,
+  }));
+
+  const certificates = s.certificates.map((c) => ({
+    id: c.id,
+    courseId: c.courseId,
+    courseTitle: c.courseTitle,
+    issuedAt: c.issuedAt.toISOString(),
+    revokedAt: c.revokedAt ? c.revokedAt.toISOString() : null,
+  }));
+
+  const exams = s.exams.map((ex) => ({
+    id: ex.id,
+    courseId: ex.courseId,
+    blockId: ex.blockId,
+    examId: ex.examId,
+    score: ex.score,
+    passed: ex.passed,
   }));
 
   return (
@@ -68,58 +81,18 @@ export default async function StudentPage({
         </div>
       </div>
 
-      {/* Acciones (cliente): PRO, conceder acceso, matrículas con revoke/reprovision */}
+      {/* Fase 1: PRO, conceder acceso, matrículas (revocar/re-provisionar) */}
       <StudentActions clerkId={s.clerkId} plan={s.plan} enrollments={enrollments} />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Certificados */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Certificados ({s.certificates.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {s.certificates.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sin certificados.</p>
-            ) : (
-              <ul className="divide-y">
-                {s.certificates.map((c) => (
-                  <li key={c.id} className="py-2 flex items-center justify-between text-sm">
-                    <span>{c.courseTitle}</span>
-                    <span className={c.revokedAt ? 'text-destructive' : 'text-muted-foreground'}>
-                      {c.revokedAt ? `revocado ${fmtDate(c.revokedAt)}` : `emitido ${fmtDate(c.issuedAt)}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Exámenes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Exámenes ({s.exams.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {s.exams.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sin exámenes.</p>
-            ) : (
-              <ul className="divide-y">
-                {s.exams.map((ex) => (
-                  <li key={ex.id} className="py-2 flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {ex.courseId} · bloque {ex.blockId}
-                    </span>
-                    <span className={ex.passed ? 'text-green-600' : 'text-destructive'}>
-                      {ex.score} — {ex.passed ? 'aprobado' : 'suspenso'}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* Fase 3: pagos, progreso, certificados, exámenes */}
+      <StudentManage
+        clerkId={s.clerkId}
+        purchases={payments.purchases}
+        subscription={payments.subscription}
+        enrollments={enrollments.map((e) => ({ documentId: e.documentId, title: e.title, percent: e.percent }))}
+        certificates={certificates}
+        exams={exams}
+      />
     </div>
   );
 }
