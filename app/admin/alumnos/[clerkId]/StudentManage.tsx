@@ -38,6 +38,14 @@ interface Enrollment {
   title: string;
   percent: number | null;
 }
+interface ProgressCourse {
+  documentId: string;
+  title: string;
+  percent: number | null;
+  completed: number;
+  lastAccessedAt: string | null;
+  enrolled: boolean;
+}
 interface Cert {
   id: string;
   courseId: string;
@@ -59,6 +67,7 @@ interface Props {
   purchases: Purchase[];
   subscription: Subscription | null;
   enrollments: Enrollment[];
+  progress: ProgressCourse[];
   certificates: Cert[];
   exams: Exam[];
 }
@@ -68,7 +77,12 @@ function fmtDate(d: string | null): string {
   return new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-export default function StudentManage({ clerkId, purchases, subscription, enrollments, certificates, exams }: Props) {
+function fmtDateTime(d: string | null): string {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+export default function StudentManage({ clerkId, purchases, subscription, enrollments, progress, certificates, exams }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [issueCourse, setIssueCourse] = useState('');
@@ -244,25 +258,34 @@ export default function StudentManage({ clerkId, purchases, subscription, enroll
           <CardTitle className="text-sm">Progreso</CardTitle>
         </CardHeader>
         <CardContent>
-          {enrollments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sin cursos.</p>
+          {progress.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Sin actividad en ningún curso.</p>
           ) : (
             <ul className="divide-y">
-              {enrollments.map((e) => (
-                <li key={e.documentId} className="flex items-center justify-between gap-3 py-2 first:pt-0">
+              {progress.map((c) => (
+                <li key={c.documentId} className="flex items-center justify-between gap-3 py-2 first:pt-0">
                   <div className="min-w-0">
-                    <div className="truncate text-sm">{e.title}</div>
-                    <div className="text-xs text-muted-foreground">{e.percent != null ? `${e.percent}%` : '—'}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-sm">{c.title}</span>
+                      {!c.enrolled && (
+                        <Badge variant="secondary" className="shrink-0 text-[10px]">sin matrícula</Badge>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {c.percent != null ? `${c.percent}% · ` : ''}
+                      {c.completed} {c.completed === 1 ? 'lección' : 'lecciones'}
+                      {c.lastAccessedAt ? ` · última conexión ${fmtDateTime(c.lastAccessedAt)}` : ''}
+                    </div>
                   </div>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm" disabled={busy === `prog:${e.documentId}`}>
+                      <Button variant="outline" size="sm" disabled={busy === `prog:${c.documentId}`}>
                         Resetear
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>¿Resetear el progreso de «{e.title}»?</AlertDialogTitle>
+                        <AlertDialogTitle>¿Resetear el progreso de «{c.title}»?</AlertDialogTitle>
                         <AlertDialogDescription>
                           Borra las lecciones completadas y la actividad del alumno en este curso. El
                           alumno empezará de cero. Irreversible.
@@ -271,7 +294,7 @@ export default function StudentManage({ clerkId, purchases, subscription, enroll
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => resetProgress(e.documentId)}
+                          onClick={() => resetProgress(c.documentId)}
                           className="bg-destructive text-white hover:bg-destructive/90"
                         >
                           Resetear progreso
