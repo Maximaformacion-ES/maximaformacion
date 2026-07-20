@@ -1,3 +1,4 @@
+import { desc } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { adminAudit } from '@/lib/db/schema';
 
@@ -33,5 +34,16 @@ export async function writeAudit(entry: AuditEntry): Promise<void> {
     });
   } catch (e) {
     console.error('[admin-audit] failed to write audit row:', e);
+  }
+}
+
+/** Últimas entradas de auditoría (solo lectura, para el visor). Defensivo. */
+export async function listAudit(opts: { limit?: number } = {}): Promise<(typeof adminAudit.$inferSelect)[]> {
+  const { limit = 200 } = opts;
+  try {
+    return await db.select().from(adminAudit).orderBy(desc(adminAudit.createdAt)).limit(limit);
+  } catch (e) {
+    console.warn('[admin:listAudit] failed:', e);
+    return [];
   }
 }

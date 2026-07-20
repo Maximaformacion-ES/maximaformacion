@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import StudentActions from './StudentActions';
 import StudentManage from './StudentManage';
+import DangerZone from './DangerZone';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,6 +94,9 @@ export default async function StudentPage({
         certificates={certificates}
         exams={exams}
       />
+
+      {/* Fase 4: zona de peligro (RGPD) */}
+      <DangerZone clerkId={s.clerkId} email={s.email} />
     </div>
   );
 }

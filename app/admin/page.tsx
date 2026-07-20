@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Users, GraduationCap, Crown, Award, ArrowUpRight } from 'lucide-react';
+import { Users, GraduationCap, Crown, Award, ArrowUpRight, Euro, Inbox, TrendingUp } from 'lucide-react';
 import { getAdminMetrics } from '@/lib/admin/metrics';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -8,11 +8,18 @@ export const dynamic = 'force-dynamic';
 export default async function AdminHome() {
   const m = await getAdminMetrics();
 
-  const stats = [
-    { label: 'Alumnos', value: m.students, icon: Users },
-    { label: 'Matrículas', value: m.enrollments, icon: GraduationCap },
-    { label: 'Alumnos PRO', value: m.pro, icon: Crown },
-    { label: 'Certificados', value: m.certificates, icon: Award },
+  const stats: { label: string; value: string; icon: typeof Users }[] = [
+    { label: 'Alumnos', value: m.students.toLocaleString('es-ES'), icon: Users },
+    { label: 'Matrículas', value: m.enrollments.toLocaleString('es-ES'), icon: GraduationCap },
+    { label: 'Alumnos PRO', value: m.pro.toLocaleString('es-ES'), icon: Crown },
+    { label: 'Certificados', value: m.certificates.toLocaleString('es-ES'), icon: Award },
+    {
+      label: 'Ingresos (aprox.)',
+      value: m.revenue.toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
+      icon: Euro,
+    },
+    { label: 'Leads', value: m.leads.toLocaleString('es-ES'), icon: Inbox },
+    { label: 'Matrículas (30 días)', value: m.recentEnrollments.toLocaleString('es-ES'), icon: TrendingUp },
   ];
 
   return (
@@ -32,7 +39,7 @@ export default async function AdminHome() {
               <s.icon className="h-4 w-4 text-mx-orange" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{s.value.toLocaleString('es-ES')}</div>
+              <div className="text-2xl font-bold">{s.value}</div>
             </CardContent>
           </Card>
         ))}
