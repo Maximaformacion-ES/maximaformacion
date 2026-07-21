@@ -46,7 +46,7 @@ export function NavMain() {
                 asChild
                 isActive={active}
                 tooltip={item.title}
-                className="data-[active=true]:bg-mx-orange/10 data-[active=true]:text-mx-orange-dark data-[active=true]:font-medium"
+                className="hover:bg-mx-orange/10 hover:text-mx-orange-dark data-[active=true]:bg-mx-blue/10 data-[active=true]:text-mx-blue data-[active=true]:hover:bg-mx-blue/10 data-[active=true]:hover:text-mx-blue data-[active=true]:font-medium"
               >
                 <Link href={item.url} onClick={() => setOpenMobile(false)}>
                   <item.icon />

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { getStudent360 } from '@/lib/admin/students';
 import { getAllCourseProgress, getLessonProgress } from '@/lib/db/queries';
 import { resolveContent } from '@/lib/admin/content';
@@ -66,14 +66,15 @@ export default async function ProgresoDetallePage({
     <div className="space-y-6">
       <Link
         href={`/admin/alumnos/${clerkId}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-2"
       >
-        ← Volver a la ficha
+        <ArrowLeft className="h-4 w-4" />
+        Volver a la ficha
       </Link>
 
       {/* Cabecera */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{courseTitle}</h1>
+      <div className="mt-4">
+        <h1 className="text-2xl font-semibold uppercase tracking-tight text-mx-blue">{courseTitle}</h1>
         <p className="text-sm text-muted-foreground">
           {student.name} · {student.email ?? '—'}
         </p>

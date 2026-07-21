@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Send, TestTube } from 'lucide-react';
+import { Send, TestTube, ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -320,8 +320,10 @@ export default function EmailComposer() {
                         size="sm"
                         disabled={safePage <= 1}
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        className="gap-1"
                       >
-                        ← Anterior
+                        <ArrowLeft className="h-4 w-4" />
+                        Anterior
                       </Button>
                       <span className="text-muted-foreground">
                         Página {safePage} de {totalPages}
@@ -332,8 +334,10 @@ export default function EmailComposer() {
                         size="sm"
                         disabled={safePage >= totalPages}
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        className="gap-1"
                       >
-                        Siguiente →
+                        Siguiente
+                        <ArrowRight className="h-4 w-4" />
                       </Button>
                     </div>
                   )}

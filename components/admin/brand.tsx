@@ -14,16 +14,21 @@ export function Brand() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton size="lg" asChild className="hover:bg-transparent">
-          <Link href="/admin">
-            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-mx-orange text-sm font-bold text-white">
-              M
-            </div>
+        <SidebarMenuButton size="lg" asChild className="h-14 hover:bg-transparent flex items-center justify-center">
+          <Link href="/admin" className="justify-center">
+            {/* Expandido: logo completo */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo-maxima.png"
               alt="Máxima Formación"
-              className="h-5 w-auto group-data-[collapsible=icon]:hidden"
+              className="h-9 w-auto group-data-[collapsible=icon]:hidden"
+            />
+            {/* Colapsado a icono: favicon */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/favicon.ico"
+              alt="Máxima Formación"
+              className="hidden h-6 w-6 group-data-[collapsible=icon]:block"
             />
           </Link>
         </SidebarMenuButton>

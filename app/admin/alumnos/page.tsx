@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, ArrowLeft, ArrowRight } from 'lucide-react';
 import { listStudents } from '@/lib/admin/students';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -93,25 +93,32 @@ export default async function AlumnosPage({
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm">
-          <PageLink q={q} page={page - 1} disabled={page <= 1} label="← Anterior" />
+          <PageLink q={q} page={page - 1} disabled={page <= 1} label="Anterior" dir="prev" />
           <span className="text-muted-foreground">
             Página {page} de {totalPages}
           </span>
-          <PageLink q={q} page={page + 1} disabled={page >= totalPages} label="Siguiente →" />
+          <PageLink q={q} page={page + 1} disabled={page >= totalPages} label="Siguiente" dir="next" />
         </div>
       )}
     </div>
   );
 }
 
-function PageLink({ q, page, disabled, label }: { q: string; page: number; disabled: boolean; label: string }) {
-  if (disabled) return <span className="text-muted-foreground/40">{label}</span>;
+function PageLink({ q, page, disabled, label, dir }: { q: string; page: number; disabled: boolean; label: string; dir: 'prev' | 'next' }) {
+  const content = (
+    <>
+      {dir === 'prev' && <ArrowLeft className="h-4 w-4" />}
+      {label}
+      {dir === 'next' && <ArrowRight className="h-4 w-4" />}
+    </>
+  );
+  if (disabled) return <span className="inline-flex items-center gap-1 text-muted-foreground/40">{content}</span>;
   const params = new URLSearchParams();
   if (q) params.set('q', q);
   params.set('page', String(page));
   return (
-    <Link href={`/admin/alumnos?${params.toString()}`} className="text-foreground hover:text-mx-blue">
-      {label}
+    <Link href={`/admin/alumnos?${params.toString()}`} className="inline-flex items-center gap-1 text-foreground hover:text-mx-blue">
+      {content}
     </Link>
   );
 }
