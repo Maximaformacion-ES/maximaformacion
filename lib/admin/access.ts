@@ -5,6 +5,7 @@ import { enrollments } from '@/lib/db/schema';
 import { upsertUser, createEnrollment, hasEnrollment, setEnrollmentExpiry } from '@/lib/db/queries';
 import { provisionMoodleAccess, unprovisionMoodleAccess } from '@/lib/moodle/provision';
 import { sendEmail } from '@/lib/email/client';
+import { renderEmail } from '@/lib/email/campaign';
 import { getSiteUrl } from '@/lib/site-url';
 import { resolveContent, type ResolvedContent } from './content';
 import { writeAudit } from './audit';
@@ -24,22 +25,35 @@ export interface Step {
 // `provisionMoodleAccess`. Para lo demás (cursos Maxymia in-app, o programas sin
 // Moodle configurado) mandamos este, porque conceder acceso manual SIEMPRE avisa
 // al alumno (decisión del cliente, 2026-07-10).
+/** Escape mínimo para meter el título del curso en el HTML del email. */
+function escHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function welcomeEmail(firstname: string, content: ResolvedContent) {
   const base = getSiteUrl('https://www.maximaformacion.es');
   const url =
     content.type === 'maxymia-course' && content.slug
       ? `${base}/maxymia/campus/${content.slug}`
       : base;
+  const title = escHtml(content.title);
   const subject = `Ya tienes acceso a ${content.title} | Máxima Formación`;
-  const html = `
-    <p>Hola ${firstname},</p>
-    <p>Te hemos dado acceso a <strong>${content.title}</strong>.</p>
-    <p>Puedes empezar cuando quieras desde tu campus:
-      <a href="${url}">${url}</a>.
+  // Mismo shell branded que las campañas y el PRO welcome (logo, naranja, botón).
+  const bodyHtml = `
+    <p>Hola {nombre},</p>
+    <h2>Ya tienes acceso a ${title}</h2>
+    <p>Hemos activado tu acceso al curso. Puedes empezar cuando quieras desde tu campus, a tu ritmo y desde cualquier dispositivo.</p>
+    <p style="text-align:center;margin:28px 0;">
+      <a href="${url}" style="display:inline-block;background:#F7A000;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 30px;border-radius:9999px;">Empezar el curso</a>
     </p>
-    <p>— Máxima Formación</p>
+    <p style="color:#8a8a8a;font-size:13px;">Si el botón no funciona, copia y pega este enlace en tu navegador:<br /><a href="${url}">${url}</a></p>
+    <p>Un saludo,<br />El equipo de <strong>Máxima Formación</strong></p>
   `;
-  const text = `Hola ${firstname},\n\nTe hemos dado acceso a ${content.title}. Puedes empezar desde tu campus: ${url}\n\n— Máxima Formación`;
+  const { html, text } = renderEmail({ subject, bodyHtml, name: firstname });
   return { subject, html, text };
 }
 
