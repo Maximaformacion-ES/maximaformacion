@@ -8,17 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CoursePicker, { type CourseOption } from './CoursePicker';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 
 interface Enrollment {
   documentId: string;
@@ -116,17 +105,6 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
     );
   }
 
-  function revoke(documentId: string) {
-    run(
-      `revoke:${documentId}`,
-      () =>
-        fetch(`${base}/access?documentId=${encodeURIComponent(documentId)}&confirm=true`, {
-          method: 'DELETE',
-        }),
-      'Acceso revocado'
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* PRO + conceder acceso */}
@@ -146,7 +124,7 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
           <span className="block text-xs text-muted-foreground">Conceder acceso a cursos</span>
           <div className="flex flex-wrap items-center gap-2">
             <CoursePicker value={courses} onChange={setCourses} />
-            <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Deja la fecha vacía para acceso indefinido (lo revocas tú a mano)">
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Deja la fecha vacía para acceso indefinido">
               hasta
               <input
                 type="date"
@@ -240,36 +218,6 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
                     >
                       Re-provisionar
                     </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={busy === `revoke:${e.documentId}`}
-                          className="border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive"
-                        >
-                          Revocar
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>¿Revocar acceso a «{e.title}»?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Se borrará la matrícula y se quitará de la cuenta del alumno. Si es un
-                            programa, también se le dará de baja en Moodle. Esta acción es destructiva.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => revoke(e.documentId)}
-                            className="bg-destructive text-white hover:bg-destructive/90"
-                          >
-                            Revocar acceso
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
                   </div>
                 </li>
               ))}
