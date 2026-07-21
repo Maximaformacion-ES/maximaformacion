@@ -1,5 +1,6 @@
 import { clerkClient } from '@clerk/nextjs/server';
 import { listAudit } from '@/lib/admin/audit';
+import { resolveContent } from '@/lib/admin/content';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -27,15 +28,26 @@ function fmt(d: Date): string {
   return d.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+/** Tipos de entidad que son un curso/programa (su entityId es un documentId). */
+const COURSE_ENTITY_TYPES = new Set(['program', 'maxymia-course', 'moodle', 'course']);
+
+/** Título guardado en el propio registro (`diff.title`), si lo hay. */
+function diffTitle(row: { diff?: unknown }): string | null {
+  const t = row.diff && typeof row.diff === 'object' ? (row.diff as { title?: unknown }).title : undefined;
+  return typeof t === 'string' && t.trim() ? t : null;
+}
+
 /**
- * Etiqueta de la entidad: preferimos el título del curso (guardado en `diff.title`
- * al escribir la auditoría) en vez del documentId crudo; caemos al `tipo · uuid`
- * solo cuando no hay título.
+ * Etiqueta de la entidad: preferimos el título del curso. Primero el que guarda el
+ * propio registro (`diff.title`); si no lo trae (registros antiguos), lo resolvemos
+ * desde Strapi por documentId (`resolved`); y solo si tampoco, caemos a `tipo · uuid`.
  */
-function entityLabel(row: { entityType?: string | null; entityId?: string | null; diff?: unknown }): string {
-  const title =
-    row.diff && typeof row.diff === 'object' ? (row.diff as { title?: unknown }).title : undefined;
-  if (typeof title === 'string' && title.trim()) return title;
+function entityLabel(
+  row: { entityType?: string | null; entityId?: string | null; diff?: unknown },
+  resolved: Map<string, string>
+): string {
+  const title = diffTitle(row) ?? (row.entityId ? resolved.get(row.entityId) : undefined);
+  if (title) return title;
   return [row.entityType, row.entityId].filter(Boolean).join(' · ') || '—';
 }
 
@@ -61,6 +73,25 @@ export default async function AuditoriaPage() {
     }
   }
   const who = (id: string | null) => (id ? emailById.get(id) ?? `${id.slice(0, 12)}…` : '—');
+
+  // Resolver títulos de curso para registros ANTIGUOS que no guardaron `diff.title`.
+  // Deduplicamos por documentId y resolvemos en paralelo (Strapi). Defensivo.
+  const titleByDocId = new Map<string, string>();
+  const idsToResolve = Array.from(
+    new Set(
+      rows
+        .filter((r) => r.entityId && COURSE_ENTITY_TYPES.has(r.entityType ?? '') && !diffTitle(r))
+        .map((r) => r.entityId as string)
+    )
+  );
+  if (idsToResolve.length > 0) {
+    await Promise.all(
+      idsToResolve.map(async (docId) => {
+        const c = await resolveContent(docId).catch(() => null);
+        if (c?.title) titleByDocId.set(docId, c.title);
+      })
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -101,8 +132,8 @@ export default async function AuditoriaPage() {
                       {ACTION_LABEL[r.action] ?? r.action}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">{who(r.targetClerkId)}</TableCell>
-                    <TableCell className="max-w-[240px] truncate text-xs text-muted-foreground" title={entityLabel(r)}>
-                      {entityLabel(r)}
+                    <TableCell className="max-w-[240px] truncate text-xs text-muted-foreground" title={entityLabel(r, titleByDocId)}>
+                      {entityLabel(r, titleByDocId)}
                     </TableCell>
                   </TableRow>
                 ))
