@@ -49,6 +49,8 @@ export const enrollments = campusSchema.table('enrollments', {
   programDocumentId: text('program_document_id').notNull(),
   accessType: text('access_type').notNull().default('purchased'),
   purchasedAt: timestamp('purchased_at', tz).defaultNow(),
+  // Acceso temporal: fecha de fin opcional. NULL = indefinido (revocar a mano).
+  expiresAt: timestamp('expires_at', tz),
   stripePaymentId: text('stripe_payment_id'),
   price: decimal('price', { precision: 10, scale: 2 }),
   title: text('title'),

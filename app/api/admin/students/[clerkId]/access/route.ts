@@ -19,6 +19,8 @@ export async function POST(
     documentId?: string;
     documentIds?: string[];
     notify?: boolean;
+    /** Acceso temporal: fecha de fin ISO (opcional). */
+    expiresAt?: string | null;
   };
 
   // Acepta uno (documentId) o varios (documentIds). Se conceden SECUENCIALMENTE
@@ -31,9 +33,13 @@ export async function POST(
   }
 
   const notify = body.notify !== false;
+  // `expiresAt` opcional: string ISO válido = caduca ahí; cualquier otra cosa
+  // (ausente/vacío) = acceso indefinido.
+  const expiresAt =
+    typeof body.expiresAt === 'string' && !Number.isNaN(Date.parse(body.expiresAt)) ? body.expiresAt : undefined;
   const results = [];
   for (const documentId of ids) {
-    results.push(await grantAccess({ actor: gate.userId, targetClerkId: clerkId, documentId, notify }));
+    results.push(await grantAccess({ actor: gate.userId, targetClerkId: clerkId, documentId, notify, expiresAt }));
   }
   const granted = results.filter((r) => r.ok).length;
   return NextResponse.json(

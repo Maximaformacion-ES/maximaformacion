@@ -2,7 +2,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { enrollments } from '@/lib/db/schema';
-import { upsertUser, createEnrollment, hasEnrollment } from '@/lib/db/queries';
+import { upsertUser, createEnrollment, hasEnrollment, setEnrollmentExpiry } from '@/lib/db/queries';
 import { provisionMoodleAccess, unprovisionMoodleAccess } from '@/lib/moodle/provision';
 import { sendEmail } from '@/lib/email/client';
 import { getSiteUrl } from '@/lib/site-url';
@@ -51,6 +51,11 @@ export interface GrantAccessParams {
   documentId: string;
   /** Enviar email de bienvenida (por defecto sí). */
   notify?: boolean;
+  /**
+   * Acceso temporal: fecha de fin en ISO. `undefined` = no tocar (indefinido en
+   * altas nuevas); una fecha ISO fija la caducidad; `null` la vuelve indefinida.
+   */
+  expiresAt?: string | null;
 }
 
 export interface GrantAccessResult {
@@ -68,6 +73,9 @@ export interface GrantAccessResult {
  */
 export async function grantAccess(params: GrantAccessParams): Promise<GrantAccessResult> {
   const { actor, targetClerkId, documentId, notify = true } = params;
+  // `expiresAt`: undefined = no se toca; string ISO = caduca; null = indefinido.
+  const expiry =
+    params.expiresAt === undefined ? undefined : params.expiresAt === null ? null : new Date(params.expiresAt);
   const steps: Step[] = [];
   const rec = (step: string, ok: boolean, detail?: unknown) => steps.push({ step, ok, detail });
 
@@ -95,28 +103,40 @@ export async function grantAccess(params: GrantAccessParams): Promise<GrantAcces
     programDocumentId: documentId,
     accessType: 'admin_granted',
     title: content.title,
+    expiresAt: expiry ?? null,
   });
-  rec('enrollment', true, { created: !!enrollment });
+  // `createEnrollment` no toca filas ya existentes (onConflictDoNothing). Si se
+  // pidió una caducidad concreta, la fijamos también sobre la matrícula previa.
+  if (!enrollment && expiry !== undefined) {
+    await setEnrollmentExpiry(targetClerkId, documentId, expiry);
+  }
+  rec('enrollment', true, { created: !!enrollment, expiresAt: expiry ? expiry.toISOString() : null });
 
   // 2) Espejo en Clerk (`purchasedCourses` — fallback que lee la web).
   try {
     const meta = (student.publicMetadata as Record<string, unknown>) || {};
-    const existing = (meta.purchasedCourses as { documentId: string }[]) || [];
-    if (!existing.some((p) => p.documentId === documentId)) {
+    const existing = (meta.purchasedCourses as { documentId: string; expiresAt?: string | null }[]) || [];
+    const expiresIso = expiry ? expiry.toISOString() : null;
+    const prev = existing.find((p) => p.documentId === documentId);
+    // Si se pasó una caducidad (undefined = no tocar), reflejamos también el
+    // `expiresAt` en el espejo de Clerk para que el fallback del gate lo respete.
+    const needsUpdate = !prev || (expiry !== undefined && (prev.expiresAt ?? null) !== expiresIso);
+    if (needsUpdate) {
+      const entry = prev
+        ? { ...prev, ...(expiry !== undefined ? { expiresAt: expiresIso } : {}) }
+        : {
+            programId: null,
+            documentId,
+            purchasedAt: new Date().toISOString(),
+            stripePaymentId: 'admin_granted',
+            price: 0,
+            title: content.title,
+            expiresAt: expiresIso,
+          };
       await cc.users.updateUserMetadata(targetClerkId, {
         publicMetadata: {
           ...meta,
-          purchasedCourses: [
-            ...existing,
-            {
-              programId: null,
-              documentId,
-              purchasedAt: new Date().toISOString(),
-              stripePaymentId: 'admin_granted',
-              price: 0,
-              title: content.title,
-            },
-          ],
+          purchasedCourses: [...existing.filter((p) => p.documentId !== documentId), entry],
         },
       });
     }
@@ -170,7 +190,7 @@ export async function grantAccess(params: GrantAccessParams): Promise<GrantAcces
     entityType: content.type,
     entityId: documentId,
     targetClerkId,
-    diff: { title: content.title, steps },
+    diff: { title: content.title, expiresAt: expiry ? expiry.toISOString() : null, steps },
     source: 'panel',
   });
   return { ok, content, steps };

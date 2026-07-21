@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { getStudent360 } from '@/lib/admin/students';
 import { getPayments } from '@/lib/admin/payments';
 import { resolveContent } from '@/lib/admin/content';
@@ -31,6 +32,7 @@ export default async function StudentPage({
     accessType: e.accessType,
     purchasedAt: e.purchasedAt ? e.purchasedAt.toISOString() : null,
     percent: s.progress[e.programDocumentId]?.progressPercent ?? null,
+    expiresAt: e.expiresAt ? e.expiresAt.toISOString() : null,
   }));
 
   // Progreso de TODOS los cursos con actividad, NO solo los matriculados: un
@@ -75,8 +77,9 @@ export default async function StudentPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/alumnos" className="text-sm text-muted-foreground hover:text-foreground">
-        ← Alumnos
+      <Link href="/admin/alumnos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-2">
+        <ArrowLeft className="h-4 w-4" />
+        Alumnos
       </Link>
 
       {/* Cabecera / perfil */}

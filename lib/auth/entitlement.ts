@@ -39,9 +39,10 @@ export async function getCourseAccess(
 
   if (isDbConfigured()) {
     try {
-      const { hasEnrollment, getUserByClerkId } = await import('@/lib/db/queries');
+      const { hasActiveEnrollment, getUserByClerkId } = await import('@/lib/db/queries');
       const [enrolled, dbUser] = await Promise.all([
-        hasEnrollment(userId, programDocumentId),
+        // `hasActiveEnrollment` excluye las matrículas caducadas (acceso temporal).
+        hasActiveEnrollment(userId, programDocumentId),
         isPro === true ? getUserByClerkId(userId) : Promise.resolve(null),
       ]);
       const hasPro = dbUser?.plan === 'pro';
@@ -61,8 +62,11 @@ export async function getCourseAccess(
   try {
     const user = await currentUser();
     const meta = (user?.publicMetadata as Record<string, unknown>) || {};
-    const purchased = (meta.purchasedCourses as Array<{ documentId?: string }>) || [];
-    const enrolled = purchased.some((c) => c.documentId === programDocumentId);
+    const purchased = (meta.purchasedCourses as Array<{ documentId?: string; expiresAt?: string | null }>) || [];
+    const now = Date.now();
+    const enrolled = purchased.some(
+      (c) => c.documentId === programDocumentId && (!c.expiresAt || new Date(c.expiresAt).getTime() > now)
+    );
     const hasPro = (meta.plan as string) === 'pro';
     return {
       isSignedIn: true,

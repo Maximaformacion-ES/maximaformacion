@@ -26,6 +26,8 @@ interface Enrollment {
   accessType: string;
   purchasedAt: string | null;
   percent: number | null;
+  /** Acceso temporal: fecha de fin (ISO) o null = indefinido. */
+  expiresAt: string | null;
 }
 
 interface Props {
@@ -39,6 +41,8 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [notify, setNotify] = useState(true);
+  // Acceso temporal (opcional): 'YYYY-MM-DD'. Vacío = acceso indefinido.
+  const [expiresAt, setExpiresAt] = useState('');
 
   const base = `/api/admin/students/${clerkId}`;
   const isPro = plan === 'pro';
@@ -67,20 +71,23 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
 
   function grant() {
     if (courses.length === 0) return;
+    // Fecha de fin: fin del día elegido (hora local) → ISO. Vacío = indefinido.
+    const expiresIso = expiresAt ? new Date(`${expiresAt}T23:59:59`).toISOString() : undefined;
+    const suffix = expiresAt ? ` (hasta ${new Date(`${expiresAt}T23:59:59`).toLocaleDateString('es-ES')})` : '';
     const okMsg =
       courses.length === 1
-        ? `Acceso concedido a «${courses[0].title}»`
-        : `Acceso concedido a ${courses.length} cursos`;
+        ? `Acceso concedido a «${courses[0].title}»${suffix}`
+        : `Acceso concedido a ${courses.length} cursos${suffix}`;
     run(
       'grant',
       () =>
         fetch(`${base}/access`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ documentIds: courses.map((c) => c.documentId), notify }),
+          body: JSON.stringify({ documentIds: courses.map((c) => c.documentId), notify, expiresAt: expiresIso }),
         }),
       okMsg
-    ).then((ok) => ok && setCourses([]));
+    ).then((ok) => ok && (setCourses([]), setExpiresAt('')));
   }
 
   function togglePro() {
@@ -139,6 +146,25 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
           <span className="block text-xs text-muted-foreground">Conceder acceso a cursos</span>
           <div className="flex flex-wrap items-center gap-2">
             <CoursePicker value={courses} onChange={setCourses} />
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Deja la fecha vacía para acceso indefinido (lo revocas tú a mano)">
+              hasta
+              <input
+                type="date"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                className="rounded-md border border-input bg-transparent px-2 py-1 text-xs"
+              />
+              {expiresAt && (
+                <button
+                  type="button"
+                  onClick={() => setExpiresAt('')}
+                  className="rounded-sm hover:text-destructive"
+                  aria-label="Quitar fecha de fin"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </label>
             <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
               avisar
@@ -184,7 +210,19 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
               {enrollments.map((e) => (
                 <li key={e.documentId} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{e.title}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium truncate">{e.title}</span>
+                      {e.expiresAt &&
+                        (new Date(e.expiresAt).getTime() > Date.now() ? (
+                          <Badge variant="secondary" className="shrink-0 gap-1 text-[10px] text-mx-blue">
+                            hasta {new Date(e.expiresAt).toLocaleDateString('es-ES')}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="shrink-0 gap-1 border-transparent bg-destructive/10 text-[10px] text-destructive">
+                            caducado {new Date(e.expiresAt).toLocaleDateString('es-ES')}
+                          </Badge>
+                        ))}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {e.accessType}
                       {e.percent != null && ` · ${e.percent}%`}
