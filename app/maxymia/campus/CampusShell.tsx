@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search, ChevronLeft, ArrowUpRight, Menu, X } from 'lucide-react';
-import { UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
+import { Search, ChevronLeft, ArrowUpRight, Menu, X, Shield } from 'lucide-react';
+import { UserButton, SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import { LocaleProvider, useLocale } from '../i18n/LocaleProvider';
 
 import NotificationBell from '../components/NotificationBell';
@@ -32,6 +32,21 @@ const CAMPUS_NAV = [
   { name: 'Notas', path: '/maxymia/campus/notas' },
 ];
 
+/** Item "Admin" del menú del avatar de Clerk (solo role==='admin'). Devuelve el
+ *  elemento UserButton.MenuItems para insertarlo como hijo directo del UserButton. */
+function adminMenuItems(isAdmin: boolean) {
+  return isAdmin ? (
+    <UserButton.MenuItems>
+      <UserButton.Link label="Admin" labelIcon={<Shield size={16} />} href="/admin" />
+    </UserButton.MenuItems>
+  ) : null;
+}
+
+function useIsAdmin(): boolean {
+  const { user } = useUser();
+  return (user?.publicMetadata as { role?: string } | undefined)?.role === 'admin';
+}
+
 function CampusHeader() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
@@ -52,6 +67,7 @@ function DefaultCampusHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { light } = useCampusTheme();
   const { logoMaxymia } = useSiteBranding();
+  const isAdmin = useIsAdmin();
   const logoSrc = light ? '/logo_maxymia_negro_sin_fondo.png' : logoMaxymia;
   // Clerk's <SignedIn>/<SignedOut> render different trees on the server (no
   // session, esp. with pk_test dev keys) vs the client (session present),
@@ -156,7 +172,9 @@ function DefaultCampusHeader() {
                       avatarBox: 'w-6 h-6',
                     },
                   }}
-                />
+                >
+                  {adminMenuItems(isAdmin)}
+                </UserButton>
               </div>
             </SignedIn>
             {/* Anónimo viendo una ficha pública: CTA para entrar al campus. */}
@@ -210,7 +228,9 @@ function DefaultCampusHeader() {
                       avatarBox: 'w-7 h-7',
                     },
                   }}
-                />
+                >
+                  {adminMenuItems(isAdmin)}
+                </UserButton>
               </SignedIn>
               <SignedOut>
                 <span className={`${light ? 'text-mx-text' : 'text-white/70'} text-label-md font-medium`}>Maxymia</span>
@@ -278,6 +298,7 @@ function LessonHeader() {
   const { locale } = useLocale();
   const courses = useCampusCourses();
   const { logoMaxymia } = useSiteBranding();
+  const isAdmin = useIsAdmin();
 
   // Extract courseSlug from path: /maxymia/campus/:courseSlug/lesson/:lessonId
   const segments = pathname.split('/');
@@ -335,7 +356,9 @@ function LessonHeader() {
                   avatarBox: 'w-6 h-6',
                 },
               }}
-            />
+            >
+              {adminMenuItems(isAdmin)}
+            </UserButton>
           </div>
         </div>
       </div>

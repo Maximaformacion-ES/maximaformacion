@@ -127,6 +127,8 @@ export async function createEnrollment(data: {
   stripePaymentId?: string;
   price?: number;
   title?: string;
+  /** Acceso temporal: fecha de fin (null/undefined = indefinido). */
+  expiresAt?: Date | null;
 }) {
   const [enrollment] = await db
     .insert(enrollments)
@@ -138,10 +140,26 @@ export async function createEnrollment(data: {
       stripePaymentId: data.stripePaymentId,
       price: data.price?.toString(),
       title: data.title,
+      expiresAt: data.expiresAt ?? null,
     })
     .onConflictDoNothing()
     .returning();
   return enrollment ?? null;
+}
+
+/**
+ * Fija/actualiza la fecha de caducidad de una matrícula existente (acceso
+ * temporal). `expiresAt = null` la vuelve indefinida. Idempotente.
+ */
+export async function setEnrollmentExpiry(
+  clerkId: string,
+  programDocumentId: string,
+  expiresAt: Date | null
+) {
+  await db
+    .update(enrollments)
+    .set({ expiresAt })
+    .where(and(eq(enrollments.clerkId, clerkId), eq(enrollments.programDocumentId, programDocumentId)));
 }
 
 export async function getUserEnrollments(clerkId: string) {
@@ -159,6 +177,27 @@ export async function hasEnrollment(clerkId: string, programDocumentId: string) 
       and(
         eq(enrollments.clerkId, clerkId),
         eq(enrollments.programDocumentId, programDocumentId)
+      )
+    )
+    .limit(1);
+  return !!result;
+}
+
+/**
+ * Como `hasEnrollment` pero además exige que la matrícula NO esté caducada
+ * (acceso temporal): `expires_at IS NULL OR expires_at > now()`. Es la que debe
+ * usar el gate de acceso — una matrícula caducada existe (para poder limpiarla a
+ * mano) pero no da acceso.
+ */
+export async function hasActiveEnrollment(clerkId: string, programDocumentId: string) {
+  const [result] = await db
+    .select({ id: enrollments.id })
+    .from(enrollments)
+    .where(
+      and(
+        eq(enrollments.clerkId, clerkId),
+        eq(enrollments.programDocumentId, programDocumentId),
+        sql`(${enrollments.expiresAt} IS NULL OR ${enrollments.expiresAt} > now())`
       )
     )
     .limit(1);

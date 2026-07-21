@@ -49,6 +49,8 @@ export const enrollments = campusSchema.table('enrollments', {
   programDocumentId: text('program_document_id').notNull(),
   accessType: text('access_type').notNull().default('purchased'),
   purchasedAt: timestamp('purchased_at', tz).defaultNow(),
+  // Acceso temporal: fecha de fin opcional. NULL = indefinido (revocar a mano).
+  expiresAt: timestamp('expires_at', tz),
   stripePaymentId: text('stripe_payment_id'),
   price: decimal('price', { precision: 10, scale: 2 }),
   title: text('title'),
@@ -189,4 +191,55 @@ export const examResults = campusSchema.table('exam_results', {
 }, (table) => [
   uniqueIndex('idx_exam_results_unique').on(table.clerkId, table.examId),
   index('idx_exam_results_course').on(table.clerkId, table.courseId),
+]);
+
+// ─── Admin Audit ───────────────────────────────────────────────────────
+// Registro inmutable de las mutaciones del panel admin (Fase 1). El panel opera
+// datos de usuario/PII (dar acceso, PRO, provisioning…), así que la seguridad se
+// apoya en requireAdmin() + ESTA auditoría + confirmación en destructivas.
+export const adminAudit = campusSchema.table('admin_audit', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clerkIdActor: text('clerk_id_actor').notNull(),      // admin que ejecutó la acción
+  action: text('action').notNull(),                    // 'grant_access' | 'revoke_access' | 'set_pro' | 'reprovision' | …
+  entityType: text('entity_type'),                     // 'enrollment' | 'plan' | 'moodle' | …
+  entityId: text('entity_id'),                         // documentId / courseId afectado
+  targetClerkId: text('target_clerk_id'),              // alumno afectado
+  diff: jsonb('diff'),                                 // payload / antes-después de la acción
+  source: text('source').default('panel').notNull(),   // 'panel' | 'assistant' | 'script'
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  index('idx_admin_audit_target').on(table.targetClerkId),
+  index('idx_admin_audit_created').on(table.createdAt),
+]);
+
+// ─── Email Campaigns (Fase 2) ──────────────────────────────────────────
+// Emails operativos/relacionales a alumnos enviados desde el panel (Resend).
+// El marketing masivo NO va por aquí (eso es Klaviyo, con baja/consentimiento).
+export const emailCampaigns = campusSchema.table('email_campaigns', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clerkIdActor: text('clerk_id_actor'),                // admin que envió
+  subject: text('subject').notNull(),
+  bodyHtml: text('body_html').notNull(),
+  segment: jsonb('segment'),                           // { kind, ... } de la audiencia
+  fromAddr: text('from_addr'),
+  replyTo: text('reply_to'),
+  total: integer('total').default(0).notNull(),
+  sent: integer('sent').default(0).notNull(),
+  failed: integer('failed').default(0).notNull(),
+  status: text('status').default('draft').notNull(),   // draft | sending | done | failed
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+  sentAt: timestamp('sent_at', tz),
+});
+
+export const emailCampaignRecipients = campusSchema.table('email_campaign_recipients', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  campaignId: uuid('campaign_id').notNull().references(() => emailCampaigns.id),
+  clerkId: text('clerk_id'),
+  email: text('email'),
+  status: text('status').default('pending').notNull(), // pending | sent | failed
+  resendId: text('resend_id'),
+  error: text('error'),
+  sentAt: timestamp('sent_at', tz),
+}, (table) => [
+  index('idx_email_campaign_recipients_campaign').on(table.campaignId),
 ]);
