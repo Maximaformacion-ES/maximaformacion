@@ -88,8 +88,8 @@ export default function ConsultingTable({ leads }: { leads: ConsultingLead[] }) 
                 <Row label="Organización" value={selected.organization} />
                 <Row label="Sector" value={selected.sector} />
                 <Row label="Fase proyecto" value={selected.projectPhase} />
-                <Row label="Plazo" value={selected.deadline} />
-                <Row label="Fecha" value={fmt(selected.createdAt)} />
+                <Row label="Fecha límite" value={selected.deadline ? fmt(selected.deadline) : null} />
+                <Row label="Recibido" value={fmt(selected.createdAt)} />
               </dl>
 
               <div>
