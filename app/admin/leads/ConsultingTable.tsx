@@ -43,25 +43,30 @@ export default function ConsultingTable({ leads }: { leads: ConsultingLead[] }) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {leads.map((c) => (
-            <TableRow
-              key={c.documentId}
-              onClick={() => setSelected(c)}
-              className="cursor-pointer transition-colors hover:bg-mx-blue/5"
-              title="Ver detalle"
-            >
-              <TableCell>
-                <div className="font-medium">{c.fullName}</div>
-                {c.organization && <div className="text-xs text-muted-foreground">{c.organization}</div>}
-              </TableCell>
-              <TableCell className="text-muted-foreground">{c.email}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">{c.sector ?? '—'}</TableCell>
-              <TableCell className="max-w-[280px] truncate text-xs text-muted-foreground">
-                {c.questionGoal ?? '—'}
-              </TableCell>
-              <TableCell className="text-xs text-muted-foreground">{fmt(c.createdAt)}</TableCell>
-            </TableRow>
-          ))}
+          {leads.map((c) => {
+            const org = c.organization?.trim() || '';
+            const sector = c.sector?.trim() || '—';
+            const question = c.questionGoal?.trim() || '—';
+            return (
+              <TableRow
+                key={c.documentId}
+                onClick={() => setSelected(c)}
+                className="cursor-pointer transition-colors hover:bg-mx-blue/5"
+                title="Ver detalle"
+              >
+                <TableCell>
+                  <div className="font-medium">{c.fullName}</div>
+                  {org && <div className="text-xs text-muted-foreground">{org}</div>}
+                </TableCell>
+                <TableCell className="text-muted-foreground">{c.email}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{sector}</TableCell>
+                <TableCell className="max-w-[280px] truncate text-xs text-muted-foreground">
+                  {question}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">{fmt(c.createdAt)}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
 

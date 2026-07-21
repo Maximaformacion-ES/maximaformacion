@@ -56,14 +56,24 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
         return rows.map((r) => r.clerkId);
       }
       case 'all': {
-        // "Todos los alumnos" = quien tiene MATRÍCULA ∪ quien es PRO. Así PRO y
-        // matriculados son subconjuntos de "Todos" (antes solo miraba matrículas,
-        // y un PRO sin matrícula no aparecía aquí pero sí en el segmento PRO).
-        const [enr, pro] = await Promise.all([
-          db.selectDistinct({ clerkId: enrollments.clerkId }).from(enrollments),
-          db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro')),
-        ]);
-        return Array.from(new Set([...enr.map((r) => r.clerkId), ...pro.map((r) => r.clerkId)]));
+        // "Todos" = TODOS los usuarios registrados. La fuente autoritativa es Clerk
+        // (puede haber un usuario en Clerk sin fila espejo en `campus.users`), así
+        // que enumeramos Clerk paginando. Unimos con `campus.users` por si acaso.
+        const ids = new Set<string>();
+        try {
+          const cc = await clerkClient();
+          const pageSize = 100;
+          for (let offset = 0; offset < 100_000; offset += pageSize) {
+            const res = await cc.users.getUserList({ limit: pageSize, offset });
+            for (const u of res.data) ids.add(u.id);
+            if (res.data.length < pageSize) break;
+          }
+        } catch (e) {
+          console.warn('[audiences] Clerk getUserList (all) failed, fallback a campus.users:', e);
+        }
+        const rows = await db.select({ clerkId: users.clerkId }).from(users);
+        for (const r of rows) ids.add(r.clerkId);
+        return Array.from(ids);
       }
       case 'inactive': {
         // Alumnos CON matrícula cuya última actividad es anterior al corte (o sin
