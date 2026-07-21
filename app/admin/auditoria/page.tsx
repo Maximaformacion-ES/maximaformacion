@@ -27,6 +27,18 @@ function fmt(d: Date): string {
   return d.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * Etiqueta de la entidad: preferimos el título del curso (guardado en `diff.title`
+ * al escribir la auditoría) en vez del documentId crudo; caemos al `tipo · uuid`
+ * solo cuando no hay título.
+ */
+function entityLabel(row: { entityType?: string | null; entityId?: string | null; diff?: unknown }): string {
+  const title =
+    row.diff && typeof row.diff === 'object' ? (row.diff as { title?: unknown }).title : undefined;
+  if (typeof title === 'string' && title.trim()) return title;
+  return [row.entityType, row.entityId].filter(Boolean).join(' · ') || '—';
+}
+
 export default async function AuditoriaPage() {
   const rows = await listAudit({ limit: 200 });
 
@@ -89,8 +101,8 @@ export default async function AuditoriaPage() {
                       {ACTION_LABEL[r.action] ?? r.action}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">{who(r.targetClerkId)}</TableCell>
-                    <TableCell className="max-w-[220px] truncate text-xs text-muted-foreground">
-                      {[r.entityType, r.entityId].filter(Boolean).join(' · ') || '—'}
+                    <TableCell className="max-w-[240px] truncate text-xs text-muted-foreground" title={entityLabel(r)}>
+                      {entityLabel(r)}
                     </TableCell>
                   </TableRow>
                 ))

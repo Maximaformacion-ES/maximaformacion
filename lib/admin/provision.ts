@@ -55,7 +55,7 @@ export async function reprovision(
       entityType: 'moodle',
       entityId: documentId,
       targetClerkId,
-      diff: { result },
+      diff: { title: content.title, result },
       source: 'panel',
     });
     return { ok: true, result };
@@ -67,7 +67,7 @@ export async function reprovision(
       entityType: 'moodle',
       entityId: documentId,
       targetClerkId,
-      diff: { error },
+      diff: { title: content.title, error },
       source: 'panel',
     });
     return { ok: false, error };
