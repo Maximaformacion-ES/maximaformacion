@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,17 @@ interface CourseOpt {
   title: string;
 }
 
+// `false` en SSR y en el PRIMER render de cliente; `true` tras hidratar. Evita el
+// mismatch de hidratación por el `useId` del Popover de Radix (mismo patrón que NavUser).
+const emptySubscribe = () => () => {};
+function useHydrated() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+}
+
 export default function StudentFilters({
   q,
   plan,
@@ -35,6 +46,7 @@ export default function StudentFilters({
   courses: CourseOpt[];
 }) {
   const router = useRouter();
+  const hydrated = useHydrated();
   const [query, setQuery] = useState(q);
   const [pro, setPro] = useState(plan === 'pro');
   const [courseId, setCourseId] = useState(course ?? '');
@@ -42,6 +54,7 @@ export default function StudentFilters({
 
   const dirty = !!plan || !!course;
   const selectedCourse = courses.find((c) => c.documentId === courseId);
+  const courseLabel = selectedCourse ? selectedCourse.title : 'Todos los cursos';
 
   function apply() {
     const params = new URLSearchParams();
@@ -77,53 +90,61 @@ export default function StudentFilters({
         />
       </div>
 
-      <Popover open={courseOpen} onOpenChange={setCourseOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
-            role="combobox"
-            aria-expanded={courseOpen}
-            className="w-[240px] justify-between font-normal"
-          >
-            <span className="truncate">{selectedCourse ? selectedCourse.title : 'Todos los cursos'}</span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-0" align="start">
-          <Command>
-            <CommandInput placeholder="Buscar curso…" />
-            <CommandList>
-              <CommandEmpty>Sin resultados.</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  value="Todos los cursos"
-                  onSelect={() => {
-                    setCourseId('');
-                    setCourseOpen(false);
-                  }}
-                >
-                  <Check className={cn('mr-2 h-4 w-4', courseId === '' ? 'opacity-100' : 'opacity-0')} />
-                  Todos los cursos
-                </CommandItem>
-                {courses.map((c) => (
+      {!hydrated ? (
+        // Placeholder estable (sin Radix) en SSR + primer render → sin mismatch.
+        <Button type="button" variant="outline" className="w-[240px] justify-between font-normal" disabled>
+          <span className="truncate">{courseLabel}</span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      ) : (
+        <Popover open={courseOpen} onOpenChange={setCourseOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              role="combobox"
+              aria-expanded={courseOpen}
+              className="w-[240px] justify-between font-normal"
+            >
+              <span className="truncate">{courseLabel}</span>
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[280px] p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Buscar curso…" />
+              <CommandList>
+                <CommandEmpty>Sin resultados.</CommandEmpty>
+                <CommandGroup>
                   <CommandItem
-                    key={c.documentId}
-                    value={c.title}
+                    value="Todos los cursos"
                     onSelect={() => {
-                      setCourseId(c.documentId);
+                      setCourseId('');
                       setCourseOpen(false);
                     }}
                   >
-                    <Check className={cn('mr-2 h-4 w-4', courseId === c.documentId ? 'opacity-100' : 'opacity-0')} />
-                    <span className="truncate">{c.title}</span>
+                    <Check className={cn('mr-2 h-4 w-4', courseId === '' ? 'opacity-100' : 'opacity-0')} />
+                    Todos los cursos
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                  {courses.map((c) => (
+                    <CommandItem
+                      key={c.documentId}
+                      value={c.title}
+                      onSelect={() => {
+                        setCourseId(c.documentId);
+                        setCourseOpen(false);
+                      }}
+                    >
+                      <Check className={cn('mr-2 h-4 w-4', courseId === c.documentId ? 'opacity-100' : 'opacity-0')} />
+                      <span className="truncate">{c.title}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      )}
 
       <Label className="flex cursor-pointer items-center gap-2 text-sm font-normal text-muted-foreground">
         <Checkbox checked={pro} onCheckedChange={(v) => setPro(v === true)} />
