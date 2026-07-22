@@ -22,26 +22,26 @@ export async function issueCertificate(params: {
   const { actor, clerkId, courseId, courseTitle, instructor } = params;
   if (!courseId || !courseTitle) return { error: 'Falta el curso o el título.' };
 
-  const [existing] = await db
-    .select()
-    .from(certificates)
-    .where(and(eq(certificates.clerkId, clerkId), eq(certificates.courseId, courseId)))
-    .limit(1);
-  if (existing) return { ok: true, certId: existing.id, already: true };
-
-  let studentName = 'Alumno';
   try {
-    const cc = await clerkClient();
-    const u = await cc.users.getUser(clerkId);
-    studentName =
-      [u.firstName, u.lastName].filter(Boolean).join(' ') ||
-      u.emailAddresses[0]?.emailAddress ||
-      'Alumno';
-  } catch {
-    /* nombre por defecto */
-  }
+    const [existing] = await db
+      .select()
+      .from(certificates)
+      .where(and(eq(certificates.clerkId, clerkId), eq(certificates.courseId, courseId)))
+      .limit(1);
+    if (existing) return { ok: true, certId: existing.id, already: true };
 
-  try {
+    let studentName = 'Alumno';
+    try {
+      const cc = await clerkClient();
+      const u = await cc.users.getUser(clerkId);
+      studentName =
+        [u.firstName, u.lastName].filter(Boolean).join(' ') ||
+        u.emailAddresses[0]?.emailAddress ||
+        'Alumno';
+    } catch {
+      /* nombre por defecto */
+    }
+
     const [ins] = await db
       .insert(certificates)
       .values({
@@ -63,6 +63,8 @@ export async function issueCertificate(params: {
     });
     return { ok: true, certId: ins.id };
   } catch (e) {
+    // Incluye el caso "column/relation does not exist" si la tabla de prod no
+    // está reconciliada con el schema → devuelve mensaje claro, nunca 500.
     return { error: msg(e) };
   }
 }
