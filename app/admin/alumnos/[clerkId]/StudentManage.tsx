@@ -10,6 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -396,18 +403,18 @@ export default function StudentManage({ clerkId, purchases, subscription, enroll
             <div className="space-y-2 border-t pt-3">
               <span className="block text-xs text-muted-foreground">Emitir certificado</span>
               <div className="flex flex-wrap items-center gap-2">
-                <select
-                  value={issueCourse}
-                  onChange={(e) => setIssueCourse(e.target.value)}
-                  className="h-9 max-w-[240px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus:outline-none focus:ring-1 focus:ring-mx-blue/30"
-                >
-                  <option value="">Curso…</option>
-                  {enrollments.map((e) => (
-                    <option key={e.documentId} value={e.documentId}>
-                      {e.title}
-                    </option>
-                  ))}
-                </select>
+                <Select value={issueCourse || undefined} onValueChange={setIssueCourse}>
+                  <SelectTrigger className="w-[240px]">
+                    <SelectValue placeholder="Curso…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {enrollments.map((e) => (
+                      <SelectItem key={e.documentId} value={e.documentId}>
+                        {e.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Input
                   value={issueInstructor}
                   onChange={(e) => setIssueInstructor(e.target.value)}

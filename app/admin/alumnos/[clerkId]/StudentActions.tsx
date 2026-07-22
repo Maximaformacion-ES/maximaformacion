@@ -7,6 +7,9 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import CoursePicker, { type CourseOption } from './CoursePicker';
 
 interface Enrollment {
@@ -124,13 +127,13 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
           <span className="block text-xs text-muted-foreground">Conceder acceso a cursos</span>
           <div className="flex flex-wrap items-center gap-2">
             <CoursePicker value={courses} onChange={setCourses} />
-            <label className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Deja la fecha vacía para acceso indefinido">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title="Deja la fecha vacía para acceso indefinido">
               hasta
-              <input
+              <Input
                 type="date"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
-                className="rounded-md border border-input bg-transparent px-2 py-1 text-xs"
+                className="h-8 w-auto text-xs"
               />
               {expiresAt && (
                 <button
@@ -142,11 +145,11 @@ export default function StudentActions({ clerkId, plan, enrollments }: Props) {
                   <X className="h-3 w-3" />
                 </button>
               )}
-            </label>
-            <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+            </div>
+            <Label className="flex cursor-pointer items-center gap-1.5 text-xs font-normal text-muted-foreground">
+              <Checkbox checked={notify} onCheckedChange={(v) => setNotify(v === true)} />
               avisar
-            </label>
+            </Label>
             <Button
               onClick={grant}
               disabled={busy === 'grant' || courses.length === 0}

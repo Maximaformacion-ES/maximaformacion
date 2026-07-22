@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import { Search, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { listStudents } from '@/lib/admin/students';
 import { listCourses } from '@/lib/admin/courses';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -14,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import StudentFilters from './StudentFilters';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,36 +49,7 @@ export default async function AlumnosPage({
         </div>
       </div>
 
-      <form method="get" className="flex flex-wrap items-center gap-2">
-        <div className="relative w-full max-w-xs">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input name="q" defaultValue={q} placeholder="Nombre o email…" className="pl-8" />
-        </div>
-        <select
-          name="course"
-          defaultValue={course ?? ''}
-          className="h-9 max-w-[240px] rounded-md border border-input bg-transparent px-2 text-sm"
-        >
-          <option value="">Todos los cursos</option>
-          {courses.map((c) => (
-            <option key={c.documentId} value={c.documentId}>
-              {c.title}
-            </option>
-          ))}
-        </select>
-        <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <input type="checkbox" name="plan" value="pro" defaultChecked={plan === 'pro'} />
-          Solo PRO
-        </label>
-        <Button type="submit" className="bg-mx-orange text-white hover:bg-mx-orange-dark">
-          Filtrar
-        </Button>
-        {filtered && (
-          <Link href="/admin/alumnos" className="text-sm text-muted-foreground hover:text-foreground">
-            Limpiar
-          </Link>
-        )}
-      </form>
+      <StudentFilters q={q} plan={plan} course={course} courses={courses} />
 
       <Card className="p-0 overflow-hidden">
         <Table>
