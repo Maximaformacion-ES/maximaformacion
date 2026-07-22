@@ -28,58 +28,138 @@ export interface StudentList {
   total: number;
 }
 
+/** Agregados de `campus` (plan, nº matrículas, email espejo) para unos clerkIds. */
+async function campusAggregates(clerkIds: string[]) {
+  const planByClerk = new Map<string, string>();
+  const enrollByClerk = new Map<string, number>();
+  const emailByClerk = new Map<string, string | null>();
+  if (clerkIds.length === 0) return { planByClerk, enrollByClerk, emailByClerk };
+  try {
+    const rows = await db
+      .select({ clerkId: users.clerkId, plan: users.plan, email: users.email })
+      .from(users)
+      .where(inArray(users.clerkId, clerkIds));
+    for (const r of rows) {
+      planByClerk.set(r.clerkId, r.plan);
+      emailByClerk.set(r.clerkId, r.email);
+    }
+  } catch (e) {
+    console.warn('[admin:listStudents] plan/email aggregate failed:', e);
+  }
+  try {
+    const rows = await db
+      .select({ clerkId: enrollments.clerkId, n: sql<number>`count(*)::int` })
+      .from(enrollments)
+      .where(inArray(enrollments.clerkId, clerkIds))
+      .groupBy(enrollments.clerkId);
+    for (const r of rows) enrollByClerk.set(r.clerkId, r.n);
+  } catch (e) {
+    console.warn('[admin:listStudents] enrollment aggregate failed:', e);
+  }
+  return { planByClerk, enrollByClerk, emailByClerk };
+}
+
 export async function listStudents(opts: {
   query?: string;
+  /** 'pro' → solo alumnos PRO. */
+  plan?: string;
+  /** documentId de un curso → solo matriculados en ese curso. */
+  courseDocumentId?: string;
   limit?: number;
   offset?: number;
 }): Promise<StudentList> {
-  const { query, limit = 25, offset = 0 } = opts;
+  const { query, plan, courseDocumentId, limit = 25, offset = 0 } = opts;
   const cc = await clerkClient();
-  const res = await cc.users.getUserList({
-    query: query || undefined,
-    limit,
-    offset,
-    orderBy: '-created_at',
-  });
+  const proFilter = plan === 'pro';
 
-  const clerkIds = res.data.map((u) => u.id);
-
-  // Agregados de campus para esos clerkIds (2 queries, no por-fila).
-  const planByClerk = new Map<string, string>();
-  const enrollByClerk = new Map<string, number>();
-  if (clerkIds.length > 0) {
-    try {
-      const planRows = await db
-        .select({ clerkId: users.clerkId, plan: users.plan })
-        .from(users)
-        .where(inArray(users.clerkId, clerkIds));
-      for (const r of planRows) planByClerk.set(r.clerkId, r.plan);
-    } catch (e) {
-      console.warn('[admin:listStudents] plan aggregate failed:', e);
-    }
-    try {
-      const enrollRows = await db
-        .select({ clerkId: enrollments.clerkId, n: sql<number>`count(*)::int` })
-        .from(enrollments)
-        .where(inArray(enrollments.clerkId, clerkIds))
-        .groupBy(enrollments.clerkId);
-      for (const r of enrollRows) enrollByClerk.set(r.clerkId, r.n);
-    } catch (e) {
-      console.warn('[admin:listStudents] enrollment aggregate failed:', e);
-    }
+  // ── Ruta rápida: sin filtros de campus → paginación nativa de Clerk. ──
+  if (!proFilter && !courseDocumentId) {
+    const res = await cc.users.getUserList({ query: query || undefined, limit, offset, orderBy: '-created_at' });
+    const { planByClerk, enrollByClerk } = await campusAggregates(res.data.map((u) => u.id));
+    const items: StudentListItem[] = res.data.map((u) => ({
+      clerkId: u.id,
+      email: u.primaryEmailAddress?.emailAddress ?? u.emailAddresses?.[0]?.emailAddress ?? null,
+      name: [u.firstName, u.lastName].filter(Boolean).join(' ') || '(sin nombre)',
+      imageUrl: u.imageUrl ?? null,
+      plan: planByClerk.get(u.id) ?? 'free',
+      enrollmentCount: enrollByClerk.get(u.id) ?? 0,
+      createdAt: u.createdAt,
+    }));
+    return { items, total: res.totalCount };
   }
 
-  const items: StudentListItem[] = res.data.map((u) => ({
-    clerkId: u.id,
-    email: u.primaryEmailAddress?.emailAddress ?? u.emailAddresses?.[0]?.emailAddress ?? null,
-    name: [u.firstName, u.lastName].filter(Boolean).join(' ') || '(sin nombre)',
-    imageUrl: u.imageUrl ?? null,
-    plan: planByClerk.get(u.id) ?? 'free',
-    enrollmentCount: enrollByClerk.get(u.id) ?? 0,
-    createdAt: u.createdAt,
-  }));
+  // ── Ruta con filtros: los clerkId salen de `campus` (matrícula/PRO). ──
+  let ids: string[] = [];
+  try {
+    if (courseDocumentId) {
+      const rows = await db
+        .selectDistinct({ clerkId: enrollments.clerkId })
+        .from(enrollments)
+        .where(eq(enrollments.programDocumentId, courseDocumentId));
+      ids = rows.map((r) => r.clerkId);
+    } else {
+      const rows = await db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro'));
+      ids = rows.map((r) => r.clerkId);
+    }
+    // Ambos filtros a la vez → intersección con PRO.
+    if (courseDocumentId && proFilter) {
+      const proRows = await db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro'));
+      const proSet = new Set(proRows.map((r) => r.clerkId));
+      ids = ids.filter((id) => proSet.has(id));
+    }
+  } catch (e) {
+    console.warn('[admin:listStudents] campus filter failed:', e);
+    return { items: [], total: 0 };
+  }
+  ids = Array.from(new Set(ids));
+  if (ids.length === 0) return { items: [], total: 0 };
 
-  return { items, total: res.totalCount };
+  const { planByClerk, enrollByClerk, emailByClerk } = await campusAggregates(ids);
+
+  // Resolver perfil en Clerk por lotes (email/nombre/foto/fecha), con fallback a
+  // campus.users para los clerkId que Clerk no devuelva (dev pk_test / borrados).
+  const byId = new Map<string, StudentListItem>();
+  for (let i = 0; i < ids.length; i += 100) {
+    try {
+      const res = await cc.users.getUserList({ userId: ids.slice(i, i + 100), limit: 100 });
+      for (const u of res.data) {
+        byId.set(u.id, {
+          clerkId: u.id,
+          email: u.primaryEmailAddress?.emailAddress ?? u.emailAddresses?.[0]?.emailAddress ?? emailByClerk.get(u.id) ?? null,
+          name: [u.firstName, u.lastName].filter(Boolean).join(' ') || '(sin nombre)',
+          imageUrl: u.imageUrl ?? null,
+          plan: planByClerk.get(u.id) ?? 'free',
+          enrollmentCount: enrollByClerk.get(u.id) ?? 0,
+          createdAt: u.createdAt,
+        });
+      }
+    } catch (e) {
+      console.warn('[admin:listStudents] clerk resolve chunk failed:', e);
+    }
+  }
+  for (const id of ids) {
+    if (byId.has(id)) continue;
+    const email = emailByClerk.get(id);
+    byId.set(id, {
+      clerkId: id,
+      email: email ?? null,
+      name: email ? email.split('@')[0] : '(sin nombre)',
+      imageUrl: null,
+      plan: planByClerk.get(id) ?? 'free',
+      enrollmentCount: enrollByClerk.get(id) ?? 0,
+      createdAt: 0,
+    });
+  }
+
+  // Búsqueda de texto (nombre/email) sobre el conjunto filtrado.
+  let all = Array.from(byId.values());
+  const q = query?.trim().toLowerCase();
+  if (q) {
+    all = all.filter((it) => it.name.toLowerCase().includes(q) || (it.email ?? '').toLowerCase().includes(q));
+  }
+  all.sort((a, b) => b.createdAt - a.createdAt);
+
+  return { items: all.slice(offset, offset + limit), total: all.length };
 }
 
 // ─── Ficha 360 de un alumno ────────────────────────────────────────────
