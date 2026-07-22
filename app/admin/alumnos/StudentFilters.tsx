@@ -2,18 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 interface CourseOpt {
   documentId: string;
@@ -34,16 +37,17 @@ export default function StudentFilters({
   const router = useRouter();
   const [query, setQuery] = useState(q);
   const [pro, setPro] = useState(plan === 'pro');
-  // 'all' es el centinela para "todos" (Radix Select no admite value vacío).
-  const [courseId, setCourseId] = useState(course ?? 'all');
+  const [courseId, setCourseId] = useState(course ?? '');
+  const [courseOpen, setCourseOpen] = useState(false);
 
   const dirty = !!plan || !!course;
+  const selectedCourse = courses.find((c) => c.documentId === courseId);
 
   function apply() {
     const params = new URLSearchParams();
     if (query.trim()) params.set('q', query.trim());
     if (pro) params.set('plan', 'pro');
-    if (courseId && courseId !== 'all') params.set('course', courseId);
+    if (courseId) params.set('course', courseId);
     const qs = params.toString();
     router.push(qs ? `/admin/alumnos?${qs}` : '/admin/alumnos');
   }
@@ -51,7 +55,7 @@ export default function StudentFilters({
   function clear() {
     setQuery('');
     setPro(false);
-    setCourseId('all');
+    setCourseId('');
     router.push('/admin/alumnos');
   }
 
@@ -73,19 +77,53 @@ export default function StudentFilters({
         />
       </div>
 
-      <Select value={courseId} onValueChange={setCourseId}>
-        <SelectTrigger className="w-[240px]">
-          <SelectValue placeholder="Todos los cursos" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos los cursos</SelectItem>
-          {courses.map((c) => (
-            <SelectItem key={c.documentId} value={c.documentId}>
-              {c.title}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Popover open={courseOpen} onOpenChange={setCourseOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-expanded={courseOpen}
+            className="w-[240px] justify-between font-normal"
+          >
+            <span className="truncate">{selectedCourse ? selectedCourse.title : 'Todos los cursos'}</span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[280px] p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Buscar curso…" />
+            <CommandList>
+              <CommandEmpty>Sin resultados.</CommandEmpty>
+              <CommandGroup>
+                <CommandItem
+                  value="Todos los cursos"
+                  onSelect={() => {
+                    setCourseId('');
+                    setCourseOpen(false);
+                  }}
+                >
+                  <Check className={cn('mr-2 h-4 w-4', courseId === '' ? 'opacity-100' : 'opacity-0')} />
+                  Todos los cursos
+                </CommandItem>
+                {courses.map((c) => (
+                  <CommandItem
+                    key={c.documentId}
+                    value={c.title}
+                    onSelect={() => {
+                      setCourseId(c.documentId);
+                      setCourseOpen(false);
+                    }}
+                  >
+                    <Check className={cn('mr-2 h-4 w-4', courseId === c.documentId ? 'opacity-100' : 'opacity-0')} />
+                    <span className="truncate">{c.title}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
       <Label className="flex cursor-pointer items-center gap-2 text-sm font-normal text-muted-foreground">
         <Checkbox checked={pro} onCheckedChange={(v) => setPro(v === true)} />
