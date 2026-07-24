@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { strapiGraphQL, getStrapiMediaUrl } from './client';
 import type {
@@ -507,14 +508,23 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
 
 // ============ Fetch Functions ============
 
-export async function getMaxymiaCoursesFromStrapi(): Promise<MaxymiaCourse[]> {
-  const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(
-    MAXYMIA_COURSES_LIST_QUERY,
-    undefined,
-    { revalidate: 60, tags: ['maxymia-courses'] }
-  );
-  return data.maxymiaCourses_connection.nodes.map(transformCourse);
-}
+// La query LIST se dispara varias veces por request (layout raíz + layout de campus
+// + página) y es un POST GraphQL, que el Data Cache de Next NO persiste. Dos capas:
+//  - `unstable_cache`: caché persistente ENTRE requests (revalida 60s + tags, igual
+//    que el DETAIL). El webhook de Strapi ya revalida 'maxymia-courses'.
+//  - `cache()` de React: dedup DENTRO del mismo request → las 3 llamadas = 1 fetch.
+const loadMaxymiaCourses = unstable_cache(
+  async (): Promise<MaxymiaCourse[]> => {
+    const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(MAXYMIA_COURSES_LIST_QUERY);
+    return data.maxymiaCourses_connection.nodes.map(transformCourse);
+  },
+  ['maxymia-courses-list'],
+  { revalidate: 60, tags: ['maxymia-courses'] }
+);
+
+export const getMaxymiaCoursesFromStrapi = cache(
+  (): Promise<MaxymiaCourse[]> => loadMaxymiaCourses()
+);
 
 export async function getMaxymiaCourseBySlugFromStrapi(
   slug: string
