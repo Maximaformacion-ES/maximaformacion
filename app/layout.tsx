@@ -167,8 +167,13 @@ export default async function RootLayout({
     <ClerkProvider localization={esES}>
       <html lang="es">
         <head>
-          <link rel="preconnect" href="https://good-bengal-30.clerk.accounts.dev" crossOrigin="anonymous" />
-          <link rel="preconnect" href="https://clerk-telemetry.com" crossOrigin="anonymous" />
+          {/* Preconnect a los orígenes REALES de la primera carga: Clerk de
+              producción (sirve clerk.browser.js) y el bucket R2 de imágenes (logos,
+              sellos, hero). Antes apuntaba a un dominio DEV de Clerk
+              (good-bengal-30.clerk.accounts.dev) que en prod no se usa → PSI avisaba
+              de que no se establecía conexión. */}
+          <link rel="preconnect" href="https://clerk.maximaformacion.es" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev" crossOrigin="anonymous" />
           <JsonLd data={[organizationSchema(), websiteSchema()]} />
           {/* Safety net for Framer Motion's SSR-emitted opacity:0 — if
               hydration hasn't completed within 2.5s (slow headless renderers,
