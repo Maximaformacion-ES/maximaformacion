@@ -18,12 +18,13 @@ import { JsonLd } from "./components/JsonLd";
 import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo/jsonld";
 import "./globals.css";
 
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
-const GTM_AUTH = process.env.NEXT_PUBLIC_GTM_AUTH;
-const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW;
-// Nota: antes convivía un segundo contenedor GTM (GTM_ID_2). Se retiró para dejar
-// un único contenedor (consolidación WPO: dos contenedores en paralelo sumaban
-// ~600 KB de JS). La variable NEXT_PUBLIC_GTM_ID_2 puede borrarse de Vercel.
+// Un único contenedor GTM (consolidación WPO: dos en paralelo sumaban ~600 KB JS).
+// El que se conserva es GTM-T74TJTL, que en Vercel vive en NEXT_PUBLIC_GTM_ID_2.
+// El otro, NEXT_PUBLIC_GTM_ID (GTM-T7RTNC7J, agencia externa), ya no se carga y
+// puede borrarse de Vercel.
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID_2;
+const GTM_AUTH = process.env.NEXT_PUBLIC_GTM_AUTH_2;
+const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW_2;
 const COOKIEBOT_ID = process.env.NEXT_PUBLIC_COOKIEBOT_ID;
 
 const ztNature = localFont({
