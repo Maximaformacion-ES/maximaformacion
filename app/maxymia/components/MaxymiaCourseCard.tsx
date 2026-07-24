@@ -121,7 +121,7 @@ export default function MaxymiaCourseCard({
         {/* Content area */}
         <div className={`${c.content} px-4 py-4 flex flex-col flex-grow`}>
           {/* Title */}
-          <h3 className={`${c.title} font-semibold text-body-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors`}>
+          <h3 className={`${c.title} font-semibold text-body-sm leading-snug line-clamp-3 min-h-[2.5rem] mb-3 group-hover/card:text-mx-orange transition-colors`}>
             {course.title[locale]}
           </h3>
 

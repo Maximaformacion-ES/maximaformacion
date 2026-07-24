@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { fetchMaxymiaCourseBySlug, fetchMaxymiaCourses } from '../../data/queries';
+import { fetchMaxymiaCourseOverviewBySlug, fetchMaxymiaCourses } from '../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
 import { getTeachers, getBadges, getInstitutions } from '@/lib/strapi/queries';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
@@ -16,7 +16,7 @@ export default async function CourseOverviewPage({ params }: PageProps) {
   // esperaban a que resolviera el DETAIL: waterfall). Solo `getCourseAccess`
   // necesita `course.id`, así que va después (auth+1 query DB, rápido).
   const [course, teachers, allCourses, allBadges, allInstitutions] = await Promise.all([
-    fetchMaxymiaCourseBySlug(courseSlug),
+    fetchMaxymiaCourseOverviewBySlug(courseSlug),
     getTeachers(),
     fetchMaxymiaCourses(),
     // Set GLOBAL de sellos e instituciones: TODOS en todas las fichas.
