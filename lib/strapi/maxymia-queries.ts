@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { strapiGraphQL, getStrapiMediaUrl } from './client';
 import type {
@@ -173,6 +174,98 @@ const MAXYMIA_COURSE_DETAIL_QUERY = `
                   }
                 }
               }
+            }
+          }
+          exam {
+            id
+            title_es
+            title_en
+            description_es
+            description_en
+            passingScore
+            questions {
+              __typename
+              ... on ComponentMaxymiaSingleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndex, explanation_es, explanation_en }
+              ... on ComponentMaxymiaMultipleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndices, explanation_es, explanation_en }
+              ... on ComponentMaxymiaOrdering { id, question_es, question_en, items { id, text_es, text_en }, correctOrder, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFillBlank { id, question_es, question_en, acceptedAnswers, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFreeText { id, question_es, question_en, sampleAnswer_es, sampleAnswer_en, explanation_es, explanation_en }
+            }
+          }
+          exams {
+            id
+            title_es
+            title_en
+            description_es
+            description_en
+            passingScore
+            questions {
+              __typename
+              ... on ComponentMaxymiaSingleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndex, explanation_es, explanation_en }
+              ... on ComponentMaxymiaMultipleChoice { id, question_es, question_en, options { id, text_es, text_en }, correctIndices, explanation_es, explanation_en }
+              ... on ComponentMaxymiaOrdering { id, question_es, question_en, items { id, text_es, text_en }, correctOrder, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFillBlank { id, question_es, question_en, acceptedAnswers, explanation_es, explanation_en }
+              ... on ComponentMaxymiaFreeText { id, question_es, question_en, sampleAnswer_es, sampleAnswer_en, explanation_es, explanation_en }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Query LIGERA para la FICHA/overview del curso: idéntica a la DETAIL pero SIN los
+// cuerpos de contenido de lecciones (content_es/content_en) ni de topics (content),
+// que son el grueso del payload y que la ficha NO renderiza (solo títulos/contadores;
+// el contenido completo solo lo usa el reproductor). `transformCourse` tolera su
+// ausencia (todo con `?? []`), así que el resultado es equivalente para la ficha.
+const MAXYMIA_COURSE_OVERVIEW_QUERY = `
+  query MaxymiaCourseOverviewBySlug($slug: String!) {
+    maxymiaCourses_connection(filters: { slug: { eq: $slug } }) {
+      nodes {
+        documentId
+        slug
+        title_es
+        title_en
+        description_es
+        description_en
+        price
+        language
+        level
+        category
+        isPro
+        haveDiscount
+        tags
+        durationHours
+        faqs { question, answer }
+        comos { question, answer }
+        badges { name, category, badge { url } }
+        docentes { documentId, slug, name, role, roleDescription, avatar { url }, avatarUrl, bio, linkedin, email }
+        institutions { name, logo { url } }
+        image { url, alternativeText }
+        thumbnailTitle
+        publishedAt
+        careers
+        objectives
+        audiences
+        blocks {
+          id
+          title_es
+          title_en
+          order
+          lessons {
+            id
+            title_es
+            title_en
+            estimatedMinutes
+            order
+            uid
+            topics {
+              id
+              title_es
+              title_en
+              anchorId
+              uid
             }
           }
           exam {
@@ -507,14 +600,23 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
 
 // ============ Fetch Functions ============
 
-export async function getMaxymiaCoursesFromStrapi(): Promise<MaxymiaCourse[]> {
-  const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(
-    MAXYMIA_COURSES_LIST_QUERY,
-    undefined,
-    { revalidate: 60, tags: ['maxymia-courses'] }
-  );
-  return data.maxymiaCourses_connection.nodes.map(transformCourse);
-}
+// La query LIST se dispara varias veces por request (layout raíz + layout de campus
+// + página) y es un POST GraphQL, que el Data Cache de Next NO persiste. Dos capas:
+//  - `unstable_cache`: caché persistente ENTRE requests (revalida 60s + tags, igual
+//    que el DETAIL). El webhook de Strapi ya revalida 'maxymia-courses'.
+//  - `cache()` de React: dedup DENTRO del mismo request → las 3 llamadas = 1 fetch.
+const loadMaxymiaCourses = unstable_cache(
+  async (): Promise<MaxymiaCourse[]> => {
+    const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(MAXYMIA_COURSES_LIST_QUERY);
+    return data.maxymiaCourses_connection.nodes.map(transformCourse);
+  },
+  ['maxymia-courses-list'],
+  { revalidate: 60, tags: ['maxymia-courses'] }
+);
+
+export const getMaxymiaCoursesFromStrapi = cache(
+  (): Promise<MaxymiaCourse[]> => loadMaxymiaCourses()
+);
 
 export async function getMaxymiaCourseBySlugFromStrapi(
   slug: string
@@ -535,6 +637,28 @@ export async function getMaxymiaCourseBySlugFromStrapi(
       return transformCourse(node);
     },
     ['maxymia-course-detail', slug],
+    { revalidate: 60, tags: ['maxymia-courses', `maxymia-course-${slug}`] }
+  );
+  return load(slug);
+}
+
+// Igual que `getMaxymiaCourseBySlugFromStrapi` pero con la query LIGERA (sin cuerpos
+// de contenido) → para la FICHA/overview del curso. El reproductor sigue usando la
+// DETAIL completa. Caché por slug con clave y tags propios.
+export async function getMaxymiaCourseOverviewBySlugFromStrapi(
+  slug: string
+): Promise<MaxymiaCourse | null> {
+  const load = unstable_cache(
+    async (s: string): Promise<MaxymiaCourse | null> => {
+      const data = await strapiGraphQL<MaxymiaCoursesGraphQLResponse>(
+        MAXYMIA_COURSE_OVERVIEW_QUERY,
+        { slug: s }
+      );
+      const node = data.maxymiaCourses_connection.nodes[0];
+      if (!node) return null;
+      return transformCourse(node);
+    },
+    ['maxymia-course-overview', slug],
     { revalidate: 60, tags: ['maxymia-courses', `maxymia-course-${slug}`] }
   );
   return load(slug);

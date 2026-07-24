@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { fetchMaxymiaCourseBySlug, fetchMaxymiaCourses } from '../../data/queries';
+import { fetchMaxymiaCourseOverviewBySlug, fetchMaxymiaCourses } from '../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
 import { getTeachers, getBadges, getInstitutions } from '@/lib/strapi/queries';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
@@ -10,7 +10,19 @@ interface PageProps {
 
 export default async function CourseOverviewPage({ params }: PageProps) {
   const { courseSlug } = await params;
-  const course = await fetchMaxymiaCourseBySlug(courseSlug);
+
+  // El DETAIL del curso es la query más pesada, pero teachers/catálogo/sellos/
+  // instituciones NO dependen de él → los lanzamos TODOS en paralelo (antes las 4
+  // esperaban a que resolviera el DETAIL: waterfall). Solo `getCourseAccess`
+  // necesita `course.id`, así que va después (auth+1 query DB, rápido).
+  const [course, teachers, allCourses, allBadges, allInstitutions] = await Promise.all([
+    fetchMaxymiaCourseOverviewBySlug(courseSlug),
+    getTeachers(),
+    fetchMaxymiaCourses(),
+    // Set GLOBAL de sellos e instituciones: TODOS en todas las fichas.
+    getBadges(),
+    getInstitutions(),
+  ]);
 
   if (!course) notFound();
 
@@ -19,18 +31,7 @@ export default async function CourseOverviewPage({ params }: PageProps) {
   // instead of the student view ("Comenzar curso") flashing while the
   // client-side profile loads. The client hook still revalidates after
   // hydration (e.g. a checkout just completed in another tab).
-  // Equipo docente (authors isTeacher) para la sección de compromiso con el
-  // alumnado — el acompañamiento se personifica en TODO el equipo, no en una
-  // sola persona. Y el catálogo para los cursos recomendados.
-  const [{ hasAccess: initialHasAccess }, teachers, allCourses, allBadges, allInstitutions] =
-    await Promise.all([
-      getCourseAccess(course.id, course.isPro),
-      getTeachers(),
-      fetchMaxymiaCourses(),
-      // Set GLOBAL de sellos e instituciones: TODOS en todas las fichas.
-      getBadges(),
-      getInstitutions(),
-    ]);
+  const { hasAccess: initialHasAccess } = await getCourseAccess(course.id, course.isPro);
 
   const teacherAvatars = teachers.map((t) => t.avatarUrl).filter((url): url is string => !!url);
 

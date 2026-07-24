@@ -2,6 +2,7 @@ import { MAXYMIA_COURSES } from './courses';
 import {
   getMaxymiaCoursesFromStrapi,
   getMaxymiaCourseBySlugFromStrapi,
+  getMaxymiaCourseOverviewBySlugFromStrapi,
 } from '@/lib/strapi/maxymia-queries';
 import type {
   MaxymiaCourse,
@@ -57,6 +58,14 @@ export async function fetchMaxymiaCourseBySlug(
   slug: string
 ): Promise<MaxymiaCourse | null> {
   return await getMaxymiaCourseBySlugFromStrapi(slug);
+}
+
+// Versión LIGERA (sin cuerpos de contenido) para la FICHA/overview del curso. El
+// reproductor de lecciones sigue usando `fetchMaxymiaCourseBySlug` (contenido completo).
+export async function fetchMaxymiaCourseOverviewBySlug(
+  slug: string
+): Promise<MaxymiaCourse | null> {
+  return await getMaxymiaCourseOverviewBySlugFromStrapi(slug);
 }
 
 // ============ Sync helpers (operate on loaded data) ============
