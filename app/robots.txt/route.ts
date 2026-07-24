@@ -31,7 +31,13 @@ const DISALLOW_PATHS = [
   '/cursos/',
   '/sign-in',
   '/sign-up',
-  '/maxymia/campus/',
+  // Campus Maxymia: NO bloquear el área entera. Las fichas de curso
+  // (/maxymia/campus/[slug]) son páginas públicas de marketing y deben
+  // indexarse (SEO). Bloqueamos solo lo privado: las áreas personales con
+  // login y el reproductor de lecciones de pago (ya protegido en servidor).
+  '/maxymia/campus/mis-cursos',
+  '/maxymia/campus/notas',
+  '/maxymia/campus/*/lesson',
   '/verificar/',
 ];
 
