@@ -169,7 +169,7 @@ export default async function RootLayout({
               (good-bengal-30.clerk.accounts.dev) que en prod no se usa → PSI avisaba
               de que no se establecía conexión. */}
           <link rel="preconnect" href="https://clerk.maximaformacion.es" crossOrigin="anonymous" />
-          <link rel="preconnect" href="https://pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://cdn.maximaformacion.es" crossOrigin="anonymous" />
           <JsonLd data={[organizationSchema(), websiteSchema()]} />
           {/* Safety net for Framer Motion's SSR-emitted opacity:0 — if
               hydration hasn't completed within 2.5s (slow headless renderers,

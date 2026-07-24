@@ -14,7 +14,7 @@ const VERIFIED_DOMAIN = 'maximaformacion.es';
 // Logo alojado en R2 (URL pública permanente): los clientes de correo lo cargan
 // desde cualquier sitio (dev y prod), a diferencia de /logo-maxima.png que en dev
 // apuntaría a localhost. Subido a bucket "maxima" bajo email/logo-maxima.png.
-const EMAIL_LOGO_URL = 'https://pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev/email/logo-maxima.png';
+const EMAIL_LOGO_URL = 'https://cdn.maximaformacion.es/email/logo-maxima.png';
 
 /** Extrae el dominio del email de un remitente en formato "Nombre <a@b>" o "a@b". */
 function fromDomain(from: string): string | null {

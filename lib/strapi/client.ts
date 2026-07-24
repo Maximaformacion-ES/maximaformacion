@@ -92,14 +92,21 @@ export async function strapiGraphQL<T>(
   return json.data;
 }
 
+// El bucket R2 servía por el endpoint de PRUEBAS (pub-*.r2.dev: sin caché, HTTP/1.1,
+// rate-limited). Ahora tiene dominio propio cacheado en el edge. Reruteamos el host al
+// vuelo para que TODAS las imágenes (las URLs viejas guardadas en la BD y las nuevas)
+// salgan por el CDN, sin necesidad de migrar la base de datos.
+const R2_DEV_HOST = 'pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev';
+const R2_CDN_HOST = 'cdn.maximaformacion.es';
+
 export function getStrapiMediaUrl(media: { url: string } | null | undefined): string {
   if (!media?.url) {
     return '';
   }
 
-  // If URL is already absolute, return as-is
+  // If URL is already absolute, return as-is (rerouting el bucket R2 a su CDN).
   if (media.url.startsWith('http://') || media.url.startsWith('https://')) {
-    return media.url;
+    return media.url.replace(`//${R2_DEV_HOST}`, `//${R2_CDN_HOST}`);
   }
 
   // Otherwise prepend Strapi URL

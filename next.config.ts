@@ -52,6 +52,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.r2.dev',
       },
+      // Dominio propio del bucket R2 (cacheado en edge). Sustituye a pub-*.r2.dev.
+      {
+        protocol: 'https',
+        hostname: 'cdn.maximaformacion.es',
+      },
       // Unsplash (used in existing data)
       {
         protocol: 'https',

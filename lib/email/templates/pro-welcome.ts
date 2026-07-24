@@ -2,7 +2,7 @@
 // desde el panel (lib/admin/pro.ts). Mismo estilo de marca que las campañas:
 // logo alojado en R2 (URL pública, se ve en cualquier cliente) + acento naranja.
 
-const LOGO = 'https://pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev/email/logo-maxima.png';
+const LOGO = 'https://cdn.maximaformacion.es/email/logo-maxima.png';
 const PRO_URL = 'https://www.maximaformacion.es/pro-content';
 const FONT = `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif`;
 
