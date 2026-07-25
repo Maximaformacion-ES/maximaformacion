@@ -97,6 +97,10 @@ export async function strapiGraphQL<T>(
 // vuelo para que TODAS las imágenes (las URLs viejas guardadas en la BD y las nuevas)
 // salgan por el CDN, sin necesidad de migrar la base de datos.
 const R2_DEV_HOST = 'pub-a3cc095f320346dca3aa9ded3eab6141.r2.dev';
+// Host del Strapi Cloud ANTIGUO (ya muerto). Algunas referencias en la BD (los
+// sellos ISO) apuntan aquí; hemos re-subido esos objetos a R2 con la MISMA clave,
+// así que rerutar este host al CDN los recupera sin tocar la BD.
+const LEGACY_STRAPI_HOST = 'sincere-beef-7072b60a10.media.strapiapp.com';
 const R2_CDN_HOST = 'cdn.maximaformacion.es';
 
 export function getStrapiMediaUrl(media: { url: string } | null | undefined): string {
@@ -104,9 +108,12 @@ export function getStrapiMediaUrl(media: { url: string } | null | undefined): st
     return '';
   }
 
-  // If URL is already absolute, return as-is (rerouting el bucket R2 a su CDN).
+  // If URL is already absolute, return as-is (rerouting el bucket R2 / el Strapi
+  // Cloud viejo a su CDN).
   if (media.url.startsWith('http://') || media.url.startsWith('https://')) {
-    return media.url.replace(`//${R2_DEV_HOST}`, `//${R2_CDN_HOST}`);
+    return media.url
+      .replace(`//${R2_DEV_HOST}`, `//${R2_CDN_HOST}`)
+      .replace(`//${LEGACY_STRAPI_HOST}`, `//${R2_CDN_HOST}`);
   }
 
   // Otherwise prepend Strapi URL
