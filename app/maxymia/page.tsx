@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getMaxymiaHome } from '@/lib/strapi/queries';
 import { fetchMaxymiaCourses, getFeaturedCourses } from './data/queries';
 import MaxymiaClient from './MaxymiaClient';
@@ -15,8 +16,13 @@ export default async function MaxymiaPage() {
     fetchMaxymiaCourses().catch(() => []),
   ]);
 
-  const homeData = maxymiaData;
+  // Si Strapi está caído (p. ej. un 503 transitorio DURANTE EL BUILD), maxymiaData
+  // viene null. Antes se pasaba con `data={homeData!}` y MaxymiaClient crasheaba en
+  // `hero`, tumbando TODO el deploy. notFound() es recuperable: la página revalida
+  // (revalidate de la query) y se regenera cuando Strapi vuelve.
+  if (!maxymiaData) notFound();
+
   const topCourses = getFeaturedCourses(allCourses, 8);
 
-  return <MaxymiaClient data={homeData!} courses={topCourses} />;
+  return <MaxymiaClient data={maxymiaData} courses={topCourses} />;
 }
