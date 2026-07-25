@@ -28,15 +28,15 @@ const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW_2;
 const COOKIEBOT_ID = process.env.NEXT_PUBLIC_COOKIEBOT_ID;
 
 const ztNature = localFont({
+  // WOFF2 (no OTF): ~50% menos peso, mismo diseño. Se quitaron los pesos Thin (100)
+  // normal e itálica, que no se usan en la web (WPO: ~450 KB de fuentes → ~187 KB).
   src: [
-    { path: "../public/fonts/ZTNature-Thin.otf", weight: "100", style: "normal" },
-    { path: "../public/fonts/ZTNature-ThinItalic.otf", weight: "100", style: "italic" },
-    { path: "../public/fonts/ZTNature-Light.otf", weight: "300", style: "normal" },
-    { path: "../public/fonts/ZTNature-Regular.otf", weight: "400", style: "normal" },
-    { path: "../public/fonts/ZTNature-Medium.otf", weight: "500", style: "normal" },
-    { path: "../public/fonts/ZTNature-Bold.otf", weight: "700", style: "normal" },
-    { path: "../public/fonts/ZTNature-Black.otf", weight: "900", style: "normal" },
-    { path: "../public/fonts/ZTNature-BlackItalic.otf", weight: "900", style: "italic" },
+    { path: "../public/fonts/ZTNature-Light.woff2", weight: "300", style: "normal" },
+    { path: "../public/fonts/ZTNature-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/ZTNature-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../public/fonts/ZTNature-Bold.woff2", weight: "700", style: "normal" },
+    { path: "../public/fonts/ZTNature-Black.woff2", weight: "900", style: "normal" },
+    { path: "../public/fonts/ZTNature-BlackItalic.woff2", weight: "900", style: "italic" },
   ],
   variable: "--font-zt-nature",
   display: "swap",
