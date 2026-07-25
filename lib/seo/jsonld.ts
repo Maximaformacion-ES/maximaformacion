@@ -107,6 +107,48 @@ export function courseSchema(program: Program) {
   };
 }
 
+/** Course schema para las fichas Maxymia (URL /maxymia/campus/[slug]). */
+export function maxymiaCourseSchema(c: {
+  slug: string;
+  name: string;
+  description?: string;
+  image?: string;
+  price: number;
+  durationHours?: number;
+}) {
+  const url = `${SITE_URL}/maxymia/campus/${c.slug}`;
+  const isFree = !c.price || c.price === 0;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: c.name,
+    description: (c.description || c.name).slice(0, 500),
+    url,
+    inLanguage: 'es-ES',
+    provider: {
+      '@type': 'EducationalOrganization',
+      name: ORG_NAME,
+      '@id': `${SITE_URL}#organization`,
+      url: SITE_URL,
+    },
+    ...(c.image ? { image: c.image } : {}),
+    educationalLevel: 'Curso',
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      inLanguage: 'es-ES',
+      ...(c.durationHours ? { courseWorkload: `PT${c.durationHours}H` } : {}),
+    },
+    offers: {
+      '@type': 'Offer',
+      price: String(isFree ? 0 : c.price),
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      url,
+    },
+  };
+}
+
 /** Article / BlogPosting — para /blog/[slug]. */
 export function blogPostSchema(post: BlogPost) {
   const postUrl = `${SITE_URL}/blog/${post.slug}`;

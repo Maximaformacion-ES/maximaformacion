@@ -1,11 +1,38 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { fetchMaxymiaCourseOverviewBySlug, fetchMaxymiaCourses } from '../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
 import { getTeachers, getBadges, getInstitutions } from '@/lib/strapi/queries';
+import { JsonLd } from '@/app/components/JsonLd';
+import { maxymiaCourseSchema } from '@/lib/seo/jsonld';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
 
 interface PageProps {
   params: Promise<{ courseSlug: string }>;
+}
+
+// Metadata propia por curso (antes usaba el título genérico del layout). Usa la
+// query "overview" cacheada → sin llamada extra a Strapi (comparte caché con la
+// página). Locale por defecto `es`.
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { courseSlug } = await params;
+  const course = await fetchMaxymiaCourseOverviewBySlug(courseSlug);
+  if (!course) return { title: 'Curso | Maxymia' };
+  const title = course.title.es || course.title.en || 'Curso';
+  const description = (course.description?.es || course.description?.en || '').slice(0, 300);
+  const url = `/maxymia/campus/${courseSlug}`;
+  return {
+    title: `${title} | Maxymia`,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      ...(course.image ? { images: [course.image] } : {}),
+    },
+  };
 }
 
 export default async function CourseOverviewPage({ params }: PageProps) {
@@ -40,14 +67,26 @@ export default async function CourseOverviewPage({ params }: PageProps) {
   const sameCat = others.filter((c) => c.category === course.category);
   const recommended = [...sameCat, ...others.filter((c) => c.category !== course.category)].slice(0, 4);
 
+  const jsonLd = maxymiaCourseSchema({
+    slug: courseSlug,
+    name: course.title.es || course.title.en || '',
+    description: course.description?.es || course.description?.en,
+    image: course.image,
+    price: course.price,
+    durationHours: course.durationHours,
+  });
+
   return (
-    <MaxymiaCourseOverview
-      course={course}
-      initialHasAccess={initialHasAccess}
-      teacherAvatars={teacherAvatars}
-      recommended={recommended}
-      allBadges={allBadges}
-      allInstitutions={allInstitutions}
-    />
+    <>
+      <JsonLd data={jsonLd} />
+      <MaxymiaCourseOverview
+        course={course}
+        initialHasAccess={initialHasAccess}
+        teacherAvatars={teacherAvatars}
+        recommended={recommended}
+        allBadges={allBadges}
+        allInstitutions={allInstitutions}
+      />
+    </>
   );
 }
