@@ -190,7 +190,11 @@ export default async function RootLayout({
         >
           {COOKIEBOT_ID && (
             <>
-              <Script id="consent-mode-default" strategy="afterInteractive">
+              {/* beforeInteractive: Cookiebot debe cargar CUANTO ANTES para (a) que el
+                  banner de consentimiento pinte pronto y deje de retrasar el LCP, y
+                  (b) poder bloquear los scripts de terceros antes de que corran. El
+                  consent-mode default va justo antes (fija denegado por defecto). */}
+              <Script id="consent-mode-default" strategy="beforeInteractive">
                 {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent', 'default', {
@@ -210,7 +214,7 @@ gtag('consent', 'default', {
                 data-cbid={COOKIEBOT_ID}
                 data-blockingmode="auto"
                 data-culture="ES"
-                strategy="afterInteractive"
+                strategy="beforeInteractive"
               />
             </>
           )}
