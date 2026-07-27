@@ -58,9 +58,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               className="absolute left-[2%] hidden lg:block pointer-events-none w-32 xl:w-48 2xl:w-[266px]"
             />
 
+            {/* El título es el elemento LCP: debe pintarse YA desde el HTML del
+                servidor, no depender del JS. Por eso arranca visible (opacity:1);
+                sin fade de entrada (el efecto de scroll `titleY` del padre se
+                mantiene). Antes arrancaba en opacity:0 y no se veía hasta hidratar
+                → LCP tardío. */}
             <m.h1
               style={{ y: titleY }}
-              initial={{ opacity: 0, y: 60 }}
+              initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}
               className="text-center text-mx-blue text-display-sm md:text-display-md xl:text-display-lg font-black leading-display tracking-display"
