@@ -298,15 +298,15 @@ function PlanCard({
 
 function ComparisonTable() {
   return (
-    <section className="px-6 md:px-12 py-20">
+    <section className="px-6 md:px-12 py-14">
       <div className="max-w-4xl mx-auto">
         <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
-          <h2 className="text-heading-lg md:text-display-sm font-black text-mx-blue mb-4">
+          <h2 className="text-heading-lg md:text-display-sm font-black text-mx-blue mb-2">
             Comparativa de planes
           </h2>
           <p className="text-mx-text-muted font-light">
@@ -322,13 +322,13 @@ function ComparisonTable() {
         >
           {/* Table Header */}
           <div className="grid grid-cols-3 bg-mx-bg border-b border-mx-border">
-            <div className="p-4 md:p-6 font-medium text-mx-text-muted">
+            <div className="px-4 py-3 md:px-6 font-medium text-mx-text-muted text-body-sm">
               Características
             </div>
-            <div className="p-4 md:p-6 text-center font-bold border-l border-mx-border text-mx-text">
+            <div className="px-4 py-3 md:px-6 text-center font-bold border-l border-mx-border text-mx-text">
               Free
             </div>
-            <div className="p-4 md:p-6 text-center font-bold border-l border-mx-border bg-mx-orange/5 text-mx-orange">
+            <div className="px-4 py-3 md:px-6 text-center font-bold border-l border-mx-border bg-mx-orange/5 text-mx-orange">
               Pro
             </div>
           </div>
@@ -341,21 +341,21 @@ function ComparisonTable() {
                 idx !== PLAN_FEATURES.length - 1 ? 'border-b border-mx-border' : ''
               }`}
             >
-              <div className="p-4 md:p-6 text-mx-text font-light">
+              <div className="px-4 py-2.5 md:px-6 text-mx-text font-light text-body-sm">
                 {item.feature}
               </div>
-              <div className="p-4 md:p-6 flex items-center justify-center border-l border-mx-border">
+              <div className="px-4 py-2.5 md:px-6 flex items-center justify-center border-l border-mx-border">
                 {item.free ? (
-                  <Check className="text-green-500" size={20} />
+                  <Check className="text-green-500" size={18} />
                 ) : (
-                  <X className="text-mx-border" size={20} />
+                  <X className="text-mx-border" size={18} />
                 )}
               </div>
-              <div className="p-4 md:p-6 flex items-center justify-center border-l border-mx-border bg-mx-orange/3">
+              <div className="px-4 py-2.5 md:px-6 flex items-center justify-center border-l border-mx-border bg-mx-orange/3">
                 {item.pro ? (
-                  <Check className="text-mx-orange" size={20} />
+                  <Check className="text-mx-orange" size={18} />
                 ) : (
-                  <X className="text-mx-border" size={20} />
+                  <X className="text-mx-border" size={18} />
                 )}
               </div>
             </div>
