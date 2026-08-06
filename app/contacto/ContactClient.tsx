@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, MessageSquare, Globe } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
-import { Header } from '../components/Header';
+import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 
 export default function ContactClient() {

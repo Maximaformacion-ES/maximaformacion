@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { Header } from '@/app/components/Header';
+import { MarketingHeader as Header } from '@/app/components/MarketingHeader';
 import { Footer } from '@/app/components/Footer';
 import { FontStyles } from '@/app/components/FontStyles';
 

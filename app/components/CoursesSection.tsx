@@ -4,8 +4,12 @@ import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { ArrowRight, ChevronDown, Sparkles, BarChart3, MonitorPlay, Activity, GraduationCap, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import { ProgramCard } from './ProgramCard';
+// Home = marketing (sin Clerk): usamos la vista presentacional de la tarjeta y
+// derivamos el estado Pro de la cookie/API (useMarketingAuth), no de Clerk. Así
+// un usuario Pro ve los precios Pro en la home sin cargar el JS de Clerk.
+import { ProgramCardView } from './ProgramCardView';
 import { StyledTitle } from './StyledTitle';
+import { useMarketingAuth } from '@/app/hooks/useMarketingAuth';
 import { SUBJECT_AREAS, type SubjectAreaKey } from '@/lib/subject-areas';
 import type { Program } from '@/lib/strapi/types';
 
@@ -40,6 +44,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
   overline = 'Áreas de Formación',
   title = 'FORMACIÓN POR {ÁREAS}',
 }) => {
+  const { hasPro } = useMarketingAuth();
   // Group programs by subjectArea, preserving the canonical SUBJECT_AREAS
   // order. Areas with no courses are skipped, so a not-yet-populated area
   // (e.g. Educación until courses are tagged in Strapi) simply doesn't render.
@@ -161,7 +166,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({
                   <div className="min-h-0 overflow-hidden">
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-6 md:pt-8">
                       {courses.slice(0, MAX_CARDS_PER_AREA).map((program, i) => (
-                        <ProgramCard key={program.documentId ?? program.slug} program={program} index={i} />
+                        <ProgramCardView key={program.documentId ?? program.slug} program={program} index={i} userHasPro={hasPro} />
                       ))}
                     </div>
                   </div>

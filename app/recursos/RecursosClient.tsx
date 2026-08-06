@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { m } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
-import { Header } from '../components/Header';
+import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 import { ResourcesHeader } from '../components/ResourcesHeader';
 import { ResourcesFilterBar, type CategoryFilter } from '../components/ResourcesFilterBar';

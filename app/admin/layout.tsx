@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { AppSidebar } from "@/components/admin/app-sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { AppClerkProvider } from "@/app/components/AppClerkProvider";
 
 export const metadata = {
   title: "Admin · Máxima Formación",
@@ -22,13 +23,15 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar />
-      <SidebarInset>
-        <AdminHeader />
-        <div className="p-4 md:p-6">{children}</div>
-      </SidebarInset>
-      <Toaster richColors position="top-right" />
-    </SidebarProvider>
+    <AppClerkProvider>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <AppSidebar />
+        <SidebarInset>
+          <AdminHeader />
+          <div className="p-4 md:p-6">{children}</div>
+        </SidebarInset>
+        <Toaster richColors position="top-right" />
+      </SidebarProvider>
+    </AppClerkProvider>
   );
 }

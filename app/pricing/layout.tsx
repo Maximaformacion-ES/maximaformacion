@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AppClerkProvider } from '@/app/components/AppClerkProvider';
 
 export const metadata: Metadata = {
   title: 'Planes y Precios | Máxima Formación',
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <AppClerkProvider>{children}</AppClerkProvider>;
 }

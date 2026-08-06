@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { FontStyles } from '../../components/FontStyles';
-import { Header } from '../../components/Header';
+import { MarketingHeader as Header } from '../../components/MarketingHeader';
 import { Footer } from '../../components/Footer';
 import { ResourceHeroSection } from '../../components/ResourceHeroSection';
 import { ResourceContent } from '../../components/ResourceContent';

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
-import { esES } from "@clerk/localizations";
 import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { getSiteMetadata, getPrograms } from "@/lib/strapi/queries";
@@ -160,7 +158,6 @@ export default async function RootLayout({
   }));
 
   return (
-    <ClerkProvider localization={esES}>
       <html lang="es">
         <head>
           {/* Preconnect a los orígenes REALES de la primera carga: Clerk de
@@ -229,6 +226,5 @@ gtag('consent', 'default', {
           </SiteBrandingProvider>
         </body>
       </html>
-    </ClerkProvider>
   );
 }

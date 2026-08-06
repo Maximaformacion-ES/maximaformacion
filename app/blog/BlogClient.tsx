@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { FontStyles } from '../components/FontStyles';
-import { Header } from '../components/Header';
+import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 import { BlogHeader } from '../components/BlogHeader';
 import { BlogFilterBar } from '../components/BlogFilterBar';

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { FontStyles } from '../components/FontStyles';
-import { Header } from '../components/Header';
+import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 
 interface SapoLegalLayoutProps {

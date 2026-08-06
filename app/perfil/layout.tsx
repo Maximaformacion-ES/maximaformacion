@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AppClerkProvider } from '@/app/components/AppClerkProvider';
 
 export const metadata: Metadata = {
   title: 'Mi Perfil | Máxima Formación',
@@ -6,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function PerfilLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <AppClerkProvider>{children}</AppClerkProvider>;
 }

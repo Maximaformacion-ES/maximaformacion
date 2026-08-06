@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FontStyles } from "./components/FontStyles";
-import { Header } from "./components/Header";
+import { MarketingHeader as Header } from "./components/MarketingHeader";
 import FloatingConsultCTA from "./components/FloatingConsultCTA";
 import { HeroSection } from "./components/HeroSection";
 import { StatsSection } from "./components/StatsSection";

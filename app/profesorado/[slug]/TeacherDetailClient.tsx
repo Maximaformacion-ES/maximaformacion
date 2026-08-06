@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Linkedin, Twitter, Globe, Mail, ArrowLeft, GraduationCap } from 'lucide-react';
 import { FontStyles } from '../../components/FontStyles';
-import { Header } from '../../components/Header';
+import { MarketingHeader as Header } from '../../components/MarketingHeader';
 import { Footer } from '../../components/Footer';
 import type { TeacherProfile } from '@/lib/strapi/types';
 
