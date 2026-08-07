@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import StudentFilters from './StudentFilters';
+import AddStudents from './AddStudents';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +48,7 @@ export default async function AlumnosPage({
             {plan ? ' · solo PRO' : ''}
           </p>
         </div>
+        <AddStudents />
       </div>
 
       <StudentFilters q={q} plan={plan} course={course} courses={courses} />
