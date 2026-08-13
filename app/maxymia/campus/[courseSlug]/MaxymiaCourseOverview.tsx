@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useMounted } from '@/app/hooks/useMounted';
 import { m, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -79,17 +80,15 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   const hasDescription = !!course.description?.[locale]?.trim();
   const [activeTab, setActiveTab] = useState<TabId>(hasDescription ? 'description' : 'objectives');
   const [showCertificate, setShowCertificate] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
+  // El portal solo puede montarse en cliente; useMounted() da false en SSR/
+  // hidratación y true tras montar, sin setState en efecto.
+  const portalReady = useMounted();
   const [issuedCertificate, setIssuedCertificate] = useState<{
     id: string;
     verifyUrl: string;
     issuedAt: string;
     completedAt: string;
   } | null>(null);
-
-  useEffect(() => {
-    setPortalReady(true);
-  }, []);
 
   useEffect(() => {
     if (!showCertificate) return;

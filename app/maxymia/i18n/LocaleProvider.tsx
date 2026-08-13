@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useCallback, useSyncExternalStore } from 'react';
 import type { Locale } from '../types';
 import { getTranslation } from './translations';
 
@@ -18,20 +18,42 @@ const LocaleContext = createContext<LocaleContextValue>({
 
 const STORAGE_KEY = 'maxymia-locale';
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('es');
+// Store del locale respaldado por localStorage, expuesto vía useSyncExternalStore.
+// Sustituye al patrón useState + useEffect(setLocaleState) que leía localStorage
+// en un efecto con setState síncrono. El snapshot se cachea en `current` (debe
+// ser referencialmente estable entre renders) y `setLocale` notifica a los
+// suscriptores, así que el cambio se propaga sin efectos.
+const localeListeners = new Set<() => void>();
+let current: Locale | null = null;
 
-  // Load from localStorage on mount
-  useEffect(() => {
+function getSnapshot(): Locale {
+  if (current === null) {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'es' || stored === 'en') {
-      setLocaleState(stored);
-    }
-  }, []);
+    current = stored === 'es' || stored === 'en' ? stored : 'es';
+  }
+  return current;
+}
+
+function getServerSnapshot(): Locale {
+  return 'es';
+}
+
+function subscribeLocale(callback: () => void): () => void {
+  localeListeners.add(callback);
+  return () => localeListeners.delete(callback);
+}
+
+function writeLocale(next: Locale) {
+  current = next;
+  localStorage.setItem(STORAGE_KEY, next);
+  localeListeners.forEach((fn) => fn());
+}
+
+export function LocaleProvider({ children }: { children: React.ReactNode }) {
+  const locale = useSyncExternalStore(subscribeLocale, getSnapshot, getServerSnapshot);
 
   const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    localStorage.setItem(STORAGE_KEY, newLocale);
+    writeLocale(newLocale);
   }, []);
 
   const t = useCallback((key: string) => getTranslation(locale, key), [locale]);

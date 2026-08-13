@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { Search, ChevronLeft, ArrowUpRight, Menu, X, Shield } from 'lucide-react';
 import { UserButton, SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import { LocaleProvider, useLocale } from '../i18n/LocaleProvider';
+import { useMounted } from '../../hooks/useMounted';
 
 import NotificationBell from '../components/NotificationBell';
 import { MaxymiaFooter } from '../../components/MaxymiaFooter';
@@ -49,11 +50,7 @@ function useIsAdmin(): boolean {
 
 function CampusHeader() {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   const isLessonPage = mounted && /\/maxymia\/campus\/[^/]+\/lesson\//.test(pathname);
 
@@ -74,13 +71,16 @@ function DefaultCampusHeader() {
   // which trips React's hydration check. Gate the auth-dependent header bits
   // behind `mounted` so SSR and the first client paint match (both empty),
   // then reveal the real auth UI after mount.
-  const [authMounted, setAuthMounted] = useState(false);
-  useEffect(() => setAuthMounted(true), []);
+  const authMounted = useMounted();
 
-  // Close menu on route change
-  useEffect(() => {
+  // Cerrar el menú al cambiar de ruta. Ajuste de estado durante el render
+  // (patrón de React para "resetear estado cuando cambia una prop") en vez de un
+  // efecto con setState síncrono.
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (pathname !== prevPath) {
+    setPrevPath(pathname);
     setMenuOpen(false);
-  }, [pathname]);
+  }
 
   // Prevent body scroll when menu is open
   useEffect(() => {

@@ -286,9 +286,9 @@ export async function getLessonNavigation(
 
   // Flatten all lessons in order
   const allLessons: { lesson: Lesson; module: ModuleWithLessons }[] = [];
-  for (const module of program.moduleRelations) {
-    for (const lesson of module.lessons) {
-      allLessons.push({ lesson, module });
+  for (const mod of program.moduleRelations) {
+    for (const lesson of mod.lessons) {
+      allLessons.push({ lesson, module: mod });
     }
   }
 

@@ -27,13 +27,17 @@ function formatSize(sizeKB: number): string {
   return `${(sizeKB / 1024).toFixed(1)} MB`;
 }
 
-function getFileIcon(mime: string) {
-  if (mime.startsWith('image/')) return FileImage;
-  if (mime === 'application/pdf') return FileText;
-  if (mime.includes('spreadsheet') || mime === 'text/csv' || mime.includes('excel')) return FileSpreadsheet;
-  if (mime.includes('zip') || mime.includes('compressed') || mime.includes('tar')) return FileArchive;
-  if (mime.startsWith('text/') || mime.includes('json') || mime.includes('xml')) return FileCode;
-  return File;
+// Devuelve el ELEMENTO del icono (no el tipo de componente): con tags estáticos
+// (<FileImage/>, …) evitamos el falso positivo "Cannot create components during
+// render" que salta al guardar un componente en una variable local y renderizarla.
+function fileIconEl(mime: string, className: string) {
+  const props = { size: 18, className };
+  if (mime.startsWith('image/')) return <FileImage {...props} />;
+  if (mime === 'application/pdf') return <FileText {...props} />;
+  if (mime.includes('spreadsheet') || mime === 'text/csv' || mime.includes('excel')) return <FileSpreadsheet {...props} />;
+  if (mime.includes('zip') || mime.includes('compressed') || mime.includes('tar')) return <FileArchive {...props} />;
+  if (mime.startsWith('text/') || mime.includes('json') || mime.includes('xml')) return <FileCode {...props} />;
+  return <File {...props} />;
 }
 
 function canPreview(mime: string): boolean {
@@ -126,13 +130,12 @@ export default function DownloadBlockView({ title, description, files }: Downloa
 
 function DownloadRow({ file }: { file: DownloadFile }) {
   const [expanded, setExpanded] = useState(false);
-  const Icon = getFileIcon(file.mime);
   const previewable = canPreview(file.mime);
 
   return (
     <li>
       <div className="flex items-center gap-3 px-5 py-3">
-        <Icon size={18} className="text-white/60 flex-shrink-0" />
+        {fileIconEl(file.mime, 'text-white/60 flex-shrink-0')}
         <div className="min-w-0 flex-1">
           <p className="text-white text-body-sm truncate">{file.label}</p>
           {file.description && (

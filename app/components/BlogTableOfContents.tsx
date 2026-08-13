@@ -33,23 +33,29 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ body }
   // Add IDs to headings inside the rendered article and extract them for the TOC.
   // The renderer outputs MarkdownIt's <h2>/<h3>; we tag them after mount.
   useEffect(() => {
-    const container = document.querySelector('.blog-content-article');
-    if (!container) return;
+    // Diferido un frame: el setHeadings depende de leer/etiquetar el DOM del
+    // markdown ya renderizado; con rAF no es un setState síncrono dentro del
+    // efecto (regla react-hooks/set-state-in-effect).
+    const raf = requestAnimationFrame(() => {
+      const container = document.querySelector('.blog-content-article');
+      if (!container) return;
 
-    const domHeadings = container.querySelectorAll('h2, h3');
-    const items: TocItem[] = [];
-    domHeadings.forEach((heading, index) => {
-      const text = (heading.textContent || '').trim();
-      if (!text) return;
-      const id = `heading-${index}-${slugify(text)}`;
-      heading.id = id;
-      items.push({
-        id,
-        text,
-        level: heading.tagName === 'H2' ? 2 : 3,
+      const domHeadings = container.querySelectorAll('h2, h3');
+      const items: TocItem[] = [];
+      domHeadings.forEach((heading, index) => {
+        const text = (heading.textContent || '').trim();
+        if (!text) return;
+        const id = `heading-${index}-${slugify(text)}`;
+        heading.id = id;
+        items.push({
+          id,
+          text,
+          level: heading.tagName === 'H2' ? 2 : 3,
+        });
       });
+      setHeadings(items);
     });
-    setHeadings(items);
+    return () => cancelAnimationFrame(raf);
   }, [body]);
 
   // Track visibility of blog content section and active heading
@@ -92,8 +98,13 @@ export const BlogTableOfContents: React.FC<BlogTableOfContentsProps> = ({ body }
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Sincronización inicial diferida un frame para no disparar el setActiveId de
+    // handleScroll de forma síncrona dentro del efecto.
+    const raf = requestAnimationFrame(handleScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [handleScroll]);
 
   if (headings.length < 2) return null;

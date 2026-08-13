@@ -35,8 +35,15 @@ function DocenteCard({ docente, locale, courseTitle }: { docente: Docente; local
   const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
-    if (docente.bio) markdownToHtml(docente.bio).then(setBioHtml);
-    else setBioHtml('');
+    // markdownToHtml('') → '' , así que llamarlo siempre evita el setBioHtml('')
+    // síncrono del caso "sin bio": el único setState queda dentro del .then.
+    let cancelled = false;
+    markdownToHtml(docente.bio || '').then((html) => {
+      if (!cancelled) setBioHtml(html);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [docente.bio]);
 
   const linkedinHref = docente.linkedin

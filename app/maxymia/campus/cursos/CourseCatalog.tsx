@@ -57,6 +57,16 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Al cambiar cualquier filtro volvemos a la página 1. Ajuste de estado durante
+  // el render (patrón de React para "resetear estado cuando cambian unas props")
+  // en vez de un efecto con setState síncrono; comparamos una clave compuesta.
+  const filterKey = `${search}|${category}|${level}|${priceRange[0]}-${priceRange[1]}|${durationRange[0]}-${durationRange[1]}|${sortBy}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setCurrentPage(1);
+  }
+
   // Click outside
   const filtersRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -68,11 +78,6 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, category, level, priceRange, durationRange, sortBy]);
 
   // Memoize course metadata
   const coursesWithMeta = useMemo(

@@ -71,6 +71,19 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
     }
   }
 
+  // Al cambiar de lección, si no hay ancla de tema en la URL volvemos a la vista
+  // índice. Ajuste de estado durante el render (patrón de React para "resetear
+  // estado cuando cambia una prop/derivación") en lugar de un efecto con
+  // setState síncrono. En el primer render lesson.id === initialLesson.id, así
+  // que el bloque no corre en SSR y `window` solo se lee en cliente.
+  const [prevLessonId, setPrevLessonId] = useState(initialLesson.id);
+  if (lesson.id !== prevLessonId) {
+    setPrevLessonId(lesson.id);
+    if (typeof window !== 'undefined' && !window.location.hash) {
+      setSelectedTopicId(null);
+    }
+  }
+
   // Read hash on mount and on hash change to select topic
   useEffect(() => {
     const readHash = () => {
@@ -86,11 +99,6 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
     window.addEventListener('hashchange', readHash);
     return () => window.removeEventListener('hashchange', readHash);
   }, [lesson.topics]);
-
-  // Reset topic when lesson changes
-  useEffect(() => {
-    if (!window.location.hash) setSelectedTopicId(null);
-  }, [lesson.id]);
 
   // Botón atrás/adelante: la URL la manejamos con pushState, así que al navegar
   // por el historial sincronizamos la lección desde el path (client-side, sin

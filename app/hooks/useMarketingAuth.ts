@@ -1,6 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
+
+// `__client_uat` (cookie no httpOnly de Clerk): "0"/ausente = fuera de sesión.
+// La cookie no emite eventos, así que la suscripción es un noop: leemos el
+// snapshot en cada render. Devolver un booleano (primitivo) mantiene estable la
+// comparación de useSyncExternalStore.
+const noopSubscribe = () => () => {};
+function readSignedInFromCookie(): boolean {
+  const match = document.cookie.match(/(?:^|;\s*)__client_uat=([^;]+)/);
+  return !!match && match[1] !== '0';
+}
 
 /**
  * Estado de sesión/Pro para páginas de MARKETING, SIN cargar Clerk.
@@ -16,14 +26,14 @@ import { useState, useEffect } from 'react';
  * de las rutas de app sin reintroducir Clerk en marketing.
  */
 export function useMarketingAuth(): { isSignedIn: boolean; hasPro: boolean } {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  // `isSignedIn` se deriva de la cookie con useSyncExternalStore (SSR=false),
+  // sin setState síncrono en efecto. El fetch de `hasPro` sigue en un efecto
+  // porque es asíncrono (el setState va dentro del .then, no lo marca la regla).
+  const isSignedIn = useSyncExternalStore(noopSubscribe, readSignedInFromCookie, () => false);
   const [hasPro, setHasPro] = useState(false);
 
   useEffect(() => {
-    const match = document.cookie.match(/(?:^|;\s*)__client_uat=([^;]+)/);
-    const signed = !!match && match[1] !== '0';
-    setIsSignedIn(signed);
-    if (!signed) return;
+    if (!isSignedIn) return; // sin sesión → hasPro se queda en false.
     let cancelled = false;
     fetch('/api/user/profile')
       .then((r) => (r.ok ? r.json() : null))
@@ -36,7 +46,7 @@ export function useMarketingAuth(): { isSignedIn: boolean; hasPro: boolean } {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isSignedIn]);
 
   return { isSignedIn, hasPro };
 }
