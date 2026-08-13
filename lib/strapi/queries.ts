@@ -265,10 +265,13 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
   }
   // Los cursos exclusivos PRO (proOnly) NO aparecen en el catálogo: se excluyen
   // por defecto. El Panel PRO y el admin piden includeProOnly=true para verlos.
-  // $ne:true incluye false y null (cursos anteriores al campo). Server-side para
-  // no descuadrar la paginación.
+  // OJO: los programas anteriores al campo tienen proOnly=NULL (no false), y en
+  // SQL `NULL != true` EXCLUYE la fila → `$ne:true` devolvía 0 programas y tumbaba
+  // el megamenú. Usamos $or(null | false) para incluir null Y false, excluyendo
+  // solo proOnly=true. Server-side (paginación correcta).
   if (!options.includeProOnly) {
-    filters.push(`filters[proOnly][$ne]=true`);
+    filters.push(`filters[$or][0][proOnly][$null]=true`);
+    filters.push(`filters[$or][1][proOnly][$eq]=false`);
   }
 
   // Pagination

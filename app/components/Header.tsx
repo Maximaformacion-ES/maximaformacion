@@ -131,6 +131,13 @@ function DesktopClerkAvatar({ userHasPro, isAdmin }: { userHasPro: boolean; isAd
                 href="/admin"
               />
             )}
+            {userHasPro && (
+              <UserButton.Link
+                label="Contenido PRO"
+                labelIcon={<Crown size={16} />}
+                href="/pro-content"
+              />
+            )}
             <UserButton.Link
               label="Mis Cursos"
               labelIcon={<GraduationCap size={16} />}
@@ -186,6 +193,13 @@ function MobileClerkAvatar({ isDark, userHasPro, isAdmin }: { isDark: boolean; u
               label="Admin"
               labelIcon={<Shield size={16} />}
               href="/admin"
+            />
+          )}
+          {userHasPro && (
+            <UserButton.Link
+              label="Contenido PRO"
+              labelIcon={<Crown size={16} />}
+              href="/pro-content"
             />
           )}
           <UserButton.Link
