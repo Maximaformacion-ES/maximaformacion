@@ -393,6 +393,11 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
   const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
   const effectivePrice = getEffectivePrice(course, userHasPro);
   const proSavings = getProSavings(course, userHasPro);
+  // Visitante NO-PRO viendo un curso incluido en PRO:
+  //  - proOnly (exclusivo PRO, no se vende) → mostramos SOLO "Gratis con PRO".
+  //  - isPro con precio (tipo "Fraude", también a la venta) → precio normal +
+  //    "Gratis con Pro · ahorras X" (más abajo, condicionado a course.isPro).
+  const proOnlyCourse = !!course.proOnly;
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
@@ -479,6 +484,10 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
                     <Crown size={20} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
                   </span>
                 </>
+              ) : (!userHasPro && proOnlyCourse) ? (
+                <span className="flex items-center gap-2 text-mx-orange text-heading-md font-black">
+                  <Crown size={20} /> {locale === 'es' ? 'Gratis con PRO' : 'Free with PRO'}
+                </span>
               ) : proDiscount ? (
                 <>
                   <span className="text-mx-text-muted text-body-lg line-through">{course.price}€</span>
@@ -557,9 +566,9 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
               >
                 <span className="flex items-center gap-2 text-mx-orange text-label-md font-medium">
                   <Crown size={14} />
-                  {includedInPro
+                  {course.isPro
                     ? (locale === 'es'
-                        ? `Sería gratis con Pro · ahorras ${proSavings}€`
+                        ? `Gratis con Pro · ahorras ${proSavings}€`
                         : `Free with Pro · save ${proSavings}€`)
                     : (locale === 'es'
                         ? `Con Pro pagarías ${course.price - proSavings}€ · ahorras ${proSavings}€`
