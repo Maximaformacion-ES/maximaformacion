@@ -159,6 +159,8 @@ export interface MaxymiaCourse {
   docentes?: MaxymiaDocente[];
   level: MaxymiaLevel;
   isPro: boolean;
+  /** Exclusivo PRO: ni se vende ni aparece en catálogo (solo con suscripción). */
+  proOnly?: boolean;
   /** Per-course toggle for the 20% Pro discount (opt-in). */
   haveDiscount: boolean;
   tags: string[];
@@ -270,6 +272,10 @@ export interface MaxymiaCourseFilters {
   level?: MaxymiaLevel;
   language?: Locale | 'bilingual';
   search?: string;
+  /** Incluir cursos proOnly (exclusivos PRO). Por defecto se EXCLUYEN de los
+   *  listados públicos/catálogo; el Panel PRO lo pone a true. El acceso a la
+   *  ficha/lección por slug NO se filtra (siempre accesible). */
+  includeProOnly?: boolean;
 }
 
 export interface LessonNavigation {

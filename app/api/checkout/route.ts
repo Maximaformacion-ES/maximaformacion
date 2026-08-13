@@ -131,6 +131,14 @@ export async function POST(request: Request) {
         );
       }
 
+      // Curso exclusivo PRO: no se vende por separado, solo con suscripción.
+      if (course.proOnly) {
+        return NextResponse.json(
+          { error: 'Este curso es exclusivo para suscriptores PRO y no se vende por separado.' },
+          { status: 403 }
+        );
+      }
+
       if (!course.price || course.price <= 0) {
         return NextResponse.json(
           { error: 'This course is not available for purchase.' },
@@ -274,6 +282,14 @@ export async function POST(request: Request) {
         return NextResponse.json(
           { error: 'Program not found' },
           { status: 404 }
+        );
+      }
+
+      // Curso exclusivo PRO: no se vende por separado, solo con suscripción.
+      if (program.proOnly) {
+        return NextResponse.json(
+          { error: 'Este curso es exclusivo para suscriptores PRO y no se vende por separado.' },
+          { status: 403 }
         );
       }
 

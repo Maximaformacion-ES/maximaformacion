@@ -51,7 +51,11 @@ export async function fetchMaxymiaCourses(
   filters?: MaxymiaCourseFilters
 ): Promise<MaxymiaCourse[]> {
   const courses = await getMaxymiaCoursesFromStrapi();
-  return filters ? applyFilters(courses, filters) : courses;
+  // Los cursos exclusivos PRO (proOnly) se excluyen de los listados por defecto
+  // (catálogo, home, megamenú, campus). Solo el Panel PRO pide includeProOnly.
+  // El acceso por slug (ficha/lección) no pasa por aquí, así que sigue funcionando.
+  const visible = filters?.includeProOnly ? courses : courses.filter((c) => !c.proOnly);
+  return filters ? applyFilters(visible, filters) : visible;
 }
 
 export async function fetchMaxymiaCourseBySlug(

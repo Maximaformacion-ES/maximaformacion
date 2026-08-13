@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { m } from 'framer-motion';
+import { Crown } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -10,10 +12,12 @@ import ProResourcesGrid from './ProResourcesGrid';
 import ProContentFilterBar from './ProContentFilterBar';
 import { SUBJECT_AREAS } from '@/lib/subject-areas';
 import { normalizeForSearch } from '@/lib/normalize-search';
-import type { ProResourceCard } from '@/lib/strapi/types';
+import type { ProResourceCard, Program } from '@/lib/strapi/types';
 
 interface ProContentClientProps {
   resources: ProResourceCard[];
+  /** Cursos incluidos en PRO (mini-cursos proOnly + cursos que también se venden). */
+  proCourses: Program[];
   hasPro: boolean;
 }
 
@@ -80,7 +84,7 @@ function groupResources(resources: ProResourceCard[]): AreaGroup[] {
   });
 }
 
-export default function ProContentClient({ resources, hasPro }: ProContentClientProps) {
+export default function ProContentClient({ resources, proCourses, hasPro }: ProContentClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeType, setActiveType] = useState('Todo');
   const [activeArea, setActiveArea] = useState('Todas');
@@ -147,6 +151,59 @@ export default function ProContentClient({ resources, hasPro }: ProContentClient
             )}
           </p>
         </m.div>
+
+        {proCourses.length > 0 && (
+          <m.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-10"
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-1 flex items-center gap-2">
+              <Crown className="text-mx-orange" size={22} /> Cursos incluidos en tu PRO
+            </h2>
+            <p className="text-mx-text/60 mb-6">
+              Cursos completos y mini-cursos a los que accedes gratis con la suscripción.
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {proCourses.map((c) => (
+                <Link
+                  key={c.documentId ?? c.slug}
+                  href={c.href ?? `/programas/${c.slug}`}
+                  className="group relative rounded-lg overflow-hidden border border-mx-border bg-mx-bg hover:border-mx-orange/50 transition-colors flex flex-col"
+                >
+                  <div className="relative h-40 overflow-hidden">
+                    {c.image && (
+                      <Image
+                        src={c.image}
+                        alt={c.title}
+                        fill
+                        sizes="(min-width:1024px) 25vw, 50vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
+                    <span className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider text-white bg-gradient-to-r from-[#f7a000] to-[#f7c948] shadow">
+                      <Crown size={10} /> {c.proOnly ? 'Mini-curso PRO' : 'Incluido en PRO'}
+                    </span>
+                  </div>
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="font-medium line-clamp-2 mb-1">{c.title}</h3>
+                    <p className="text-sm text-mx-text/60 line-clamp-2">{c.description}</p>
+                    {!c.proOnly && c.price ? (
+                      <p className="mt-auto pt-3 text-sm text-mx-text/50">
+                        También a la venta ·{' '}
+                        <span className="line-through">{c.price}€</span>{' '}
+                        <span className="text-mx-orange font-medium">gratis con PRO</span>
+                      </p>
+                    ) : (
+                      <p className="mt-auto pt-3 text-sm text-mx-orange font-medium">Solo para suscriptores PRO</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </m.section>
+        )}
 
         {resources.length === 0 ? (
           <div className="mt-10">

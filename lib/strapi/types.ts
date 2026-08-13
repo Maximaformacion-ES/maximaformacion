@@ -119,6 +119,8 @@ export interface StrapiProgram {
   tags: string[] | null;
   featured: boolean;
   isPro: boolean;
+  /** Exclusivo PRO: ni se vende ni aparece en catálogo (solo con suscripción). */
+  proOnly?: boolean | null;
   haveDiscount: boolean | null;
   description: string;
   longDescription: string | null;
@@ -278,6 +280,8 @@ export interface Program {
   careers: string;
   objectives: string;
   isPro: boolean;
+  /** Exclusivo PRO: ni se vende ni aparece en catálogo (solo con suscripción). */
+  proOnly?: boolean;
   /** Per-course toggle for the 20% Pro discount. Off → course shown at full price to Pro users. */
   haveDiscount: boolean;
   moodleCourseId?: number | null;
@@ -414,6 +418,9 @@ export interface ProgramQueryOptions {
   type?: 'Master' | 'Curso';
   featured?: boolean;
   isPro?: boolean;
+  /** Incluir cursos proOnly (exclusivos PRO). Por defecto se EXCLUYEN del listado
+   *  (catálogo). El Panel PRO y el admin lo ponen a true. */
+  includeProOnly?: boolean;
   limit?: number;
   page?: number;
   sort?: string;
@@ -1139,6 +1146,7 @@ export interface StrapiMaxymiaCourse {
   level: string;
   category: string;
   isPro: boolean | null;
+  proOnly?: boolean | null;
   haveDiscount: boolean | null;
   tags: string[] | null; // JSON scalar
   docentes?: StrapiAuthor[] | null;

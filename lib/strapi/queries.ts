@@ -98,6 +98,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     careers: strapi.careers || '',
     objectives: strapi.objectives || '',
     isPro: strapi.isPro,
+    proOnly: strapi.proOnly ?? false,
     haveDiscount: strapi.haveDiscount ?? false,
     moodleCourseId: strapi.moodleCourseId ?? null,
     moodle: strapi.moodle ?? null,
@@ -261,6 +262,13 @@ function buildProgramQuery(options: ProgramQueryOptions = {}): string {
   }
   if (options.isPro !== undefined) {
     filters.push(`filters[isPro][$eq]=${options.isPro}`);
+  }
+  // Los cursos exclusivos PRO (proOnly) NO aparecen en el catálogo: se excluyen
+  // por defecto. El Panel PRO y el admin piden includeProOnly=true para verlos.
+  // $ne:true incluye false y null (cursos anteriores al campo). Server-side para
+  // no descuadrar la paginación.
+  if (!options.includeProOnly) {
+    filters.push(`filters[proOnly][$ne]=true`);
   }
 
   // Pagination

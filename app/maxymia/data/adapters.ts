@@ -44,6 +44,7 @@ export function maxymiaCourseAsProgram(c: MaxymiaCourse): Program {
     careers: c.careers ?? '',
     objectives: c.objectives ?? '',
     isPro: c.isPro,
+    proOnly: c.proOnly,
     haveDiscount: c.haveDiscount,
     moodleCourseId: null,
     moodle: null,
