@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Menu, X, ChevronDown, User } from 'lucide-react';
+import { ArrowUpRight, Menu, X, ChevronDown, User, Crown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -51,6 +51,8 @@ export interface NavItem {
       description: string;
       href: string;
       cta: string;
+      /** Estilo dorado + icono corona (usado por la card "Área PRO"). */
+      highlight?: boolean;
     };
   };
 }
@@ -88,10 +90,11 @@ export const NAV_ITEMS: NavItem[] = [
         },
       ],
       feature: {
-        title: 'Hazte Pro',
-        description: 'Acceso ilimitado a cursos exclusivos y un 20 % de descuento en los demás.',
-        href: '/pricing',
-        cta: 'Ver plan Pro',
+        title: 'Área PRO',
+        description: 'Todo lo que incluye tu suscripción: mini-cursos exclusivos, cursos gratis y recursos premium.',
+        href: '/pro-content',
+        cta: 'Ver todo lo que incluye',
+        highlight: true,
       },
     },
   },
@@ -487,6 +490,17 @@ function MobileNavRow({
                   </ul>
                 </div>
               ))}
+              {item.megaMenu.feature?.highlight && (
+                <Link
+                  href={item.megaMenu.feature.href}
+                  onClick={onClose}
+                  className="mt-3 flex items-center gap-2 mx-3 px-3 py-2.5 rounded-lg border border-mx-orange/30 bg-mx-orange/10 text-mx-orange text-label-md font-semibold hover:bg-mx-orange/15"
+                >
+                  <Crown size={16} className="shrink-0" />
+                  {item.megaMenu.feature.title}
+                  <ArrowUpRight size={14} className="ml-auto shrink-0" />
+                </Link>
+              )}
             </div>
           </m.div>
         )}
@@ -648,20 +662,23 @@ function MegaMenuTrigger({ item, isActive, isDark, featureOverride }: MegaMenuTr
                 {feature && (
                   <div
                     className={`w-60 p-6 md:p-7 rounded-r-2xl flex flex-col justify-between ${
-                      isDark
-                        ? 'bg-gradient-to-br from-mx-blue/15 to-transparent border-l border-white/10'
-                        : 'bg-gradient-to-br from-mx-orange/8 to-mx-orange/[0.02] border-l border-mx-border'
+                      feature.highlight
+                        ? 'bg-gradient-to-br from-mx-orange/20 to-mx-orange/[0.03] border-l border-mx-orange/30'
+                        : isDark
+                          ? 'bg-gradient-to-br from-mx-blue/15 to-transparent border-l border-white/10'
+                          : 'bg-gradient-to-br from-mx-orange/8 to-mx-orange/[0.02] border-l border-mx-border'
                     }`}
                   >
                     <div>
                       <p className="text-mx-orange text-label-sm tracking-widest uppercase font-semibold mb-2">
-                        Destacado
+                        {feature.highlight ? 'Incluido en PRO' : 'Destacado'}
                       </p>
                       <p
-                        className={`text-body-lg font-bold leading-snug mb-2 ${
+                        className={`text-body-lg font-bold leading-snug mb-2 flex items-center gap-1.5 ${
                           isDark ? 'text-white' : 'text-mx-text'
                         }`}
                       >
+                        {feature.highlight && <Crown size={18} className="text-mx-orange shrink-0" />}
                         {feature.title}
                       </p>
                       <p
@@ -791,15 +808,17 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
               {items.map((item) => {
                 const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
                 if (item.megaMenu) {
-                  // El "Hazte Pro" destacado en Formación no tiene sentido para
-                  // quien ya es Pro — lo sustituimos por un link al Campus.
+                  // La card "Área PRO" de Formación se muestra a todos (→ /pro-content,
+                  // que ya hace de escaparate y upsell). Para quien ya es Pro,
+                  // ajustamos el copy a "acceso" en vez de "descubrimiento".
                   const featureOverride: FeatureCard | undefined =
                     item.name === 'Formación' && userHasPro
                       ? {
-                          title: 'Tu Campus Pro',
-                          description: 'Accede a tus cursos exclusivos y al contenido reservado a Pro.',
-                          href: '/maxymia/campus',
-                          cta: 'Ir al Campus',
+                          title: 'Área PRO',
+                          description: 'Tus mini-cursos exclusivos, los cursos incluidos y los recursos premium.',
+                          href: '/pro-content',
+                          cta: 'Ir a mi Área PRO',
+                          highlight: true,
                         }
                       : undefined;
                   return (
