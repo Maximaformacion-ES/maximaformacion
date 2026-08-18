@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/client';
+import { db } from '@/lib/db/client';
+import { consultingLeads } from '@/lib/db/schema';
 
 const STRAPI_URL = process.env.STRAPI_URL || '';
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
@@ -151,6 +153,28 @@ async function saveToStrapi(lead: LeadBody): Promise<string | null> {
   return json?.data?.documentId ?? json?.data?.id ?? null;
 }
 
+async function saveToNeon(lead: LeadBody, strapiId: string | null): Promise<void> {
+  await db.insert(consultingLeads).values({
+    strapiDocumentId: strapiId,
+    fullName: lead.fullName,
+    organization: lead.organization ?? null,
+    email: lead.email,
+    sector: lead.sector,
+    questionGoal: lead.questionGoal,
+    projectPhase: lead.projectPhase,
+    deadline: lead.deadline ?? null,
+    // Campos ricos que no tienen columna propia, para no perder nada.
+    payload: {
+      dataSource: lead.dataSource,
+      rowsEstimate: lead.rowsEstimate,
+      columnsEstimate: lead.columnsEstimate,
+      dataFormat: lead.dataFormat,
+      expectedOutputs: lead.expectedOutputs,
+      observations: lead.observations,
+    },
+  });
+}
+
 function buildEmailHtml(lead: LeadBody): string {
   const row = (label: string, value: string | number | undefined) =>
     value === undefined || value === '' || value === null
@@ -196,23 +220,39 @@ export async function POST(request: NextRequest) {
   }
   const lead = result.data;
 
+  // Guardado dual, ambos best-effort:
+  //  - Strapi (compat con el histórico existente).
+  //  - Neon = fuente de verdad del panel admin.
+  let strapiId: string | null = null;
   try {
-    const id = await saveToStrapi(lead);
-
-    try {
-      await sendEmail({
-        to: LEAD_NOTIFY_TO,
-        subject: `Nuevo lead de consultoría — ${lead.fullName}`,
-        html: buildEmailHtml(lead),
-        replyTo: lead.email,
-      });
-    } catch (emailErr) {
-      console.error('Email notification failed:', emailErr);
-    }
-
-    return NextResponse.json({ success: true, id });
+    strapiId = await saveToStrapi(lead);
   } catch (err) {
-    console.error('Lead submission failed:', err);
+    console.error('Strapi lead save failed:', err);
+  }
+
+  let savedToNeon = false;
+  try {
+    await saveToNeon(lead, strapiId);
+    savedToNeon = true;
+  } catch (err) {
+    console.error('Neon lead save failed:', err);
+  }
+
+  // Si no se pudo guardar en NINGÚN sitio, el lead se perdería → error.
+  if (!strapiId && !savedToNeon) {
     return NextResponse.json({ error: 'No se pudo guardar el lead' }, { status: 502 });
   }
+
+  try {
+    await sendEmail({
+      to: LEAD_NOTIFY_TO,
+      subject: `Nuevo lead de consultoría — ${lead.fullName}`,
+      html: buildEmailHtml(lead),
+      replyTo: lead.email,
+    });
+  } catch (emailErr) {
+    console.error('Email notification failed:', emailErr);
+  }
+
+  return NextResponse.json({ success: true, id: strapiId });
 }

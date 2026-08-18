@@ -1,6 +1,6 @@
 import { desc, eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
-import { leadCaptureLog, contactMessages } from '@/lib/db/schema';
+import { leadCaptureLog, contactMessages, consultingLeads } from '@/lib/db/schema';
 import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiResponse } from '@/lib/strapi/types';
 import { upsertProfile, trackEvent, subscribeToList, isKlaviyoConfigured } from '@/lib/klaviyo/client';
@@ -73,27 +73,70 @@ interface StrapiConsultingLead {
   createdAt?: string;
 }
 
+/**
+ * Leads de consultoría. Fuente de verdad = Neon (guardado dual desde el
+ * endpoint). Mientras no se backfilee el histórico, además fusionamos los que
+ * solo existen en Strapi (deduplicados por strapiDocumentId). Resiliente: si
+ * Strapi no está disponible, se muestran igualmente los de Neon.
+ */
 export async function getConsultingLeads(): Promise<ConsultingLead[]> {
+  // 1. Neon (fuente de verdad).
+  let neon: ConsultingLead[] = [];
+  const seenStrapiIds = new Set<string>();
+  try {
+    const rows = await db
+      .select()
+      .from(consultingLeads)
+      .orderBy(desc(consultingLeads.createdAt))
+      .limit(200);
+    neon = rows.map((r) => {
+      if (r.strapiDocumentId) seenStrapiIds.add(r.strapiDocumentId);
+      return {
+        documentId: r.strapiDocumentId ?? `neon:${r.id}`,
+        fullName: r.fullName,
+        organization: r.organization,
+        email: r.email,
+        sector: r.sector,
+        questionGoal: r.questionGoal,
+        projectPhase: r.projectPhase,
+        deadline: r.deadline,
+        createdAt: r.createdAt.toISOString(),
+      };
+    });
+  } catch (e) {
+    console.warn('[admin:getConsultingLeads] Neon failed:', e);
+  }
+
+  // 2. Strapi: histórico aún no migrado. Best-effort; se omiten los ya en Neon.
+  let strapiOnly: ConsultingLead[] = [];
   try {
     const res = await strapiRequest<StrapiResponse<StrapiConsultingLead[]>>(
       '/api/consulting-leads?sort=createdAt:desc&pagination[pageSize]=100',
       { revalidate: 0 }
     );
-    return (res?.data ?? []).map((l) => ({
-      documentId: l.documentId,
-      fullName: l.fullName ?? '(sin nombre)',
-      organization: l.organization ?? null,
-      email: l.email ?? '',
-      sector: l.sector ?? null,
-      questionGoal: l.questionGoal ?? null,
-      projectPhase: l.projectPhase ?? null,
-      deadline: l.deadline ?? null,
-      createdAt: l.createdAt ?? null,
-    }));
+    strapiOnly = (res?.data ?? [])
+      .filter((l) => !seenStrapiIds.has(l.documentId))
+      .map((l) => ({
+        documentId: l.documentId,
+        fullName: l.fullName ?? '(sin nombre)',
+        organization: l.organization ?? null,
+        email: l.email ?? '',
+        sector: l.sector ?? null,
+        questionGoal: l.questionGoal ?? null,
+        projectPhase: l.projectPhase ?? null,
+        deadline: l.deadline ?? null,
+        createdAt: l.createdAt ?? null,
+      }));
   } catch (e) {
-    console.warn('[admin:getConsultingLeads] failed:', e);
-    return [];
+    console.warn('[admin:getConsultingLeads] Strapi failed (histórico):', e);
   }
+
+  // 3. Merge y orden por fecha descendente (nulls al final).
+  return [...neon, ...strapiOnly].sort((a, b) => {
+    if (!a.createdAt) return 1;
+    if (!b.createdAt) return -1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
 }
 
 // ─── Mensajes de contacto (contact_messages, Neon) ─────────────────────

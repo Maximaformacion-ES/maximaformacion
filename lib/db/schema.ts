@@ -213,6 +213,29 @@ export const contactMessages = campusSchema.table('contact_messages', {
   index('idx_contact_messages_email').on(table.email),
 ]);
 
+// ─── Consulting Leads ──────────────────────────────────────────────────
+// Leads del formulario de /consultoria. Históricamente vivían solo en Strapi;
+// se unifican en Neon (fuente de verdad del panel), con guardado dual: el
+// endpoint sigue escribiendo en Strapi Y aquí. `strapi_document_id` permite
+// deduplicar/backfillear el histórico de Strapi de forma idempotente.
+export const consultingLeads = campusSchema.table('consulting_leads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  strapiDocumentId: text('strapi_document_id'),
+  fullName: text('full_name').notNull(),
+  organization: text('organization'),
+  email: text('email').notNull(),
+  sector: text('sector'),
+  questionGoal: text('question_goal'),
+  projectPhase: text('project_phase'),
+  deadline: text('deadline'),
+  payload: jsonb('payload'),           // resto de campos (datos, formato, entregables, observaciones)
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('idx_consulting_leads_strapi').on(table.strapiDocumentId),
+  index('idx_consulting_leads_created').on(table.createdAt),
+  index('idx_consulting_leads_email').on(table.email),
+]);
+
 // ─── Admin Audit ───────────────────────────────────────────────────────
 // Registro inmutable de las mutaciones del panel admin (Fase 1). El panel opera
 // datos de usuario/PII (dar acceso, PRO, provisioning…), así que la seguridad se
