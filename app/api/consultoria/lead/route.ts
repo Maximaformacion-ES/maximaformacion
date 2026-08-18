@@ -3,7 +3,13 @@ import { sendEmail } from '@/lib/email/client';
 
 const STRAPI_URL = process.env.STRAPI_URL || '';
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
-const LEAD_NOTIFY_TO = process.env.CONSULTING_LEAD_NOTIFY_TO || 'cursos@maximaformacion.es';
+// Destinatarios de los leads de consultoría (WEB-56: además de cursos@, el
+// equipo de consultoría en mrodriguez@maximaconsultoria.es). Coma-separado en la
+// env para añadir/quitar sin tocar código.
+const LEAD_NOTIFY_TO = (process.env.CONSULTING_LEAD_NOTIFY_TO || 'cursos@maximaformacion.es,mrodriguez@maximaconsultoria.es')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 const ALLOWED_SECTORS = ['bioestadistica-salud', 'marketing', 'finanzas', 'academia', 'otro'] as const;
 const ALLOWED_PHASES = ['idea', 'datos-recogidos', 'necesita-validacion'] as const;

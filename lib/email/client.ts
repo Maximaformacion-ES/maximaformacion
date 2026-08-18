@@ -17,7 +17,8 @@ interface EmailAttachment {
 }
 
 interface SendEmailOptions {
-  to: string;
+  /** Uno o varios destinatarios. Resend acepta string o array. */
+  to: string | string[];
   subject: string;
   html: string;
   text?: string;

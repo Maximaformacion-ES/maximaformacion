@@ -16,10 +16,30 @@ export default function ContactClient() {
     message: '',
     subject: 'general'
   });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Mensaje enviado correctamente. Te contactaremos pronto.');
+    if (status === 'sending') return;
+    setStatus('sending');
+    setErrorMsg('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'No se pudo enviar el mensaje');
+      }
+      setStatus('sent');
+      setFormState({ name: '', email: '', phone: '', message: '', subject: 'general' });
+    } catch (err) {
+      setStatus('error');
+      setErrorMsg(err instanceof Error ? err.message : 'No se pudo enviar el mensaje');
+    }
   };
 
   return (
@@ -122,11 +142,23 @@ export default function ContactClient() {
 
                 <button
                   type="submit"
-                  className="group w-full bg-mx-orange text-white py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer"
+                  disabled={status === 'sending'}
+                  className="group w-full bg-mx-orange text-white py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Enviar Mensaje
+                  {status === 'sending' ? 'Enviando…' : 'Enviar Mensaje'}
                   <Send size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
+
+                {status === 'sent' && (
+                  <p className="text-body-sm text-green-600 font-medium" role="status">
+                    Mensaje enviado correctamente. Te contactaremos pronto.
+                  </p>
+                )}
+                {status === 'error' && (
+                  <p className="text-body-sm text-red-500 font-medium" role="alert">
+                    {errorMsg || 'No se pudo enviar el mensaje. Inténtalo de nuevo o escríbenos a cursos@maximaformacion.es.'}
+                  </p>
+                )}
               </form>
             </m.div>
 
