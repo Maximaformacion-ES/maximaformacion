@@ -193,6 +193,26 @@ export const examResults = campusSchema.table('exam_results', {
   index('idx_exam_results_course').on(table.clerkId, table.courseId),
 ]);
 
+// ─── Contact Messages ──────────────────────────────────────────────────
+// Mensajes del formulario público de /contacto. Antes se PERDÍAN (el form solo
+// hacía alert() sin enviar nada). Se guardan aquí como fuente de verdad para el
+// panel admin, además de notificarse por email. (Consultoría vive en Strapi.)
+export const contactMessages = campusSchema.table('contact_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  phone: text('phone'),
+  subject: text('subject'),
+  message: text('message').notNull(),
+  ipPrefix: text('ip_prefix'),        // primeros octetos de IP (RGPD)
+  userAgent: text('user_agent'),
+  referer: text('referer'),
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  index('idx_contact_messages_created').on(table.createdAt),
+  index('idx_contact_messages_email').on(table.email),
+]);
+
 // ─── Admin Audit ───────────────────────────────────────────────────────
 // Registro inmutable de las mutaciones del panel admin (Fase 1). El panel opera
 // datos de usuario/PII (dar acceso, PRO, provisioning…), así que la seguridad se

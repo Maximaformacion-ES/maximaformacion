@@ -1,6 +1,6 @@
 import { desc, eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
-import { leadCaptureLog } from '@/lib/db/schema';
+import { leadCaptureLog, contactMessages } from '@/lib/db/schema';
 import { strapiRequest } from '@/lib/strapi/client';
 import type { StrapiResponse } from '@/lib/strapi/types';
 import { upsertProfile, trackEvent, subscribeToList, isKlaviyoConfigured } from '@/lib/klaviyo/client';
@@ -92,6 +92,40 @@ export async function getConsultingLeads(): Promise<ConsultingLead[]> {
     }));
   } catch (e) {
     console.warn('[admin:getConsultingLeads] failed:', e);
+    return [];
+  }
+}
+
+// ─── Mensajes de contacto (contact_messages, Neon) ─────────────────────
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string | null;
+  message: string;
+  createdAt: string;
+}
+
+export async function getContactMessages(opts: { limit?: number } = {}): Promise<ContactMessage[]> {
+  const { limit = 200 } = opts;
+  try {
+    const rows = await db
+      .select()
+      .from(contactMessages)
+      .orderBy(desc(contactMessages.createdAt))
+      .limit(limit);
+    return rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      email: r.email,
+      phone: r.phone,
+      subject: r.subject,
+      message: r.message,
+      createdAt: r.createdAt.toISOString(),
+    }));
+  } catch (e) {
+    console.warn('[admin:getContactMessages] failed:', e);
     return [];
   }
 }

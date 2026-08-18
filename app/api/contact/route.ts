@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/client';
+import { db } from '@/lib/db/client';
+import { contactMessages } from '@/lib/db/schema';
+
+/** Primeros 3 octetos de una IPv4 (RGPD: no guardamos la IP completa). */
+function anonymizeIp(raw: string | null): string | null {
+  if (!raw) return null;
+  const ip = raw.split(',')[0].trim();
+  const m = ip.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}$/);
+  return m ? `${m[1]}.${m[2]}.${m[3]}.x` : null;
+}
 
 // Destinatario(s) de los mensajes del formulario de /contacto. Coma-separado en
 // la env para poder añadir buzones sin tocar código. Por defecto, el correo que
@@ -88,6 +98,33 @@ export async function POST(request: NextRequest) {
   }
   const lead = result.data;
 
+  const ipPrefix = anonymizeIp(
+    request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
+  );
+  const referer = request.headers.get('referer');
+  const userAgent = request.headers.get('user-agent');
+
+  // 1. Persistir en Neon = fuente de verdad para el panel admin. Best-effort:
+  //    si el email falla, el mensaje sigue guardado (y viceversa).
+  let saved = false;
+  try {
+    await db.insert(contactMessages).values({
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone ?? null,
+      subject: lead.subject ?? null,
+      message: lead.message,
+      ipPrefix,
+      userAgent: userAgent ?? null,
+      referer: referer ?? null,
+    });
+    saved = true;
+  } catch (err) {
+    console.error('Contact message DB insert failed:', err);
+  }
+
+  // 2. Notificar por email.
+  let emailed = false;
   try {
     await sendEmail({
       to: CONTACT_NOTIFY_TO,
@@ -95,10 +132,14 @@ export async function POST(request: NextRequest) {
       html: buildEmailHtml(lead),
       replyTo: lead.email,
     });
+    emailed = true;
   } catch (err) {
-    // A diferencia del stub anterior, aquí SÍ propagamos el fallo para que el
-    // formulario muestre error en vez de un falso "enviado correctamente".
     console.error('Contact email failed:', err);
+  }
+
+  // Solo es un error real si NO se pudo ni guardar ni enviar: en ese caso el
+  // mensaje se habría perdido, así que el formulario debe mostrar error.
+  if (!saved && !emailed) {
     return NextResponse.json({ error: 'No se pudo enviar el mensaje' }, { status: 502 });
   }
 
