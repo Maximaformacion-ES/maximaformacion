@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
+import { toast } from 'sonner';
 import { Mail, Phone, MapPin, Send, MessageSquare, Globe } from 'lucide-react';
+import { Toaster } from '@/components/ui/sonner';
 import { FontStyles } from '../components/FontStyles';
 import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
@@ -16,14 +18,12 @@ export default function ContactClient() {
     message: '',
     subject: 'general'
   });
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (status === 'sending') return;
-    setStatus('sending');
-    setErrorMsg('');
+    if (sending) return;
+    setSending(true);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -34,17 +34,22 @@ export default function ContactClient() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'No se pudo enviar el mensaje');
       }
-      setStatus('sent');
+      toast.success('Mensaje enviado correctamente. Te contactaremos pronto.');
       setFormState({ name: '', email: '', phone: '', message: '', subject: 'general' });
     } catch (err) {
-      setStatus('error');
-      setErrorMsg(err instanceof Error ? err.message : 'No se pudo enviar el mensaje');
+      toast.error(
+        err instanceof Error ? err.message : 'No se pudo enviar el mensaje',
+        { description: 'Inténtalo de nuevo o escríbenos a cursos@maximaformacion.es.' },
+      );
+    } finally {
+      setSending(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
+      <Toaster richColors position="top-right" />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
@@ -142,23 +147,12 @@ export default function ContactClient() {
 
                 <button
                   type="submit"
-                  disabled={status === 'sending'}
+                  disabled={sending}
                   className="group w-full bg-mx-orange text-white py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {status === 'sending' ? 'Enviando…' : 'Enviar Mensaje'}
+                  {sending ? 'Enviando…' : 'Enviar Mensaje'}
                   <Send size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-
-                {status === 'sent' && (
-                  <p className="text-body-sm text-green-600 font-medium" role="status">
-                    Mensaje enviado correctamente. Te contactaremos pronto.
-                  </p>
-                )}
-                {status === 'error' && (
-                  <p className="text-body-sm text-red-500 font-medium" role="alert">
-                    {errorMsg || 'No se pudo enviar el mensaje. Inténtalo de nuevo o escríbenos a cursos@maximaformacion.es.'}
-                  </p>
-                )}
               </form>
             </m.div>
 
