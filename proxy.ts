@@ -37,6 +37,11 @@ const isPublicRoute = createRouteMatcher([
   '/verificar(.*)',
   '/recursos(.*)',
   '/api/leads(.*)',
+  // Endpoints públicos de formularios (visitantes anónimos). Sin esto, Clerk
+  // ejecuta auth.protect() y devuelve 404 a cada envío → los mensajes NUNCA
+  // llegaban (contacto y consultoría). Validan la entrada por su cuenta.
+  '/api/contact(.*)',
+  '/api/consultoria(.*)',
   '/politica-de-privacidad(.*)',
   '/aviso-legal(.*)',
   '/politica-de-cookies(.*)',
