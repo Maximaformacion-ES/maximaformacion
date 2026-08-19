@@ -5,6 +5,7 @@ import { fetchMaxymiaCourses } from './maxymia/data/queries';
 import { maxymiaCourseAsProgram } from './maxymia/data/adapters';
 import type { MaxymiaCourse } from './maxymia/types';
 import HomeClient from './HomeClient';
+import { HOME_FALLBACK } from './data/home-fallback';
 import type { HomeData } from '@/lib/strapi/types';
 
 export const revalidate = 60;
@@ -32,5 +33,8 @@ export default async function Home() {
   // populate the "Inteligencia Artificial" area, whose courses live in Maxymia.
   const merged = [...programs, ...maxymiaCourses.map(maxymiaCourseAsProgram)];
 
-  return <HomeClient programs={merged} badges={badges} homeData={homeData as HomeData} />;
+  // getHomeData() devuelve null si Strapi está caído; HomeClient desreferencia
+  // homeData sin guardas, así que caemos al HOME_FALLBACK estático (antes era
+  // código muerto) para que la home renderice degradada en vez de tumbar el build.
+  return <HomeClient programs={merged} badges={badges} homeData={(homeData ?? HOME_FALLBACK) as HomeData} />;
 }

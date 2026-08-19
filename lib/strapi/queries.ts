@@ -355,20 +355,28 @@ export async function getPrograms(
   options: ProgramQueryOptions = {}
 ): Promise<{ programs: Program[]; total: number; pageCount: number }> {
   const query = buildProgramQuery(options);
-  const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-    `/api/programs?${query}`,
-    {
-      revalidate: 60,
-      tags: ['programs'],
-      draft: options.draft,
-    }
-  );
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
+      `/api/programs?${query}`,
+      {
+        revalidate: 60,
+        tags: ['programs'],
+        draft: options.draft,
+      }
+    );
 
-  return {
-    programs: response.data.map(transformProgram),
-    total: response.meta.pagination?.total || 0,
-    pageCount: response.meta.pagination?.pageCount || 1,
-  };
+    return {
+      programs: response.data.map(transformProgram),
+      total: response.meta.pagination?.total || 0,
+      pageCount: response.meta.pagination?.pageCount || 1,
+    };
+  } catch (error) {
+    // Strapi caído/lento: devolvemos vacío en vez de propagar. getPrograms es
+    // central (home, /programas, megamenú); si petaba, tumbaba el prerender y con
+    // él TODO el build de Vercel. Degradar > caerse.
+    console.warn('[getPrograms] Strapi no disponible, devuelvo vacío:', error);
+    return { programs: [], total: 0, pageCount: 1 };
+  }
 }
 
 export async function getProgramById(
