@@ -50,7 +50,15 @@ function applyFilters(courses: MaxymiaCourse[], filters?: MaxymiaCourseFilters):
 export async function fetchMaxymiaCourses(
   filters?: MaxymiaCourseFilters
 ): Promise<MaxymiaCourse[]> {
-  const courses = await getMaxymiaCoursesFromStrapi();
+  let courses: MaxymiaCourse[];
+  try {
+    courses = await getMaxymiaCoursesFromStrapi();
+  } catch (e) {
+    // Strapi caído/lento: devolvemos vacío en vez de propagar y tumbar el
+    // prerender de la página (que hacía FALLAR el build entero de Vercel).
+    console.warn('[fetchMaxymiaCourses] Strapi no disponible, devuelvo []:', e);
+    return [];
+  }
   // Los cursos exclusivos PRO (proOnly) se excluyen de los listados por defecto
   // (catálogo, home, megamenú, campus). Solo el Panel PRO pide includeProOnly.
   // El acceso por slug (ficha/lección) no pasa por aquí, así que sigue funcionando.
