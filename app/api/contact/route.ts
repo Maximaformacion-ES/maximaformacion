@@ -84,6 +84,34 @@ function buildEmailHtml(lead: ContactBody): string {
   `;
 }
 
+// Email de confirmación (auto-respuesta) para el usuario que rellena el
+// formulario: le avisa de que su mensaje ha llegado y de que le contactarán.
+function buildConfirmationHtml(lead: ContactBody): string {
+  const firstName = escapeHtml(lead.name.split(/\s+/)[0] || lead.name);
+  return `
+    <div style="font-family:system-ui,sans-serif;color:#111;max-width:560px;margin:0 auto;padding:8px">
+      <h2 style="color:#f59e0b;margin:0 0 12px">¡Hemos recibido tu mensaje!</h2>
+      <p style="font-size:15px;line-height:1.6;margin:0 0 12px">Hola ${firstName},</p>
+      <p style="font-size:15px;line-height:1.6;margin:0 0 12px">
+        Gracias por escribirnos. Tu mensaje ha llegado correctamente y
+        <strong>un docente te contactará lo antes posible</strong> para ayudarte.
+      </p>
+      <div style="border-left:3px solid #f59e0b;background:#faf7f2;padding:10px 14px;margin:0 0 16px;border-radius:4px">
+        <p style="font-size:13px;color:#666;margin:0 0 4px;font-weight:600">Tu mensaje:</p>
+        <p style="font-size:14px;line-height:1.5;color:#333;margin:0;white-space:pre-wrap">${escapeHtml(lead.message)}</p>
+      </div>
+      <p style="font-size:14px;line-height:1.6;color:#555;margin:0 0 12px">
+        Mientras tanto, si es urgente puedes escribirnos a
+        <a href="mailto:cursos@maximaformacion.es" style="color:#f59e0b">cursos@maximaformacion.es</a>
+        o llamarnos al <a href="tel:+34635659391" style="color:#f59e0b">+34 635 65 93 91</a>.
+      </p>
+      <p style="font-size:14px;line-height:1.6;color:#555;margin:0">
+        Un saludo,<br/><strong>Equipo de Máxima Formación</strong>
+      </p>
+    </div>
+  `;
+}
+
 export async function POST(request: NextRequest) {
   let raw: unknown;
   try {
@@ -141,6 +169,20 @@ export async function POST(request: NextRequest) {
   // mensaje se habría perdido, así que el formulario debe mostrar error.
   if (!saved && !emailed) {
     return NextResponse.json({ error: 'No se pudo enviar el mensaje' }, { status: 502 });
+  }
+
+  // 3. Confirmación al remitente (auto-respuesta). Best-effort: nunca debe hacer
+  //    fallar el envío del formulario si este email no sale. replyTo al buzón del
+  //    equipo para que, si responde, le llegue a quien gestiona las consultas.
+  try {
+    await sendEmail({
+      to: lead.email,
+      subject: 'Hemos recibido tu mensaje — Máxima Formación',
+      html: buildConfirmationHtml(lead),
+      replyTo: CONTACT_NOTIFY_TO[0],
+    });
+  } catch (err) {
+    console.error('Contact confirmation email failed:', err);
   }
 
   return NextResponse.json({ success: true });
