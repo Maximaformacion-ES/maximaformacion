@@ -313,10 +313,21 @@ export async function POST(request: Request) {
       let priceIdForCheckout: string | null = program.stripePriceId ?? null;
       if (priceIdForCheckout) {
         try {
-          const retrieved = await stripe.prices.retrieve(priceIdForCheckout);
-          if (!retrieved.active) {
+          // Expandimos el producto: Stripe RECHAZA en Checkout un precio cuyo
+          // producto esté archivado (active:false) o borrado, AUNQUE el precio
+          // siga activo — eso salía como "Failed to create checkout session".
+          // Por tanto el precio guardado solo vale si el precio Y su producto
+          // están activos; si no, caemos al ad-hoc (crea producto+precio nuevos).
+          const retrieved = await stripe.prices.retrieve(priceIdForCheckout, { expand: ['product'] });
+          const prod = retrieved.product;
+          const productUnusable =
+            typeof prod === 'object' && prod !== null &&
+            (('deleted' in prod && prod.deleted === true) ||
+              ('active' in prod && prod.active === false));
+          if (!retrieved.active || productUnusable) {
             console.warn(
-              `Stripe price ${priceIdForCheckout} is archived ` +
+              `Stripe price ${priceIdForCheckout} no usable ` +
+              `(price.active=${retrieved.active}, producto archivado/borrado=${productUnusable}) ` +
               `for program ${program.id} (${program.title}); creating ad-hoc.`
             );
             priceIdForCheckout = null;
