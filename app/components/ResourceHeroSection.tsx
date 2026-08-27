@@ -3,8 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
-import { Calendar, Award, User, Download, ExternalLink } from 'lucide-react';
+import { Calendar, Award, User, Download, ExternalLink, Clock } from 'lucide-react';
 import type { Resource } from '@/lib/strapi/types';
+import { isComingSoon } from '@/lib/resources/coming-soon';
 
 interface ResourceHeroSectionProps {
   resource: Resource;
@@ -26,6 +27,7 @@ export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({
 
   const hasImage = Boolean(resource.image) && resource.image !== '/placeholder-course.svg';
   const primaryDownload = resource.downloads[0];
+  const comingSoon = isComingSoon(resource.slug);
 
   return (
     <section className={`relative ${compactTop ? 'pt-4 md:pt-8' : 'pt-32 md:pt-40'} pb-12 md:pb-16`}>
@@ -116,7 +118,15 @@ export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({
                 transition={{ delay: 0.4, duration: 0.6 }}
                 className={`mt-8 flex flex-col sm:flex-row gap-3 ${hasImage ? '' : 'justify-center'}`}
               >
-                {primaryDownload && (
+                {primaryDownload && (comingSoon ? (
+                  <span
+                    title="Este recurso estará disponible próximamente"
+                    className="inline-flex items-center justify-center gap-3 bg-mx-orange/40 text-white px-6 py-3.5 text-label-md font-bold rounded-full cursor-not-allowed select-none"
+                  >
+                    <Clock size={18} />
+                    Próximamente
+                  </span>
+                ) : (
                   <a
                     href={primaryDownload.url}
                     target="_blank"
@@ -133,7 +143,7 @@ export const ResourceHeroSection: React.FC<ResourceHeroSectionProps> = ({
                       </span>
                     )}
                   </a>
-                )}
+                ))}
                 {resource.externalUrl && (
                   <a
                     href={resource.externalUrl}

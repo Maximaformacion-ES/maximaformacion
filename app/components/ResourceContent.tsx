@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, Clock } from 'lucide-react';
 import type { Resource } from '@/lib/strapi/types';
+import { isComingSoon } from '@/lib/resources/coming-soon';
 
 interface ResourceContentProps {
   resource: Resource;
@@ -17,6 +18,7 @@ const formatSize = (kb: number) => {
 };
 
 export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, bodyHtml, onDownloadClick }) => {
+  const comingSoon = isComingSoon(resource.slug);
   return (
     <section className="relative py-12 md:py-16 px-4 sm:px-6 md:px-24">
       <div className="max-w-3xl mx-auto">
@@ -85,6 +87,14 @@ export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, body
               <Download size={22} className="text-mx-orange" />
               Descargas
             </h2>
+            {comingSoon ? (
+            <div className="flex items-center gap-3 p-4 bg-mx-bg border border-mx-border rounded-xl text-mx-text-muted">
+              <Clock size={18} className="text-mx-orange shrink-0" />
+              <span className="text-body-sm md:text-body-md">
+                Este recurso estará disponible <strong className="text-mx-text">próximamente</strong>.
+              </span>
+            </div>
+            ) : (
             <ul className="flex flex-col gap-3">
               {resource.downloads.map((d) => (
                 <li key={d.id}>
@@ -149,6 +159,7 @@ export const ResourceContent: React.FC<ResourceContentProps> = ({ resource, body
                 </li>
               )}
             </ul>
+            )}
           </m.div>
         )}
 
