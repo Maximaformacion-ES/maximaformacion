@@ -56,10 +56,14 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
         return rows.map((r) => r.clerkId);
       }
       case 'all': {
-        // "Todos" = TODOS los usuarios registrados. La fuente autoritativa es Clerk
-        // (puede haber un usuario en Clerk sin fila espejo en `campus.users`), así
-        // que enumeramos Clerk paginando. Unimos con `campus.users` por si acaso.
+        // "Todos" = TODOS los usuarios registrados en Clerk (fuente autoritativa),
+        // enumerando por páginas. Contamos SOLO desde Clerk para que "a todos"
+        // cuadre con el total de la pantalla de alumnos (que también sale de Clerk)
+        // y no arrastre filas huérfanas de `campus.users` (cuentas borradas en Clerk
+        // que dejaron su espejo). Solo si la enumeración de Clerk falla caemos a
+        // `campus.users`, para no quedarnos sin audiencia por un corte puntual.
         const ids = new Set<string>();
+        let clerkOk = false;
         try {
           const cc = await clerkClient();
           const pageSize = 100;
@@ -68,11 +72,14 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
             for (const u of res.data) ids.add(u.id);
             if (res.data.length < pageSize) break;
           }
+          clerkOk = true;
         } catch (e) {
           console.warn('[audiences] Clerk getUserList (all) failed, fallback a campus.users:', e);
         }
-        const rows = await db.select({ clerkId: users.clerkId }).from(users);
-        for (const r of rows) ids.add(r.clerkId);
+        if (!clerkOk) {
+          const rows = await db.select({ clerkId: users.clerkId }).from(users);
+          for (const r of rows) ids.add(r.clerkId);
+        }
         return Array.from(ids);
       }
       case 'inactive': {
