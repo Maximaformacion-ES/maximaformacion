@@ -76,6 +76,15 @@ function normalizeUserData(u?: AnalyticsUserData): AnalyticsUserData | undefined
   return Object.keys(out).length ? out : undefined;
 }
 
+/** GA4/GTM esperan `quantity` dentro de cada item. Lo garantizamos aquí, en el
+ *  punto central, para que TODOS los eventos de ecommerce (view_item,
+ *  begin_checkout, purchase…) lo lleven sin tener que tocar cada call site. Por
+ *  defecto 1 —compra de un curso o de la membresía— salvo que el item ya traiga
+ *  otro valor explícito. */
+function withQuantity(items: AnalyticsItem[]): AnalyticsItem[] {
+  return items.map((i) => ({ ...i, quantity: i.quantity ?? 1 }));
+}
+
 function pushEcommerce(event: Record<string, unknown>) {
   if (typeof window === 'undefined') return;
   window.dataLayer = window.dataLayer || [];
@@ -101,7 +110,7 @@ export function trackViewItemList(items: AnalyticsItem[], listName?: string, lis
       currency: CURRENCY,
       ...(listId ? { item_list_id: listId } : {}),
       ...(listName ? { item_list_name: listName } : {}),
-      items,
+      items: withQuantity(items),
     },
   });
 }
@@ -112,7 +121,7 @@ export function trackViewItem(item: AnalyticsItem) {
     ecommerce: {
       currency: CURRENCY,
       value: item.price,
-      items: [item],
+      items: withQuantity([item]),
     },
   });
 }
@@ -125,7 +134,7 @@ export function trackBeginCheckout(items: AnalyticsItem[]) {
     ecommerce: {
       currency: CURRENCY,
       value,
-      items,
+      items: withQuantity(items),
     },
   });
 }
@@ -150,7 +159,7 @@ function trackPurchase(params: PurchaseParams) {
       currency: CURRENCY,
       value: params.value,
       ...(params.tax !== undefined ? { tax: params.tax } : {}),
-      items: params.items,
+      items: withQuantity(params.items),
     },
   });
 }
