@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Mail, Inbox, ScrollText, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Mail, Inbox, ScrollText, type LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -23,6 +23,7 @@ interface NavItem {
 const items: NavItem[] = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard, exact: true },
   { title: "Alumnos", url: "/admin/alumnos", icon: Users },
+  { title: "Compras", url: "/admin/compras", icon: ShoppingCart },
   { title: "Emails", url: "/admin/emails", icon: Mail },
   { title: "Leads", url: "/admin/leads", icon: Inbox },
   { title: "Auditoría", url: "/admin/auditoria", icon: ScrollText },
