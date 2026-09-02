@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Euro, ExternalLink, ShoppingCart, TrendingUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Euro, ExternalLink, RotateCcw, ShoppingCart, TrendingUp } from 'lucide-react';
 import { listPurchases } from '@/lib/admin/purchases';
 import { listCourses } from '@/lib/admin/courses';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import PurchaseFilters from './PurchaseFilters';
+import PurchaseActions from './PurchaseActions';
+import ComprasChart from './ComprasChart';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +34,10 @@ export default async function ComprasPage({
   const limit = 25;
   const filtered = !!q || !!course || !!tipo;
 
-  const [{ items, total, totalAmount, last30Count, last30Amount }, courses] = await Promise.all([
+  const [
+    { items, total, totalAmount, last30Count, last30Amount, refundedCount, refundedAmount, months },
+    courses,
+  ] = await Promise.all([
     listPurchases({ query: q, courseDocumentId: course, accessType: tipo, limit, offset: (page - 1) * limit }),
     listCourses().catch(() => []),
   ]);
@@ -47,6 +52,11 @@ export default async function ComprasPage({
       value: `${eur(last30Amount)} · ${last30Count.toLocaleString('es-ES')}`,
       icon: TrendingUp,
     },
+    {
+      label: 'Reembolsadas',
+      value: `${refundedCount.toLocaleString('es-ES')} · ${eur(refundedAmount)}`,
+      icon: RotateCcw,
+    },
   ];
 
   return (
@@ -60,7 +70,7 @@ export default async function ComprasPage({
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.label}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -73,6 +83,8 @@ export default async function ComprasPage({
           </Card>
         ))}
       </div>
+
+      <ComprasChart months={months} />
 
       <PurchaseFilters q={q} course={course} tipo={tipo} courses={courses} />
 
@@ -87,12 +99,13 @@ export default async function ComprasPage({
               <TableHead>Fecha</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Pago</TableHead>
+              <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                   Sin resultados.
                 </TableCell>
               </TableRow>
@@ -109,9 +122,20 @@ export default async function ComprasPage({
                     <span className="line-clamp-2 max-w-[320px]">{p.title}</span>
                   </TableCell>
                   <TableCell className="text-right font-medium tabular-nums">
-                    {p.price !== null
-                      ? Number(p.price).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
-                      : '—'}
+                    <span className={p.refundedAt ? 'text-muted-foreground line-through' : undefined}>
+                      {p.price !== null
+                        ? Number(p.price).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
+                        : '—'}
+                    </span>
+                    {p.refundedAt && (
+                      <Badge
+                        variant="outline"
+                        className="ml-2 border-red-200 bg-red-50 text-red-600"
+                        title={`Reembolsada el ${new Date(p.refundedAt).toLocaleDateString('es-ES')}`}
+                      >
+                        reembolsada
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-muted-foreground">
                     {p.purchasedAt
@@ -147,6 +171,9 @@ export default async function ComprasPage({
                     ) : (
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
+                  </TableCell>
+                  <TableCell className="pr-2">
+                    <PurchaseActions enrollmentId={p.id} refunded={!!p.refundedAt} />
                   </TableCell>
                 </TableRow>
               ))

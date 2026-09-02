@@ -54,6 +54,8 @@ export const enrollments = campusSchema.table('enrollments', {
   stripePaymentId: text('stripe_payment_id'),
   price: decimal('price', { precision: 10, scale: 2 }),
   title: text('title'),
+  // Fecha de reembolso de la compra; NULL = no reembolsada (migración 0009).
+  refundedAt: timestamp('refunded_at', tz),
 }, (table) => [
   uniqueIndex('idx_enrollments_unique').on(table.clerkId, table.programDocumentId),
 ]);

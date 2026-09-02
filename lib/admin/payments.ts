@@ -127,6 +127,15 @@ export async function refund(params: RefundParams): Promise<{
 
   try {
     const r = await stripe.refunds.create({ payment_intent: pi });
+    // Marca la compra como reembolsada para el historial de /admin/compras.
+    try {
+      await db
+        .update(enrollments)
+        .set({ refundedAt: new Date() })
+        .where(and(eq(enrollments.clerkId, clerkId), eq(enrollments.programDocumentId, documentId)));
+    } catch (e) {
+      console.warn('[admin:refund] set refundedAt failed (¿migración 0009 aplicada?):', e);
+    }
     await writeAudit({
       actor,
       action: 'refund',
