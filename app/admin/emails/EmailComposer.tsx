@@ -244,6 +244,18 @@ export default function EmailComposer() {
                 del perfil.
               </p>
             )}
+            {(kind === 'pro' || kind === 'inactive' || kind === 'all' || kind === 'nopro_registered') && (
+              <p className="pt-1 text-xs text-muted-foreground">
+                Este segmento <strong>excluye automáticamente</strong> a los alumnos dados de baja
+                de comunicaciones comerciales. El email lleva enlace de baja en el pie.
+              </p>
+            )}
+            {kind === 'course' && (
+              <p className="pt-1 text-xs text-muted-foreground">
+                Comunicación formativa: llega a <strong>todos</strong> los matriculados, también a
+                los dados de baja de comunicaciones comerciales.
+              </p>
+            )}
 
             {kind === 'course' && (
               <div className="pt-1">
@@ -312,7 +324,8 @@ export default function EmailComposer() {
                 ) : (
                   <>
                     Has recibido este email como alumno de{' '}
-                    <strong className="text-neutral-500">Máxima Formación</strong>.
+                    <strong className="text-neutral-500">Máxima Formación</strong>.{' '}
+                    <span className="underline">No quiero recibir más comunicaciones comerciales</span>
                   </>
                 )}
               </div>

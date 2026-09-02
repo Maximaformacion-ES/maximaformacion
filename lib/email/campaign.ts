@@ -3,6 +3,7 @@ import { db } from '@/lib/db/client';
 import { emailCampaigns, emailCampaignRecipients } from '@/lib/db/schema';
 import { sendEmail } from '@/lib/email/client';
 import { writeAudit } from '@/lib/admin/audit';
+import { unsubscribeUrl } from './optout';
 import {
   getListInfo,
   getNewsletterListId,
@@ -267,9 +268,31 @@ export async function sendCampaign({
     const batch = audience.slice(i, i + BATCH);
     await Promise.all(
       batch.map(async (r) => {
-        const { html, text } = renderEmail({ subject, bodyHtml, name: r.name });
+        // Enlace de baja firmado, por destinatario. Da de baja SOLO del
+        // marketing: los correos de su formación (segmento curso) siguen.
+        const bajaUrl = unsubscribeUrl(r.clerkId);
+        const { html, text } = renderEmail({
+          subject,
+          bodyHtml,
+          name: r.name,
+          footerHtml:
+            `Has recibido este email como alumno de <strong style="color:#6b6b6b;">Máxima Formación</strong>. ` +
+            `<a href="${bajaUrl}" style="color:#9a9a9a;text-decoration:underline;">No quiero recibir más comunicaciones comerciales</a>`,
+        });
         try {
-          await sendEmail({ to: r.email, subject, html, text, from, replyTo });
+          await sendEmail({
+            to: r.email,
+            subject,
+            html,
+            text,
+            from,
+            replyTo,
+            // RFC 8058: botón "Darse de baja" nativo de Gmail/Yahoo.
+            headers: {
+              'List-Unsubscribe': `<${bajaUrl.replace('/baja?', '/api/baja?')}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            },
+          });
           sent++;
           if (campaignId) {
             try {

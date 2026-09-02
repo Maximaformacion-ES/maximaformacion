@@ -20,6 +20,81 @@ import type { UserCourseData } from '@/lib/strapi/types';
 import { getMaxymiaCourses, getCourseMeta } from '@/app/maxymia/data/queries';
 import { buildCourseLink } from '@/lib/courseLink';
 
+// ─── Comunicaciones comerciales (opt-out de marketing) ───────────────
+// Interruptor para dejar de recibir (o volver a recibir) emails comerciales.
+// Los emails relativos a los cursos contratados no se ven afectados.
+const MarketingPrefsSection = () => {
+  const [optedOut, setOptedOut] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/account/marketing')
+      .then((r) => r.json())
+      .then((d) => setOptedOut(typeof d?.optedOut === 'boolean' ? d.optedOut : false))
+      .catch(() => setOptedOut(false));
+  }, []);
+
+  async function toggle() {
+    if (optedOut === null || saving) return;
+    const next = !optedOut;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/account/marketing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ optOut: next }),
+      });
+      if (res.ok) setOptedOut(next);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const subscribed = optedOut === false;
+
+  return (
+    <div className="mt-8 pt-6 border-t border-mx-border">
+      <h3 className="text-body-md font-semibold mb-1 flex items-center gap-2">
+        <Mail size={16} className="text-mx-orange" />
+        Comunicaciones comerciales
+      </h3>
+      <p className="text-body-sm text-mx-text-muted mb-4">
+        Novedades, ofertas y recomendaciones. Los emails sobre tus cursos contratados no se ven
+        afectados por esta preferencia.
+      </p>
+      {optedOut === null ? (
+        <p className="text-body-sm text-mx-text-muted flex items-center gap-2">
+          <Loader2 size={14} className="animate-spin" /> Cargando preferencia…
+        </p>
+      ) : (
+        <button
+          type="button"
+          onClick={toggle}
+          disabled={saving}
+          role="switch"
+          aria-checked={subscribed}
+          className="flex items-center gap-3 disabled:opacity-60"
+        >
+          <span
+            className={`relative inline-flex h-6 w-11 shrink-0 rounded-full transition-colors ${
+              subscribed ? 'bg-mx-orange' : 'bg-mx-border'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                subscribed ? 'translate-x-[22px]' : 'translate-x-0.5'
+              }`}
+            />
+          </span>
+          <span className="text-body-sm">
+            {saving ? 'Guardando…' : subscribed ? 'Suscrito' : 'Dado de baja'}
+          </span>
+        </button>
+      )}
+    </div>
+  );
+};
+
 // ─── User Info Section ───────────────────────────────────────────────
 const UserInfoSection = () => {
   const { user, isLoaded } = useUser();
@@ -1027,7 +1102,12 @@ export default function PerfilPage() {
                     {sectionTitles[activeSection]}
                   </h2>
 
-                  {activeSection === 'perfil' && <UserInfoSection />}
+                  {activeSection === 'perfil' && (
+                    <>
+                      <UserInfoSection />
+                      <MarketingPrefsSection />
+                    </>
+                  )}
                   {activeSection === 'seguridad' && <SeguridadSection />}
                   {activeSection === 'plan' && <MiPlanSection />}
                   {activeSection === 'cursos' && <MisCursosSection />}

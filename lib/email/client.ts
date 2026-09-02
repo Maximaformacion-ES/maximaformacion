@@ -31,6 +31,8 @@ interface SendEmailOptions {
    *  rejects the send or it lands in spam. */
   from?: string;
   attachments?: EmailAttachment[];
+  /** Cabeceras extra (p.ej. List-Unsubscribe para el botón nativo de Gmail). */
+  headers?: Record<string, string>;
 }
 
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
@@ -46,6 +48,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     html: options.html,
     text: options.text,
     replyTo: options.replyTo,
+    ...(options.headers ? { headers: options.headers } : {}),
     ...(options.attachments && options.attachments.length > 0
       ? {
           attachments: options.attachments.map((a) => ({

@@ -42,6 +42,10 @@ const isPublicRoute = createRouteMatcher([
   // llegaban (contacto y consultoría). Validan la entrada por su cuenta.
   '/api/contact(.*)',
   '/api/consultoria(.*)',
+  // Baja de comunicaciones comerciales: llega desde el enlace del email, sin
+  // sesión (el token firmado hace de autenticación).
+  '/baja(.*)',
+  '/api/baja(.*)',
   '/politica-de-privacidad(.*)',
   '/aviso-legal(.*)',
   '/politica-de-cookies(.*)',

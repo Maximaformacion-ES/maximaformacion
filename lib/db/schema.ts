@@ -16,6 +16,8 @@ export const users = campusSchema.table('users', {
   // which wrongly tripped on the placeholder rows created on single-course
   // purchases and hid the promo from users who were never Pro.
   hasBeenPro: boolean('has_been_pro').default(false).notNull(),
+  // Baja de comunicaciones comerciales; NULL = acepta (migración 0010).
+  marketingOptOutAt: timestamp('marketing_opt_out_at', tz),
   createdAt: timestamp('created_at', tz).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', tz).defaultNow().notNull(),
 });

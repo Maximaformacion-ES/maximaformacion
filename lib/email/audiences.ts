@@ -2,6 +2,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { eq, gte, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { users, enrollments, courseActivity } from '@/lib/db/schema';
+import { optedOutClerkIds } from './optout';
 
 // ─── Segmentos de audiencia ────────────────────────────────────────────
 export type Segment =
@@ -138,14 +139,27 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
   }
 }
 
+/** Segmentos COMERCIALES: respetan la baja de marketing (marketing_opt_out_at).
+ *  'course' queda fuera a propósito: es comunicación formativa a matriculados. */
+const MARKETING_KINDS: ReadonlySet<Segment['kind']> = new Set([
+  'pro',
+  'inactive',
+  'all',
+  'nopro_registered',
+]);
+
 /**
  * Resuelve un segmento a la lista de destinatarios {clerkId, email, name}. Los
  * clerkId salen de `campus`; el email+nombre AUTORITATIVOS de Clerk (en lotes de
  * 100). Si Clerk falla, cae al email de `campus.users`. Descarta sin email;
- * deduplica por clerkId.
+ * deduplica por clerkId. Los segmentos comerciales excluyen a los dados de baja.
  */
 export async function buildAudience(segment: Segment): Promise<Recipient[]> {
-  const clerkIds = Array.from(new Set(await clerkIdsForSegment(segment)));
+  let clerkIds = Array.from(new Set(await clerkIdsForSegment(segment)));
+  if (MARKETING_KINDS.has(segment.kind) && clerkIds.length > 0) {
+    const optedOut = await optedOutClerkIds();
+    if (optedOut.size > 0) clerkIds = clerkIds.filter((id) => !optedOut.has(id));
+  }
   if (clerkIds.length === 0) return [];
 
   // Fallback de email desde campus.users.
