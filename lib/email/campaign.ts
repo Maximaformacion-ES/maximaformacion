@@ -3,6 +3,12 @@ import { db } from '@/lib/db/client';
 import { emailCampaigns, emailCampaignRecipients } from '@/lib/db/schema';
 import { sendEmail } from '@/lib/email/client';
 import { writeAudit } from '@/lib/admin/audit';
+import {
+  getListInfo,
+  getNewsletterListId,
+  isSkipped,
+  sendListCampaign,
+} from '@/lib/klaviyo/client';
 import { buildAudience, type Segment } from './audiences';
 
 const MAX_AUDIENCE = 2000;
@@ -49,12 +55,18 @@ export function renderEmail({
   subject,
   bodyHtml,
   name,
+  footerHtml,
 }: {
   subject: string;
   bodyHtml: string;
   name: string;
+  /** Pie legal alternativo (p.ej. suscriptores con enlace de baja de Klaviyo). */
+  footerHtml?: string;
 }): { html: string; text: string } {
   const body = bodyHtml.replaceAll('{nombre}', escapeHtml(name));
+  const footer =
+    footerHtml ??
+    `Has recibido este email como alumno de <strong style="color:#6b6b6b;">Máxima Formación</strong>.`;
   const font = `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif`;
 
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${escapeHtml(subject)}</title>
@@ -82,7 +94,7 @@ export function renderEmail({
           <div class="mx-body">${body}</div>
         </td></tr>
         <tr><td style="padding:20px 36px;border-top:1px solid #f0f0f0;background:#fafafa;color:#9a9a9a;font-size:12px;line-height:1.5;font-family:${font};">
-          Has recibido este email como alumno de <strong style="color:#6b6b6b;">Máxima Formación</strong>.
+          ${footer}
         </td></tr>
       </table>
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
@@ -149,6 +161,13 @@ export async function sendCampaign({
   replyTo?: string;
 }): Promise<{ campaignId: string | null; total: number; sent: number; failed: number }> {
   assertVerifiedFrom(from);
+
+  // Los suscriptores del boletín se envían POR Klaviyo (13k perfiles: fuera del
+  // alcance del bucle síncrono de Resend). Klaviyo gestiona bajas y entrega.
+  if (segment.kind === 'newsletter') {
+    return sendNewsletterCampaign({ actor, subject, bodyHtml, from, replyTo });
+  }
+
   const audience = await buildAudience(segment);
   if (audience.length === 0) {
     throw new Error('La audiencia está vacía: no hay alumnos que coincidan con ese segmento.');
@@ -271,6 +290,115 @@ export async function sendCampaign({
   });
 
   return { campaignId, total, sent, failed };
+}
+
+// ─── Boletín (suscriptores Klaviyo) ────────────────────────────────────
+
+/** "Nombre <a@b>" → { label, email }. */
+function parseFrom(from: string): { label: string; email: string } {
+  const m = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (m) return { label: m[1] || 'Máxima Formación', email: m[2].trim() };
+  return { label: 'Máxima Formación', email: from.trim() };
+}
+
+const NEWSLETTER_FOOTER =
+  `Has recibido este email porque estás suscrito al boletín de ` +
+  `<strong style="color:#6b6b6b;">Máxima Formación</strong>. ` +
+  `<a href="{% unsubscribe_link %}" style="color:#9a9a9a;text-decoration:underline;">Darte de baja</a>`;
+
+/**
+ * Envía la campaña a los suscriptores del boletín A TRAVÉS de Klaviyo
+ * (plantilla + campaña + send job). El envío real, las bajas y la
+ * entregabilidad los gestiona Klaviyo; aquí solo se registra el histórico.
+ */
+async function sendNewsletterCampaign({
+  actor,
+  subject,
+  bodyHtml,
+  from,
+  replyTo,
+}: {
+  actor: string;
+  subject: string;
+  bodyHtml: string;
+  from?: string;
+  replyTo?: string;
+}): Promise<{ campaignId: string | null; total: number; sent: number; failed: number }> {
+  const listId = getNewsletterListId();
+  if (!listId) {
+    throw new Error('Falta KLAVIYO_LIST_NEWSLETTER_ID: no sé a qué lista de Klaviyo enviar.');
+  }
+
+  const { label: fromLabel, email: fromEmail } = parseFrom(
+    from ?? 'Máxima Formación <cursos@maximaformacion.es>'
+  );
+
+  // {nombre} → variable de plantilla de Klaviyo (se personaliza por perfil).
+  const body = bodyHtml.replaceAll('{nombre}', `{{ first_name|default:'' }}`);
+  const { html, text } = renderEmail({
+    subject,
+    bodyHtml: body,
+    name: '', // ya no queda {nombre} que sustituir
+    footerHtml: NEWSLETTER_FOOTER,
+  });
+
+  const info = await getListInfo(listId);
+  const total = isSkipped(info) ? 0 : info.profileCount;
+  if (total === 0) {
+    throw new Error(
+      'La lista de suscriptores de Klaviyo está vacía o no se pudo leer; no se envía nada.'
+    );
+  }
+
+  const result = await sendListCampaign({
+    listId,
+    name: `[panel] ${subject}`,
+    subject,
+    fromEmail,
+    fromLabel,
+    replyToEmail: replyTo,
+    html,
+    text,
+  });
+  if (isSkipped(result)) {
+    throw new Error('Klaviyo no está configurado (KLAVIYO_PRIVATE_API_KEY).');
+  }
+
+  // Histórico local. sent = total: el envío real es asíncrono en Klaviyo y las
+  // métricas finas (aperturas, bajas, rebotes) se consultan allí.
+  let campaignId: string | null = null;
+  try {
+    const [row] = await db
+      .insert(emailCampaigns)
+      .values({
+        clerkIdActor: actor,
+        subject,
+        bodyHtml,
+        segment: { kind: 'newsletter', klaviyoCampaignId: result.campaignId } as never,
+        fromAddr: from ?? null,
+        replyTo: replyTo ?? null,
+        total,
+        sent: total,
+        failed: 0,
+        status: 'done',
+        sentAt: new Date(),
+      })
+      .returning({ id: emailCampaigns.id });
+    campaignId = row?.id ?? null;
+  } catch (e) {
+    console.error('[campaign] insert email_campaigns (newsletter) failed:', e);
+  }
+
+  await writeAudit({
+    actor,
+    action: 'send_email_campaign',
+    entityType: 'email_campaign',
+    entityId: campaignId ?? undefined,
+    diff: { subject, total, segment: { kind: 'newsletter' }, klaviyoCampaignId: result.campaignId },
+    source: 'panel',
+  });
+
+  return { campaignId, total, sent: total, failed: 0 };
 }
 
 /** Últimas campañas (defensivo). Para la tabla de historial. */

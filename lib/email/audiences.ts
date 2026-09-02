@@ -8,7 +8,10 @@ export type Segment =
   | { kind: 'course'; documentIds: string[] }
   | { kind: 'pro' }
   | { kind: 'inactive'; days: number }
-  | { kind: 'all' };
+  | { kind: 'all' }
+  // Suscriptores del boletín (lista importada en Klaviyo). No se resuelve a
+  // Recipients: el envío va POR Klaviyo (campaña), no por Resend.
+  | { kind: 'newsletter' };
 
 export interface Recipient {
   clerkId: string;
@@ -35,6 +38,8 @@ export function resolveSegment(input: unknown): Segment | null {
     }
     case 'all':
       return { kind: 'all' };
+    case 'newsletter':
+      return { kind: 'newsletter' };
     default:
       return null;
   }
@@ -44,6 +49,9 @@ export function resolveSegment(input: unknown): Segment | null {
 async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
   try {
     switch (segment.kind) {
+      case 'newsletter':
+        // El boletín no tiene clerkIds: se envía vía Klaviyo (ver campaign.ts).
+        return [];
       case 'course': {
         const rows = await db
           .selectDistinct({ clerkId: enrollments.clerkId })

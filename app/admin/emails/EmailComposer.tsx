@@ -24,7 +24,7 @@ import {
 import RichTextEditor from '@/components/admin/RichTextEditor';
 import CoursePicker, { type CourseOption } from '@/app/admin/alumnos/[clerkId]/CoursePicker';
 
-type Kind = 'course' | 'pro' | 'inactive' | 'all';
+type Kind = 'course' | 'pro' | 'inactive' | 'all' | 'newsletter';
 
 interface Segment {
   kind: Kind;
@@ -213,7 +213,17 @@ export default function EmailComposer() {
               <SegmentOption value="pro" label="Alumnos PRO" />
               <SegmentOption value="inactive" label="Alumnos inactivos" />
               <SegmentOption value="all" label="Todos los alumnos" />
+              <SegmentOption value="newsletter" label="Suscriptores del boletín (Klaviyo)" />
             </RadioGroup>
+
+            {kind === 'newsletter' && (
+              <p className="pt-1 text-xs text-muted-foreground">
+                Se envía <strong>a través de Klaviyo</strong> a la lista de suscriptores importada.
+                Klaviyo gestiona el envío, las bajas (añade enlace de baja en el pie) y las métricas
+                de apertura. <span className="font-mono">{'{nombre}'}</span> se sustituye por el
+                nombre del perfil en Klaviyo.
+              </p>
+            )}
 
             {kind === 'course' && (
               <div className="pt-1">
@@ -273,8 +283,18 @@ export default function EmailComposer() {
                 )}
               </div>
               <div className="border-t bg-neutral-50 px-6 py-4 text-xs text-neutral-400">
-                Has recibido este email como alumno de{' '}
-                <strong className="text-neutral-500">Máxima Formación</strong>.
+                {kind === 'newsletter' ? (
+                  <>
+                    Has recibido este email porque estás suscrito al boletín de{' '}
+                    <strong className="text-neutral-500">Máxima Formación</strong>.{' '}
+                    <span className="underline">Darte de baja</span>
+                  </>
+                ) : (
+                  <>
+                    Has recibido este email como alumno de{' '}
+                    <strong className="text-neutral-500">Máxima Formación</strong>.
+                  </>
+                )}
               </div>
             </div>
           </CardContent>
@@ -291,11 +311,17 @@ export default function EmailComposer() {
                     {kind === 'course' ? 'Elige uno o más cursos.' : 'Selecciona un segmento.'}
                   </span>
                 ) : count === 0 ? (
-                  <span className="text-muted-foreground">Ningún alumno coincide con este segmento.</span>
+                  <span className="text-muted-foreground">
+                    {kind === 'newsletter'
+                      ? 'La lista de Klaviyo está vacía o no se pudo leer.'
+                      : 'Ningún alumno coincide con este segmento.'}
+                  </span>
                 ) : (
                   <span>
                     Se enviará a estos <strong>{count.toLocaleString('es-ES')}</strong>{' '}
-                    {count === 1 ? 'alumno' : 'alumnos'}:
+                    {kind === 'newsletter'
+                      ? count === 1 ? 'suscriptor' : 'suscriptores'
+                      : count === 1 ? 'alumno' : 'alumnos'}:
                   </span>
                 )}
               </div>
@@ -327,7 +353,7 @@ export default function EmailComposer() {
                       </Button>
                       <span className="text-muted-foreground">
                         Página {safePage} de {totalPages}
-                        {preview.truncated ? ' · primeros 2000' : ''}
+                        {preview.truncated ? (kind === 'newsletter' ? ' · muestra' : ' · primeros 2000') : ''}
                       </span>
                       <Button
                         variant="outline"
@@ -360,9 +386,13 @@ export default function EmailComposer() {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>¿Enviar este email a {count?.toLocaleString('es-ES')} alumnos?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      ¿Enviar este email a {count?.toLocaleString('es-ES')}{' '}
+                      {kind === 'newsletter' ? 'suscriptores' : 'alumnos'}?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Es un envío <strong>real</strong> a {count?.toLocaleString('es-ES')} personas. Revisa el asunto,
+                      Es un envío <strong>real</strong> a {count?.toLocaleString('es-ES')} personas
+                      {kind === 'newsletter' ? ' (a través de Klaviyo)' : ''}. Revisa el asunto,
                       el cuerpo y el segmento. Recomendado: envía primero una prueba a ti mismo.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
