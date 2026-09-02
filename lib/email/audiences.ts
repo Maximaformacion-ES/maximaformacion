@@ -11,7 +11,14 @@ export type Segment =
   | { kind: 'all' }
   // Suscriptores del boletín (lista importada en Klaviyo). No se resuelve a
   // Recipients: el envío va POR Klaviyo (campaña), no por Resend.
-  | { kind: 'newsletter' };
+  | { kind: 'newsletter' }
+  // Alumnos registrados (Clerk) que NO son PRO. Va por Resend.
+  | { kind: 'nopro_registered' }
+  // Suscriptores del boletín SIN cuenta: lista de Klaviyo excluyendo a los
+  // registrados (lista de exclusión sincronizada al enviar). Va por Klaviyo.
+  | { kind: 'nopro_unregistered' }
+  // Unión de los dos anteriores (Resend + Klaviyo en el mismo envío).
+  | { kind: 'nopro_all' };
 
 export interface Recipient {
   clerkId: string;
@@ -40,9 +47,45 @@ export function resolveSegment(input: unknown): Segment | null {
       return { kind: 'all' };
     case 'newsletter':
       return { kind: 'newsletter' };
+    case 'nopro_registered':
+      return { kind: 'nopro_registered' };
+    case 'nopro_unregistered':
+      return { kind: 'nopro_unregistered' };
+    case 'nopro_all':
+      return { kind: 'nopro_all' };
     default:
       return null;
   }
+}
+
+/** TODOS los clerkIds: enumeración de Clerk con fallback a campus.users
+ *  (misma lógica y motivos que el segmento 'all', extraída para reutilizar). */
+export async function allClerkIds(): Promise<string[]> {
+  const ids = new Set<string>();
+  let clerkOk = false;
+  try {
+    const cc = await clerkClient();
+    const pageSize = 100;
+    for (let offset = 0; offset < 100_000; offset += pageSize) {
+      const res = await cc.users.getUserList({ limit: pageSize, offset });
+      for (const u of res.data) ids.add(u.id);
+      if (res.data.length < pageSize) break;
+    }
+    clerkOk = true;
+  } catch (e) {
+    console.warn('[audiences] Clerk getUserList (all) failed, fallback a campus.users:', e);
+  }
+  if (!clerkOk) {
+    const rows = await db.select({ clerkId: users.clerkId }).from(users);
+    for (const r of rows) ids.add(r.clerkId);
+  }
+  return Array.from(ids);
+}
+
+/** clerkIds con plan PRO (espejo campus.users). */
+export async function proClerkIds(): Promise<Set<string>> {
+  const rows = await db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro'));
+  return new Set(rows.map((r) => r.clerkId));
 }
 
 // ─── Resolución de clerkIds por segmento (SQL sobre campus, defensivo) ──
@@ -50,8 +93,15 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
   try {
     switch (segment.kind) {
       case 'newsletter':
-        // El boletín no tiene clerkIds: se envía vía Klaviyo (ver campaign.ts).
+      case 'nopro_unregistered':
+      case 'nopro_all':
+        // Sin clerkIds propios: estos segmentos se resuelven en campaign.ts
+        // (envío vía Klaviyo; nopro_all además reutiliza 'nopro_registered').
         return [];
+      case 'nopro_registered': {
+        const [ids, pro] = await Promise.all([allClerkIds(), proClerkIds()]);
+        return ids.filter((id) => !pro.has(id));
+      }
       case 'course': {
         const rows = await db
           .selectDistinct({ clerkId: enrollments.clerkId })
@@ -63,33 +113,10 @@ async function clerkIdsForSegment(segment: Segment): Promise<string[]> {
         const rows = await db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro'));
         return rows.map((r) => r.clerkId);
       }
-      case 'all': {
-        // "Todos" = TODOS los usuarios registrados en Clerk (fuente autoritativa),
-        // enumerando por páginas. Contamos SOLO desde Clerk para que "a todos"
-        // cuadre con el total de la pantalla de alumnos (que también sale de Clerk)
-        // y no arrastre filas huérfanas de `campus.users` (cuentas borradas en Clerk
-        // que dejaron su espejo). Solo si la enumeración de Clerk falla caemos a
-        // `campus.users`, para no quedarnos sin audiencia por un corte puntual.
-        const ids = new Set<string>();
-        let clerkOk = false;
-        try {
-          const cc = await clerkClient();
-          const pageSize = 100;
-          for (let offset = 0; offset < 100_000; offset += pageSize) {
-            const res = await cc.users.getUserList({ limit: pageSize, offset });
-            for (const u of res.data) ids.add(u.id);
-            if (res.data.length < pageSize) break;
-          }
-          clerkOk = true;
-        } catch (e) {
-          console.warn('[audiences] Clerk getUserList (all) failed, fallback a campus.users:', e);
-        }
-        if (!clerkOk) {
-          const rows = await db.select({ clerkId: users.clerkId }).from(users);
-          for (const r of rows) ids.add(r.clerkId);
-        }
-        return Array.from(ids);
-      }
+      case 'all':
+        // "Todos" = TODOS los usuarios registrados en Clerk (fuente autoritativa).
+        // Ver allClerkIds() para el porqué de contar solo desde Clerk.
+        return allClerkIds();
       case 'inactive': {
         // Alumnos CON matrícula cuya última actividad es anterior al corte (o sin
         // ninguna actividad registrada).

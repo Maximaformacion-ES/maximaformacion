@@ -19,6 +19,9 @@ const SEGMENT_LABEL: Record<string, string> = {
   inactive: 'Inactivos',
   all: 'Todos',
   newsletter: 'Boletín (Klaviyo)',
+  nopro_registered: 'No PRO (registrados)',
+  nopro_unregistered: 'No PRO (sin cuenta)',
+  nopro_all: 'No PRO (todos)',
 };
 
 function segmentLabel(segment: unknown): string {

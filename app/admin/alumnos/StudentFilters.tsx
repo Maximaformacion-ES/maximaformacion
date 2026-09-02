@@ -6,9 +6,14 @@ import { Search, Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Command,
   CommandEmpty,
@@ -48,9 +53,12 @@ export default function StudentFilters({
   const router = useRouter();
   const hydrated = useHydrated();
   const [query, setQuery] = useState(q);
-  const [pro, setPro] = useState(plan === 'pro');
+  const [planValue, setPlanValue] = useState(plan === 'pro' || plan === 'free' ? plan : 'all');
   const [courseId, setCourseId] = useState(course ?? '');
   const [courseOpen, setCourseOpen] = useState(false);
+
+  const planLabel =
+    planValue === 'pro' ? 'Solo PRO' : planValue === 'free' ? 'Solo NO PRO' : 'Todos los planes';
 
   const dirty = !!plan || !!course;
   const selectedCourse = courses.find((c) => c.documentId === courseId);
@@ -59,7 +67,7 @@ export default function StudentFilters({
   function apply() {
     const params = new URLSearchParams();
     if (query.trim()) params.set('q', query.trim());
-    if (pro) params.set('plan', 'pro');
+    if (planValue !== 'all') params.set('plan', planValue);
     if (courseId) params.set('course', courseId);
     const qs = params.toString();
     router.push(qs ? `/admin/alumnos?${qs}` : '/admin/alumnos');
@@ -67,7 +75,7 @@ export default function StudentFilters({
 
   function clear() {
     setQuery('');
-    setPro(false);
+    setPlanValue('all');
     setCourseId('');
     router.push('/admin/alumnos');
   }
@@ -92,11 +100,18 @@ export default function StudentFilters({
 
       {!hydrated ? (
         // Placeholder estable (sin Radix) en SSR + primer render → sin mismatch.
-        <Button type="button" variant="outline" className="w-[240px] justify-between font-normal" disabled>
-          <span className="truncate">{courseLabel}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+        <>
+          <Button type="button" variant="outline" className="w-[240px] justify-between font-normal" disabled>
+            <span className="truncate">{courseLabel}</span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+          <Button type="button" variant="outline" className="w-[170px] justify-between font-normal" disabled>
+            <span className="truncate">{planLabel}</span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </>
       ) : (
+        <>
         <Popover open={courseOpen} onOpenChange={setCourseOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -144,12 +159,19 @@ export default function StudentFilters({
             </Command>
           </PopoverContent>
         </Popover>
-      )}
 
-      <Label className="flex cursor-pointer items-center gap-2 text-sm font-normal text-muted-foreground">
-        <Checkbox checked={pro} onCheckedChange={(v) => setPro(v === true)} />
-        Solo PRO
-      </Label>
+        <Select value={planValue} onValueChange={setPlanValue}>
+          <SelectTrigger className="w-[170px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los planes</SelectItem>
+            <SelectItem value="pro">Solo PRO</SelectItem>
+            <SelectItem value="free">Solo NO PRO</SelectItem>
+          </SelectContent>
+        </Select>
+        </>
+      )}
 
       <Button type="submit" className="bg-mx-orange text-white hover:bg-mx-orange-dark">
         Filtrar

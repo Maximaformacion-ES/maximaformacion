@@ -218,6 +218,8 @@ export async function getListProfilesSample(
 
 export interface ListCampaignInput {
   listId: string;
+  /** Listas cuyos perfiles NO deben recibir la campaña (p.ej. registrados). */
+  excludedListIds?: string[];
   /** Nombre interno de la campaña en Klaviyo. */
   name: string;
   subject: string;
@@ -274,7 +276,10 @@ export async function sendListCampaign(
           type: 'campaign',
           attributes: {
             name: input.name.slice(0, 100),
-            audiences: { included: [input.listId] },
+            audiences: {
+              included: [input.listId],
+              ...(input.excludedListIds?.length ? { excluded: input.excludedListIds } : {}),
+            },
             send_strategy: { method: 'immediate' },
             send_options: { use_smart_sending: false },
             'campaign-messages': {
@@ -341,4 +346,90 @@ export async function sendListCampaign(
   if (isSkipped(job)) return job;
 
   return { campaignId: campaign.data.id };
+}
+
+// ─── Lista de exclusión de registrados ─────────────────────────────────
+// Para el segmento "No PRO sin registrar": la campaña se envía a la lista del
+// boletín EXCLUYENDO una lista de alumnos registrados que sincronizamos justo
+// antes de cada envío (Klaviyo permite audiences.excluded con ids de lista).
+
+/** Busca una lista por nombre exacto; si no existe la crea. Devuelve su id. */
+export async function getOrCreateListByName(name: string): Promise<string | SkipResult> {
+  const found = await klaviyoFetch<{ data: { id: string }[] }>(
+    `/api/lists?filter=${encodeURIComponent(`equals(name,"${name}")`)}`,
+    {},
+    CAMPAIGN_REVISION,
+  );
+  if (isSkipped(found)) return found;
+  if (found.data.length > 0) return found.data[0].id;
+
+  const created = await klaviyoFetch<{ data: { id: string } }>(
+    '/api/lists',
+    {
+      method: 'POST',
+      body: JSON.stringify({ data: { type: 'list', attributes: { name } } }),
+    },
+    CAMPAIGN_REVISION,
+  );
+  if (isSkipped(created)) return created;
+  return created.data.id;
+}
+
+/**
+ * Importa emails a una lista en lotes (máx. 10k/5MB por job; usamos 5k).
+ * Devuelve los ids de los jobs (asíncronos en Klaviyo).
+ */
+export async function importEmailsToList(
+  listId: string,
+  emails: string[],
+): Promise<string[] | SkipResult> {
+  const jobIds: string[] = [];
+  for (let i = 0; i < emails.length; i += 5000) {
+    const chunk = emails.slice(i, i + 5000);
+    const res = await klaviyoFetch<{ data: { id: string } }>(
+      '/api/profile-bulk-import-jobs',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          data: {
+            type: 'profile-bulk-import-job',
+            attributes: {
+              profiles: {
+                data: chunk.map((email) => ({ type: 'profile', attributes: { email } })),
+              },
+            },
+            relationships: { lists: { data: [{ type: 'list', id: listId }] } },
+          },
+        }),
+      },
+      CAMPAIGN_REVISION,
+    );
+    if (isSkipped(res)) return res;
+    jobIds.push(res.data.id);
+  }
+  return jobIds;
+}
+
+/** Espera (polling) a que los jobs de importación terminen. true = todos OK. */
+export async function waitForImportJobs(jobIds: string[], timeoutMs = 90_000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  const pending = new Set(jobIds);
+  while (pending.size > 0 && Date.now() < deadline) {
+    for (const id of Array.from(pending)) {
+      const res = await klaviyoFetch<{ data: { attributes: { status: string } } }>(
+        `/api/profile-bulk-import-jobs/${id}`,
+        {},
+        CAMPAIGN_REVISION,
+      );
+      if (isSkipped(res)) return false;
+      const status = res.data.attributes.status;
+      if (status === 'complete') pending.delete(id);
+      if (status === 'cancelled') {
+        console.warn(`[klaviyo] import job ${id} cancelled`);
+        pending.delete(id);
+      }
+    }
+    if (pending.size > 0) await new Promise((r) => setTimeout(r, 2000));
+  }
+  return pending.size === 0;
 }

@@ -24,7 +24,18 @@ import {
 import RichTextEditor from '@/components/admin/RichTextEditor';
 import CoursePicker, { type CourseOption } from '@/app/admin/alumnos/[clerkId]/CoursePicker';
 
-type Kind = 'course' | 'pro' | 'inactive' | 'all' | 'newsletter';
+type Kind =
+  | 'course'
+  | 'pro'
+  | 'inactive'
+  | 'all'
+  | 'newsletter'
+  | 'nopro_registered'
+  | 'nopro_unregistered'
+  | 'nopro_all';
+
+/** Segmentos cuyo envío pasa (total o parcialmente) por Klaviyo. */
+const KLAVIYO_KINDS: ReadonlySet<Kind> = new Set(['newsletter', 'nopro_unregistered', 'nopro_all']);
 
 interface Segment {
   kind: Kind;
@@ -56,7 +67,8 @@ export default function EmailComposer() {
     count: number | null;
     recipients: { name: string; email: string }[];
     truncated: boolean;
-  }>({ count: null, recipients: [], truncated: false });
+    estimated: boolean;
+  }>({ count: null, recipients: [], truncated: false, estimated: false });
   const [page, setPage] = useState(1);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [busy, setBusy] = useState<null | 'test' | 'send'>(null);
@@ -79,10 +91,11 @@ export default function EmailComposer() {
             count: typeof d?.count === 'number' ? d.count : null,
             recipients: Array.isArray(d?.recipients) ? d.recipients : [],
             truncated: !!d?.truncated,
+            estimated: !!d?.estimated,
           });
           setPage(1);
         })
-        .catch(() => setPreview({ count: null, recipients: [], truncated: false }))
+        .catch(() => setPreview({ count: null, recipients: [], truncated: false, estimated: false }))
         .finally(() => setLoadingPreview(false));
     }, 300);
     return () => clearTimeout(t);
@@ -213,15 +226,22 @@ export default function EmailComposer() {
               <SegmentOption value="pro" label="Alumnos PRO" />
               <SegmentOption value="inactive" label="Alumnos inactivos" />
               <SegmentOption value="all" label="Todos los alumnos" />
+              <SegmentOption value="nopro_registered" label="No PRO — alumnos registrados" />
               <SegmentOption value="newsletter" label="Suscriptores del boletín (Klaviyo)" />
+              <SegmentOption value="nopro_unregistered" label="No PRO — suscriptores sin cuenta (Klaviyo)" />
+              <SegmentOption value="nopro_all" label="No PRO — todos (registrados + sin cuenta)" />
             </RadioGroup>
 
-            {kind === 'newsletter' && (
+            {KLAVIYO_KINDS.has(kind) && (
               <p className="pt-1 text-xs text-muted-foreground">
-                Se envía <strong>a través de Klaviyo</strong> a la lista de suscriptores importada.
-                Klaviyo gestiona el envío, las bajas (añade enlace de baja en el pie) y las métricas
-                de apertura. <span className="font-mono">{'{nombre}'}</span> se sustituye por el
-                nombre del perfil en Klaviyo.
+                {kind === 'nopro_all'
+                  ? 'Envío mixto: a los alumnos registrados no PRO por el canal habitual, y al resto de suscriptores a través de Klaviyo. '
+                  : 'Se envía a través de Klaviyo a la lista de suscriptores importada. '}
+                {kind !== 'newsletter' &&
+                  'Los alumnos ya registrados se excluyen automáticamente de la parte de Klaviyo. '}
+                Klaviyo gestiona las bajas (añade enlace de baja en el pie) y las métricas de
+                apertura. <span className="font-mono">{'{nombre}'}</span> se sustituye por el nombre
+                del perfil.
               </p>
             )}
 
@@ -283,7 +303,7 @@ export default function EmailComposer() {
                 )}
               </div>
               <div className="border-t bg-neutral-50 px-6 py-4 text-xs text-neutral-400">
-                {kind === 'newsletter' ? (
+                {kind === 'newsletter' || kind === 'nopro_unregistered' ? (
                   <>
                     Has recibido este email porque estás suscrito al boletín de{' '}
                     <strong className="text-neutral-500">Máxima Formación</strong>.{' '}
@@ -312,16 +332,25 @@ export default function EmailComposer() {
                   </span>
                 ) : count === 0 ? (
                   <span className="text-muted-foreground">
-                    {kind === 'newsletter'
+                    {KLAVIYO_KINDS.has(kind)
                       ? 'La lista de Klaviyo está vacía o no se pudo leer.'
                       : 'Ningún alumno coincide con este segmento.'}
                   </span>
                 ) : (
                   <span>
-                    Se enviará a estos <strong>{count.toLocaleString('es-ES')}</strong>{' '}
-                    {kind === 'newsletter'
+                    Se enviará a {preview.estimated ? 'como mucho' : 'estos'}{' '}
+                    <strong>
+                      {preview.estimated ? '≈' : ''}
+                      {count.toLocaleString('es-ES')}
+                    </strong>{' '}
+                    {kind === 'newsletter' || kind === 'nopro_unregistered'
                       ? count === 1 ? 'suscriptor' : 'suscriptores'
-                      : count === 1 ? 'alumno' : 'alumnos'}:
+                      : kind === 'nopro_all'
+                        ? 'personas'
+                        : count === 1 ? 'alumno' : 'alumnos'}
+                    {preview.estimated
+                      ? ' (los registrados se descuentan al enviar):'
+                      : ':'}
                   </span>
                 )}
               </div>
@@ -353,7 +382,7 @@ export default function EmailComposer() {
                       </Button>
                       <span className="text-muted-foreground">
                         Página {safePage} de {totalPages}
-                        {preview.truncated ? (kind === 'newsletter' ? ' · muestra' : ' · primeros 2000') : ''}
+                        {preview.truncated ? (KLAVIYO_KINDS.has(kind) ? ' · muestra' : ' · primeros 2000') : ''}
                       </span>
                       <Button
                         variant="outline"
@@ -387,12 +416,16 @@ export default function EmailComposer() {
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
-                      ¿Enviar este email a {count?.toLocaleString('es-ES')}{' '}
-                      {kind === 'newsletter' ? 'suscriptores' : 'alumnos'}?
+                      ¿Enviar este email a {preview.estimated ? '≈' : ''}
+                      {count?.toLocaleString('es-ES')}{' '}
+                      {kind === 'newsletter' || kind === 'nopro_unregistered'
+                        ? 'suscriptores'
+                        : kind === 'nopro_all' ? 'personas' : 'alumnos'}?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Es un envío <strong>real</strong> a {count?.toLocaleString('es-ES')} personas
-                      {kind === 'newsletter' ? ' (a través de Klaviyo)' : ''}. Revisa el asunto,
+                      Es un envío <strong>real</strong> a {preview.estimated ? 'hasta ' : ''}
+                      {count?.toLocaleString('es-ES')} personas
+                      {KLAVIYO_KINDS.has(kind) ? ' (a través de Klaviyo)' : ''}. Revisa el asunto,
                       el cuerpo y el segmento. Recomendado: envía primero una prueba a ti mismo.
                     </AlertDialogDescription>
                   </AlertDialogHeader>

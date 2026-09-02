@@ -8,6 +8,7 @@ import {
   getAllCourseProgress,
   getSubscriptionByClerkId,
 } from '@/lib/db/queries';
+import { allClerkIds, proClerkIds } from '@/lib/email/audiences';
 
 // ─── Lista de alumnos ──────────────────────────────────────────────────
 // Fuente de perfil = Clerk (indexa nombre/email). Enriquecemos con agregados de
@@ -61,7 +62,7 @@ async function campusAggregates(clerkIds: string[]) {
 
 export async function listStudents(opts: {
   query?: string;
-  /** 'pro' → solo alumnos PRO. */
+  /** 'pro' → solo alumnos PRO; 'free' → solo alumnos NO PRO. */
   plan?: string;
   /** documentId de un curso → solo matriculados en ese curso. */
   courseDocumentId?: string;
@@ -70,10 +71,10 @@ export async function listStudents(opts: {
 }): Promise<StudentList> {
   const { query, plan, courseDocumentId, limit = 25, offset = 0 } = opts;
   const cc = await clerkClient();
-  const proFilter = plan === 'pro';
+  const planFilter = plan === 'pro' || plan === 'free' ? plan : undefined;
 
   // ── Ruta rápida: sin filtros de campus → paginación nativa de Clerk. ──
-  if (!proFilter && !courseDocumentId) {
+  if (!planFilter && !courseDocumentId) {
     const res = await cc.users.getUserList({ query: query || undefined, limit, offset, orderBy: '-created_at' });
     const { planByClerk, enrollByClerk } = await campusAggregates(res.data.map((u) => u.id));
     const items: StudentListItem[] = res.data.map((u) => ({
@@ -88,7 +89,7 @@ export async function listStudents(opts: {
     return { items, total: res.totalCount };
   }
 
-  // ── Ruta con filtros: los clerkId salen de `campus` (matrícula/PRO). ──
+  // ── Ruta con filtros: los clerkId salen de `campus`/Clerk (matrícula/plan). ──
   let ids: string[] = [];
   try {
     if (courseDocumentId) {
@@ -97,15 +98,19 @@ export async function listStudents(opts: {
         .from(enrollments)
         .where(eq(enrollments.programDocumentId, courseDocumentId));
       ids = rows.map((r) => r.clerkId);
-    } else {
+    } else if (planFilter === 'pro') {
       const rows = await db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro'));
       ids = rows.map((r) => r.clerkId);
+    } else {
+      // 'free' = todos los registrados (Clerk) menos los PRO. No basta con
+      // campus.users (solo espeja a quien ha comprado/interactuado).
+      const [all, pro] = await Promise.all([allClerkIds(), proClerkIds()]);
+      ids = all.filter((id) => !pro.has(id));
     }
-    // Ambos filtros a la vez → intersección con PRO.
-    if (courseDocumentId && proFilter) {
-      const proRows = await db.select({ clerkId: users.clerkId }).from(users).where(eq(users.plan, 'pro'));
-      const proSet = new Set(proRows.map((r) => r.clerkId));
-      ids = ids.filter((id) => proSet.has(id));
+    // Curso + plan a la vez → intersección/resta con el conjunto PRO.
+    if (courseDocumentId && planFilter) {
+      const proSet = await proClerkIds();
+      ids = planFilter === 'pro' ? ids.filter((id) => proSet.has(id)) : ids.filter((id) => !proSet.has(id));
     }
   } catch (e) {
     console.warn('[admin:listStudents] campus filter failed:', e);

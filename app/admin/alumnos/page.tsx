@@ -24,7 +24,7 @@ export default async function AlumnosPage({
 }) {
   const sp = await searchParams;
   const q = sp.q?.trim() ?? '';
-  const plan = sp.plan === 'pro' ? 'pro' : undefined;
+  const plan = sp.plan === 'pro' || sp.plan === 'free' ? sp.plan : undefined;
   const course = sp.course?.trim() || undefined;
   const page = Math.max(1, Number.parseInt(sp.page ?? '1', 10) || 1);
   const limit = 25;
@@ -45,7 +45,7 @@ export default async function AlumnosPage({
           <p className="text-sm text-muted-foreground">
             {total.toLocaleString('es-ES')} {filtered ? 'con este filtro' : 'en total'}
             {courseTitle ? ` · matriculados en «${courseTitle}»` : ''}
-            {plan ? ' · solo PRO' : ''}
+            {plan === 'pro' ? ' · solo PRO' : plan === 'free' ? ' · solo NO PRO' : ''}
           </p>
         </div>
         <AddStudents />

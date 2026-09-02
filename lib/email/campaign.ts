@@ -6,8 +6,11 @@ import { writeAudit } from '@/lib/admin/audit';
 import {
   getListInfo,
   getNewsletterListId,
+  getOrCreateListByName,
+  importEmailsToList,
   isSkipped,
   sendListCampaign,
+  waitForImportJobs,
 } from '@/lib/klaviyo/client';
 import { buildAudience, type Segment } from './audiences';
 
@@ -164,8 +167,48 @@ export async function sendCampaign({
 
   // Los suscriptores del boletín se envían POR Klaviyo (13k perfiles: fuera del
   // alcance del bucle síncrono de Resend). Klaviyo gestiona bajas y entrega.
-  if (segment.kind === 'newsletter') {
-    return sendNewsletterCampaign({ actor, subject, bodyHtml, from, replyTo });
+  // 'nopro_unregistered' = boletín MENOS registrados (lista de exclusión).
+  if (segment.kind === 'newsletter' || segment.kind === 'nopro_unregistered') {
+    return sendNewsletterCampaign({
+      actor,
+      subject,
+      bodyHtml,
+      from,
+      replyTo,
+      excludeRegistered: segment.kind === 'nopro_unregistered',
+    });
+  }
+
+  // 'nopro_all' = no-PRO registrados (Resend) + boletín sin registrar (Klaviyo).
+  if (segment.kind === 'nopro_all') {
+    let registered = { campaignId: null as string | null, total: 0, sent: 0, failed: 0 };
+    try {
+      registered = await sendCampaign({
+        actor,
+        subject,
+        bodyHtml,
+        segment: { kind: 'nopro_registered' },
+        from,
+        replyTo,
+      });
+    } catch (e) {
+      // Sin registrados no-PRO (o error): seguimos con la mitad de Klaviyo.
+      console.warn('[campaign] nopro_all: mitad Resend falló/vacía:', e);
+    }
+    const unregistered = await sendNewsletterCampaign({
+      actor,
+      subject,
+      bodyHtml,
+      from,
+      replyTo,
+      excludeRegistered: true,
+    });
+    return {
+      campaignId: registered.campaignId ?? unregistered.campaignId,
+      total: registered.total + unregistered.total,
+      sent: registered.sent + unregistered.sent,
+      failed: registered.failed + unregistered.failed,
+    };
   }
 
   const audience = await buildAudience(segment);
@@ -311,22 +354,53 @@ const NEWSLETTER_FOOTER =
  * (plantilla + campaña + send job). El envío real, las bajas y la
  * entregabilidad los gestiona Klaviyo; aquí solo se registra el histórico.
  */
+/** Nombre de la lista de Klaviyo con los alumnos registrados (se sincroniza
+ *  antes de cada envío "sin registrar" y se usa como audiencia excluida). */
+const REGISTERED_LIST_NAME = 'Alumnos registrados (sync del panel — no tocar)';
+
 async function sendNewsletterCampaign({
   actor,
   subject,
   bodyHtml,
   from,
   replyTo,
+  excludeRegistered = false,
 }: {
   actor: string;
   subject: string;
   bodyHtml: string;
   from?: string;
   replyTo?: string;
+  /** true → excluir de la campaña a los alumnos registrados (no-PRO sin cuenta). */
+  excludeRegistered?: boolean;
 }): Promise<{ campaignId: string | null; total: number; sent: number; failed: number }> {
   const listId = getNewsletterListId();
   if (!listId) {
     throw new Error('Falta KLAVIYO_LIST_NEWSLETTER_ID: no sé a qué lista de Klaviyo enviar.');
+  }
+
+  // Sincronizar la lista de exclusión con los registrados actuales.
+  let excludedListIds: string[] | undefined;
+  if (excludeRegistered) {
+    const registered = await buildAudience({ kind: 'all' });
+    const emails = registered.map((r) => r.email);
+    const exclListId = await getOrCreateListByName(REGISTERED_LIST_NAME);
+    if (isSkipped(exclListId)) {
+      throw new Error('Klaviyo no está configurado (KLAVIYO_PRIVATE_API_KEY).');
+    }
+    if (emails.length > 0) {
+      const jobs = await importEmailsToList(exclListId, emails);
+      if (!isSkipped(jobs)) {
+        const ok = await waitForImportJobs(jobs);
+        if (!ok) {
+          console.warn(
+            '[campaign] sync de registrados a Klaviyo no terminó a tiempo; ' +
+              'algún registrado reciente podría recibir la campaña.'
+          );
+        }
+      }
+    }
+    excludedListIds = [exclListId];
   }
 
   const { label: fromLabel, email: fromEmail } = parseFrom(
@@ -352,7 +426,8 @@ async function sendNewsletterCampaign({
 
   const result = await sendListCampaign({
     listId,
-    name: `[panel] ${subject}`,
+    excludedListIds,
+    name: `[panel] ${subject}${excludeRegistered ? ' (sin registrados)' : ''}`,
     subject,
     fromEmail,
     fromLabel,
@@ -374,7 +449,10 @@ async function sendNewsletterCampaign({
         clerkIdActor: actor,
         subject,
         bodyHtml,
-        segment: { kind: 'newsletter', klaviyoCampaignId: result.campaignId } as never,
+        segment: {
+          kind: excludeRegistered ? 'nopro_unregistered' : 'newsletter',
+          klaviyoCampaignId: result.campaignId,
+        } as never,
         fromAddr: from ?? null,
         replyTo: replyTo ?? null,
         total,
@@ -394,7 +472,12 @@ async function sendNewsletterCampaign({
     action: 'send_email_campaign',
     entityType: 'email_campaign',
     entityId: campaignId ?? undefined,
-    diff: { subject, total, segment: { kind: 'newsletter' }, klaviyoCampaignId: result.campaignId },
+    diff: {
+      subject,
+      total,
+      segment: { kind: excludeRegistered ? 'nopro_unregistered' : 'newsletter' },
+      klaviyoCampaignId: result.campaignId,
+    },
     source: 'panel',
   });
 
