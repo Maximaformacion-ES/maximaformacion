@@ -216,6 +216,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
               open={masterChooserOpen}
               onClose={() => setMasterChooserOpen(false)}
               formMode="contacto-page"
+              contactoHref={`/contacto?curso=${encodeURIComponent(program.title)}`}
             />
             {/* Temario download moved to the hero (under the description)
                 in MF-17 — see ProgramHeroSection. */}

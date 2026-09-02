@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { listCourses } from '@/lib/admin/courses';
 import ContactClient from './ContactClient';
 
 export const metadata: Metadata = {
@@ -7,6 +8,19 @@ export const metadata: Metadata = {
   alternates: { canonical: '/contacto' },
 };
 
-export default function ContactoPage() {
-  return <ContactClient />;
+export default async function ContactoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ curso?: string }>;
+}) {
+  // El selector de curso evita el eterno "¿a qué curso te refieres?": la lista
+  // sale de Strapi (programas + Maxymia) y `?curso=` permite que las fichas de
+  // curso lleguen con el curso ya preseleccionado.
+  const [sp, courses] = await Promise.all([searchParams, listCourses().catch(() => [])]);
+  return (
+    <ContactClient
+      courses={courses.map((c) => c.title)}
+      initialCourse={sp.curso?.trim() || undefined}
+    />
+  );
 }

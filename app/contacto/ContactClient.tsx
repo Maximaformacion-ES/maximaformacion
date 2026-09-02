@@ -9,14 +9,22 @@ import { FontStyles } from '../components/FontStyles';
 import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 
-export default function ContactClient() {
+export default function ContactClient({
+  courses = [],
+  initialCourse,
+}: {
+  /** Títulos de cursos/programas (de Strapi) para el selector "¿Sobre qué curso…?". */
+  courses?: string[];
+  /** Curso preseleccionado vía /contacto?curso=… (desde las fichas de curso). */
+  initialCourse?: string;
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [formState, setFormState] = useState({
     name: '',
     email: '',
     phone: '',
     message: '',
-    subject: 'general'
+    subject: initialCourse || 'general'
   });
   const [sending, setSending] = useState(false);
 
@@ -35,7 +43,7 @@ export default function ContactClient() {
         throw new Error(data.error || 'No se pudo enviar el mensaje');
       }
       toast.success('Mensaje enviado correctamente. Te contactaremos pronto.');
-      setFormState({ name: '', email: '', phone: '', message: '', subject: 'general' });
+      setFormState({ name: '', email: '', phone: '', message: '', subject: initialCourse || 'general' });
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'No se pudo enviar el mensaje',
@@ -130,6 +138,26 @@ export default function ContactClient() {
                     value={formState.phone}
                     onChange={(e) => setFormState({...formState, phone: e.target.value})}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="contact-course" className="text-label-sm md:text-label-md xl:text-label-lg uppercase tracking-widest text-mx-text-muted font-medium">
+                    ¿Sobre qué curso nos escribes? <span className="normal-case tracking-normal text-mx-text-muted/60">(opcional)</span>
+                  </label>
+                  <select
+                    id="contact-course"
+                    className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-body-sm md:text-body-md text-mx-text focus:outline-none focus:border-mx-orange transition-colors cursor-pointer"
+                    value={formState.subject}
+                    onChange={(e) => setFormState({...formState, subject: e.target.value})}
+                  >
+                    <option value="general">Consulta general / otro tema</option>
+                    {initialCourse && !courses.includes(initialCourse) && (
+                      <option value={initialCourse}>{initialCourse}</option>
+                    )}
+                    {courses.map((title) => (
+                      <option key={title} value={title}>{title}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-2">

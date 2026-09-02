@@ -147,6 +147,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
           open={masterChooserOpen}
           onClose={() => setMasterChooserOpen(false)}
           formMode="contacto-page"
+          contactoHref={`/contacto?curso=${encodeURIComponent(program.title)}`}
         />
       </>
     );

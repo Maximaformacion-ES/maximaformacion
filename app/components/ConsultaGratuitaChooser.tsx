@@ -19,12 +19,19 @@ interface Props {
    *   and every other page that just needs the generic contact form).
    */
   formMode?: 'consultoria-form' | 'contacto-page';
+  /**
+   * Destination of the "Formulario de contacto" option in 'contacto-page'
+   * mode. Course pages pass /contacto?curso=<título> so the form arrives
+   * with the course preselected. Defaults to the bare contact page.
+   */
+  contactoHref?: string;
 }
 
 export default function ConsultaGratuitaChooser({
   open,
   onClose,
   formMode = 'consultoria-form',
+  contactoHref = '/contacto',
 }: Props) {
   const [formOpen, setFormOpen] = useState(false);
 
@@ -90,7 +97,7 @@ export default function ConsultaGratuitaChooser({
                 </button>
               ) : (
                 <Link
-                  href="/contacto"
+                  href={contactoHref}
                   onClick={onClose}
                   className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-mx-orange text-white hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
                 >

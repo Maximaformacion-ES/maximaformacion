@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
   try {
     await sendEmail({
       to: CONTACT_NOTIFY_TO,
-      subject: `Nuevo mensaje de contacto — ${lead.name}`,
+      subject: `Nuevo mensaje de contacto — ${lead.name}${lead.subject && lead.subject !== 'general' ? ` · ${lead.subject}` : ''}`,
       html: buildEmailHtml(lead),
       replyTo: lead.email,
     });
