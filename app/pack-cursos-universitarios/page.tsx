@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { getTeacherBySlug } from '@/lib/strapi/queries';
+import type { Docente } from '../components/DocenteSection';
 import PackClient from './PackClient';
 
 export const metadata: Metadata = {
@@ -8,6 +10,26 @@ export const metadata: Metadata = {
   alternates: { canonical: '/pack-cursos-universitarios' },
 };
 
-export default function PackCursosPage() {
-  return <PackClient />;
+// Docente de los tres cursos del pack: José Antonio Lorente (responsable de
+// e-learning). Sale de Strapi por su slug de /profesorado; si Strapi no
+// responde, la sección simplemente no se pinta (DocenteSection devuelve null).
+const DOCENTE_SLUG = 'jose-ant-lorente';
+
+export default async function PackCursosPage() {
+  const teacher = await getTeacherBySlug(DOCENTE_SLUG).catch(() => null);
+  const docentes: Docente[] | undefined = teacher
+    ? [
+        {
+          documentId: teacher.documentId,
+          slug: teacher.slug,
+          name: teacher.name,
+          role: teacher.role,
+          avatar: teacher.avatarUrl,
+          bio: teacher.bio,
+          linkedin: teacher.linkedin,
+          email: teacher.email,
+        },
+      ]
+    : undefined;
+  return <PackClient docentes={docentes} />;
 }

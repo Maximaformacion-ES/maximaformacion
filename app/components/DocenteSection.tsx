@@ -162,20 +162,24 @@ export function DocenteSection({
   courseTitle,
   overline,
   title,
+  align = 'left',
 }: {
   docentes?: Docente[];
   locale?: Locale;
   courseTitle?: string;
   overline?: string;
   title?: string;
+  /** 'center' centra la cabecera y el bloque — para páginas donde la sección
+   *  ocupa todo el ancho (landing del pack) en vez de la columna de la ficha. */
+  align?: 'left' | 'center';
 }) {
   const t = COPY[locale];
   if (!docentes?.length) return null;
 
   return (
     <section className="py-10 md:py-20">
-      <div className="max-w-[812px]">
-        <SectionHeader overline={overline ?? t.overline} title={title ?? t.title} />
+      <div className={`max-w-[812px] ${align === 'center' ? 'mx-auto' : ''}`}>
+        <SectionHeader overline={overline ?? t.overline} title={title ?? t.title} align={align} />
 
         <m.div
           initial={{ opacity: 0, y: 20 }}

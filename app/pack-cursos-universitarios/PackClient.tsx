@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { FAQSection } from '../components/FAQSection';
+import { DocenteSection, type Docente } from '../components/DocenteSection';
 import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 import {
@@ -433,7 +434,7 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
   );
 }
 
-export default function PackClient() {
+export default function PackClient({ docentes }: { docentes?: Docente[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [buying, setBuying] = useState<{ item: string; title: string; price: number } | null>(null);
 
@@ -591,6 +592,16 @@ export default function PackClient() {
             </div>
           </div>
         </section>
+
+        {/* Docente de los tres cursos, justo tras las tarjetas: visto el
+            temario, lo siguiente es quién lo imparte. El componente no trae
+            contenedor propio — en las fichas vive dentro de una columna — así
+            que aquí lo alineamos con el resto de secciones. */}
+        <div className="px-6 md:px-12">
+          <div className="max-w-7xl mx-auto">
+            <DocenteSection docentes={docentes} courseTitle={PACK_TITLE} align="center" />
+          </div>
+        </div>
 
         {/* Qué incluye / cómo funciona */}
         <section className="py-16 px-6 md:px-12">
