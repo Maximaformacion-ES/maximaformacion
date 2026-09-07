@@ -8,6 +8,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
+  GraduationCap,
 } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { Header } from '../components/Header';
@@ -319,6 +321,41 @@ export default function ProgramsClient({ initialPrograms, initialPage = 1 }: Pro
             </span>
           </m.h1>
         </div>
+
+        {/* Promo del pack universitario: no es un programa de Strapi (los 3
+            cursos aún no existen en el CMS), así que va como tarjeta fija
+            encima del catálogo enlazando a su landing. */}
+        <m.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-8"
+        >
+          <Link
+            href="/pack-cursos-universitarios"
+            className="group flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-mx-orange/5 border border-mx-orange/40 hover:border-mx-orange rounded-2xl px-6 py-5 transition-all"
+          >
+            <div className="w-11 h-11 rounded-xl bg-mx-orange/10 text-mx-orange flex items-center justify-center shrink-0 group-hover:bg-mx-orange group-hover:text-white transition-all">
+              <GraduationCap size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-label-sm uppercase tracking-widest text-mx-orange font-bold mb-1">
+                Nuevo · Formación universitaria
+              </p>
+              <p className="text-body-sm md:text-body-md font-bold text-mx-text leading-snug">
+                Pack 3 Cursos Universitarios para docentes: IA + eXeLearning, H5P + IA para Moodle y
+                Atención Educativa (SAAC) — 12 ECTS
+              </p>
+            </div>
+            <div className="shrink-0 flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-heading-sm font-black text-mx-orange leading-none">190 €</p>
+                <p className="text-[13px] text-mx-text-muted">o 95 € por curso</p>
+              </div>
+              <ArrowRight size={20} className="text-mx-orange group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+        </m.div>
 
         <m.div
           initial={{ opacity: 0, y: 20 }}

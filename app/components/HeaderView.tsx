@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSiteBranding } from './SiteBrandingProvider';
 import { useMegaMenu } from './MegaMenuProvider';
+import { PackAnnouncementBar } from './PackAnnouncementBar';
 
 /**
  * Header presentacional SIN dependencia de Clerk. Recibe el estado de sesión y
@@ -57,6 +58,15 @@ export interface NavItem {
   };
 }
 
+// Enlace al pack de cursos universitarios (landing hardcodeada, los cursos aún
+// no existen en Strapi). Vive en el "Catálogo" estático (móvil y fallback) y se
+// re-inyecta en las columnas dinámicas por área del megamenú de escritorio.
+const PACK_NAV_LINK = {
+  label: 'Pack 3 Cursos Universitarios',
+  href: '/pack-cursos-universitarios',
+  description: '¡Nuevo! 12 ECTS · 190 €',
+};
+
 export const NAV_ITEMS: NavItem[] = [
   { name: 'Conócenos', path: '/conocenos' },
   {
@@ -70,6 +80,7 @@ export const NAV_ITEMS: NavItem[] = [
             { label: 'Todos los programas', href: '/programas', description: 'Másters y cursos' },
             { label: 'Másters', href: '/programas?type=Master', description: 'Programas largos' },
             { label: 'Cursos', href: '/programas?type=Curso', description: 'Programas cortos' },
+            PACK_NAV_LINK,
           ],
         },
         {
@@ -737,27 +748,36 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
     if (dynamicAreas.length === 0) return base;
     return base.map((item) => {
       if (item.name !== 'Formación' || !item.megaMenu) return item;
+      const columns = dynamicAreas.map((area) => {
+        const capped = area.programs.slice(0, MAX_PROGRAMS_PER_COLUMN);
+        const hasMore = area.programs.length > MAX_PROGRAMS_PER_COLUMN;
+        return {
+          title: area.label,
+          links: capped.map((p) => ({
+            label: p.title,
+            href: p.href,
+          })),
+          ...(hasMore && {
+            footerLink: {
+              label: `Ver los ${area.programs.length} cursos →`,
+              href: `/programas/area/${area.slug}`,
+            },
+          }),
+        };
+      });
+      // El pack de cursos universitarios no es un programa de Strapi, así que
+      // las columnas dinámicas lo dejarían fuera: lo re-inyectamos arriba de
+      // su área temática (Moodle/eXe/H5P; si no existe, la primera columna).
+      const packColumn =
+        columns.find((c) => c.title.toLowerCase().includes('moodle')) ?? columns[0];
+      if (packColumn && !packColumn.links.some((l) => l.href === PACK_NAV_LINK.href)) {
+        packColumn.links.unshift(PACK_NAV_LINK);
+      }
       return {
         ...item,
         megaMenu: {
           ...item.megaMenu,
-          columns: dynamicAreas.map((area) => {
-            const capped = area.programs.slice(0, MAX_PROGRAMS_PER_COLUMN);
-            const hasMore = area.programs.length > MAX_PROGRAMS_PER_COLUMN;
-            return {
-              title: area.label,
-              links: capped.map((p) => ({
-                label: p.title,
-                href: p.href,
-              })),
-              ...(hasMore && {
-                footerLink: {
-                  label: `Ver los ${area.programs.length} cursos →`,
-                  href: `/programas/area/${area.slug}`,
-                },
-              }),
-            };
-          }),
+          columns,
         },
       };
     });
@@ -862,6 +882,13 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Tira anunciadora del pack universitario: pegada bajo la barra de
+            navegación, dentro del nav fijo. Fuera de Maxymia (marca oscura),
+            de Consultoría (marca verde propia) y de la landing del pack. */}
+        {!isDark && !isConsultoria && !pathname?.startsWith('/pack-cursos-universitarios') && (
+          <PackAnnouncementBar />
+        )}
       </m.nav>
 
       <MobileMenu
