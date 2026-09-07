@@ -344,7 +344,7 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
           onClick={onBuy}
           className="bg-mx-bg border border-mx-orange text-mx-orange px-6 py-3 rounded-xl font-bold text-label-sm uppercase tracking-widest hover:bg-mx-orange hover:text-white transition-all cursor-pointer"
         >
-          Comprar este curso
+          Matricúlate
         </button>
       </div>
       </div>
@@ -432,7 +432,7 @@ export default function PackClient() {
                     Los 3 Cursos Universitarios · 12 ECTS · certificación incluida
                   </p>
                   <p className="text-body-sm text-white/70">
-                    También puedes comprar cada curso por separado por {COURSE_PRICE} €.
+                    También puedes matricularte en cada curso por separado por {COURSE_PRICE} €.
                   </p>
                 </div>
 
@@ -442,7 +442,7 @@ export default function PackClient() {
                     onClick={buyPack}
                     className="bg-mx-orange text-white px-12 py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest hover:bg-mx-orange-dark hover:scale-[1.02] transition-all cursor-pointer shadow-lg shadow-black/20"
                   >
-                    Comprar el pack
+                    Matricúlate en el pack
                   </button>
                   <p className="text-center text-[13px] text-white/70">Pago único y seguro con Stripe</p>
                 </div>
@@ -538,7 +538,7 @@ export default function PackClient() {
                 ))}
               </ol>
               <p className="mt-8 text-body-sm text-mx-text-muted">
-                ¿Dudas antes de comprar?{' '}
+                ¿Dudas antes de matricularte?{' '}
                 <a href="#consulta" className="text-mx-orange font-bold">
                   Haznos tu consulta aquí abajo
                 </a>{' '}
@@ -608,7 +608,7 @@ export default function PackClient() {
                 onClick={buyPack}
                 className="bg-mx-orange text-white px-12 py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest hover:bg-mx-orange-dark transition-all cursor-pointer"
               >
-                Comprar el pack — {PACK_PRICE} €
+                Matricúlate en el pack
               </button>
             </m.div>
           </div>
