@@ -240,6 +240,27 @@ export const consultingLeads = campusSchema.table('consulting_leads', {
   index('idx_consulting_leads_email').on(table.email),
 ]);
 
+// ─── Pack Purchases ────────────────────────────────────────────────────
+// Compras del pack de cursos universitarios (y sus cursos sueltos) hechas SIN
+// cuenta en la plataforma: los cursos aún no existen en Strapi, así que no hay
+// enrollment que crear. El acceso se asigna después a mano desde el admin.
+// El email (en minúsculas) es la clave de deduplicación: quien ya compró el
+// pack no puede volver a comprar un curso suelto, y viceversa (migración 0011).
+export const packPurchases = campusSchema.table('pack_purchases', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').notNull(),
+  name: text('name'),
+  item: text('item').notNull(),                 // 'pack' | id del curso suelto
+  itemTitle: text('item_title'),
+  amount: decimal('amount', { precision: 10, scale: 2 }),
+  dni: text('dni'),
+  stripeSessionId: text('stripe_session_id').unique(),
+  stripePaymentId: text('stripe_payment_id'),
+  createdAt: timestamp('created_at', tz).defaultNow().notNull(),
+}, (table) => [
+  index('idx_pack_purchases_email').on(table.email),
+]);
+
 // ─── Admin Audit ───────────────────────────────────────────────────────
 // Registro inmutable de las mutaciones del panel admin (Fase 1). El panel opera
 // datos de usuario/PII (dar acceso, PRO, provisioning…), así que la seguridad se

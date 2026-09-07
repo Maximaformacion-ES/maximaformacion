@@ -61,13 +61,18 @@ export default async function ComprasPage({
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Compras</h1>
-        <p className="text-sm text-muted-foreground">
-          {total.toLocaleString('es-ES')} {filtered ? 'con este filtro' : 'en total'}
-          {courseTitle ? ` · «${courseTitle}»` : ''}
-          {tipo === 'purchased' ? ' · solo pagos Stripe' : tipo === 'admin_granted' ? ' · solo accesos manuales' : ''}
-        </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Compras</h1>
+          <p className="text-sm text-muted-foreground">
+            {total.toLocaleString('es-ES')} {filtered ? 'con este filtro' : 'en total'}
+            {courseTitle ? ` · «${courseTitle}»` : ''}
+            {tipo === 'purchased' ? ' · solo pagos Stripe' : tipo === 'admin_granted' ? ' · solo accesos manuales' : ''}
+          </p>
+        </div>
+        <Link href="/admin/compras/pack" className="inline-flex items-center gap-1 text-sm text-mx-blue hover:underline">
+          Pack universitario <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

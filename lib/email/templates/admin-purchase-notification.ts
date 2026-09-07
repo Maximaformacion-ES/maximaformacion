@@ -3,7 +3,7 @@ interface AdminPurchaseNotificationParams {
   studentEmail: string;
   studentDni?: string;
   productTitle: string;
-  productType: 'Curso' | 'Master' | 'Maxymia';
+  productType: 'Curso' | 'Master' | 'Maxymia' | 'Pack' | 'Curso Universitario';
   amount: number;
   currency: string;
   stripeSessionId: string;

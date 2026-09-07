@@ -46,6 +46,10 @@ const isPublicRoute = createRouteMatcher([
   // sesión (el token firmado hace de autenticación).
   '/baja(.*)',
   '/api/baja(.*)',
+  // Pack de cursos universitarios: landing de venta pública con checkout de
+  // invitado (los compradores llegan de campañas externas, sin cuenta).
+  '/pack-cursos-universitarios(.*)',
+  '/api/pack(.*)',
   '/politica-de-privacidad(.*)',
   '/aviso-legal(.*)',
   '/politica-de-cookies(.*)',

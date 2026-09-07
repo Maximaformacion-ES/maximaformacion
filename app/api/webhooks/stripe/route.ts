@@ -8,6 +8,8 @@ import type { StrapiSingleResponse, StrapiProgram } from '@/lib/strapi/types';
 import { provisionMoodleAccess } from '@/lib/moodle/provision';
 import { sendEmail } from '@/lib/email/client';
 import { adminPurchaseNotificationEmail } from '@/lib/email/templates/admin-purchase-notification';
+import { packPurchasePendingEmail } from '@/lib/email/templates/pack-purchase-pending';
+import { PACK_ITEM_ID, packItemTitle } from '@/app/data/pack-cursos';
 import { diplomaWelcomeEmail } from '@/lib/email/templates/diploma-welcome';
 import { getSiteUrl } from '@/lib/site-url';
 
@@ -332,6 +334,106 @@ async function forwardInvoiceToAdmin(invoice: Stripe.Invoice): Promise<void> {
   });
 
   console.log(`[invoice-forward] ${invoiceLabel} → ${ADMIN_NOTIFICATION_EMAIL}`);
+}
+
+/**
+ * Compra del pack de cursos universitarios (/pack-cursos-universitarios).
+ * Es un flujo aparte de 'course': el comprador NO tiene cuenta (metadata sin
+ * userId) y los cursos aún no existen en Strapi/campus, así que no hay
+ * matrícula ni Moodle que provisionar. Registramos la compra en
+ * campus.pack_purchases (fuente del listado admin y de la deduplicación del
+ * checkout), avisamos al equipo y confirmamos al comprador que tendrá el
+ * acceso próximamente. El acceso real se asigna a mano desde el admin.
+ */
+async function handlePackPurchase(session: Stripe.Checkout.Session): Promise<void> {
+  const item = session.metadata?.packItem || '';
+  const title = session.metadata?.packItemTitle || packItemTitle(item) || item;
+  const email = (session.customer_details?.email || session.customer_email || '').toLowerCase();
+  const buyerName = session.metadata?.buyerName || session.customer_details?.name || undefined;
+  const amount = (session.amount_total || 0) / 100;
+  const dni = extractBuyerTaxId(session);
+
+  if (!email) {
+    console.error(`[pack] session ${session.id} has no customer email — cannot record purchase`);
+  }
+
+  // Registro en BD (idempotente por stripe_session_id: los reintentos del
+  // webhook no duplican filas ni emails — si la fila ya existía, salimos).
+  if (isDbConfigured() && email) {
+    try {
+      const { db } = await import('@/lib/db/client');
+      const { packPurchases } = await import('@/lib/db/schema');
+      const inserted = await db
+        .insert(packPurchases)
+        .values({
+          email,
+          name: buyerName,
+          item: item || 'desconocido',
+          itemTitle: title,
+          amount: String(amount),
+          dni,
+          stripeSessionId: session.id,
+          stripePaymentId: (session.payment_intent as string) || undefined,
+        })
+        .onConflictDoNothing({ target: packPurchases.stripeSessionId })
+        .returning({ id: packPurchases.id });
+      if (inserted.length === 0) {
+        console.log(`[pack] session ${session.id} already recorded — skipping notifications`);
+        return;
+      }
+    } catch (e) {
+      // La fila es importante pero no debe hacer reintentar a Stripe para
+      // siempre: seguimos con las notificaciones y queda el log para backfill.
+      console.error('[pack] failed to record purchase in DB:', e);
+    }
+  }
+
+  console.log(`[pack] purchase recorded: ${email} bought "${title}" (${amount}€)`);
+
+  // Aviso al equipo (con el matiz clave: hay que asignar el acceso a mano).
+  try {
+    const notification = adminPurchaseNotificationEmail({
+      studentName: buyerName || 'Sin nombre',
+      studentEmail: email || 'desconocido',
+      studentDni: dni,
+      productTitle: `${title} — PENDIENTE de asignar acceso (compra del pack, sin matrícula)`,
+      productType: item === PACK_ITEM_ID ? 'Pack' : 'Curso Universitario',
+      amount,
+      currency: (session.currency || 'eur').toUpperCase(),
+      stripeSessionId: session.id,
+      purchasedAt: new Date(),
+    });
+    await sendEmail({
+      to: ADMIN_NOTIFICATION_EMAIL,
+      subject: notification.subject,
+      html: notification.html,
+      text: notification.text,
+      replyTo: email || undefined,
+    });
+  } catch (e) {
+    console.warn('[pack] admin notification failed:', e);
+  }
+
+  // Confirmación al comprador: pago recibido, acceso próximamente.
+  if (email) {
+    try {
+      const confirmation = packPurchasePendingEmail({
+        buyerName: buyerName?.split(' ')[0],
+        itemTitle: title,
+        amount,
+        currency: (session.currency || 'eur').toUpperCase(),
+      });
+      await sendEmail({
+        to: email,
+        subject: confirmation.subject,
+        html: confirmation.html,
+        text: confirmation.text,
+        replyTo: 'cursos@maximaformacion.es',
+      });
+    } catch (e) {
+      console.warn('[pack] buyer confirmation email failed:', e);
+    }
+  }
 }
 
 async function handleWithDb(event: Stripe.Event): Promise<boolean> {
@@ -819,6 +921,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Compras del pack de cursos universitarios: flujo propio sin cuenta ni
+    // matrícula (los handlers de abajo exigen metadata.userId y saldrían por
+    // el early-return de "No userId in session metadata").
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      if (session.metadata?.type === 'pack') {
+        await handlePackPurchase(session);
+        return NextResponse.json({ received: true });
+      }
+    }
+
     // Try DB first, fall back to Clerk
     const handled = await handleWithDb(event);
     if (!handled) {
