@@ -14,7 +14,7 @@ function anonymizeIp(raw: string | null): string | null {
 // Destinatario(s) de los mensajes del formulario de /contacto. Coma-separado en
 // la env para poder añadir buzones sin tocar código. Por defecto, el correo que
 // ya se muestra en la propia página de contacto.
-const CONTACT_NOTIFY_TO = (process.env.CONTACT_NOTIFY_TO || 'cursos@maximaformacion.es')
+const CONTACT_NOTIFY_TO = (process.env.CONTACT_NOTIFY_TO || 'cursos@maximaformacion.es,gerente@maximaformacion.es')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);

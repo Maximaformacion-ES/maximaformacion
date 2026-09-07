@@ -8,7 +8,7 @@ const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN || '';
 // Destinatarios de los leads de consultoría (WEB-56: además de cursos@, el
 // equipo de consultoría en mrodriguez@maximaconsultoria.es). Coma-separado en la
 // env para añadir/quitar sin tocar código.
-const LEAD_NOTIFY_TO = (process.env.CONSULTING_LEAD_NOTIFY_TO || 'cursos@maximaformacion.es,mrodriguez@maximaconsultoria.es')
+const LEAD_NOTIFY_TO = (process.env.CONSULTING_LEAD_NOTIFY_TO || 'cursos@maximaformacion.es,gerente@maximaformacion.es,mrodriguez@maximaconsultoria.es')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);

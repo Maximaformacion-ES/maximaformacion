@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 import {
   Award,
   BookOpen,
@@ -12,6 +14,7 @@ import {
   GraduationCap,
   Loader2,
   Mail,
+  Send,
   Sparkles,
   X,
 } from 'lucide-react';
@@ -159,6 +162,108 @@ function PurchaseModal({
   );
 }
 
+/** Formulario de consulta sobre el pack. Reutiliza el endpoint público de
+ *  /contacto fijando `subject` al título del pack: el aviso llega al equipo
+ *  etiquetado como consulta del pack (asunto del email + fila "Asunto") y
+ *  queda guardado igual en campus.contact_messages. */
+function PackConsultaForm() {
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (sending) return;
+    setSending(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, subject: PACK_TITLE }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'No se pudo enviar la consulta');
+      }
+      toast.success('Consulta enviada. Te responderemos muy pronto.');
+      setForm({ name: '', email: '', message: '' });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'No se pudo enviar la consulta', {
+        description: 'Inténtalo de nuevo o escríbenos a cursos@maximaformacion.es.',
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const inputCls =
+    'w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-body-sm text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50';
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label htmlFor="consulta-nombre" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
+            Nombre
+          </label>
+          <input
+            id="consulta-nombre"
+            type="text"
+            required
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            placeholder="Tu nombre"
+            className={inputCls}
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="consulta-email" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
+            Email
+          </label>
+          <input
+            id="consulta-email"
+            type="email"
+            required
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            placeholder="tu@email.com"
+            className={inputCls}
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <label htmlFor="consulta-mensaje" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
+          Tu consulta
+        </label>
+        <textarea
+          id="consulta-mensaje"
+          required
+          rows={4}
+          value={form.message}
+          onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+          placeholder="Cuéntanos qué te gustaría saber sobre el pack o sobre alguno de los cursos…"
+          className={`${inputCls} resize-none`}
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={sending}
+        className="group w-full sm:w-auto bg-mx-orange text-white px-10 py-4 rounded-xl font-bold text-label-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {sending ? (
+          <>
+            <Loader2 size={18} className="animate-spin" /> Enviando…
+          </>
+        ) : (
+          <>
+            Enviar consulta
+            <Send size={16} className="group-hover:translate-x-1 transition-transform" />
+          </>
+        )}
+      </button>
+    </form>
+  );
+}
+
 function CourseCard({ course, index, onBuy }: { course: PackCourse; index: number; onBuy: () => void }) {
   const [open, setOpen] = useState(false);
   return (
@@ -256,6 +361,7 @@ export default function PackClient() {
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-hidden">
       <FontStyles />
+      <Toaster richColors position="top-right" />
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main>
@@ -432,12 +538,52 @@ export default function PackClient() {
                 ))}
               </ol>
               <p className="mt-8 text-body-sm text-mx-text-muted">
-                ¿Dudas antes de comprar? Escríbenos a{' '}
+                ¿Dudas antes de comprar?{' '}
+                <a href="#consulta" className="text-mx-orange font-bold">
+                  Haznos tu consulta aquí abajo
+                </a>{' '}
+                o escríbenos a{' '}
                 <a href="mailto:cursos@maximaformacion.es" className="text-mx-orange font-bold">
                   cursos@maximaformacion.es
                 </a>
                 .
               </p>
+            </m.div>
+          </div>
+        </section>
+
+        {/* Consulta sobre el pack */}
+        <section id="consulta" className="py-16 px-6 md:px-12 scroll-mt-32">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-12">
+            <m.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-2"
+            >
+              <h2 className="text-heading-sm md:text-heading-md font-black text-mx-blue leading-heading mb-6">
+                ¿DUDAS SOBRE <span className="text-stroke text-mx-orange">EL PACK?</span>
+              </h2>
+              <p className="text-body-sm text-mx-text-muted leading-relaxed mb-6">
+                Pregúntanos lo que necesites: contenidos, certificación, fechas de inicio, facturas
+                para tu centro… Te respondemos por email lo antes posible.
+              </p>
+              <p className="flex items-center gap-3 text-body-sm text-mx-text-muted">
+                <Mail size={16} className="text-mx-orange shrink-0" />
+                <a href="mailto:cursos@maximaformacion.es" className="text-mx-orange font-bold">
+                  cursos@maximaformacion.es
+                </a>
+              </p>
+            </m.div>
+            <m.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="lg:col-span-3 bg-mx-card border border-mx-border rounded-2xl p-8"
+            >
+              <PackConsultaForm />
             </m.div>
           </div>
         </section>
