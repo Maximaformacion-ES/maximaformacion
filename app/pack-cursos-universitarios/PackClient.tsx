@@ -600,9 +600,40 @@ export default function PackClient() {
               <h2 className="text-heading-md md:text-heading-lg font-black text-mx-blue leading-heading mb-6">
                 12 ECTS POR <span className="text-stroke text-mx-orange">{PACK_PRICE} €</span>
               </h2>
-              <p className="text-body-md text-mx-text-muted mb-8 max-w-2xl mx-auto">
+              <p className="text-body-md text-mx-text-muted mb-10 max-w-2xl mx-auto">
                 Los tres Cursos Universitarios por menos de lo que cuestan dos por separado.
               </p>
+
+              {/* Los 3 cursos en versión mini (curso + curso + curso): la
+                  información completa ya está en las tarjetas de arriba. */}
+              <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 mb-10">
+                {PACK_COURSES.map((course, i) => (
+                  <React.Fragment key={course.id}>
+                    {i > 0 && (
+                      <span aria-hidden className="text-heading-md font-black text-mx-orange leading-none">
+                        +
+                      </span>
+                    )}
+                    <div className="w-full max-w-xs md:w-64 bg-mx-card border border-mx-border rounded-2xl overflow-hidden text-left">
+                      {course.image && (
+                        <Image
+                          src={course.image}
+                          alt=""
+                          width={1200}
+                          height={675}
+                          sizes="(max-width: 768px) 100vw, 256px"
+                          className="w-full h-auto"
+                        />
+                      )}
+                      <div className="px-4 py-3">
+                        <p className="text-body-sm font-bold text-mx-text leading-snug">{course.shortTitle}</p>
+                        <p className="text-[13px] text-mx-text-muted">{course.ects} ECTS · {COURSE_PRICE} €</p>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                ))}
+              </div>
+
               <button
                 type="button"
                 onClick={buyPack}

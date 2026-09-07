@@ -14,6 +14,8 @@ export const PACK_TITLE = 'Pack 3 Cursos Universitarios en Innovación Docente';
 export interface PackCourse {
   id: string;
   title: string;
+  /** Versión corta del título para piezas compactas (mini-cards, menús). */
+  shortTitle: string;
   /** Denominación exacta del certificado UCAV. */
   certificate: string;
   summary: string;
@@ -28,6 +30,7 @@ export const PACK_COURSES: PackCourse[] = [
   {
     id: 'ia-exelearning',
     title: 'Inteligencia Artificial y eXeLearning: Crea Recursos Educativos Interactivos en Tiempo Récord',
+    shortTitle: 'Inteligencia Artificial y eXeLearning',
     certificate:
       'Curso Universitario en Inteligencia Artificial y eXeLearning: Crea Recursos Educativos Interactivos en Tiempo Récord',
     summary:
@@ -51,6 +54,7 @@ export const PACK_COURSES: PackCourse[] = [
   {
     id: 'h5p-ia',
     title: 'H5P e Inteligencia Artificial: Diseña Actividades Interactivas para Moodle en Minutos',
+    shortTitle: 'H5P e Inteligencia Artificial',
     certificate:
       'Curso Universitario en H5P e Inteligencia Artificial: Diseña Actividades Interactivas para Moodle en Minutos',
     summary:
@@ -75,6 +79,7 @@ export const PACK_COURSES: PackCourse[] = [
     id: 'atencion-educativa-saac',
     title:
       'Atención Educativa al Alumnado con Discapacidad Motora y Sistemas Aumentativos y Alternativos de Comunicación (SAAC)',
+    shortTitle: 'Atención Educativa y SAAC',
     certificate:
       'Curso Universitario en Atención Educativa al Alumnado con Discapacidad Motora y Sistemas Aumentativos y Alternativos de Comunicación (SAAC)',
     summary:
