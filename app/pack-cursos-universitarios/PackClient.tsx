@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -15,10 +15,12 @@ import {
   Loader2,
   Mail,
   Send,
+  ShieldCheck,
   Sparkles,
   X,
 } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
+import { FAQSection } from '../components/FAQSection';
 import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 import {
@@ -162,6 +164,37 @@ function PurchaseModal({
   );
 }
 
+// Preguntas frecuentes: resolver objeciones antes del pago (fechas, formato,
+// certificado, factura). Solo afirmaciones que hoy son ciertas — nada de
+// urgencia inventada ni promesas que dependan del lanzamiento.
+const FAQS = [
+  {
+    question: '¿Cuándo empiezan los cursos?',
+    answer:
+      'Los cursos están en fase de lanzamiento. Al matricularte reservas tu plaza al precio actual y te avisamos por email en cuanto abramos el acceso, con todas las instrucciones para empezar.',
+  },
+  {
+    question: '¿Cómo se estudia?',
+    answer:
+      'Formación 100 % online y a tu ritmo, con evaluación continua. Cada curso tiene 10 módulos, 4 ECTS y 100 horas de dedicación estimada.',
+  },
+  {
+    question: '¿Qué obtengo al terminar?',
+    answer:
+      'La certificación universitaria de cada Curso Universitario superado. Si completas el pack, tres certificaciones que suman 12 ECTS.',
+  },
+  {
+    question: '¿Puedo matricularme en un solo curso?',
+    answer:
+      'Sí, cada curso se puede comprar por separado por 95 €. El pack completo cuesta 190 €: pagas dos cursos y el tercero te sale gratis.',
+  },
+  {
+    question: '¿Cómo es el pago? ¿Recibo factura?',
+    answer:
+      'Pago único y seguro con tarjeta a través de Stripe. La factura se emite y se envía automáticamente a tu email; durante el pago puedes indicar tu DNI/NIE/CIF para incluirlo.',
+  },
+];
+
 /** Formulario de consulta sobre el pack. Reutiliza el endpoint público de
  *  /contacto fijando `subject` al título del pack: el aviso llega al equipo
  *  etiquetado como consulta del pack (asunto del email + fila "Asunto") y
@@ -261,6 +294,54 @@ function PackConsultaForm() {
         )}
       </button>
     </form>
+  );
+}
+
+// Barra de matrícula fija inferior: aparece pasado el hero para que el CTA y
+// el precio acompañen durante toda la lectura (el momento de decisión no
+// siempre llega arriba). Suscripción al scroll vía useSyncExternalStore, igual
+// que la tira anunciadora (sin setState síncrono en efectos).
+function subscribeScroll(cb: () => void) {
+  window.addEventListener('scroll', cb, { passive: true });
+  return () => window.removeEventListener('scroll', cb);
+}
+
+function StickyBuyBar({ onBuy }: { onBuy: () => void }) {
+  const visible = useSyncExternalStore(
+    subscribeScroll,
+    () => window.scrollY > 700,
+    () => false,
+  );
+  return (
+    <AnimatePresence>
+      {visible && (
+        <m.div
+          initial={{ y: 96 }}
+          animate={{ y: 0 }}
+          exit={{ y: 96 }}
+          transition={{ duration: 0.3 }}
+          className="fixed bottom-0 inset-x-0 z-40 bg-mx-blue text-white shadow-[0_-4px_24px_rgba(0,0,0,0.18)]"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-3 flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-body-sm font-bold truncate">Pack 3 Cursos Universitarios · 12 ECTS</p>
+              <p className="text-[13px] text-white/75">
+                <s className="text-white/50">{INDIVIDUAL_TOTAL} €</s>{' '}
+                <span className="font-black text-white text-body-sm">{PACK_PRICE} €</span> · el tercer
+                curso, gratis
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onBuy}
+              className="shrink-0 bg-mx-orange text-white px-6 sm:px-10 py-3 rounded-xl font-bold text-label-sm uppercase tracking-widest hover:bg-mx-orange-dark transition-all cursor-pointer"
+            >
+              Matricúlate
+            </button>
+          </div>
+        </m.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -415,7 +496,7 @@ export default function PackClient() {
               <div className="relative flex flex-col lg:flex-row lg:items-center gap-10">
                 <div className="flex-1">
                   <p className="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-label-sm uppercase tracking-widest font-bold mb-6">
-                    <Sparkles size={14} /> Oferta de lanzamiento
+                    <Sparkles size={14} /> Oferta de lanzamiento · 3×2
                   </p>
                   <div className="flex flex-wrap items-end gap-x-4 gap-y-2 mb-3">
                     <span className="text-heading-md text-white/50 line-through font-bold leading-none">
@@ -429,7 +510,8 @@ export default function PackClient() {
                     </span>
                   </div>
                   <p className="text-body-md font-bold mb-1">
-                    Los 3 Cursos Universitarios · 12 ECTS · certificación incluida
+                    Paga dos cursos y llévate el tercero gratis: 12 ECTS con certificación
+                    universitaria.
                   </p>
                   <p className="text-body-sm text-white/70">
                     También puedes matricularte en cada curso por separado por {COURSE_PRICE} €.
@@ -444,7 +526,9 @@ export default function PackClient() {
                   >
                     Matricúlate en el pack
                   </button>
-                  <p className="text-center text-[13px] text-white/70">Pago único y seguro con Stripe</p>
+                  <p className="text-center text-[13px] text-white/70">
+                    Pago único y seguro · Factura automática
+                  </p>
                 </div>
               </div>
 
@@ -460,6 +544,26 @@ export default function PackClient() {
                 </p>
               </div>
             </m.div>
+
+            {/* Franja de confianza: credenciales y reducción de riesgo */}
+            <m.ul
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4"
+            >
+              {[
+                { icon: GraduationCap, text: 'Certificación universitaria' },
+                { icon: Award, text: '12 ECTS · 300 horas en total' },
+                { icon: Clock, text: '100 % online, a tu ritmo' },
+                { icon: ShieldCheck, text: 'Pago seguro y factura automática' },
+              ].map((item) => (
+                <li key={item.text} className="flex items-center gap-3 text-body-sm text-mx-text-muted">
+                  <item.icon size={18} className="text-mx-orange shrink-0" />
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </m.ul>
           </div>
         </section>
 
@@ -552,6 +656,9 @@ export default function PackClient() {
           </div>
         </section>
 
+        {/* Preguntas frecuentes: objeciones resueltas antes del pago */}
+        <FAQSection compact faqs={FAQS} />
+
         {/* Consulta sobre el pack */}
         <section id="consulta" className="py-16 px-6 md:px-12 scroll-mt-32">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-12">
@@ -598,10 +705,11 @@ export default function PackClient() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-heading-md md:text-heading-lg font-black text-mx-blue leading-heading mb-6">
-                12 ECTS POR <span className="text-stroke text-mx-orange">{PACK_PRICE} €</span>
+                PAGA 2 CURSOS, <span className="text-stroke text-mx-orange">LLÉVATE 3</span>
               </h2>
               <p className="text-body-md text-mx-text-muted mb-10 max-w-2xl mx-auto">
-                Los tres Cursos Universitarios por menos de lo que cuestan dos por separado.
+                Los tres Cursos Universitarios (12 ECTS) por {PACK_PRICE} €: exactamente el precio de
+                dos.
               </p>
 
               {/* Los 3 cursos en versión mini (curso + curso + curso): la
@@ -645,6 +753,8 @@ export default function PackClient() {
           </div>
         </section>
       </main>
+
+      <StickyBuyBar onBuy={buyPack} />
 
       <AnimatePresence>
         {buying && (
