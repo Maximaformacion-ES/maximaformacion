@@ -259,9 +259,25 @@ export default function PackClient() {
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main>
-        {/* Hero */}
-        <section className="relative pt-40 pb-16 px-6 md:px-12 overflow-hidden">
-          <div className="max-w-7xl mx-auto">
+        {/* Hero estilo "ficha de streaming": el banner del cliente a sangre
+            completa, fundido con el fondo de la página mediante un degradado,
+            y el texto entrando por debajo sobre la zona ya legible. */}
+        <section className="relative pb-16 overflow-hidden">
+          <div className="relative mt-[72px] sm:mt-[96px] h-[42vh] min-h-[280px] md:h-[60vh] md:min-h-[440px] max-h-[720px] w-full">
+            <Image
+              src="/pack/banner-pack-cursos.webp"
+              alt="Pack 3 Cursos Universitarios: IA con eXeLearning, H5P e IA para Moodle, y atención educativa con SAAC"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+            {/* Fundido hacia el fondo de la página para que el texto que se
+                superpone abajo sea legible sobre una zona casi lisa. */}
+            <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-mx-bg via-mx-bg/70 to-transparent" />
+          </div>
+
+          <div className="relative max-w-7xl mx-auto px-6 md:px-12 -mt-20 md:-mt-32">
             <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -280,24 +296,6 @@ export default function PackClient() {
                 para Moodle, y atención educativa al alumnado con discapacidad motora y SAAC.
                 <span className="font-bold text-mx-text"> 4 ECTS por curso — 12 ECTS en total.</span>
               </p>
-            </m.div>
-
-            {/* Banner del pack (del cliente, optimizado a webp en public/pack/) */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="mb-10 rounded-2xl overflow-hidden border border-mx-border"
-            >
-              <Image
-                src="/pack/banner-pack-cursos.webp"
-                alt="Pack 3 Cursos Universitarios: IA con eXeLearning, H5P e IA para Moodle, y atención educativa con SAAC"
-                width={1600}
-                height={686}
-                priority
-                sizes="(max-width: 1280px) 100vw, 1280px"
-                className="w-full h-auto"
-              />
             </m.div>
 
             {/* Franja de precios / CTA del pack */}
