@@ -57,6 +57,7 @@ export const PACK_COURSES: PackCourse[] = [
       'Crea actividades interactivas, vídeos enriquecidos, gamificación y escenarios ramificados con H5P asistido por IA, e intégralo todo en Moodle: de la idea a la actividad publicada en minutos.',
     ects: 4,
     hours: 100,
+    image: '/pack/portada-h5p-ia.webp',
     modules: [
       'H5P y la Inteligencia Artificial aplicada a la educación',
       'Ingeniería de Prompts para la creación de actividades H5P',
@@ -80,6 +81,7 @@ export const PACK_COURSES: PackCourse[] = [
       'Da una respuesta educativa real al alumnado con discapacidad motora: evaluación psicopedagógica, tecnologías de apoyo, sistemas aumentativos y alternativos de comunicación (SAAC) y diseño de situaciones de aprendizaje inclusivas.',
     ects: 4,
     hours: 100,
+    image: '/pack/portada-atencion-educativa-saac.webp',
     modules: [
       'Educación Inclusiva y Atención a la Diversidad',
       'Discapacidad Motora: Conceptualización y Características',
