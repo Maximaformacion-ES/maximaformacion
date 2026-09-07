@@ -298,55 +298,62 @@ export default function PackClient() {
               </p>
             </m.div>
 
-            {/* Franja de precios / CTA del pack */}
+            {/* Panel de oferta del pack: precio protagonista sobre azul de
+                marca, con el aviso de disponibilidad integrado como pie. */}
             <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15 }}
-              className="bg-mx-card border-2 border-mx-orange rounded-2xl p-8 md:p-10 flex flex-col lg:flex-row lg:items-center gap-8"
+              className="relative overflow-hidden rounded-3xl bg-mx-blue text-white p-8 md:p-12"
             >
-              <div className="flex-1">
-                <p className="flex items-center gap-2 text-label-sm uppercase tracking-widest text-mx-orange font-bold mb-3">
-                  <Sparkles size={16} /> Oferta de lanzamiento
-                </p>
-                <p className="text-body-md text-mx-text leading-relaxed">
-                  Cada curso por separado cuesta <span className="font-bold">{COURSE_PRICE} €</span>.
-                  Llévate los tres por{' '}
-                  <span className="font-black text-mx-orange text-heading-sm">{PACK_PRICE} €</span>{' '}
-                  <span className="text-mx-text-muted">
-                    (en lugar de <s>{INDIVIDUAL_TOTAL} €</s> — ahorras {SAVINGS} €)
-                  </span>
-                  .
-                </p>
+              <div className="relative flex flex-col lg:flex-row lg:items-center gap-10">
+                <div className="flex-1">
+                  <p className="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-label-sm uppercase tracking-widest font-bold mb-6">
+                    <Sparkles size={14} /> Oferta de lanzamiento
+                  </p>
+                  <div className="flex flex-wrap items-end gap-x-4 gap-y-2 mb-3">
+                    <span className="text-heading-md text-white/50 line-through font-bold leading-none">
+                      {INDIVIDUAL_TOTAL} €
+                    </span>
+                    <span className="text-display-sm md:text-display-md font-black leading-none">
+                      {PACK_PRICE} €
+                    </span>
+                    <span className="bg-mx-orange text-white text-label-sm font-bold uppercase tracking-widest rounded-full px-4 py-2 mb-1">
+                      Ahorras {SAVINGS} €
+                    </span>
+                  </div>
+                  <p className="text-body-md font-bold mb-1">
+                    Los 3 Cursos Universitarios · 12 ECTS · certificación incluida
+                  </p>
+                  <p className="text-body-sm text-white/70">
+                    También puedes comprar cada curso por separado por {COURSE_PRICE} €.
+                  </p>
+                </div>
+
+                <div className="shrink-0 flex flex-col items-stretch lg:items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={buyPack}
+                    className="bg-mx-orange text-white px-12 py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest hover:bg-mx-orange-dark hover:scale-[1.02] transition-all cursor-pointer shadow-lg shadow-black/20"
+                  >
+                    Comprar el pack
+                  </button>
+                  <p className="text-center text-[13px] text-white/70">Pago único y seguro con Stripe</p>
+                </div>
               </div>
-              <div className="shrink-0 flex flex-col items-stretch gap-2">
-                <button
-                  type="button"
-                  onClick={buyPack}
-                  className="group bg-mx-orange text-white px-10 py-5 rounded-xl font-bold text-label-sm md:text-label-md uppercase tracking-widest hover:bg-mx-orange-dark transition-all cursor-pointer"
-                >
-                  Comprar el pack — {PACK_PRICE} €
-                </button>
-                <p className="text-center text-[13px] text-mx-text-muted">Pago único y seguro con Stripe</p>
+
+              {/* Aviso de disponibilidad: se cobra ahora, el acceso llega después */}
+              <div className="relative mt-8 pt-6 border-t border-white/15 flex items-start gap-3 text-body-sm text-white/80">
+                <Mail size={18} className="shrink-0 mt-0.5 text-mx-orange" />
+                <p>
+                  Los cursos están en fase de lanzamiento: al completar tu compra reservas tu plaza y{' '}
+                  <span className="font-bold text-white">
+                    te contactaremos por email en cuanto tu acceso esté disponible
+                  </span>
+                  , muy pronto.
+                </p>
               </div>
             </m.div>
-
-            {/* Aviso de disponibilidad: se cobra ahora, el acceso llega después */}
-            <m.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-6 flex items-start gap-3 text-body-sm text-mx-text-muted bg-mx-orange/5 border border-mx-orange/20 rounded-xl px-5 py-4 max-w-3xl"
-            >
-              <Mail size={18} className="text-mx-orange shrink-0 mt-0.5" />
-              <span>
-                Los cursos están en fase de lanzamiento: al completar tu compra reservas tu plaza y{' '}
-                <span className="font-bold text-mx-text">
-                  te contactaremos por email en cuanto tu acceso esté disponible
-                </span>
-                , muy pronto.
-              </span>
-            </m.p>
           </div>
         </section>
 
