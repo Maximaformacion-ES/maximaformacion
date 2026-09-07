@@ -20,6 +20,8 @@ export interface PackCourse {
   ects: number;
   hours: number;
   modules: string[];
+  /** Portada (webp optimizado en public/pack/); opcional hasta tenerlas todas. */
+  image?: string;
 }
 
 export const PACK_COURSES: PackCourse[] = [
@@ -32,6 +34,7 @@ export const PACK_COURSES: PackCourse[] = [
       'Aprende a combinar la IA generativa con eXeLearning para diseñar y publicar recursos educativos completos: desde la ingeniería de prompts hasta la creación automática de contenidos, actividades y evaluaciones.',
     ects: 4,
     hours: 100,
+    image: '/pack/portada-ia-exelearning.webp',
     modules: [
       'Inteligencia Artificial aplicada a la creación de contenidos educativos',
       'Ingeniería de Prompts para docentes',

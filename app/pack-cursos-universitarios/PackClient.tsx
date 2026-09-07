@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
 import {
   Award,
@@ -166,8 +167,19 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="flex flex-col bg-mx-card rounded-2xl border border-mx-border hover:border-mx-orange/40 transition-all p-8"
+      className="flex flex-col bg-mx-card rounded-2xl border border-mx-border hover:border-mx-orange/40 transition-all overflow-hidden"
     >
+      {course.image && (
+        <Image
+          src={course.image}
+          alt={`Portada del curso ${course.title}`}
+          width={1200}
+          height={675}
+          sizes="(max-width: 1024px) 100vw, 33vw"
+          className="w-full h-auto border-b border-mx-border"
+        />
+      )}
+      <div className="flex flex-col flex-1 p-8">
       <span className="text-mx-orange text-label-sm font-medium tracking-[0.3em] uppercase mb-3">
         Curso Universitario
       </span>
@@ -230,6 +242,7 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
           Comprar este curso
         </button>
       </div>
+      </div>
     </m.article>
   );
 }
@@ -267,6 +280,24 @@ export default function PackClient() {
                 para Moodle, y atención educativa al alumnado con discapacidad motora y SAAC.
                 <span className="font-bold text-mx-text"> 4 ECTS por curso — 12 ECTS en total.</span>
               </p>
+            </m.div>
+
+            {/* Banner del pack (del cliente, optimizado a webp en public/pack/) */}
+            <m.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="mb-10 rounded-2xl overflow-hidden border border-mx-border"
+            >
+              <Image
+                src="/pack/banner-pack-cursos.webp"
+                alt="Pack 3 Cursos Universitarios: IA con eXeLearning, H5P e IA para Moodle, y atención educativa con SAAC"
+                width={1600}
+                height={686}
+                priority
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="w-full h-auto"
+              />
             </m.div>
 
             {/* Franja de precios / CTA del pack */}
