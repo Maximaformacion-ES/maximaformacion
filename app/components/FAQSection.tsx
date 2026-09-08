@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useSyncExternalStore } from 'react';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, type LucideIcon } from 'lucide-react';
 import { m } from 'framer-motion';
 import { StyledTitle } from './StyledTitle';
 import {
@@ -51,6 +51,8 @@ const DEFAULT_FAQS: FAQItem[] = [
 
 interface FAQGroup {
   label: string;
+  /** Icono lucide opcional mostrado en la píldora de la pestaña. */
+  icon?: LucideIcon;
   faqs: FAQItem[];
 }
 
@@ -140,12 +142,13 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
                 type="button"
                 onClick={() => setActiveGroup(i)}
                 aria-pressed={i === activeGroup}
-                className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all cursor-pointer border ${
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all cursor-pointer border ${
                   i === activeGroup
                     ? 'bg-mx-orange border-mx-orange text-white'
                     : 'bg-mx-card border-mx-border text-mx-text-muted hover:border-mx-orange/40 hover:text-mx-text'
                 }`}
               >
+                {g.icon && <g.icon size={14} className="shrink-0" />}
                 {g.label}
               </button>
             ))}

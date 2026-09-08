@@ -2,12 +2,16 @@
 // ("FAQ Pack tres cursos.docx" — 21 preguntas en 5 categorías). Se muestran
 // agrupadas por pestañas para no convertir la página en un scroll infinito.
 
+import { BookOpen, CreditCard, GraduationCap, Laptop, Wrench, type LucideIcon } from 'lucide-react';
+
 export const PACK_FAQ_GROUPS: {
   label: string;
+  icon?: LucideIcon;
   faqs: { question: string; answer: string }[];
 }[] = [
   {
-    label: '📝 Matrícula y precio',
+    label: 'Matrícula y precio',
+    icon: CreditCard,
     faqs: [
       {
         question: '¿Cuál es el precio del pack de tres cursos y qué incluye?',
@@ -36,7 +40,8 @@ export const PACK_FAQ_GROUPS: {
     ],
   },
   {
-    label: '🎓 Contenido de los cursos',
+    label: 'Contenido de los cursos',
+    icon: BookOpen,
     faqs: [
       {
         question: '¿Qué voy a aprender en el curso "Atención Educativa al Alumnado con Discapacidad Motora y SAAC"?',
@@ -67,7 +72,8 @@ export const PACK_FAQ_GROUPS: {
     ],
   },
   {
-    label: '💻 Metodología y evaluación',
+    label: 'Metodología y evaluación',
+    icon: Laptop,
     faqs: [
       {
         question: '¿Cómo son las clases? ¿Son presenciales?',
@@ -91,7 +97,8 @@ export const PACK_FAQ_GROUPS: {
     ],
   },
   {
-    label: '🏛️ Titulación',
+    label: 'Titulación',
+    icon: GraduationCap,
     faqs: [
       {
         question: '¿Qué título o certificado obtendré al finalizar?',
@@ -115,7 +122,8 @@ export const PACK_FAQ_GROUPS: {
     ],
   },
   {
-    label: '🔧 Aspectos prácticos',
+    label: 'Aspectos prácticos',
+    icon: Wrench,
     faqs: [
       {
         question: '¿Necesito conocimientos previos para realizar estos cursos?',
