@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useSyncExternalStore } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { ChevronDownIcon } from 'lucide-react';
 import { m } from 'framer-motion';
 import { StyledTitle } from './StyledTitle';
@@ -49,10 +49,19 @@ const DEFAULT_FAQS: FAQItem[] = [
   },
 ];
 
+interface FAQGroup {
+  label: string;
+  faqs: FAQItem[];
+}
+
 interface FAQSectionProps {
   overline?: string;
   title?: string;
   faqs?: FAQItem[];
+  /** Preguntas agrupadas por categoría: se muestran como pestañas (píldoras) y
+   *  solo se pinta el acordeón del grupo activo — evita el scroll infinito
+   *  cuando hay muchas preguntas. Tiene prioridad sobre `faqs`. */
+  groups?: FAQGroup[];
   /** Título más pequeño para usarlo dentro de una ficha (columna), en vez del
    *  tamaño display grande de la home. */
   compact?: boolean;
@@ -66,9 +75,18 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   overline = 'Resolvemos tus dudas',
   title = 'PREGUNTAS {FRECUENTES}',
   faqs = DEFAULT_FAQS,
+  groups,
   compact = false,
 }) => {
-  const displayFaqs = faqs.length > 0 ? faqs : DEFAULT_FAQS;
+  // Grupo activo cuando hay pestañas. El 0 inicial coincide en servidor y
+  // cliente, así que no hay riesgo de hydration mismatch.
+  const [activeGroup, setActiveGroup] = useState(0);
+  const grouped = !!groups?.length;
+  const displayFaqs = grouped
+    ? groups[Math.min(activeGroup, groups.length - 1)].faqs
+    : faqs.length > 0
+      ? faqs
+      : DEFAULT_FAQS;
 
   // Radix's Accordion derives aria ids from React.useId(); upstream client
   // components (Clerk, Framer Motion LazyMotion) can shift that counter
@@ -109,6 +127,31 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           <StyledTitle text={title} color="blue" />
         </m.h2>
 
+        {grouped && (
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap justify-center gap-2 mb-8"
+          >
+            {groups.map((g, i) => (
+              <button
+                key={g.label}
+                type="button"
+                onClick={() => setActiveGroup(i)}
+                aria-pressed={i === activeGroup}
+                className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all cursor-pointer border ${
+                  i === activeGroup
+                    ? 'bg-mx-orange border-mx-orange text-white'
+                    : 'bg-mx-card border-mx-border text-mx-text-muted hover:border-mx-orange/40 hover:text-mx-text'
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </m.div>
+        )}
+
         <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -116,7 +159,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           transition={{ duration: 0.8 }}
         >
           {mounted ? (
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion key={grouped ? activeGroup : 'flat'} type="single" collapsible className="w-full">
               {displayFaqs.map((faq, index) => (
                 <AccordionItem key={faq.question} value={`faq-${index}`}>
                   <AccordionTrigger>{faq.question}</AccordionTrigger>

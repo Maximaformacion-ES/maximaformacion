@@ -22,6 +22,7 @@ import {
 import { FontStyles } from '../components/FontStyles';
 import { FAQSection } from '../components/FAQSection';
 import { DocenteSection, type Docente } from '../components/DocenteSection';
+import { PACK_FAQ_GROUPS } from './faqs';
 import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 import {
@@ -164,37 +165,6 @@ function PurchaseModal({
     </m.div>
   );
 }
-
-// Preguntas frecuentes: resolver objeciones antes del pago (fechas, formato,
-// certificado, factura). Solo afirmaciones que hoy son ciertas — nada de
-// urgencia inventada ni promesas que dependan del lanzamiento.
-const FAQS = [
-  {
-    question: '¿Cuándo empiezan los cursos?',
-    answer:
-      'Los cursos están en fase de lanzamiento. Al matricularte reservas tu plaza al precio actual y te avisamos por email en cuanto abramos el acceso, con todas las instrucciones para empezar.',
-  },
-  {
-    question: '¿Cómo se estudia?',
-    answer:
-      'Formación 100 % online y a tu ritmo, con evaluación continua. Cada curso tiene 10 módulos, 4 ECTS y 100 horas de dedicación estimada.',
-  },
-  {
-    question: '¿Qué obtengo al terminar?',
-    answer:
-      'La certificación universitaria de cada Curso Universitario superado. Si completas el pack, tres certificaciones que suman 12 ECTS.',
-  },
-  {
-    question: '¿Puedo matricularme en un solo curso?',
-    answer:
-      'Sí, cada curso se puede comprar por separado por 95 €. El pack completo cuesta 190 €: pagas dos cursos y el tercero te sale gratis.',
-  },
-  {
-    question: '¿Cómo es el pago? ¿Recibo factura?',
-    answer:
-      'Pago único y seguro con tarjeta a través de Stripe. La factura se emite y se envía automáticamente a tu email; durante el pago puedes indicar tu DNI/NIE/CIF para incluirlo.',
-  },
-];
 
 /** Formulario de consulta sobre el pack. Reutiliza el endpoint público de
  *  /contacto fijando `subject` al título del pack: el aviso llega al equipo
@@ -667,8 +637,9 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
           </div>
         </section>
 
-        {/* Preguntas frecuentes: objeciones resueltas antes del pago */}
-        <FAQSection compact faqs={FAQS} />
+        {/* Preguntas frecuentes: las 21 del documento del cliente, en pestañas
+            por categoría para no convertir la página en un scroll infinito */}
+        <FAQSection compact groups={PACK_FAQ_GROUPS} />
 
         {/* Consulta sobre el pack */}
         <section id="consulta" className="py-16 px-6 md:px-12 scroll-mt-32">
