@@ -24,13 +24,6 @@ import {
 
 const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Página de gracias tras el pago: la gestiona el equipo de WordPress en
-// moodle.maximaformacion.es (petición del cliente, sep-2026). Nuestra
-// /pack-cursos-universitarios/gracias queda como respaldo por si quieren
-// volver a controlarla desde la web (cámbiese con la env PACK_SUCCESS_URL).
-const SUCCESS_URL =
-  process.env.PACK_SUCCESS_URL || 'https://moodle.maximaformacion.es/gracias';
-
 // Mismo campo fiscal que /api/checkout (DNI como custom field, ver el
 // comentario largo allí): la gestoría necesita el DNI para la factura.
 const STRIPE_CHECKOUT_EXTRA_FIELDS = {
@@ -143,7 +136,7 @@ export async function POST(request: Request) {
           },
         },
       ],
-      success_url: SUCCESS_URL,
+      success_url: `${baseUrl}/pack-cursos-universitarios/gracias?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/pack-cursos-universitarios?cancelado=true`,
       customer_email: email,
       invoice_creation: {
