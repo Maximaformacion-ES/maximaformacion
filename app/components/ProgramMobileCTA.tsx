@@ -9,6 +9,7 @@ import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
+import { contactHrefFor } from './ContactCourseProvider';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProgramMobileCTAProps {
@@ -147,7 +148,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
           open={masterChooserOpen}
           onClose={() => setMasterChooserOpen(false)}
           formMode="contacto-page"
-          contactoHref={`/contacto?curso=${encodeURIComponent(program.title)}`}
+          contactoHref={contactHrefFor(program.title)}
         />
       </>
     );

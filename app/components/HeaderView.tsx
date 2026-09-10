@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSiteBranding } from './SiteBrandingProvider';
 import { useMegaMenu } from './MegaMenuProvider';
+import { useContactHref } from './ContactCourseProvider';
 import { PackAnnouncementBar } from './PackAnnouncementBar';
 
 /**
@@ -151,6 +152,14 @@ const CAMPUS_OPTIONS = [
   { name: 'Maxymia', url: '/maxymia/campus' },
 ];
 
+/**
+ * En una ficha de curso, "Contacto" lleva ?curso= para que el formulario salga
+ * con ese curso preseleccionado (ver ContactCourseProvider).
+ */
+function withContactHref(items: NavItem[], contactHref: string): NavItem[] {
+  return items.map((item) => (item.path === '/contacto' ? { ...item, path: contactHref } : item));
+}
+
 // --- Sub-components ---
 
 interface DesktopAuthButtonsProps {
@@ -269,6 +278,7 @@ interface MobileMenuProps {
 }
 
 function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark, isSignedIn, pathname }: MobileMenuProps) {
+  const mobileItems = withContactHref(NAV_ITEMS, useContactHref());
   // Prevent body scroll when menu is open
   useEffect(() => {
     if (isMenuOpen) {
@@ -341,7 +351,7 @@ function MobileMenu({ isMenuOpen, setIsMenuOpen, isDark, isSignedIn, pathname }:
 
             {/* Nav links */}
             <nav className="flex flex-col pt-5 pb-3 flex-1 overflow-y-auto">
-              {NAV_ITEMS.map((item, i) => {
+              {mobileItems.map((item, i) => {
                 const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
                 return (
                   <m.div
@@ -742,8 +752,9 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
   // link to the full landing. Falls back to the static columns when Strapi
   // is unavailable at build time.
   const MAX_PROGRAMS_PER_COLUMN = 6;
+  const contactHref = useContactHref();
   const items = useMemo(() => {
-    const base = navItems ?? NAV_ITEMS;
+    const base = withContactHref(navItems ?? NAV_ITEMS, contactHref);
     const dynamicAreas = megaMenu.areas.filter((a) => a.programs.length > 0);
     if (dynamicAreas.length === 0) return base;
     return base.map((item) => {
@@ -781,7 +792,7 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
         },
       };
     });
-  }, [navItems, megaMenu]);
+  }, [navItems, megaMenu, contactHref]);
   // En /consultoria usamos un logo y nombre diferenciados (Maxima Consultoria,
   // brand verde-azul). En Maxymia mantenemos el logo oscuro de la marca. En el
   // resto, el logo estándar de Máxima Formación.

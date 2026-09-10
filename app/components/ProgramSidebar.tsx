@@ -23,6 +23,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
+import { contactHrefFor } from './ContactCourseProvider';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
@@ -216,7 +217,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
               open={masterChooserOpen}
               onClose={() => setMasterChooserOpen(false)}
               formMode="contacto-page"
-              contactoHref={`/contacto?curso=${encodeURIComponent(program.title)}`}
+              contactoHref={contactHrefFor(program.title)}
             />
             {/* Temario download moved to the hero (under the description)
                 in MF-17 — see ProgramHeroSection. */}

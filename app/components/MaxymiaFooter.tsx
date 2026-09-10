@@ -6,8 +6,9 @@ import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { useSiteBranding } from './SiteBrandingProvider';
 import { useCampusTheme } from '../maxymia/campus/CampusShell';
+import { useContactHref } from './ContactCourseProvider';
 
-const footerLinks = {
+const buildFooterLinks = (contactHref: string) => ({
   Campus: [
     { label: 'Catálogo de cursos', href: '/maxymia/campus/cursos' },
     { label: 'Mis cursos', href: '/maxymia/campus/mis-cursos' },
@@ -18,9 +19,10 @@ const footerLinks = {
     { label: 'Consultoría', href: '/consultoria' },
     { label: 'Innovación', href: '/innovacion' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Contacto', href: '/contacto' },
+    // En la ficha de un curso lleva ?curso= (formulario con el curso preseleccionado).
+    { label: 'Contacto', href: contactHref },
   ],
-};
+});
 
 const externalLinks = [
   { label: 'Campus E-Learning', href: 'https://maximaformacion.com.es/' },
@@ -30,6 +32,7 @@ const externalLinks = [
 export const MaxymiaFooter: React.FC = () => {
   const { logoMaxymia } = useSiteBranding();
   const { light } = useCampusTheme();
+  const footerLinks = buildFooterLinks(useContactHref());
   return (
     <footer className={`${light ? 'bg-mx-bg border-t border-mx-border' : 'bg-[#0b1018] border-t border-white/10'} py-16 md:py-20`}>
       <div className="max-w-[1800px] mx-auto px-6 md:px-28">

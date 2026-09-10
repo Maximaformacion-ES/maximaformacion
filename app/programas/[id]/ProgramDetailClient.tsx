@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FontStyles } from '../../components/FontStyles';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { ContactCourse } from '../../components/ContactCourseProvider';
 import { ProgramHeroSection } from '../../components/ProgramHeroSection';
 import { ProgramTabs } from '../../components/ProgramTabs';
 import { ProgramSidebar, SIDEBAR_CTA_ANCHOR_ID } from '../../components/ProgramSidebar';
@@ -106,6 +107,8 @@ export default function ProgramDetailClient({
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip">
       <FontStyles />
+      {/* Header/footer/CTAs enlazan a /contacto?curso=<este curso> */}
+      <ContactCourse title={program.title} />
 
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 

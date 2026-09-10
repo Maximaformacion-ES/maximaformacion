@@ -5,10 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSiteBranding } from "./SiteBrandingProvider";
+import { useContactHref } from "./ContactCourseProvider";
 
 export const Footer: React.FC = () => {
   const branding = useSiteBranding();
   const pathname = usePathname();
+  // En una ficha de curso lleva ?curso= (formulario con el curso preseleccionado).
+  const contactHref = useContactHref();
   const isMaxymia = pathname?.startsWith("/maxymia") ?? false;
   const logoSrc = isMaxymia ? branding.logoMaxymia : branding.logoMaximaformacion;
   const logoAlt = isMaxymia ? "Maxymia" : "Máxima Formación";
@@ -28,7 +31,7 @@ export const Footer: React.FC = () => {
       { label: "Profesorado", href: "/profesorado" },
       { label: "Autores", href: "/autores" },
       { label: "Blog", href: "/blog" },
-      { label: "Contacto", href: "/contacto" },
+      { label: "Contacto", href: contactHref },
     ],
   };
 

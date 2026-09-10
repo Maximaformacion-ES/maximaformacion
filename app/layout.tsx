@@ -11,6 +11,7 @@ import { MotionProvider } from "./components/MotionProvider";
 import { Analytics } from "./components/Analytics";
 import { SiteBrandingProvider } from "./components/SiteBrandingProvider";
 import { MegaMenuProvider, type MegaMenuArea } from "./components/MegaMenuProvider";
+import { ContactCourseProvider } from "./components/ContactCourseProvider";
 import { SUBJECT_AREAS } from "@/lib/subject-areas";
 import { JsonLd } from "./components/JsonLd";
 import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo/jsonld";
@@ -221,7 +222,9 @@ gtag('consent', 'default', {
           {GTM_ID && <Analytics />}
           <SiteBrandingProvider value={branding}>
             <MegaMenuProvider value={{ areas: megaMenuAreas }}>
-              <MotionProvider>{children}</MotionProvider>
+              <ContactCourseProvider>
+                <MotionProvider>{children}</MotionProvider>
+              </ContactCourseProvider>
             </MegaMenuProvider>
           </SiteBrandingProvider>
         </body>

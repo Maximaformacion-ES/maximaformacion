@@ -37,6 +37,7 @@ import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
+import { ContactCourse } from '@/app/components/ContactCourseProvider';
 import Certificate from '../../components/Certificate';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
 import type { Badge, Institution } from '@/lib/strapi/types';
@@ -250,7 +251,13 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
   if (!hasAccess) {
-    return <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} allBadges={allBadges} allInstitutions={allInstitutions} />;
+    return (
+      <>
+        {/* El footer del campus enlaza a /contacto?curso=<este curso> */}
+        <ContactCourse title={course.title.es || course.title[locale]} />
+        <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} allBadges={allBadges} allInstitutions={allInstitutions} />
+      </>
+    );
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [
@@ -264,6 +271,8 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
 
   return (
     <div className="h-[calc(100dvh-65px)] md:h-[calc(100dvh-97px)] flex flex-col overflow-hidden">
+      {/* El footer del campus enlaza a /contacto?curso=<este curso> */}
+      <ContactCourse title={course.title.es || course.title[locale]} />
       {/* ─── Scrollable content ─── */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
       {/* ─── Hero Section (two-column) ─────────────────────── */}
