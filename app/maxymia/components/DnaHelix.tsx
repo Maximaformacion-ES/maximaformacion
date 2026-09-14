@@ -17,19 +17,20 @@ import * as THREE from 'three';
  *   prefers-reduced-motion pinta un único fotograma.
  */
 
+// Colores EXACTOS de marca (--color-mx-blue / --color-mx-orange). El shader
+// termina con `colorspace_fragment` para que salgan tal cual en pantalla.
 const BLUE = new THREE.Color('#527BE7');
 const ORANGE = new THREE.Color('#F7A000');
-const BLUE_LIGHT = new THREE.Color('#9DBBF5');
-const ORANGE_LIGHT = new THREE.Color('#FFC24D');
 
-const HEIGHT = 13; // alto de la hélice (unidades)
+const HEIGHT = 18; // alto de la hélice (unidades); se ve solo una parte
+const VISIBLE = 0.6; // fracción del alto que cabe en el lienzo → rebosa arriba y abajo
 const RADIUS = 1.8;
-const TURNS = 2.4;
+const TURNS = 3.2;
 const STRAND_PTS = 4200; // partículas por hebra
 const RUNGS = 46; // peldaños
 const RUNG_PTS = 70; // partículas por peldaño
 const HALO_PTS = 1600; // partículas sueltas alrededor
-const TILT_Z = THREE.MathUtils.degToRad(-28); // diagonal, como la referencia
+const TILT_Z = THREE.MathUtils.degToRad(-20); // diagonal, como la referencia
 const SPEED = 0.18; // rad/s (~35 s por vuelta)
 const FOV = 34;
 
@@ -51,8 +52,8 @@ const VERT = /* glsl */ `
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     float dz = abs(mv.z - uFocus);          // distancia al plano de enfoque
     float blur = 1.0 + dz * 0.35;           // desenfocado → más grande...
-    float twinkle = 0.8 + 0.2 * sin(uTime * 1.6 + aSeed * 6.2831);
-    vAlpha = 0.55 * twinkle / (1.0 + dz * dz * 0.4); // ...y más tenue
+    float twinkle = 0.85 + 0.15 * sin(uTime * 1.6 + aSeed * 6.2831);
+    vAlpha = 0.9 * twinkle / (1.0 + dz * dz * 0.4); // ...y más tenue
     vColor = aColor;
     gl_PointSize = aSize * blur * uPixelRatio * (140.0 / -mv.z);
     gl_Position = projectionMatrix * mv;
@@ -67,44 +68,62 @@ const FRAG = /* glsl */ `
     float a = smoothstep(0.5, 0.25, d) * vAlpha;
     if (a < 0.01) discard;
     gl_FragColor = vec4(vColor, a);
+    #include <colorspace_fragment>
   }
 `;
 
-function buildGeometry(): THREE.BufferGeometry {
-  const total = STRAND_PTS * 2 + RUNGS * RUNG_PTS + HALO_PTS;
-  const pos = new Float32Array(total * 3);
-  const col = new Float32Array(total * 3);
-  const size = new Float32Array(total);
-  const seed = new Float32Array(total);
-  let i = 0;
+class Cloud {
+  pos: Float32Array;
+  col: Float32Array;
+  size: Float32Array;
+  seed: Float32Array;
+  i = 0;
+  constructor(n: number) {
+    this.pos = new Float32Array(n * 3);
+    this.col = new Float32Array(n * 3);
+    this.size = new Float32Array(n);
+    this.seed = new Float32Array(n);
+  }
+  put(x: number, y: number, z: number, color: THREE.Color, s: number) {
+    const i = this.i++;
+    this.pos[i * 3] = x;
+    this.pos[i * 3 + 1] = y;
+    this.pos[i * 3 + 2] = z;
+    this.col[i * 3] = color.r;
+    this.col[i * 3 + 1] = color.g;
+    this.col[i * 3 + 2] = color.b;
+    this.size[i] = s;
+    this.seed[i] = Math.random();
+  }
+  geometry(): THREE.BufferGeometry {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
+    geo.setAttribute('aColor', new THREE.BufferAttribute(this.col, 3));
+    geo.setAttribute('aSize', new THREE.BufferAttribute(this.size, 1));
+    geo.setAttribute('aSeed', new THREE.BufferAttribute(this.seed, 1));
+    return geo;
+  }
+}
+
+const strandPoint = (t: number, phase: number) => {
+  const ang = t * TURNS * Math.PI * 2 + phase;
+  return [Math.cos(ang) * RADIUS, -HEIGHT / 2 + t * HEIGHT, Math.sin(ang) * RADIUS] as const;
+};
+
+/** Hebras + peldaños: es lo que gira sobre el eje de la hélice. */
+function buildHelix(): THREE.BufferGeometry {
+  const cloud = new Cloud(STRAND_PTS * 2 + RUNGS * RUNG_PTS);
+  const put = cloud.put.bind(cloud);
   const c = new THREE.Color();
-
-  const put = (x: number, y: number, z: number, color: THREE.Color, s: number) => {
-    pos[i * 3] = x;
-    pos[i * 3 + 1] = y;
-    pos[i * 3 + 2] = z;
-    col[i * 3] = color.r;
-    col[i * 3 + 1] = color.g;
-    col[i * 3 + 2] = color.b;
-    size[i] = s;
-    seed[i] = Math.random();
-    i++;
-  };
-
-  const strandPoint = (t: number, phase: number) => {
-    const ang = t * TURNS * Math.PI * 2 + phase;
-    return [Math.cos(ang) * RADIUS, -HEIGHT / 2 + t * HEIGHT, Math.sin(ang) * RADIUS] as const;
-  };
 
   // Hebras: tubo denso de partículas alrededor de la curva.
   for (let s = 0; s < 2; s++) {
     const base = s === 0 ? BLUE : ORANGE;
-    const light = s === 0 ? BLUE_LIGHT : ORANGE_LIGHT;
     for (let k = 0; k < STRAND_PTS; k++) {
       const t = Math.random();
       const [x, y, z] = strandPoint(t, s * Math.PI);
       const spread = 0.1 + Math.random() * 0.08;
-      c.copy(base).lerp(light, Math.random() * 0.45);
+      c.copy(base);
       put(x + gauss() * spread, y + gauss() * spread, z + gauss() * spread, c, 0.55 + Math.random() * 1.1);
     }
   }
@@ -117,9 +136,7 @@ function buildGeometry(): THREE.BufferGeometry {
     const [bx, by, bz] = strandPoint(t, Math.PI);
     for (let k = 0; k < RUNG_PTS; k++) {
       const u = Math.random();
-      const base = u < 0.5 ? BLUE : ORANGE;
-      const light = u < 0.5 ? BLUE_LIGHT : ORANGE_LIGHT;
-      c.copy(base).lerp(light, Math.random() * 0.5);
+      c.copy(u < 0.5 ? BLUE : ORANGE);
       const jit = 0.06;
       put(
         ax + (bx - ax) * u + gauss() * jit,
@@ -131,21 +148,21 @@ function buildGeometry(): THREE.BufferGeometry {
     }
   }
 
-  // Halo: polvo disperso alrededor de la hélice, muy tenue.
+  return cloud.geometry();
+}
+
+/** Halo: polvo disperso alrededor de la hélice. NO gira, solo parpadea. */
+function buildHalo(): THREE.BufferGeometry {
+  const cloud = new Cloud(HALO_PTS);
+  const c = new THREE.Color();
   for (let k = 0; k < HALO_PTS; k++) {
     const t = Math.random();
     const s = Math.random() < 0.5 ? 0 : Math.PI;
     const [x, y, z] = strandPoint(t, s);
-    c.copy(s === 0 ? BLUE_LIGHT : ORANGE_LIGHT);
-    put(x + gauss() * 1.4, y + gauss() * 1.0, z + gauss() * 1.4, c, 0.4 + Math.random() * 0.8);
+    c.copy(s === 0 ? BLUE : ORANGE);
+    cloud.put(x + gauss() * 1.4, y + gauss() * 1.0, z + gauss() * 1.4, c, 0.4 + Math.random() * 0.8);
   }
-
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
-  geo.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
-  geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
-  return geo;
+  return cloud.geometry();
 }
 
 export default function DnaHelix({ className = '' }: { className?: string }) {
@@ -159,8 +176,10 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
     const half = THREE.MathUtils.degToRad(FOV / 2);
-    // Distancia para que la hélice inclinada entre en alto con margen.
-    const dist = (HEIGHT / 2 + 1.2) / Math.tan(half);
+    // Distancia para que solo se vea la fracción VISIBLE del alto: la hélice
+    // rebosa por arriba y por abajo (el fundido lo pone el contenedor con
+    // mask-image en MaxymiaClient).
+    const dist = ((HEIGHT * VISIBLE) / 2) / Math.tan(half);
     camera.position.set(0, 0, dist);
     camera.lookAt(0, 0, 0);
 
@@ -171,7 +190,8 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
     host.appendChild(renderer.domElement);
     Object.assign(renderer.domElement.style, { display: 'block', width: '100%', height: '100%' });
 
-    const geo = buildGeometry();
+    const helixGeo = buildHelix();
+    const haloGeo = buildHalo();
     const mat = new THREE.ShaderMaterial({
       vertexShader: VERT,
       fragmentShader: FRAG,
@@ -187,14 +207,17 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
         uFocus: { value: -dist + RADIUS * 0.6 },
       },
     });
-    const points = new THREE.Points(geo, mat);
+    const helixPts = new THREE.Points(helixGeo, mat);
+    const haloPts = new THREE.Points(haloGeo, mat);
 
-    const spin = new THREE.Group(); // gira sobre su eje local Y
-    spin.add(points);
-    const tilt = new THREE.Group(); // inclinación fija en diagonal
+    // `tilt`: inclinación fija en diagonal (no se anima). `spin`: SOLO las
+    // hebras y los peldaños, girando sobre el eje de la propia hélice (su Y
+    // local). El halo cuelga de `tilt`, así que se queda quieto.
+    const spin = new THREE.Group();
+    spin.add(helixPts);
+    const tilt = new THREE.Group();
     tilt.rotation.z = TILT_Z;
-    tilt.rotation.x = THREE.MathUtils.degToRad(8);
-    tilt.add(spin);
+    tilt.add(spin, haloPts);
     scene.add(tilt);
 
     const resize = () => {
@@ -235,7 +258,8 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
       cancelAnimationFrame(raf);
       io.disconnect();
       ro.disconnect();
-      geo.dispose();
+      helixGeo.dispose();
+      haloGeo.dispose();
       mat.dispose();
       renderer.dispose();
       if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);

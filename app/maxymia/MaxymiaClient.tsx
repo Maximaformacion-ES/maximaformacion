@@ -83,8 +83,24 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
         <div className="absolute top-1/2 right-10 w-50 h-50 bg-mx-orange/3 rounded-full blur-[80px]" />
       </div>
 
+      {/* Hélice de ADN (Three.js): capa absoluta en la mitad derecha, a TODO
+          el alto del hero. La hélice es más larga que el lienzo y se pierde
+          por arriba y por abajo con un fundido (mask-image). */}
+      <m.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2, delay: 0.3 }}
+        className="hidden lg:block absolute inset-y-0 right-0 w-1/2 pointer-events-none z-0"
+        style={{
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
+        }}
+      >
+        <DnaHelix className="absolute inset-0" />
+      </m.div>
+
       <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] w-full relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center lg:min-h-[calc(100dvh-12rem)]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left content */}
           <div>
             <m.div
@@ -162,15 +178,8 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
             </m.div>
           </div>
 
-          {/* Right — doble hélice de ADN (Three.js) a todo el alto del hero */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.3 }}
-            className="hidden lg:block relative self-stretch min-h-[560px]"
-          >
-            <DnaHelix className="absolute inset-0" />
-          </m.div>
+          {/* Right — columna vacía: la hélice va en la capa absoluta de arriba */}
+          <div className="hidden lg:block" aria-hidden="true" />
         </div>
       </div>
 
