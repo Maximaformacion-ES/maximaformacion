@@ -17,9 +17,12 @@ export interface ProgramCardViewProps {
   program: Program;
   index?: number;
   userHasPro?: boolean;
+  /** El usuario ya tiene acceso (matrícula o Pro): la tarjeta lo dice y
+   *  enlaza al player en vez de a la ficha. */
+  enrolled?: boolean;
 }
 
-export function programToCardData(program: Program): CourseCardData {
+export function programToCardData(program: Program, enrolled = false): CourseCardData {
   const isMaster = program.type === "Master";
   const meta: CourseCardData["meta"] = [];
   if (program.durationLabel || program.duration) {
@@ -29,7 +32,9 @@ export function programToCardData(program: Program): CourseCardData {
   if (program.modules?.length) meta.push({ icon: Layers, label: `${program.modules.length} módulos` });
 
   return {
-    href: program.href || `/programas/${program.slug}`,
+    href: enrolled
+      ? `/cursos/${program.documentId || program.id}`
+      : program.href || `/programas/${program.slug}`,
     title: program.title,
     description: program.description,
     image: program.image,
@@ -47,6 +52,7 @@ export function programToCardData(program: Program): CourseCardData {
       // número en el CMS; y cualquier programa sin precio configurado también.
       consult: isMaster || !program.price,
     },
+    enrolled,
   };
 }
 
@@ -54,9 +60,10 @@ export const ProgramCardView: React.FC<ProgramCardViewProps> = ({
   program,
   index = 0,
   userHasPro = false,
+  enrolled = false,
 }) => (
   <CourseCard
-    data={programToCardData(program)}
+    data={programToCardData(program, enrolled)}
     index={index}
     userHasPro={userHasPro}
     priority={index < 3}

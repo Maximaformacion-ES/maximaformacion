@@ -76,11 +76,29 @@ export default function MaxymiaCourseCard({
   light = false,
 }: MaxymiaCourseCardProps) {
   const { isSignedIn } = useUser();
-  const { hasPro } = useUserCampus();
+  const { hasPro, hasAccess, courseProgress } = useUserCampus();
   const userHasPro = !!isSignedIn && hasPro;
+  // Si la página no pasa acceso/progreso (landing, ficha, recomendados), se
+  // toman del perfil del campus: así la tarjeta dice "Ya lo tienes" e "Ir al
+  // curso" en cualquier sitio donde aparezca.
+  const own = courseProgress[course.id];
+  const effectiveProgress: MaxymiaCourseProgress | undefined =
+    progress ??
+    (own
+      ? {
+          courseId: course.id,
+          completedLessons: own.completedLessons ?? [],
+          currentLessonId: own.currentLessonId ?? null,
+          examResults: {},
+          startedAt: own.startedAt ?? '',
+          lastAccessedAt: own.lastAccessedAt ?? '',
+        }
+      : undefined);
+  const effectiveEnrolled =
+    enrolled ?? (!!isSignedIn && (hasAccess(course.id, course.isPro) || !!own));
   return (
     <CourseCard
-      data={maxymiaCourseToCardData(course, locale, progress, enrolled)}
+      data={maxymiaCourseToCardData(course, locale, effectiveProgress, effectiveEnrolled)}
       index={index}
       userHasPro={userHasPro}
       locale={locale}

@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { m } from 'framer-motion';
-import { ArrowRight, Crown, Trophy } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Crown, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
   getEffectivePrice,
@@ -99,12 +99,12 @@ const COPY = {
     view: 'Ver curso',
     viewMaster: 'Ver máster',
     consultCta: 'Consultar',
-    start: 'Empezar',
+    go: 'Ir al curso',
     resume: 'Continuar',
     review: 'Repasar',
     completed: 'Completado',
     lessons: 'lecciones',
-    purchased: 'Matriculado',
+    purchased: 'Ya lo tienes',
   },
   en: {
     master: 'Master',
@@ -117,7 +117,7 @@ const COPY = {
     view: 'View course',
     viewMaster: 'View master',
     consultCta: 'Enquire',
-    start: 'Start',
+    go: 'Go to course',
     resume: 'Continue',
     review: 'Review',
     completed: 'Completed',
@@ -177,7 +177,7 @@ export function CourseCard({
       ? t.review
       : progress && progress.completed > 0
         ? t.resume
-        : t.start
+        : t.go
     : consult
       ? t.consultCta
       : isMaster
@@ -281,11 +281,11 @@ export function CourseCard({
             <div className="flex items-end justify-between gap-3">
               <div className="min-w-0">
                 {showProgress ? (
-                  <span className={`text-body-sm font-medium ${progress?.isCompleted ? 'text-amber-500' : c.text}`}>
+                  <span className={`text-body-sm font-medium ${progress?.isCompleted ? 'text-amber-500' : 'text-emerald-600'}`}>
                     {progress?.isCompleted ? (
                       <span className="inline-flex items-center gap-1.5"><Trophy size={14} /> {t.completed}</span>
                     ) : (
-                      t.purchased
+                      <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} /> {t.purchased}</span>
                     )}
                   </span>
                 ) : consult ? (
