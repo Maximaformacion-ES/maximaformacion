@@ -32,7 +32,10 @@ export function programToCardData(program: Program, enrolled = false): CourseCar
   if (program.modules?.length) meta.push({ icon: Layers, label: `${program.modules.length} módulos` });
 
   return {
-    href: enrolled
+    // Los cursos Maxymia (adaptados con `href` a /maxymia/campus/[slug]) no
+    // viven en /cursos: su propia ficha ya muestra la vista de alumno si tiene
+    // acceso. Solo los programas de Máxima (Moodle) van a /cursos/[documentId].
+    href: enrolled && !program.href
       ? `/cursos/${program.documentId || program.id}`
       : program.href || `/programas/${program.slug}`,
     title: program.title,
