@@ -350,7 +350,6 @@ function CoursesSection({
 // ─── WHY SECTION ───────────────────────────────────────
 
 function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
-  const [activeCard, setActiveCard] = useState(0);
 
   return (
     <section className="relative py-24 md:py-32">
@@ -373,61 +372,46 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
           </p>
         </m.div>
 
-        {/* Two columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-          {/* Left — differentiator cards */}
-          <div className="space-y-5">
-            {section.cards.map((diff: MaxymiaCard, i: number) => (
+        {/* Filas alternas: texto a un lado, imagen al otro, cambiando de lado
+            en cada fila (estilo editorial). Sin tarjetas ni panel sticky. */}
+        <div className="flex flex-col gap-20 md:gap-28">
+          {section.cards.map((card: MaxymiaCard, i: number) => {
+            const visual = WHY_VISUALS[i % WHY_VISUALS.length];
+            const Icon = visual.icon;
+            const imageFirst = i % 2 === 1;
+            return (
               <m.div
-                key={diff.title}
-                initial={{ opacity: 0, y: 30 }}
+                key={card.title}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                onClick={() => setActiveCard(i)}
-                className={`relative p-5 md:p-6 rounded-2xl border cursor-pointer transition-all duration-500 group ${
-                  activeCard === i
-                    ? 'border-mx-orange/50 bg-mx-orange/5'
-                    : 'border-mx-border bg-mx-card hover:border-mx-orange/30 hover:bg-mx-orange/5'
-                }`}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.7 }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center"
               >
-                {activeCard === i && (
-                  <div className="absolute -top-6 -left-6 w-32 h-32 bg-mx-orange/10 rounded-full blur-[50px] pointer-events-none" />
-                )}
-                <span className={`text-label-md font-mono tracking-widest mb-2 block relative z-10 ${
-                  activeCard === i ? 'text-mx-orange' : 'text-mx-orange/40'
-                }`}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <h3 className="text-mx-text text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 relative z-10">{diff.title}</h3>
-                <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light leading-relaxed relative z-10">
-                  {diff.description}
-                </p>
-              </m.div>
-            ))}
-          </div>
+                {/* Texto */}
+                <div className={`${imageFirst ? 'lg:order-2 lg:pl-8' : 'lg:order-1 lg:pr-8'}`}>
+                  <span className="block text-mx-orange text-label-md font-mono tracking-widest mb-4">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="text-heading-md md:text-heading-lg 2xl:text-display-sm font-black tracking-tight leading-[1.05] text-mx-text mb-6 max-w-xl">
+                    {card.title}
+                  </h3>
+                  <p className="text-mx-text-muted text-body-md 2xl:text-body-lg font-light leading-relaxed max-w-lg">
+                    {card.description}
+                  </p>
+                </div>
 
-          {/* Right — image that changes on card click */}
-          <m.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="hidden lg:block rounded-2xl overflow-hidden bg-mx-card border border-mx-border aspect-4/3 sticky top-32 shadow-sm"
-          >
-            {section.cards.map((card: MaxymiaCard, i: number) => {
-              const visual = WHY_VISUALS[i % WHY_VISUALS.length];
-              const Icon = visual.icon;
-              return (
-                <m.div
-                  key={card.title}
-                  className="absolute inset-0"
-                  initial={false}
-                  animate={{ opacity: activeCard === i ? 1 : 0 }}
-                  transition={{ duration: 0.5 }}
-                >
+                {/* Imagen (o degradado con icono si Strapi no trae imagen) */}
+                <div className={`relative rounded-2xl overflow-hidden aspect-4/3 border border-mx-border bg-mx-card shadow-sm ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}>
                   {card.image ? (
-                    <Image src={card.image} alt={card.title} className="absolute inset-0 w-full h-full object-cover" fill sizes="(max-width: 1024px) 100vw, 50vw" unoptimized />
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      className="object-cover"
+                      unoptimized
+                    />
                   ) : (
                     <>
                       <div className={`absolute inset-0 bg-linear-to-br ${visual.gradient}`} />
@@ -436,22 +420,10 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                       </div>
                     </>
                   )}
-                </m.div>
-              );
-            })}
-            {/* Active indicator dots */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {section.cards.map((card: MaxymiaCard, i: number) => (
-                <button
-                  key={card.title}
-                  onClick={() => setActiveCard(i)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    activeCard === i ? 'bg-mx-orange w-6' : 'bg-white/60'
-                  }`}
-                />
-              ))}
-            </div>
-          </m.div>
+                </div>
+              </m.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -413,41 +413,9 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                 </div>
               </m.section>
 
-              {/* Contenido del curso — el temario es el contenido principal
-                  de la página (patrón Udemy/Domestika), con estado por lección. */}
-              <m.section
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mb-14"
-              >
-                <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
-                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
-                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
-                  </h2>
-                  <p className="text-label-md text-mx-text-muted">
-                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
-                    {totalExams > 0 ? ` · ${totalExams} ${locale === 'es' ? 'exámenes' : 'exams'}` : ''}
-                  </p>
-                </div>
-                <div className="space-y-3">
-                  {course.blocks.map((block, blockIdx) => (
-                    <ModuleCard
-                      key={block.id}
-                      block={block}
-                      blockIndex={blockIdx}
-                      courseSlug={course.slug}
-                      completedSet={completedSet}
-                      firstIncompleteLessonId={firstIncompleteLessonId}
-                      locale={locale}
-                      examResultsByExamId={examResultsByExamId}
-                    />
-                  ))}
-                </div>
-              </m.section>
-
-              {/* Sobre el curso — información secundaria en pestañas */}
-              <m.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
+              {/* Sobre el curso — descripción, objetivos, audiencia y salidas,
+                  antes del temario (contexto primero, contenido después). */}
+              <m.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="mb-14">
                 <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue mb-4">
                   {locale === 'es' ? 'Sobre el curso' : 'About the course'}
                 </h2>
@@ -487,6 +455,38 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   )}
                 </div>
               </m.section>
+              {/* Contenido del curso — el temario es el contenido principal
+                  de la página (patrón Udemy/Domestika), con estado por lección. */}
+              <m.section
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
+                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
+                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
+                  </h2>
+                  <p className="text-label-md text-mx-text-muted">
+                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
+                    {totalExams > 0 ? ` · ${totalExams} ${locale === 'es' ? 'exámenes' : 'exams'}` : ''}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {course.blocks.map((block, blockIdx) => (
+                    <ModuleCard
+                      key={block.id}
+                      block={block}
+                      blockIndex={blockIdx}
+                      courseSlug={course.slug}
+                      completedSet={completedSet}
+                      firstIncompleteLessonId={firstIncompleteLessonId}
+                      locale={locale}
+                      examResultsByExamId={examResultsByExamId}
+                    />
+                  ))}
+                </div>
+              </m.section>
+
             </div>
 
             {/* ─── Panel lateral sticky: resumen y acciones ─── */}
