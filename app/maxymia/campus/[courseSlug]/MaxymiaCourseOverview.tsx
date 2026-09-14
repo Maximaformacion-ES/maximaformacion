@@ -343,17 +343,25 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
             <div className="absolute inset-y-0 left-0 w-3/4 bg-gradient-to-r from-mx-bg/80 via-mx-bg/30 to-transparent" />
           </div>
 
-          <div className="relative flex-1 flex flex-col max-w-[1400px] w-full mx-auto px-6 md:px-12 pt-6 pb-10 md:pb-14">
-            {/* Breadcrumb arriba del todo, pegado al header */}
-            <m.div {...fadeUp(0)}>
-              <Breadcrumb
-                items={[
-                  { label: 'Campus', href: '/maxymia/campus' },
-                  { label: locale === 'es' ? 'Mis cursos' : 'My courses', href: '/maxymia/campus/mis-cursos' },
-                  { label: course.title[locale] },
-                ]}
-                className=""
-              />
+          <div className="relative flex-1 flex flex-col max-w-[1400px] w-full mx-auto px-6 md:px-12 pb-10 md:pb-14">
+            {/* Breadcrumb arriba del todo: pestaña blanca que "cuelga" del
+                header, con las esquinas inferiores redondeadas. */}
+            <m.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              className="self-start max-w-full"
+            >
+              <div className="inline-block max-w-full rounded-b-2xl bg-mx-bg px-5 py-3 shadow-[0_8px_24px_-12px_rgba(26,26,26,0.25)]">
+                <Breadcrumb
+                  items={[
+                    { label: 'Campus', href: '/maxymia/campus' },
+                    { label: locale === 'es' ? 'Mis cursos' : 'My courses', href: '/maxymia/campus/mis-cursos' },
+                    { label: course.title[locale] },
+                  ]}
+                  className=""
+                />
+              </div>
             </m.div>
 
             {/* Contenido abajo a la izquierda */}
