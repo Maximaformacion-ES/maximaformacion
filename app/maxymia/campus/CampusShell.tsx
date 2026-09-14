@@ -37,7 +37,7 @@ function ShellInner({ children, courses, defaultOpen }: Required<Omit<CampusShel
   const { locale } = useLocale();
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <CampusSidebar locale={locale} courses={courses} />
+      <CampusSidebar locale={locale} />
       <SidebarInset className="bg-mx-bg text-mx-text">
         <CampusHeader locale={locale} courses={courses} />
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
