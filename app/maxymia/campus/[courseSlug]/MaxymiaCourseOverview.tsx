@@ -334,7 +334,9 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
         {/* ─── 1. Hero a sangre (estilo ficha del pack): la imagen del curso
             ocupa todo el hero y el contenido va abajo a la izquierda sobre
             el fundido hacia el fondo de la página. ─── */}
-        <section className="relative overflow-hidden mt-[72px] sm:mt-[96px] min-h-[calc(100dvh-72px)] sm:min-h-[calc(100dvh-96px)] flex flex-col">
+        {/* Altura algo menor que la ventana (≈86 %) para que el borde inferior
+            del panel blanco y sus curvas queden a la vista sin hacer scroll. */}
+        <section className="relative overflow-hidden mt-[72px] sm:mt-[96px] min-h-[calc(86dvh-72px)] sm:min-h-[calc(86dvh-96px)] flex flex-col">
           {/* Imagen a sangre cubriendo TODO el hero, con fundidos para que el
               texto y la tarjeta de retomar (dentro del hero) se lean. */}
           <div className="absolute inset-0">
