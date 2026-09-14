@@ -360,13 +360,13 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-right mb-20"
+          className="text-right mb-20 flex flex-col items-end"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-mx-blue/80 bg-mx-blue/10 mb-5">
             <Check size={14} className="text-mx-blue" />
             <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
-          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-4">{section.title}</h2>
+          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-4 w-1/2">{section.title}</h2>
           <p className="text-mx-text-muted text-body-md font-light max-w-lg ml-auto leading-relaxed">
             {section.description}
           </p>
@@ -382,27 +382,50 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
             return (
               <m.div
                 key={card.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.7 }}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: '-15% 0px' }}
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
                 className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center"
               >
-                {/* Texto */}
-                <div className={`${imageFirst ? 'lg:order-2 lg:pl-8' : 'lg:order-1 lg:pr-8'}`}>
-                  <span className="block text-mx-orange text-label-md font-mono tracking-widest mb-4">
+                {/* Texto: entra desde su lado, con número, título y párrafo
+                    escalonados. */}
+                <m.div
+                  variants={{
+                    hidden: { opacity: 0, x: imageFirst ? 48 : -48 },
+                    show: { opacity: 1, x: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.1 } },
+                  }}
+                  className={`${imageFirst ? 'lg:order-2 lg:pl-8' : 'lg:order-1 lg:pr-8'}`}
+                >
+                  <m.span
+                    variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+                    className="block text-mx-orange text-label-md font-mono tracking-widest mb-4"
+                  >
                     {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <h3 className="text-heading-md md:text-heading-lg 2xl:text-display-sm font-black tracking-tight leading-[1.05] text-mx-text mb-6 max-w-xl">
+                  </m.span>
+                  <m.h3
+                    variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+                    className="text-heading-md md:text-heading-lg 2xl:text-display-sm font-black tracking-tight leading-[1.05] text-mx-text mb-6 max-w-xl"
+                  >
                     {card.title}
-                  </h3>
-                  <p className="text-mx-text-muted text-body-md 2xl:text-body-lg font-light leading-relaxed max-w-lg">
+                  </m.h3>
+                  <m.p
+                    variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+                    className="text-mx-text-muted text-body-md 2xl:text-body-lg font-light leading-relaxed max-w-lg"
+                  >
                     {card.description}
-                  </p>
-                </div>
+                  </m.p>
+                </m.div>
 
-                {/* Imagen (o degradado con icono si Strapi no trae imagen) */}
-                <div className={`relative rounded-2xl overflow-hidden aspect-4/3 border border-mx-border bg-mx-card shadow-sm ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}>
+                {/* Imagen (o degradado con icono si Strapi no trae imagen):
+                    entra desde el lado contrario con un ligero zoom. */}
+                <m.div
+                  variants={{
+                    hidden: { opacity: 0, x: imageFirst ? -48 : 48, scale: 0.96 },
+                    show: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
+                  }}
+                  className={`relative rounded-2xl overflow-hidden aspect-4/3 border border-mx-border bg-mx-card shadow-sm ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}
+                >
                   {card.image ? (
                     <Image
                       src={card.image}
@@ -420,7 +443,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                       </div>
                     </>
                   )}
-                </div>
+                </m.div>
               </m.div>
             );
           })}
