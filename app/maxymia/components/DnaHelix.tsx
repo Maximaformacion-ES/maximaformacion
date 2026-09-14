@@ -86,9 +86,9 @@ export default function DnaHelix({
     host.appendChild(renderer.domElement);
     Object.assign(renderer.domElement.style, { display: 'block', width: '100%', height: '100%' });
 
-    // Geometría unitaria (1 × 1 px con esquinas redondeadas) que escalamos por
-    // instancia; la esquina se estira un poco al escalar en X, es aceptable.
-    const geo = roundedRect(1, 1, 0.42);
+    // Geometría unitaria (1 × 1 px, esquinas apenas redondeadas: radio del
+    // 12 % del alto) que escalamos por instancia. Rectángulos, no píldoras.
+    const geo = roundedRect(1, 1, 0.12);
     const mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     let mesh: THREE.InstancedMesh | null = null;
