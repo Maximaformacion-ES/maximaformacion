@@ -44,7 +44,7 @@ import { maxymiaCategoryLabel } from '../../data/labels';
 import Certificate from '../../components/Certificate';
 import TutorQuestionModal from '../../components/TutorQuestionModal';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaCourseProgress, Locale } from '../../types';
-import type { Badge, Institution } from '@/lib/strapi/types';
+import type { Badge, Institution, VideoTestimonial } from '@/lib/strapi/types';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   beginner: { es: 'Principiante', en: 'Beginner' },
@@ -77,9 +77,10 @@ interface Props {
   /** Set GLOBAL de sellos/instituciones: TODOS en todas las fichas. */
   allBadges?: Badge[];
   allInstitutions?: Institution[];
+  videoTestimonials?: VideoTestimonial[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess, embedded = false, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, embedded = false, teacherAvatars, recommended, allBadges, allInstitutions, videoTestimonials }: Props) {
   const { locale } = useLocale();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showTutorModal, setShowTutorModal] = useState(false);
@@ -291,6 +292,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, embedd
         recommended={recommended}
         allBadges={allBadges}
         allInstitutions={allInstitutions}
+        videoTestimonials={videoTestimonials}
       />
     );
   }

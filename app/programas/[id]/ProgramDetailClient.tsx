@@ -15,12 +15,13 @@ import { ProgramCTASection } from '../../components/ProgramCTASection';
 import { ProgramMobileCTA } from '../../components/ProgramMobileCTA';
 import { TrustBlock } from '../../components/TrustBlock';
 import { TeamCommitment } from '../../components/TeamCommitment';
+import { VideoTestimonialsSection } from '../../components/VideoTestimonialsSection';
 import { DocenteSection, type Docente } from '../../components/DocenteSection';
 import { SectionHeader } from '../../components/SectionHeader';
 import { ProgramCard } from '../../components/ProgramCard';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
-import type { Program, Badge, Institution } from '@/lib/strapi/types';
+import type { Program, Badge, Institution, VideoTestimonial } from '@/lib/strapi/types';
 import type { ProgramRichHtml } from './page';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -38,6 +39,8 @@ interface ProgramDetailClientProps {
   allBadges?: Badge[];
   /** Set GLOBAL de instituciones: se muestran TODAS en todas las fichas. */
   allInstitutions?: Institution[];
+  /** Testimonios en vídeo (globales). Opcional: sin datos no hay sección. */
+  videoTestimonials?: VideoTestimonial[];
 }
 
 /** "Otros alumnos también compraron": fila de programas recomendados al pie. */
@@ -70,6 +73,7 @@ export default function ProgramDetailClient({
   recommended,
   allBadges,
   allInstitutions,
+  videoTestimonials,
 }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -149,6 +153,7 @@ export default function ProgramDetailClient({
                 certifications={allBadges}
               />
               <TeamCommitment avatars={teacherAvatars} />
+              <VideoTestimonialsSection testimonials={videoTestimonials} />
               <DocenteSection
                 docentes={docentes}
                 courseTitle={program.title}

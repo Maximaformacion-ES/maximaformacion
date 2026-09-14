@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { fetchMaxymiaCourseOverviewBySlug, fetchMaxymiaCourses } from '../../data/queries';
 import { getCourseAccess } from '@/lib/auth/entitlement';
-import { getTeachers, getBadges, getInstitutions } from '@/lib/strapi/queries';
+import { getTeachers, getBadges, getInstitutions, getVideoTestimonials } from '@/lib/strapi/queries';
 import { JsonLd } from '@/app/components/JsonLd';
 import { maxymiaCourseSchema } from '@/lib/seo/jsonld';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
@@ -43,13 +43,14 @@ export default async function CourseOverviewPage({ params }: PageProps) {
   // instituciones NO dependen de él → los lanzamos TODOS en paralelo (antes las 4
   // esperaban a que resolviera el DETAIL: waterfall). Solo `getCourseAccess`
   // necesita `course.id`, así que va después (auth+1 query DB, rápido).
-  const [course, teachers, allCourses, allBadges, allInstitutions] = await Promise.all([
+  const [course, teachers, allCourses, allBadges, allInstitutions, videoTestimonials] = await Promise.all([
     fetchMaxymiaCourseOverviewBySlug(courseSlug),
     getTeachers(),
     fetchMaxymiaCourses(),
     // Set GLOBAL de sellos e instituciones: TODOS en todas las fichas.
     getBadges(),
     getInstitutions(),
+    getVideoTestimonials(),
   ]);
 
   if (!course) notFound();
@@ -89,6 +90,7 @@ export default async function CourseOverviewPage({ params }: PageProps) {
       teacherAvatars={teacherAvatars}
       recommended={recommended}
       allBadges={allBadges}
+      videoTestimonials={videoTestimonials}
       allInstitutions={allInstitutions}
     />
   );

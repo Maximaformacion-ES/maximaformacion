@@ -38,6 +38,7 @@ import { ProgramHeroSection, type HeroProgram } from '@/app/components/ProgramHe
 import { ProgramCTASection } from '@/app/components/ProgramCTASection';
 import { DocenteSection } from '@/app/components/DocenteSection';
 import { TeamCommitment } from '@/app/components/TeamCommitment';
+import { VideoTestimonialsSection } from '@/app/components/VideoTestimonialsSection';
 import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
 import { SectionHeader } from '@/app/components/SectionHeader';
 import { useCampusTheme } from '../CampusShell';
@@ -45,7 +46,7 @@ import { TrustBlock } from '@/app/components/TrustBlock';
 import { FAQSection } from '@/app/components/FAQSection';
 import { Comos } from '@/app/components/Comos';
 import type { MaxymiaCourse, Locale } from '../../types';
-import type { Badge, Institution } from '@/lib/strapi/types';
+import type { Badge, Institution, VideoTestimonial } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount, klarnaInstallment } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
@@ -111,6 +112,8 @@ interface Props {
   /** Set GLOBAL de sellos/instituciones: TODOS en todas las fichas. */
   allBadges?: Badge[];
   allInstitutions?: Institution[];
+  /** Testimonios en vídeo (globales). Opcional: sin datos no hay sección. */
+  videoTestimonials?: VideoTestimonial[];
   /**
    * `true` (lo normal): ficha PÚBLICA de venta fuera del campus. Pinta la
    * página completa con el Header/Footer del sitio, exactamente como
@@ -138,6 +141,7 @@ export default function MaxymiaCourseDetail({
   recommended,
   allBadges,
   allInstitutions,
+  videoTestimonials,
   standalone = true,
 }: Props) {
   const { locale } = useLocale();
@@ -208,6 +212,7 @@ export default function MaxymiaCourseDetail({
               locale={locale}
             />
             <TeamCommitment locale={locale} avatars={teacherAvatars} />
+            <VideoTestimonialsSection testimonials={videoTestimonials} locale={locale} />
             <DocenteSection
               docentes={course.docentes}
               locale={locale}

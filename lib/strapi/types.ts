@@ -379,6 +379,30 @@ export interface Badge {
   category?: string | null;
 }
 
+// ============ Video testimonial (conjunto GLOBAL de las fichas) ============
+
+export interface StrapiVideoTestimonial {
+  id: number;
+  documentId: string;
+  name: string;
+  role: string | null;
+  quote: string | null;
+  videoUrl: string | null;
+  video: StrapiMedia | null;
+  poster: StrapiMedia | null;
+  order: number | null;
+}
+
+export interface VideoTestimonial {
+  id: number;
+  name: string;
+  role: string | null;
+  quote: string | null;
+  /** URL de YouTube/Vimeo o del archivo de vídeo subido a Strapi. */
+  videoUrl: string;
+  posterUrl: string | null;
+}
+
 // ============ Institution Types (clientes con logos) ============
 
 export interface StrapiInstitution {

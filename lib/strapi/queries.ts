@@ -38,6 +38,8 @@ import type {
   StrapiProResource,
   ProResourceCard,
   ProResource,
+  StrapiVideoTestimonial,
+  VideoTestimonial,
 } from './types';
 import type { ContentBlock } from '@/app/maxymia/types';
 
@@ -1120,6 +1122,32 @@ export async function getLogos(limit = 100): Promise<Logo[]> {
       }));
   } catch (error) {
     console.error('Error fetching logos:', error);
+    return [];
+  }
+}
+
+// ============ Video testimonial Queries ============
+
+/** Testimonios en vídeo (conjunto GLOBAL). Devuelve [] si no hay ninguno o si
+ *  la colección aún no existe en ese Strapi (robusto al orden de deploy). */
+export async function getVideoTestimonials(): Promise<VideoTestimonial[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiVideoTestimonial[]>>(
+      '/api/video-testimonials?populate[video]=true&populate[poster]=true&pagination[pageSize]=50&sort=order:asc',
+      { revalidate: 600, tags: ['video-testimonials'] }
+    );
+    return response.data
+      .map((t) => ({
+        id: t.id,
+        name: t.name,
+        role: t.role ?? null,
+        quote: t.quote ?? null,
+        videoUrl: (t.videoUrl && t.videoUrl.trim()) || (t.video ? getStrapiMediaUrl(t.video) : ''),
+        posterUrl: t.poster ? getStrapiMediaUrl(t.poster) : null,
+      }))
+      .filter((t) => t.videoUrl);
+  } catch (error) {
+    console.warn('[getVideoTestimonials] sin testimonios:', error instanceof Error ? error.message : error);
     return [];
   }
 }
