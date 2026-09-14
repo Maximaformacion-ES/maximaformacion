@@ -14,3 +14,10 @@ export const MAXYMIA_LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   intermediate: { es: 'Intermedio', en: 'Intermediate' },
   advanced: { es: 'Avanzado', en: 'Advanced' },
 };
+
+/** Etiqueta de categoría tolerante con la clave ('data_science', 'Data-Science'…). */
+export function maxymiaCategoryLabel(category: string | undefined | null, locale: Locale): string {
+  if (!category) return '';
+  const key = category.toLowerCase().replace(/[_\s]+/g, '-');
+  return MAXYMIA_CATEGORY_LABELS[key]?.[locale] ?? category.replace(/[_-]+/g, ' ');
+}

@@ -292,7 +292,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
         <h1 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
           {locale === 'es' ? 'Hola' : 'Hi'}{user?.firstName ? `, ${user.firstName}` : ''}
         </h1>
-        <p className="text-mx-text-muted text-body-sm mt-1">
+        <p className="text-mx-text-muted text-body-sm md:text-body-md 2xl:text-body-lg mt-1">
           {inProgressCourses.length > 0
             ? (locale === 'es'
                 ? `Tienes ${inProgressCourses.length} ${inProgressCourses.length === 1 ? 'curso en marcha' : 'cursos en marcha'}. Sigue por donde lo dejaste.`

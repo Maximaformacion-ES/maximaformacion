@@ -40,7 +40,7 @@ import { FontStyles } from '@/app/components/FontStyles';
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 import { Breadcrumb } from '@/app/components/Breadcrumb';
-import { MAXYMIA_CATEGORY_LABELS } from '../../data/labels';
+import { maxymiaCategoryLabel } from '../../data/labels';
 import Certificate from '../../components/Certificate';
 import TutorQuestionModal from '../../components/TutorQuestionModal';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaCourseProgress, Locale } from '../../types';
@@ -334,14 +334,17 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
         {/* ─── 1. Hero a sangre (estilo ficha del pack): la imagen del curso
             ocupa todo el hero y el contenido va abajo a la izquierda sobre
             el fundido hacia el fondo de la página. ─── */}
-        <section className="relative overflow-hidden">
-          <div className="relative mt-[72px] sm:mt-[96px] h-[48vh] min-h-[320px] md:h-[64vh] md:min-h-[460px] max-h-[760px] w-full">
+        <section className="relative overflow-hidden mt-[72px] sm:mt-[96px] min-h-[calc(100dvh-72px)] sm:min-h-[calc(100dvh-96px)] flex flex-col">
+          {/* Imagen a sangre cubriendo TODO el hero, con fundidos para que el
+              texto y la tarjeta de retomar (dentro del hero) se lean. */}
+          <div className="absolute inset-0">
             <Image src={course.image} alt="" fill priority sizes="100vw" className="object-cover object-center" unoptimized />
-            <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-mx-bg via-mx-bg/75 to-transparent" />
-            <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-mx-bg/70 via-mx-bg/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-mx-bg via-mx-bg/80 to-transparent" />
+            <div className="absolute inset-y-0 left-0 w-3/4 bg-gradient-to-r from-mx-bg/80 via-mx-bg/30 to-transparent" />
           </div>
 
-          <div className="relative max-w-[1400px] mx-auto px-6 md:px-12 -mt-28 md:-mt-44">
+          <div className="relative flex-1 flex flex-col max-w-[1400px] w-full mx-auto px-6 md:px-12 pt-6 pb-10 md:pb-14">
+            {/* Breadcrumb arriba del todo, pegado al header */}
             <m.div {...fadeUp(0)}>
               <Breadcrumb
                 items={[
@@ -349,11 +352,15 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   { label: locale === 'es' ? 'Mis cursos' : 'My courses', href: '/maxymia/campus/mis-cursos' },
                   { label: course.title[locale] },
                 ]}
-                className="mb-5"
+                className=""
               />
+            </m.div>
+
+            {/* Contenido abajo a la izquierda */}
+            <m.div {...fadeUp(0.05)} className="mt-auto pt-16">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
-                  {MAXYMIA_CATEGORY_LABELS[course.category]?.[locale] ?? course.category}
+                  {maxymiaCategoryLabel(course.category, locale)}
                 </span>
                 <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-mx-card/80 backdrop-blur-sm border border-mx-border text-mx-text-muted">
                   {LEVEL_LABELS[course.level]?.[locale]}
@@ -364,10 +371,10 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   </span>
                 )}
               </div>
-              <h1 className="text-[32px] text-balance md:text-display-sm lg:text-display-md font-black tracking-tight leading-[1.02] text-mx-blue mb-4 max-w-4xl">
+              <h1 className="text-[30px] text-balance md:text-heading-lg lg:text-display-sm font-black tracking-tight leading-[1.05] text-mx-blue mb-3 max-w-3xl">
                 {course.title[locale]}
               </h1>
-              <p className="text-mx-text-muted text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-6">
+              <p className="text-mx-text-muted text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-5">
                 {course.description[locale]}
               </p>
             </m.div>

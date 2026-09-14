@@ -6,7 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import type { MaxymiaCourse, MaxymiaCourseProgress, Locale } from '../types';
 import { getCourseMeta, getCourseProgressStats } from '../data/queries';
-import { MAXYMIA_CATEGORY_LABELS, MAXYMIA_LEVEL_LABELS } from '../data/labels';
+import { maxymiaCategoryLabel, MAXYMIA_LEVEL_LABELS } from '../data/labels';
 import { CourseCard, type CourseCardData } from '@/app/components/CourseCard';
 
 /**
@@ -51,7 +51,7 @@ export function maxymiaCourseToCardData(
     image: course.image,
     kind: 'maxymia',
     isPro: course.isPro,
-    area: MAXYMIA_CATEGORY_LABELS[course.category]?.[locale] ?? null,
+    area: maxymiaCategoryLabel(course.category, locale) || null,
     meta,
     pricing: {
       price: course.price,

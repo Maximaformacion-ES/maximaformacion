@@ -26,6 +26,7 @@ import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
+import { maxymiaCategoryLabel } from '../../data/labels';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
 import { FontStyles } from '@/app/components/FontStyles';
@@ -47,14 +48,6 @@ import type { MaxymiaCourse, Locale } from '../../types';
 import type { Badge, Institution } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
-
-const CATEGORY_LABELS: Record<string, Record<Locale, string>> = {
-  ia: { es: 'Inteligencia Artificial', en: 'Artificial Intelligence' },
-  'data-science': { es: 'Data Science', en: 'Data Science' },
-  'machine-learning': { es: 'Machine Learning', en: 'Machine Learning' },
-  nlp: { es: 'Procesamiento del Lenguaje', en: 'Language Processing' },
-  'computer-vision': { es: 'Visión por Computador', en: 'Computer Vision' },
-};
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   beginner: { es: 'Principiante', en: 'Beginner' },
@@ -170,7 +163,7 @@ export default function MaxymiaCourseDetail({
     image: course.image,
     title,
     description: course.description[locale],
-    type: CATEGORY_LABELS[course.category]?.[locale] ?? course.category,
+    type: maxymiaCategoryLabel(course.category, locale),
     isPro: course.isPro,
     topics: course.tags.map((tag) => ({ id: tag, name: tag })),
     durationLabel,
