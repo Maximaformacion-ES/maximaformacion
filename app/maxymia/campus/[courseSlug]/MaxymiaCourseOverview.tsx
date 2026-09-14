@@ -339,11 +339,11 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
               texto y la tarjeta de retomar (dentro del hero) se lean. */}
           <div className="absolute inset-0">
             <Image src={course.image} alt="" fill priority sizes="100vw" className="object-cover object-center" unoptimized />
-            <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-mx-bg via-mx-bg/80 to-transparent" />
-            <div className="absolute inset-y-0 left-0 w-3/4 bg-gradient-to-r from-mx-bg/80 via-mx-bg/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-mx-bg/60 to-transparent" />
+            <div className="absolute inset-0 bg-black/[0.06]" />
           </div>
 
-          <div className="relative flex-1 flex flex-col max-w-[1400px] w-full mx-auto px-6 md:px-12 pb-10 md:pb-14">
+          <div className="relative flex-1 flex flex-col max-w-[1400px] w-full mx-auto px-6 md:px-12">
             {/* Breadcrumb arriba del todo: pestaña blanca que "cuelga" del
                 header, con las esquinas inferiores redondeadas. */}
             <m.div
@@ -364,8 +364,15 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
               </div>
             </m.div>
 
-            {/* Contenido abajo a la izquierda */}
-            <m.div {...fadeUp(0.05)} className="mt-auto pt-16">
+            {/* Contenido abajo a la izquierda: panel blanco que sale del borde
+                inferior del hero, con las esquinas superiores redondeadas
+                (espejo de la pestaña del breadcrumb). */}
+            <m.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              className="mt-auto self-start w-full max-w-3xl rounded-t-2xl bg-mx-bg px-6 md:px-8 pt-6 md:pt-8 shadow-[0_-8px_24px_-12px_rgba(26,26,26,0.25)]"
+            >
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
                   {maxymiaCategoryLabel(course.category, locale)}
@@ -385,12 +392,10 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
               <p className="text-mx-text-muted text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-5">
                 {course.description[locale]}
               </p>
-            </m.div>
 
-            {/* Retomar: abajo a la izquierda, ancho contenido */}
-            <m.div
-              {...fadeUp(0.1)}
-              className="max-w-3xl rounded-2xl border border-mx-orange/30 bg-mx-card/90 backdrop-blur-md shadow-sm p-5 sm:p-6"
+            {/* Retomar, dentro del panel */}
+            <div
+              className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-5 sm:p-6 mb-6 md:mb-8"
               aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
             >
               <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1.5">
@@ -443,6 +448,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   </Link>
                 </div>
               </div>
+            </div>
             </m.div>
           </div>
         </section>
