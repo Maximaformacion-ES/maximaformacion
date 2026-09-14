@@ -26,6 +26,7 @@ export const VERT = /* glsl */ `
   uniform float uScale;   // factor de tamaño global (px)
   uniform float uMotion;  // 0 = quieto, 1 = partículas "vivas" (hover)
   uniform float uWobble;  // amplitud del temblor por partícula (unidades)
+  uniform float uBlur;    // cuánto crece la partícula al desenfocarse
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
@@ -38,7 +39,7 @@ export const VERT = /* glsl */ `
     );
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     float dz = abs(mv.z - uFocus);
-    float blur = 1.0 + dz * 0.35;
+    float blur = 1.0 + dz * uBlur;
     float twinkle = 1.0 - uMotion * (0.15 - 0.15 * sin(uTime * 1.6 + aSeed * 6.2831));
     vAlpha = 0.9 * twinkle / (1.0 + dz * dz * 0.4);
     vColor = aColor;
@@ -133,6 +134,8 @@ export interface ParticleSceneOptions {
   idleUntilActive?: boolean;
   /** Amplitud del temblor por partícula en modo activo (unidades). */
   wobble?: number;
+  /** Crecimiento de la partícula por unidad de distancia al plano de enfoque. */
+  blur?: number;
   /** Alto visible del mundo (unidades) que debe caber en el lienzo. */
   visibleHeight: number;
   /** Desplazamiento horizontal del centro de la figura (unidades). */
@@ -187,6 +190,7 @@ export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): 
       // quietas arrancan en 0 y suben a 1 con el hover.
       uMotion: { value: o.idleUntilActive ? 0 : 1 },
       uWobble: { value: o.wobble ?? 0 },
+      uBlur: { value: o.blur ?? 0.35 },
     },
   });
 

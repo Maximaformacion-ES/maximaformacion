@@ -146,8 +146,10 @@ export default function ParticleFigure({
       wobble: 0.035,
       visibleHeight: 3.2,
       // Figuras ~2.5 unidades de alto (la hélice mide 18): partícula mucho
-      // más pequeña para que se vea el grano y no manchas.
-      scale: 34,
+      // más pequeña y casi sin crecimiento por desenfoque, para que se vea el
+      // grano de puntos y no manchas.
+      scale: 19,
+      blur: 0.12,
     });
     sceneRef.current = scene;
     return () => {
