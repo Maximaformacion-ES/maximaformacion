@@ -150,6 +150,8 @@ export interface StrapiProgram {
   audiences: string | null;
   careers: string | null;
   objectives: string | null;
+  /** Pestañas personalizadas de la ficha (componente program.extra-section). */
+  extraSections?: { title: string; content: string; icon?: string | null }[] | null;
   docentes?: StrapiAuthor[] | null;
   noIndex?: boolean | null;
   createdAt: string;
@@ -279,6 +281,8 @@ export interface Program {
   audience: string;
   careers: string;
   objectives: string;
+  /** Pestañas personalizadas (markdown) que se añaden tras las estándar. */
+  extraSections?: { title: string; content: string; icon?: string | null }[];
   isPro: boolean;
   /** Exclusivo PRO: ni se vende ni aparece en catálogo (solo con suscripción). */
   proOnly?: boolean;

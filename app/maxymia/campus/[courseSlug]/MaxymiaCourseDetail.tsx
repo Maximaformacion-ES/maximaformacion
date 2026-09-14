@@ -46,7 +46,7 @@ import { FAQSection } from '@/app/components/FAQSection';
 import { Comos } from '@/app/components/Comos';
 import type { MaxymiaCourse, Locale } from '../../types';
 import type { Badge, Institution } from '@/lib/strapi/types';
-import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
+import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount, klarnaInstallment } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
@@ -453,7 +453,13 @@ function CourseSidebar({ course, locale, totalLessons, durationLabel, totalExams
               )
             )}
             <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">
-              {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
+              {klarnaInstallment(effectivePrice) && !proOnlyCourse && !includedInPro ? (
+                locale === 'es'
+                  ? <>Pago único o <span className="text-mx-text font-medium">3 plazos de {klarnaInstallment(effectivePrice)} €</span> sin intereses con Klarna • Acceso permanente</>
+                  : <>One-time payment or <span className="text-mx-text font-medium">3 × {klarnaInstallment(effectivePrice)} €</span> interest-free with Klarna • Lifetime access</>
+              ) : (
+                locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'
+              )}
             </p>
           </div>
 

@@ -47,6 +47,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
   const [localUnits, setLocalUnits] = useState<string[]>([]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileIndexOpen, setMobileIndexOpen] = useState(false);
   // Track which topic is selected (null = lesson index view)
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
 
@@ -312,6 +313,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
             className="hidden lg:block shrink-0 overflow-hidden"
           >
             <MaxymiaLessonSidebar
+              variant="desktop"
               course={course}
               currentLessonId={lesson.id}
               completedLessons={completedSet}
@@ -323,6 +325,20 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
           </m.div>
         )}
       </AnimatePresence>
+      {/* Índice móvil: botón flotante + cajón, siempre montado en <lg y
+          controlado también desde el botón de la barra del contenido. */}
+      <MaxymiaLessonSidebar
+        variant="mobile"
+        course={course}
+        currentLessonId={lesson.id}
+        completedLessons={completedSet}
+        updatedUnits={updates}
+        locale={locale}
+        onNavigate={navigateToLesson}
+        selectedTopicId={selectedTopicId}
+        mobileOpen={mobileIndexOpen}
+        onMobileOpenChange={setMobileIndexOpen}
+      />
 
       {/* Main content — only this part scrolls */}
       <div id="lesson-content-area" className="flex-1 min-w-0 overflow-y-auto">
@@ -330,7 +346,11 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
         <div className="sticky top-0 z-30 h-14 bg-mx-bg/85 backdrop-blur-sm border-b border-mx-border px-6 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => setSidebarOpen((v) => !v)}
+              onClick={() => {
+                // En escritorio pliega/despliega el panel; en móvil abre el cajón.
+                if (window.matchMedia('(min-width: 1024px)').matches) setSidebarOpen((v) => !v);
+                else setMobileIndexOpen(true);
+              }}
               className="text-mx-text-muted hover:text-mx-orange transition-colors shrink-0"
               title={sidebarOpen ? (locale === 'es' ? 'Ocultar índice' : 'Hide index') : (locale === 'es' ? 'Mostrar índice' : 'Show index')}
             >

@@ -64,3 +64,10 @@ export function getProSavings(
   if (hasPro) return 0;
   return product.price - getEffectivePrice(product, true);
 }
+
+/** Cuota de "Paga en 3" de Klarna (3 plazos sin intereses, 1–3.000 €).
+ *  Devuelve el importe de cada plazo formateado ("63,33") o null si no aplica. */
+export function klarnaInstallment(price: number | null | undefined): string | null {
+  if (!price || price < 1 || price > 3000) return null;
+  return (price / 3).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}

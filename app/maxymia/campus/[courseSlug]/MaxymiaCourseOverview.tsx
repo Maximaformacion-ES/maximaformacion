@@ -406,7 +406,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, embedd
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="relative mt-auto self-start w-full max-w-3xl rounded-t-2xl bg-mx-bg px-6 md:px-8 pt-6 md:pt-8 shadow-[0_-8px_24px_-12px_rgba(26,26,26,0.25)]"
+              className="relative mt-auto self-start w-full max-w-3xl rounded-t-2xl bg-mx-bg px-4 sm:px-6 md:px-8 pt-5 sm:pt-6 md:pt-8 shadow-[0_-8px_24px_-12px_rgba(26,26,26,0.25)]"
             >
               <Fillet at="tl" className="bottom-0 -left-4" />
               <Fillet at="tr" className="bottom-0 -right-4" />
@@ -423,16 +423,16 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, embedd
                   </span>
                 )}
               </div>
-              <h1 className="text-[30px] text-balance md:text-heading-lg lg:text-display-sm font-black tracking-tight leading-[1.05] text-mx-blue mb-3 max-w-3xl">
+              <h1 className="text-[24px] sm:text-[30px] text-balance md:text-heading-lg lg:text-display-sm font-black tracking-tight leading-[1.05] text-mx-blue mb-3 max-w-3xl">
                 {course.title[locale]}
               </h1>
-              <p className="text-mx-text-muted text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-5">
+              <p className="text-mx-text-muted text-label-md sm:text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-4 sm:mb-5">
                 {course.description[locale]}
               </p>
 
             {/* Retomar, dentro del panel */}
             <div
-              className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-5 sm:p-6 mb-6 md:mb-8"
+              className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-4 sm:p-6 mb-5 md:mb-8"
               aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
             >
               <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1.5">

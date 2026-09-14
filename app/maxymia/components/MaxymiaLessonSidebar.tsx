@@ -48,6 +48,12 @@ interface MaxymiaLessonSidebarProps {
    *  sin ir al servidor. El player pinta desde el curso ya cargado. */
   onNavigate?: (lessonId: string, topic?: MaxymiaTopic) => void;
   selectedTopicId?: string | null;
+  /** 'desktop': solo el panel lateral (lg+). 'mobile': solo el botón flotante y
+   *  el cajón (<lg). 'both' (por defecto): ambos. */
+  variant?: 'desktop' | 'mobile' | 'both';
+  /** Cajón móvil controlado desde fuera (p. ej. el botón de la barra del player). */
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 export default function MaxymiaLessonSidebar({
@@ -58,8 +64,16 @@ export default function MaxymiaLessonSidebar({
   locale,
   onNavigate,
   selectedTopicId,
+  variant = 'both',
+  mobileOpen: mobileOpenProp,
+  onMobileOpenChange,
 }: MaxymiaLessonSidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpenState, setMobileOpenState] = useState(false);
+  const mobileOpen = mobileOpenProp ?? mobileOpenState;
+  const setMobileOpen = (v: boolean) => {
+    setMobileOpenState(v);
+    onMobileOpenChange?.(v);
+  };
 
   // Al navegar desde el sidebar cerramos el drawer móvil (en desktop es no-op).
   const handleNavigate = (lessonId: string, topic?: MaxymiaTopic) => {
@@ -111,10 +125,13 @@ export default function MaxymiaLessonSidebar({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-80 min-w-80 flex-shrink-0 border-r border-mx-border bg-mx-card h-full overflow-hidden">
-        {sidebarContent}
-      </aside>
-
+      {variant !== 'mobile' && (
+        <aside className="hidden lg:block w-80 min-w-80 flex-shrink-0 border-r border-mx-border bg-mx-card h-full overflow-hidden">
+          {sidebarContent}
+        </aside>
+      )}
+      {variant === 'desktop' ? null : (
+      <>
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
@@ -154,6 +171,8 @@ export default function MaxymiaLessonSidebar({
           </>
         )}
       </AnimatePresence>
+      </>
+      )}
     </>
   );
 }
@@ -169,6 +188,12 @@ interface SidebarBlockProps {
   locale: Locale;
   onNavigate?: (lessonId: string, topic?: MaxymiaTopic) => void;
   selectedTopicId?: string | null;
+  /** 'desktop': solo el panel lateral (lg+). 'mobile': solo el botón flotante y
+   *  el cajón (<lg). 'both' (por defecto): ambos. */
+  variant?: 'desktop' | 'mobile' | 'both';
+  /** Cajón móvil controlado desde fuera (p. ej. el botón de la barra del player). */
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, updatedUnits, locale, onNavigate, selectedTopicId }: SidebarBlockProps) {

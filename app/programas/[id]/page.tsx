@@ -13,6 +13,8 @@ export interface ProgramRichHtml {
   objectives: string;
   audience: string;
   careers: string;
+  /** Pestañas personalizadas ya convertidas a HTML (solo la ficha de /programas). */
+  extraSections?: { title: string; html: string; icon?: string | null }[];
 }
 
 // Page becomes dynamic the moment we read auth() inside the server
@@ -138,8 +140,15 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
         objectives: program.objectives ? await markdownToHtml(program.objectives) : '',
         audience: program.audience ? await markdownToHtml(program.audience) : '',
         careers: program.careers ? await markdownToHtml(program.careers) : '',
+        extraSections: await Promise.all(
+          (program.extraSections ?? []).map(async (x) => ({
+            title: x.title,
+            icon: x.icon ?? null,
+            html: await markdownToHtml(x.content),
+          })),
+        ),
       }
-    : { longDescription: '', objectives: '', audience: '', careers: '' };
+    : { longDescription: '', objectives: '', audience: '', careers: '', extraSections: [] };
 
   return (
     <>
