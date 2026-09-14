@@ -67,8 +67,10 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
   const { handleCampusClick } = useCampusLink();
 
   return (
-    // pt-* despeja el Header fijo del sitio (72px móvil / 96px escritorio).
-    <section className="relative flex items-center overflow-hidden pt-28 md:pt-36">
+    // Ocupa el alto de la ventana (100dvh) con el contenido centrado en
+    // vertical; pt-* despeja el Header fijo del sitio (72px móvil / 96px
+    // escritorio) para que el centrado se haga en el espacio visible.
+    <section className="relative min-h-dvh flex items-center overflow-hidden pt-28 md:pt-36 pb-12">
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-32 right-[30%] w-125 h-125 bg-mx-orange/5 rounded-full blur-[120px]" />
@@ -76,7 +78,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
         <div className="absolute top-1/2 right-10 w-50 h-50 bg-mx-orange/3 rounded-full blur-[80px]" />
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] w-full py-16 md:py-0 relative z-10">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left content */}
           <div>
@@ -94,7 +96,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-display-sm md:text-display-md lg:text-display-md 2xl:text-display-lg font-black leading-[0.95] tracking-tight mb-8 text-mx-blue"
+              className="text-display-sm md:text-display-md lg:text-display-md 2xl:text-display-md font-black leading-[0.95] tracking-tight mb-8 text-mx-blue"
             >
               <ColoredTitle text={hero.title} />
             </m.h1>
@@ -104,7 +106,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-lg mb-10"
+              className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-body-lg font-light leading-relaxed max-w-lg mb-10"
             >
               {hero.description}
             </m.p>
