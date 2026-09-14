@@ -205,7 +205,7 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
             <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
           <h2
-            className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue mb-6"
+            className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-6"
           >
             <ColoredTitle text={section.title}/>
           </h2>
@@ -361,7 +361,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
             <Check size={14} className="text-mx-blue" />
             <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
-          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue mb-4">{section.title}</h2>
+          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-4">{section.title}</h2>
           <p className="text-mx-text-muted text-body-md font-light max-w-lg ml-auto leading-relaxed">
             {section.description}
           </p>
@@ -484,7 +484,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-tight mb-6"
+          className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-6"
         >
           <ColoredTitle text={section.title}/>
         </m.h2>
