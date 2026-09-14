@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { FontStyles } from '../components/FontStyles';
@@ -23,6 +24,10 @@ import { ColoredTitle, StyledTitle } from '../components/StyledTitle';
 import type { MaxymiaHomeData, MaxymiaCard } from '../../lib/strapi/types';
 import type { MaxymiaCourse } from './types';
 import MaxymiaCourseCard from './components/MaxymiaCourseCard';
+
+// Three.js solo en cliente y fuera del bundle inicial (WPO): la hélice es
+// decorativa y no debe retrasar el LCP del hero.
+const DnaHelix = dynamic(() => import('./components/DnaHelix'), { ssr: false });
 
 const CAMPUS_URL = '/maxymia/campus';
 const CAMPUS_PUBLIC_HREF = '/sign-in?redirect_url=/maxymia/campus';
@@ -79,7 +84,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
       </div>
 
       <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] w-full relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center lg:min-h-[calc(100dvh-12rem)]">
           {/* Left content */}
           <div>
             <m.div
@@ -157,58 +162,14 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
             </m.div>
           </div>
 
-          {/* Right - Logo decoration */}
+          {/* Right — doble hélice de ADN (Three.js) a todo el alto del hero */}
           <m.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="hidden lg:flex items-center justify-center"
+            className="hidden lg:block relative self-stretch min-h-[560px]"
           >
-            <div className="relative w-[550px] h-[550px]">
-              {/* Background hero image — round with faded edges */}
-              <div
-                className="absolute inset-0 rounded-full overflow-hidden m-12"
-                style={{ maskImage: 'radial-gradient(circle, black 40%, transparent 70%)', WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 70%)' }}
-              >
-                <Image
-                  src="/hero-image.webp"
-                  alt=""
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              {/* Outer ring */}
-              <div className="absolute inset-0 rounded-full border-2 border-mx-border" />
-              <div className="absolute inset-4 rounded-full border border-mx-border/60" />
-              {/* Floating icons — alternating orange/blue bg, dark icon */}
-              {[
-                { top: '2%', left: '45%', size: 48, color: 'orange' as const },
-                { top: '82%', left: '3%', size: 48, color: 'orange' as const },
-                { top: '35%', left: '90%', size: 48, color: 'blue' as const },
-                { top: '88%', left: '85%', size: 48, color: 'orange' as const },
-                { top: '28%', left: '-2%', size: 48, color: 'blue' as const },
-              ].map((pos, i) => (
-                <m.div
-                  key={`${pos.top}-${pos.left}`}
-                  className={`absolute rounded-full flex items-center justify-center shadow-lg ${
-                    pos.color === 'orange'
-                      ? 'bg-mx-orange/20 text-mx-orange border border-mx-orange/80 shadow-mx-orange/20'
-                      : 'bg-mx-blue/20 text-mx-blue border border-mx-blue/80 shadow-mx-blue/20'
-                  }`}
-                  style={{ top: pos.top, left: pos.left, width: pos.size, height: pos.size }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
-                >
-                  {[FlaskConical, BookOpen, Award, Route, Users][i] &&
-                    React.createElement([FlaskConical, BookOpen, Award, Route, Users][i], {
-                      size: pos.size * 0.35,
-                      className: 'text-current',
-                    })}
-                </m.div>
-              ))}
-            </div>
+            <DnaHelix className="absolute inset-0" />
           </m.div>
         </div>
       </div>
