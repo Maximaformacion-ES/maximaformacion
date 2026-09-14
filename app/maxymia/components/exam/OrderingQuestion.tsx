@@ -61,8 +61,8 @@ export default function OrderingQuestion({
 
   return (
     <div>
-      <p className="text-white font-medium mb-1">{question.question[locale]}</p>
-      <p className="text-white/40 text-label-md mb-4">
+      <p className="text-mx-text font-medium mb-1">{question.question[locale]}</p>
+      <p className="text-mx-text-muted text-label-md mb-4">
         {locale === 'es'
           ? 'Arrastra los elementos o usa las flechas para ordenarlos'
           : 'Drag items or use the arrows to order them'}
@@ -134,8 +134,8 @@ function SortableItem({
     opacity: isDragging ? 0.9 : 1,
   };
 
-  let borderClass = 'border-white/10';
-  let bgClass = 'bg-white/[0.03]';
+  let borderClass = 'border-mx-border';
+  let bgClass = 'bg-mx-card';
 
   if (submitted) {
     borderClass = isCorrectPosition ? 'border-green-500/50' : 'border-red-500/50';
@@ -159,21 +159,21 @@ function SortableItem({
         {...listeners}
         disabled={submitted}
         aria-label="Arrastrar para reordenar"
-        className={`flex-shrink-0 text-white/30 ${
-          submitted ? 'cursor-default' : 'cursor-grab active:cursor-grabbing hover:text-white/60'
+        className={`flex-shrink-0 text-mx-text-muted/70 ${
+          submitted ? 'cursor-default' : 'cursor-grab active:cursor-grabbing hover:text-mx-text'
         } touch-none`}
       >
         <GripVertical size={16} />
       </button>
-      <span className="text-white/40 text-label-md w-5">{positionIndex + 1}.</span>
-      <span className="text-white/80 text-body-sm flex-1">{label}</span>
+      <span className="text-mx-text-muted text-label-md w-5">{positionIndex + 1}.</span>
+      <span className="text-mx-text text-body-sm flex-1">{label}</span>
       {!submitted && (
         <div className="flex gap-1">
           <button
             type="button"
             onClick={onMoveUp}
             disabled={isFirst}
-            className="p-1 text-white/30 hover:text-mx-orange disabled:opacity-20 transition-colors"
+            className="p-1 text-mx-text-muted/70 hover:text-mx-orange disabled:opacity-20 transition-colors"
           >
             <ArrowUp size={14} />
           </button>
@@ -181,14 +181,14 @@ function SortableItem({
             type="button"
             onClick={onMoveDown}
             disabled={isLast}
-            className="p-1 text-white/30 hover:text-mx-orange disabled:opacity-20 transition-colors"
+            className="p-1 text-mx-text-muted/70 hover:text-mx-orange disabled:opacity-20 transition-colors"
           >
             <ArrowDown size={14} />
           </button>
         </div>
       )}
-      {submitted && isCorrectPosition && <CheckCircle size={14} className="text-green-400" />}
-      {submitted && !isCorrectPosition && <XCircle size={14} className="text-red-400" />}
+      {submitted && isCorrectPosition && <CheckCircle size={14} className="text-green-600" />}
+      {submitted && !isCorrectPosition && <XCircle size={14} className="text-red-600" />}
     </div>
   );
 }

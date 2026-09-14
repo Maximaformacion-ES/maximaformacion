@@ -3,7 +3,9 @@
 import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { ChevronLeft, ChevronRight, ArrowRight, Play } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../i18n/LocaleProvider';
 import { getTranslation } from '../i18n/translations';
@@ -35,95 +37,79 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
 
   const badges = [t('campus.featuredBadge'), t('campus.newCourse')];
 
-  const activeCourse = courses[activeIndex];
-
   return (
-    <section className="relative mb-8 sm:mb-16 min-h-[60dvh] sm:h-[80dvh] flex flex-col justify-center overflow-hidden">
-      {/* Course image background — full viewport width */}
-      {activeCourse && (
-        <div className="absolute inset-0 -mx-[128px] max-md:-mx-6" style={{ left: 0, right: 0, marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
-          <img
-            src={activeCourse.image}
-            alt=""
-            className="absolute inset-0 w-screen h-full object-cover opacity-5"
-          />
-          {/* Blue accent gradient — left and bottom */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#527be7]/25 via-transparent to-transparent"/>
-        </div>
-      )}
-
-      <div className="relative max-w-[1800px] w-full mx-auto px-4 sm:px-6 md:px-[128px]">
-        <AnimatePresence mode="wait">
-          {courses.map((course, i) => {
-            if (i !== activeIndex) return null;
-
-            return (
-              <m.div
-                key={course.id}
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -40 }}
-                transition={{ duration: 0.5 }}
-                className="py-12 md:py-20"
-              >
-                <div>
-                  <div className="lg:w-1/2 w-full">
-                    {/* Badge */}
-                    <span className="inline-block px-3 py-1 mb-5 text-label-sm font-bold tracking-widest uppercase bg-mx-blue/20 text-mx-blue rounded-full border border-mx-blue/30">
-                      {badges[i] ?? badges[0]}
-                    </span>
-
-                    <h1 className="text-heading-sm sm:text-heading-md md:text-heading-lg 2xl:text-display-sm font-bold text-white leading-tight mb-3 sm:mb-5 text-balance">
-                      {course.title[locale].toUpperCase()}
-                    </h1>
-
-                    <p className="text-white/50 text-body-sm sm:text-body-md 2xl:text-body-lg leading-relaxed mb-4 sm:mb-6 max-w-lg">
-                      {course.description[locale]}
-                    </p>
-
-                    {/* Instructor */}
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-mx-orange/30 to-purple-500/30 flex items-center justify-center">
-                        <span className="text-white font-semibold text-body-sm">
-                          {course.instructor.name.charAt(0)}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-white text-body-sm font-medium">{course.instructor.name}</p>
-                        <p className="text-white/40 text-label-md">{course.instructor.role}</p>
-                      </div>
-                    </div>
-
-                    {/* Price + CTA */}
-                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
-                      <div className="flex items-baseline gap-2">
-                        {course.originalPrice && course.originalPrice > course.price && (
-                          <span className="text-white/30 text-body-lg line-through">{course.originalPrice}&euro;</span>
-                        )}
-                        <span className="text-mx-orange text-heading-md sm:text-heading-lg 2xl:text-display-sm font-bold">{course.price}&euro;</span>
-                      </div>
-                      <Link
-                        href={`/maxymia/campus/${course.slug}`}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3 bg-mx-orange hover:bg-mx-orange/90 text-white font-semibold rounded-lg transition-colors text-label-md md:text-body-sm w-fit"
-                      >
-                        {t('campus.startLearning')}
-                        <ArrowRight size={16} />
-                      </Link>
-                    </div>
+    <section className="relative mb-10 rounded-2xl border border-mx-border bg-mx-card shadow-sm overflow-hidden">
+      <AnimatePresence mode="wait">
+        {courses.map((course, i) => {
+          if (i !== activeIndex) return null;
+          return (
+            <m.div
+              key={course.id}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.4 }}
+              className="grid grid-cols-1 lg:grid-cols-5"
+            >
+              {/* Texto */}
+              <div className="lg:col-span-3 p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
+                <span className="inline-block w-fit px-3 py-1 mb-4 text-label-sm font-black tracking-[0.18em] uppercase bg-mx-blue text-white rounded-full">
+                  {badges[i] ?? badges[0]}
+                </span>
+                <h1 className="text-heading-md md:text-heading-lg 2xl:text-display-sm font-black tracking-tight leading-tight text-mx-blue mb-3 text-balance">
+                  {course.title[locale]}
+                </h1>
+                <p className="text-mx-text-muted text-body-sm sm:text-body-md leading-relaxed mb-5 max-w-xl line-clamp-3">
+                  {course.description[locale]}
+                </p>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-9 h-9 rounded-full bg-mx-blue/10 text-mx-blue flex items-center justify-center font-semibold text-body-sm">
+                    {course.instructor.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>
+                    <p className="text-mx-text-muted text-label-md">{course.instructor.role}</p>
                   </div>
                 </div>
-              </m.div>
-            );
-          })}
-        </AnimatePresence>
-
-        {/* Slide indicator — bottom right */}
-        {courses.length > 1 && (
-          <div className="flex justify-end pb-6">
-            <SlideIndicator count={courses.length} active={activeIndex} onSelect={setActiveIndex} />
-          </div>
-        )}
-      </div>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Link
+                    href={`/maxymia/campus/${course.slug}`}
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-mx-orange hover:bg-mx-orange-dark text-white font-medium rounded-lg transition-colors text-body-sm"
+                  >
+                    <Play size={16} fill="currentColor" />
+                    {t('campus.startLearning')}
+                    <ArrowRight size={16} />
+                  </Link>
+                  <div className="flex items-baseline gap-2">
+                    {course.originalPrice && course.originalPrice > course.price && (
+                      <span className="text-mx-text-muted text-body-sm line-through">{course.originalPrice}&euro;</span>
+                    )}
+                    <span className="text-mx-orange text-heading-sm font-black">{course.price}&euro;</span>
+                  </div>
+                </div>
+              </div>
+              {/* Imagen */}
+              <div className="relative lg:col-span-2 min-h-[220px] lg:min-h-[320px]">
+                <Image
+                  src={course.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                  className="object-cover"
+                  unoptimized
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-mx-card via-mx-card/30 to-transparent lg:via-transparent" />
+              </div>
+            </m.div>
+          );
+        })}
+      </AnimatePresence>
+      {courses.length > 1 && (
+        <div className="absolute bottom-4 left-6 sm:left-8 lg:left-10">
+          <SlideIndicator count={courses.length} active={activeIndex} onSelect={setActiveIndex} />
+        </div>
+      )}
     </section>
   );
 }
@@ -168,22 +154,22 @@ function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }
     >
       {/* Row header */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 px-1">
-        <h2 className="text-white text-body-md sm:text-body-lg md:text-heading-sm 2xl:text-heading-md font-semibold">{title}</h2>
+        <h2 className="text-mx-text text-body-lg md:text-heading-sm font-bold tracking-tight">{title}</h2>
         {courses.length > 3 && (
           <div className="hidden md:flex items-center gap-1">
             <button
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
-              className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center transition-colors disabled:opacity-20 disabled:cursor-default"
+              className="w-8 h-8 rounded-full border border-mx-border bg-mx-card hover:border-mx-orange/40 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-default"
             >
-              <ChevronLeft size={16} className="text-white" />
+              <ChevronLeft size={16} className="text-mx-text" />
             </button>
             <button
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
-              className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/10 flex items-center justify-center transition-colors disabled:opacity-20 disabled:cursor-default"
+              className="w-8 h-8 rounded-full border border-mx-border bg-mx-card hover:border-mx-orange/40 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-default"
             >
-              <ChevronRight size={16} className="text-white" />
+              <ChevronRight size={16} className="text-mx-text" />
             </button>
           </div>
         )}
@@ -193,7 +179,7 @@ function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }
       <div className="relative group/row">
         {/* Left fade */}
         {canScrollLeft && (
-          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0b1018] to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-mx-bg to-transparent z-10 pointer-events-none" />
         )}
 
         <div
@@ -212,6 +198,7 @@ function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }
                 progress={progressMap[course.id]}
                 enrolled={hasAccess(course.id, course.isPro) || !!progressMap[course.id]}
                 index={i}
+                light
               />
             </div>
           ))}
@@ -219,7 +206,7 @@ function CourseRow({ title, courses, locale, progressMap, hasAccess, delay = 0 }
 
         {/* Right fade */}
         {canScrollRight && (
-          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0b1018] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-mx-bg to-transparent z-10 pointer-events-none" />
         )}
       </div>
     </m.section>
@@ -235,6 +222,7 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
   const { locale } = useLocale();
   const t = (key: string) => getTranslation(locale, key);
   const { courseProgress, hasAccess, isLoading } = useUserCampus();
+  const { user } = useUser();
 
   // Build progress map
   const progressMap: Record<string, MaxymiaCourseProgress> = useMemo(() => {
@@ -293,12 +281,38 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
   }, [courses, progressMap]);
 
   return (
-    <div>
-      {/* Hero Carousel */}
+    <div className="w-full">
+      {/* Saludo */}
+      <div className="mb-6">
+        <h1 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
+          {locale === 'es' ? 'Hola' : 'Hi'}{user?.firstName ? `, ${user.firstName}` : ''}
+        </h1>
+        <p className="text-mx-text-muted text-body-sm mt-1">
+          {inProgressCourses.length > 0
+            ? (locale === 'es'
+                ? `Tienes ${inProgressCourses.length} ${inProgressCourses.length === 1 ? 'curso en marcha' : 'cursos en marcha'}. Sigue por donde lo dejaste.`
+                : `You have ${inProgressCourses.length} ${inProgressCourses.length === 1 ? 'course' : 'courses'} in progress. Pick up where you left off.`)
+            : t('campus.welcomeDesc')}
+        </p>
+      </div>
+
+      {/* Continuar: lo primero si hay cursos en marcha */}
+      {!isLoading && inProgressCourses.length > 0 && (
+        <CourseRow
+          title={t('campus.continueLearningRow')}
+          courses={inProgressCourses}
+          locale={locale}
+          progressMap={progressMap}
+          hasAccess={hasAccess}
+          delay={0}
+        />
+      )}
+
+      {/* Destacado / nuevo */}
       <HeroCarousel courses={heroSlides} locale={locale} t={t} />
 
       {/* Course rows */}
-      <div id="courses" className="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-[128px]">
+      <div id="courses" className="w-full">
         {/* Recently Added */}
         <CourseRow
           title={t('campus.recentlyAdded')}
@@ -328,18 +342,6 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
           hasAccess={hasAccess}
           delay={0.2}
         />
-
-        {/* Continue Learning */}
-        {!isLoading && inProgressCourses.length > 0 && (
-          <CourseRow
-            title={t('campus.continueLearningRow')}
-            courses={inProgressCourses}
-            locale={locale}
-            progressMap={progressMap}
-            hasAccess={hasAccess}
-            delay={0.3}
-          />
-        )}
 
         {/* Completed Courses */}
         {!isLoading && completedCourses.length > 0 && (

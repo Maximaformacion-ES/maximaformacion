@@ -17,7 +17,7 @@ export default function ExamExplanation({ explanation, locale, submitted }: Prop
   return (
     <div className="mt-4 px-4 py-3 rounded-lg bg-mx-orange/5 border border-mx-orange/20 flex gap-3">
       <Info size={16} className="text-mx-orange shrink-0 mt-0.5" />
-      <div className="text-white/70 text-body-sm leading-relaxed whitespace-pre-line">
+      <div className="text-mx-text-muted text-body-sm leading-relaxed whitespace-pre-line">
         {text}
       </div>
     </div>

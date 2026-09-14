@@ -21,21 +21,21 @@ export default function FreeTextQuestion({
 }: Props) {
   return (
     <div>
-      <p className="text-white font-medium mb-4">{question.question[locale]}</p>
+      <p className="text-mx-text font-medium mb-4">{question.question[locale]}</p>
       <textarea
         value={answer}
         onChange={(e) => onAnswerChange(e.target.value)}
         disabled={submitted}
         rows={4}
         placeholder={locale === 'es' ? 'Escribe tu respuesta...' : 'Write your answer...'}
-        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/[0.03] text-body-sm text-white placeholder:text-white/20 focus:outline-none focus:border-mx-orange/50 transition-colors resize-y"
+        className="w-full px-4 py-3 rounded-lg border border-mx-border bg-mx-card text-body-sm text-mx-text placeholder:text-mx-text-muted/60 focus:outline-none focus:border-mx-orange/60 transition-colors resize-y"
       />
       {submitted && (
         <div className="mt-3 p-4 rounded-lg border border-blue-500/30 bg-blue-500/5">
-          <p className="text-blue-300 text-label-md font-medium mb-1">
+          <p className="text-blue-700 text-label-md font-medium mb-1">
             {locale === 'es' ? 'Respuesta de referencia:' : 'Sample answer:'}
           </p>
-          <p className="text-white/60 text-body-sm">{question.sampleAnswer[locale]}</p>
+          <p className="text-mx-text-muted text-body-sm">{question.sampleAnswer[locale]}</p>
         </div>
       )}
       <ExamExplanation explanation={question.explanation} locale={locale} submitted={submitted} />

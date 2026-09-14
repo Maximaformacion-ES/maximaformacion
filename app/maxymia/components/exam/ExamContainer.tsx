@@ -172,11 +172,11 @@ export default function ExamContainer({
     <div ref={rootRef}>
       {/* Exam header */}
       <div className="flex items-center gap-3 mb-8">
-        <FileQuestion className="text-purple-400" size={24} />
+        <FileQuestion className="text-purple-600" size={24} />
         <div>
-          <h3 className="text-white text-body-lg font-semibold">{exam.title[locale]}</h3>
+          <h3 className="text-mx-text text-body-lg font-semibold">{exam.title[locale]}</h3>
           {exam.description && (
-            <p className="text-white/40 text-body-sm">{exam.description[locale]}</p>
+            <p className="text-mx-text-muted text-body-sm">{exam.description[locale]}</p>
           )}
         </div>
       </div>
@@ -201,8 +201,8 @@ export default function ExamContainer({
         {exam.questions.map((q, i) => {
           const key = questionKey(q);
           return (
-            <div key={key} className="p-5 rounded-xl border border-white/10 bg-white/[0.02]">
-              <span className="text-white/30 text-label-md mb-3 block">
+            <div key={key} className="p-5 rounded-xl border border-mx-border bg-mx-card">
+              <span className="text-mx-text-muted text-label-md mb-3 block">
                 {locale === 'es' ? 'Pregunta' : 'Question'} {i + 1}/{exam.questions.length}
               </span>
               <QuestionRenderer
@@ -223,7 +223,7 @@ export default function ExamContainer({
           <button
             onClick={handleSubmit}
             disabled={answeredCount < exam.questions.length}
-            className="flex items-center gap-2 bg-mx-orange text-white px-6 py-3 rounded-lg font-medium hover:bg-mx-orange/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 bg-mx-orange text-white px-6 py-3 rounded-lg font-medium hover:bg-mx-orange-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <Send size={16} />
             {locale === 'es' ? 'Enviar examen' : 'Submit exam'}

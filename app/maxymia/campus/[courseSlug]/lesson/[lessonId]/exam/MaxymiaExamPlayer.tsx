@@ -42,7 +42,7 @@ export default function MaxymiaExamPlayer({ course, block, exam, anchorLesson }:
   }, [course, block.id]);
 
   return (
-    <div className="flex h-[calc(100dvh-57px)] overflow-hidden">
+    <div className="flex h-[calc(100dvh-57px)] overflow-hidden bg-mx-bg text-mx-text">
       <AnimatePresence initial={false}>
         {sidebarOpen && (
           <m.div
@@ -63,27 +63,27 @@ export default function MaxymiaExamPlayer({ course, block, exam, anchorLesson }:
       </AnimatePresence>
 
       <div id="exam-scroll-area" className="flex-1 min-w-0 overflow-y-auto">
-        <div className="sticky top-0 z-30 bg-[#0b1018]/80 backdrop-blur-sm border-b border-white/5 px-6 py-3 flex items-center justify-between gap-4">
+        <div className="sticky top-0 z-30 bg-mx-bg/85 backdrop-blur-sm border-b border-mx-border px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen((v) => !v)}
-              className="text-[#6b7280] hover:text-mx-orange transition-colors shrink-0"
+              className="text-mx-text-muted hover:text-mx-orange transition-colors shrink-0"
               title={sidebarOpen ? (locale === 'es' ? 'Ocultar índice' : 'Hide index') : (locale === 'es' ? 'Mostrar índice' : 'Show index')}
             >
               {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
             </button>
             <div className="min-w-0">
-              <p className="text-white/30 text-label-sm tracking-widest uppercase truncate">
+              <p className="text-mx-text-muted text-label-sm tracking-widest uppercase truncate">
                 {block.title[locale]}
               </p>
-              <p className="text-white text-body-sm font-medium truncate">
+              <p className="text-mx-text text-body-sm font-medium truncate">
                 {locale === 'es' ? 'Examen del bloque' : 'Block exam'}
               </p>
             </div>
           </div>
           <Link
             href={`/maxymia/campus/${course.slug}/lesson/${anchorLesson.id}`}
-            className="flex items-center gap-1.5 text-white/50 hover:text-white text-label-md transition-colors px-3 py-1.5 rounded border border-white/10 hover:border-white/30 flex-shrink-0"
+            className="flex items-center gap-1.5 text-mx-text-muted hover:text-mx-text text-label-md transition-colors px-3 py-1.5 rounded-lg border border-mx-border hover:border-mx-text-muted flex-shrink-0"
             title={locale === 'es' ? 'Salir del examen' : 'Exit exam'}
           >
             <X size={14} />
