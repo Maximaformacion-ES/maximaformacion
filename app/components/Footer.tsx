@@ -173,6 +173,21 @@ export const Footer: React.FC = () => {
                 Política de cookies
               </Link>
             </li>
+            <li aria-hidden className="text-mx-border">·</li>
+            <li>
+              {/* Reabre el diálogo de Cookiebot para cambiar/retirar el consentimiento.
+                  Sustituye al icono flotante, desactivado en el layout. */}
+              <button
+                type="button"
+                onClick={() => {
+                  const cb = (window as unknown as { Cookiebot?: { renew?: () => void; show?: () => void } }).Cookiebot;
+                  (cb?.renew ?? cb?.show)?.();
+                }}
+                className="text-mx-text-muted hover:text-mx-orange transition-colors"
+              >
+                Configurar cookies
+              </button>
+            </li>
           </ul>
         </div>
       </div>
