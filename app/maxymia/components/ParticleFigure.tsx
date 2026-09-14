@@ -119,8 +119,8 @@ const BUILDERS: Record<ParticleShape, () => THREE.BufferGeometry> = {
 
 /**
  * `active`: la figura está quieta por defecto; con `active` (hover de la
- * tarjeta) las partículas tiemblan suavemente y el conjunto se balancea un
- * poco. No rota nunca.
+ * tarjeta) solo las partículas tiemblan suavemente alrededor de su sitio. El
+ * conjunto no se desplaza ni rota.
  */
 export default function ParticleFigure({
   shape,

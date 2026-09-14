@@ -127,8 +127,8 @@ export interface ParticleSceneOptions {
   speed?: number;
   /**
    * Modo "quieto hasta hover": no anima nada por defecto; `setActive(true)`
-   * enciende un temblor suave de las partículas y un leve balanceo (sin
-   * rotación) y `setActive(false)` lo apaga con fundido. Si es false, la
+   * enciende un temblor suave de las partículas (el conjunto no se mueve ni
+   * rota) y `setActive(false)` lo apaga con fundido. Si es false, la
    * escena anima siempre (hélice del hero).
    */
   idleUntilActive?: boolean;
@@ -237,15 +237,12 @@ export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): 
       if (!active && motion < 0.01) {
         motion = 0;
         mat.uniforms.uMotion.value = 0;
-        spin.position.y = 0;
         renderer.render(scene, camera);
         cancelAnimationFrame(raf);
         raf = 0;
         return;
       }
       mat.uniforms.uMotion.value = motion;
-      // Leve balanceo vertical del conjunto, sin rotación.
-      spin.position.y = Math.sin(time * 1.2) * 0.05 * motion;
     } else {
       spin.rotation.y += dt * speed;
     }
