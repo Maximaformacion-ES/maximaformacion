@@ -307,7 +307,9 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
             animate={{ width: 320, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="shrink-0 overflow-hidden"
+            // Solo en lg+: en móvil el índice va en un cajón (drawer) propio y
+            // este envoltorio de 320 px dejaba al contenido sin ancho.
+            className="hidden lg:block shrink-0 overflow-hidden"
           >
             <MaxymiaLessonSidebar
               course={course}
