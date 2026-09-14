@@ -42,7 +42,7 @@ export default function MaxymiaExamPlayer({ course, block, exam, anchorLesson }:
   }, [course, block.id]);
 
   return (
-    <div className="flex h-[calc(100dvh-57px)] overflow-hidden bg-mx-bg text-mx-text">
+    <div className="flex h-full overflow-hidden bg-mx-bg text-mx-text">
       <AnimatePresence initial={false}>
         {sidebarOpen && (
           <m.div

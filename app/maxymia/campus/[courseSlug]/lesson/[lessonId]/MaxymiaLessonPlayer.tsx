@@ -298,7 +298,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
   }, [selectedTopicId, topicSections, hasTopics, handleSelectTopic, handleAdvanceToTopic, handleAdvanceLesson]);
 
   return (
-    <div className="flex h-[calc(100dvh-57px)] overflow-hidden bg-mx-bg text-mx-text">
+    <div className="flex h-full overflow-hidden bg-mx-bg text-mx-text">
       {/* Sidebar */}
       <AnimatePresence initial={false}>
         {sidebarOpen && (
@@ -325,7 +325,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
       {/* Main content — only this part scrolls */}
       <div id="lesson-content-area" className="flex-1 min-w-0 overflow-y-auto">
         {/* Header bar */}
-        <div className="sticky top-0 z-30 bg-mx-bg/85 backdrop-blur-sm border-b border-mx-border px-6 py-3 flex items-center justify-between gap-4">
+        <div className="sticky top-0 z-30 h-14 bg-mx-bg/85 backdrop-blur-sm border-b border-mx-border px-6 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen((v) => !v)}

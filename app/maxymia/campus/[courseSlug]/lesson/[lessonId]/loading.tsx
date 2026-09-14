@@ -6,7 +6,7 @@ export default function LessonLoading() {
   const lines = Array.from({ length: 6 });
 
   return (
-    <div className="flex h-[calc(100dvh-57px)] overflow-hidden animate-pulse bg-mx-bg" aria-busy="true">
+    <div className="flex h-full overflow-hidden animate-pulse bg-mx-bg" aria-busy="true">
       {/* Sidebar (índice de módulos/lecciones) */}
       <aside className="hidden md:flex shrink-0 w-80 flex-col border-r border-mx-border bg-mx-card p-4 gap-3">
         <div className="h-3 w-24 rounded bg-black/[0.08]" />

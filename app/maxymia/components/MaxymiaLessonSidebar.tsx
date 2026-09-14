@@ -72,9 +72,10 @@ export default function MaxymiaLessonSidebar({
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      {/* Progress header */}
-      <div className="p-4 border-b border-mx-border">
-        <div className="flex items-center justify-between mb-2">
+      {/* Progress header — mismo alto (h-14) que la barra sticky del
+          contenido, para que las dos líneas inferiores queden alineadas. */}
+      <div className="h-14 shrink-0 px-4 border-b border-mx-border flex flex-col justify-center gap-1.5">
+        <div className="flex items-center justify-between">
           <span className="text-mx-text-muted text-label-md">
             {completedCount}/{totalLessons} {locale === 'es' ? 'completadas' : 'completed'}
           </span>

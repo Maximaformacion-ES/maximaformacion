@@ -44,10 +44,10 @@ function ShellInner({ children, courses, defaultOpen }: Required<Omit<CampusShel
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <CampusSidebar locale={locale} />
-      <SidebarInset className={`bg-mx-bg text-mx-text ${isLessonPage ? 'h-svh max-h-svh overflow-hidden' : ''}`}>
+      <SidebarInset className={`bg-mx-bg text-mx-text ${isLessonPage ? 'h-dvh max-h-dvh overflow-hidden' : ''}`}>
         <CampusHeader locale={locale} courses={courses} />
         {isLessonPage ? (
-          <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+          <main className="flex-1 min-h-0 h-0 overflow-hidden">{children}</main>
         ) : (
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto w-full max-w-[1400px]">{children}</div>
