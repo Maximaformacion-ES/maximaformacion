@@ -35,13 +35,14 @@ import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
-import { ContactCourse, contactHrefFor } from '@/app/components/ContactCourseProvider';
+import { ContactCourse } from '@/app/components/ContactCourseProvider';
 import { FontStyles } from '@/app/components/FontStyles';
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 import { Breadcrumb } from '@/app/components/Breadcrumb';
 import { MAXYMIA_CATEGORY_LABELS } from '../../data/labels';
 import Certificate from '../../components/Certificate';
+import TutorQuestionModal from '../../components/TutorQuestionModal';
 import type { MaxymiaCourse, MaxymiaBlock, MaxymiaCourseProgress, Locale } from '../../types';
 import type { Badge, Institution } from '@/lib/strapi/types';
 
@@ -77,6 +78,7 @@ interface Props {
 export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
   const { locale } = useLocale();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showTutorModal, setShowTutorModal] = useState(false);
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
   const { byExamId: examResultsByExamId } = useExamResults(course.id);
@@ -354,12 +356,13 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                       </p>
                     </div>
                   </div>
-                  <Link
-                    href={contactHrefFor(course.title.es || course.title[locale])}
+                  <button
+                    type="button"
+                    onClick={() => setShowTutorModal(true)}
                     className="inline-flex items-center justify-center gap-2 shrink-0 rounded-lg border border-mx-blue text-mx-blue px-4 py-2.5 text-label-md font-medium hover:bg-mx-blue hover:text-white transition-colors"
                   >
                     <MessageCircle size={15} /> {locale === 'es' ? 'Contactar con el tutor' : 'Contact the tutor'}
-                  </Link>
+                  </button>
                 </div>
                 <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-label-md text-mx-text-muted mb-8">
                   <MetaItem icon={Clock} label={durationLabel} />
@@ -537,6 +540,8 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
       </main>
 
       <Footer />
+
+      <TutorQuestionModal open={showTutorModal} onClose={() => setShowTutorModal(false)} locale={locale} course={course} />
 
       {/* Certificate modal — portaled to body to escape any transformed ancestor */}
       {portalReady && createPortal(

@@ -21,6 +21,7 @@ import { UserButton, useUser } from '@clerk/nextjs';
 import { LocaleProvider, useLocale } from '../i18n/LocaleProvider';
 import { useMounted } from '../../hooks/useMounted';
 import NotificationBell from '../components/NotificationBell';
+import TutorQuestionModal from '../components/TutorQuestionModal';
 import type { MaxymiaCourse } from '../types';
 
 /**
@@ -147,6 +148,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function Sidebar() {
   const { locale } = useLocale();
+  const courses = useCampusCourses();
+  const [askOpen, setAskOpen] = useState(false);
   return (
     <aside className="hidden lg:flex flex-col sticky top-0 h-screen w-[260px] shrink-0 border-r border-mx-border bg-mx-card">
       <div className="px-6 py-6 border-b border-mx-border">
@@ -165,14 +168,16 @@ function Sidebar() {
           <p className="text-label-md text-mx-text-muted mb-3">
             {locale === 'es' ? 'Tu tutor te las resuelve.' : 'Your tutor will help.'}
           </p>
-          <Link
-            href="/contacto"
+          <button
+            type="button"
+            onClick={() => setAskOpen(true)}
             className="inline-flex items-center gap-1.5 text-label-md font-medium text-mx-blue hover:text-mx-orange transition-colors"
           >
             {locale === 'es' ? 'Escribir al tutor' : 'Write to the tutor'} <ArrowUpRight size={12} />
-          </Link>
+          </button>
         </div>
       </div>
+      <TutorQuestionModal open={askOpen} onClose={() => setAskOpen(false)} locale={locale} courses={courses} />
     </aside>
   );
 }
