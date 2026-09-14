@@ -1410,3 +1410,11 @@ a[href*="/billing"],
     scroll-behavior: auto !important;
   }
 }
+
+/* La tira anunciadora del pack (PackAnnouncementBar, dentro del header fijo)
+   publica su altura en --announcement-h; el body la reserva como padding para
+   que la tira ocupe sitio y no tape el inicio de las páginas. */
+body {
+  padding-top: var(--announcement-h, 0px);
+  transition: padding-top 0.25s ease;
+}
