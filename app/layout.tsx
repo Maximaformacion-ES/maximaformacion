@@ -24,7 +24,13 @@ import "./globals.css";
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID_2;
 const GTM_AUTH = process.env.NEXT_PUBLIC_GTM_AUTH_2;
 const GTM_PREVIEW = process.env.NEXT_PUBLIC_GTM_PREVIEW_2;
-const COOKIEBOT_ID = process.env.NEXT_PUBLIC_COOKIEBOT_ID;
+// Cookiebot solo en producción: su modo de bloqueo automático intercepta los
+// <script> que Next inyecta al hacer streaming (RSC) y los re-ejecuta tarde y
+// desordenados → "Connection closed" / "missing bootstrap script". En
+// localhost además el dominio no está autorizado en Cookiebot, así que no
+// aporta nada y solo rompe la hidratación.
+const COOKIEBOT_ID =
+  process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_COOKIEBOT_ID : undefined;
 
 const ztNature = localFont({
   // WOFF2 (no OTF): ~50% menos peso, mismo diseño. Se quitaron los pesos Thin (100)
