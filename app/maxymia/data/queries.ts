@@ -1,3 +1,4 @@
+import { rethrowIfStrapiUnavailable } from '@/lib/strapi/client';
 import { MAXYMIA_COURSES } from './courses';
 import {
   getMaxymiaCoursesFromStrapi,
@@ -54,8 +55,11 @@ export async function fetchMaxymiaCourses(
   try {
     courses = await getMaxymiaCoursesFromStrapi();
   } catch (e) {
-    // Strapi caído/lento: devolvemos vacío en vez de propagar y tumbar el
-    // prerender de la página (que hacía FALLAR el build entero de Vercel).
+    // Strapi caído/lento: en runtime relanzamos para que ISR conserve la última
+    // versión buena de la página (en vez de cachear un listado vacío 60s). En
+    // `next build` devolvemos [] para no tumbar el deploy entero por un
+    // transitorio; la página se regenera sola con `revalidate`.
+    rethrowIfStrapiUnavailable(e);
     console.warn('[fetchMaxymiaCourses] Strapi no disponible, devuelvo []:', e);
     return [];
   }

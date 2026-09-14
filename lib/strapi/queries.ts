@@ -1,4 +1,4 @@
-import { strapiRequest, getStrapiMediaUrl } from './client';
+import { strapiRequest, getStrapiMediaUrl, isStrapiUnavailable, rethrowIfStrapiUnavailable } from './client';
 import type {
   StrapiResponse,
   StrapiSingleResponse,
@@ -376,6 +376,7 @@ export async function getPrograms(
       pageCount: response.meta.pagination?.pageCount || 1,
     };
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     // Strapi caído/lento: devolvemos vacío en vez de propagar. getPrograms es
     // central (home, /programas, megamenú); si petaba, tumbaba el prerender y con
     // él TODO el build de Vercel. Degradar > caerse.
@@ -397,6 +398,8 @@ async function strapiRequestTolerantPopulate<T>(
   try {
     return await strapiRequest<T>(path, options);
   } catch (error) {
+    // Si Strapi está caído no tiene sentido reintentar (duplicaría el timeout).
+    if (isStrapiUnavailable(error)) throw error;
     const stripped = OPTIONAL_POPULATES.reduce((acc, key) => acc.replace(key, ''), path);
     if (stripped === path) throw error;
     console.warn('[strapi] reintentando sin populates opcionales:', error instanceof Error ? error.message : error);
@@ -424,6 +427,7 @@ export async function getProgramById(
 
     return transformProgram(response.data);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching program ${id}:`, error);
     return null;
   }
@@ -449,6 +453,7 @@ export async function getProgramBySlug(
 
     return transformProgram(response.data[0]);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching program by slug ${slug}:`, error);
     return null;
   }
@@ -512,6 +517,7 @@ export async function getTeacherBySlug(slug: string): Promise<TeacherProfile | n
     if (!response.data || response.data.length === 0) return null;
     return transformTeacher(response.data[0]);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching teacher ${slug}:`, error);
     return null;
   }
@@ -554,6 +560,7 @@ export async function getAuthorBySlug(slug: string): Promise<TeacherProfile | nu
     if (!response.data || response.data.length === 0) return null;
     return transformTeacher(response.data[0]);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching author ${slug}:`, error);
     return null;
   }
@@ -681,6 +688,7 @@ async function getBlogPostById(
 
     return transformBlogPost(response.data);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching blog post ${id}:`, error);
     return null;
   }
@@ -706,6 +714,7 @@ export async function getBlogPostBySlug(
 
     return transformBlogPost(response.data[0]);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching blog post by slug ${slug}:`, error);
     return null;
   }
@@ -868,6 +877,7 @@ export async function getResources(
       pageCount: response.meta.pagination?.pageCount || 1,
     };
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error('Error fetching resources:', error);
     return { resources: [], total: 0, pageCount: 0 };
   }
@@ -923,6 +933,7 @@ export async function getProResources(
     );
     return response.data.map(transformProResourceCard);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error('Error fetching pro-resources:', error);
     return [];
   }
@@ -947,6 +958,7 @@ export async function getProResourceBySlug(
     const item = response.data[0];
     return item ? transformProResource(item) : null;
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error('Error fetching pro-resource by slug:', error);
     return null;
   }
@@ -968,6 +980,7 @@ export async function getResourceBySlug(
     if (!response.data || response.data.length === 0) return null;
     return transformResource(response.data[0]);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error(`Error fetching resource by slug ${slug}:`, error);
     return null;
   }
@@ -1385,6 +1398,7 @@ export async function getMaxymiaHome(): Promise<MaxymiaHomeData | null> {
 
     return transformMaxymiaHome(response.data);
   } catch (error) {
+    rethrowIfStrapiUnavailable(error); // caída → conservar la versión anterior (ISR)
     console.error('Error fetching maxymia home data:', error);
     return null;
   }

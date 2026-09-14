@@ -11,15 +11,12 @@ export const metadata: Metadata = {
 };
 
 export default async function MaxymiaPage() {
-  const [maxymiaData, allCourses] = await Promise.all([
-    getMaxymiaHome(),
-    fetchMaxymiaCourses().catch(() => []),
-  ]);
-
-  // Si Strapi está caído (p. ej. un 503 transitorio DURANTE EL BUILD), maxymiaData
-  // viene null. Antes se pasaba con `data={homeData!}` y MaxymiaClient crasheaba en
-  // `hero`, tumbando TODO el deploy. notFound() es recuperable: la página revalida
-  // (revalidate de la query) y se regenera cuando Strapi vuelve.
+  // Si Strapi está caído en runtime, los fetchers LANZAN (StrapiUnavailableError):
+  // en una revalidación ISR Next conserva la última versión buena de la página y
+  // en un primer render se sirve la página de error (no cacheable) en vez de un
+  // 404 cacheado. Durante `next build` degradan a null/[] para no tumbar el
+  // deploy; entonces notFound() es recuperable porque la página revalida sola.
+  const [maxymiaData, allCourses] = await Promise.all([getMaxymiaHome(), fetchMaxymiaCourses()]);
   if (!maxymiaData) notFound();
 
   const topCourses = getFeaturedCourses(allCourses, 8);

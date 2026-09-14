@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { getProgramBySlug, getTeachers, getPrograms, getBadges, getInstitutions, getVideoTestimonials } from '@/lib/strapi/queries';
 import type { Docente } from '@/app/components/DocenteSection';
 import { markdownToHtml } from '@/lib/markdown';
@@ -82,6 +83,12 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
       // Testimonios en vídeo: también globales; [] → la sección no se pinta.
       getVideoTestimonials(),
     ]);
+
+  // Programa inexistente → 404 real (antes se devolvía 200 con una vista "no
+  // encontrado", que Google indexaba como página válida). Si Strapi está caído,
+  // getProgramBySlug lanza en runtime y no llegamos aquí (ISR conserva la
+  // versión anterior).
+  if (!program) notFound();
 
   // Avatares del equipo docente completo (sección "Atención al alumnado").
   const teacherAvatars = teachers
