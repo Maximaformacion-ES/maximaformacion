@@ -278,7 +278,8 @@ export function CourseCard({
                 </div>
               </div>
             )}
-            <div className="flex items-end justify-between gap-3">
+            {/* En tarjetas estrechas el estado y el CTA pasan a dos líneas. */}
+            <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
               <div className="min-w-0">
                 {showProgress ? (
                   <span className={`text-body-sm font-medium ${progress?.isCompleted ? 'text-amber-500' : 'text-emerald-600'}`}>
