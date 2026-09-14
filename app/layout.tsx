@@ -135,6 +135,9 @@ export default async function RootLayout({
     // cabeceras/footer oscuros de Maxymia). El campo `logoMaxymia` del Site
     // Metadata de Strapi apunta por error al logo de Máxima (logo_completo).
     logoMaxymia: '/logo_maxymia_blanco_sin_fondo.png',
+    // Favicon real (el de Strapi, el mismo que va en <link rel="icon">); lo usa
+    // el sidebar del campus plegado.
+    favicon: siteMetadata?.favicon || '',
   };
 
   // Group programs by subjectArea for the desktop megamenu. Ordering and

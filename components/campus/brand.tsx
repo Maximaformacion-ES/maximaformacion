@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { useSiteBranding } from "@/app/components/SiteBrandingProvider";
 
 /** Marca del campus en la cabecera del sidebar: logo negro de Maxymia
  *  expandido; el favicon del sitio al colapsar a icono (como en /admin). */
 export function CampusBrand() {
+  const { favicon } = useSiteBranding();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -19,9 +23,9 @@ export function CampusBrand() {
             />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/favicon.ico"
+              src={favicon || "/favicon.ico"}
               alt="Maxymia"
-              className="hidden h-6 w-6 group-data-[collapsible=icon]:block"
+              className="hidden h-7 w-7 object-contain group-data-[collapsible=icon]:block"
             />
           </Link>
         </SidebarMenuButton>
