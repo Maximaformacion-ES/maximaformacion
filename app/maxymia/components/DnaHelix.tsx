@@ -32,7 +32,20 @@ const BAR_H = 6; // alto del guion
 const CELL_W = 22; // paso horizontal de las celdas
 const DASH_W = 11; // ancho del guion de relleno
 const TURN_ROWS = 46; // filas por vuelta completa de la hélice
-const SPEED = 0.55; // rad/s de giro
+const SPEED = 0.2; // rad/s de giro (~31 s por vuelta)
+
+export type DnaHelixStyle =
+  /** Peldaños de guiones con huecos y relleno irregular tipo "flujo de datos" (por defecto). */
+  | 'dashed'
+  /** Peldaños como barras continuas y relleno regular. */
+  | 'solid';
+
+// Ruido determinista por celda (misma semilla en cada frame → la textura
+// no parpadea; cambia solo con la fase, muy despacio).
+function hash(r: number, c: number): number {
+  const n = Math.sin(r * 127.1 + c * 311.7) * 43758.5453;
+  return n - Math.floor(n);
+}
 
 function roundedRect(w: number, h: number, r: number): THREE.ShapeGeometry {
   const s = new THREE.Shape();
@@ -50,7 +63,13 @@ function roundedRect(w: number, h: number, r: number): THREE.ShapeGeometry {
   return new THREE.ShapeGeometry(s, 4);
 }
 
-export default function DnaHelix({ className = '' }: { className?: string }) {
+export default function DnaHelix({
+  className = '',
+  style = 'dashed',
+}: {
+  className?: string;
+  style?: DnaHelixStyle;
+}) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -137,12 +156,20 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
             col.copy(isA ? BLUE : ORANGE);
             a = front ? 1 : 0.55;
           } else if (x > lo && x < hi && span > CELL_W) {
-            // Peldaño: barra continua (las celdas se tocan) a dos tonos: la
-            // mitad pegada a la hebra A en azul y la pegada a B en naranja.
-            // (Un degradado real pasa por un gris sucio a mitad de camino.)
-            w = CELL_W + 0.5;
+            // Peldaño a dos tonos: la mitad pegada a la hebra A en azul y la
+            // pegada a B en naranja (un degradado real pasa por un gris sucio).
+            // 'solid': las celdas se tocan → barra continua.
+            // 'dashed': guiones con hueco, más largos cerca de las hebras y
+            // más cortos hacia el centro del peldaño (como la referencia).
             col.copy(dA <= dB ? BLUE : ORANGE);
-            a = 0.85;
+            if (style === 'solid') {
+              w = CELL_W + 0.5;
+              a = 0.85;
+            } else {
+              const mid = 1 - Math.min(dA, dB) / (span / 2); // 0 en hebra → 1 en centro
+              w = CELL_W - 3 - mid * 6;
+              a = 0.8 - mid * 0.15;
+            }
           } else {
             // Relleno: guiones azules cortos que se atenúan y encogen al
             // alejarse de las hebras, hasta quedar en puntos casi invisibles.
@@ -151,6 +178,17 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
             col.copy(BLUE);
             a = 0.42 * Math.pow(1 - far, 3);
             w = DASH_W * (1 - far * 0.6);
+            if (style === 'dashed') {
+              // Textura irregular: cada celda tiene un "peso" fijo; con la fase
+              // el umbral se desplaza despacio, así que algunos guiones se
+              // apagan, otros se encienden y unos pocos se hacen más largos,
+              // como un flujo de datos. Sin parpadeo (ruido determinista).
+              const n = hash(r, c);
+              const pulse = 0.5 + 0.5 * Math.sin(phase * 1.7 + n * Math.PI * 2);
+              if (n < 0.28) a *= 0.15 + 0.85 * pulse; // se apaga y enciende
+              else if (n > 0.9) w *= 1.6 + 0.6 * pulse; // guion largo ocasional
+              else a *= 0.6 + 0.4 * pulse;
+            }
           }
 
           a *= edge;
@@ -210,7 +248,7 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
       renderer.dispose();
       if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [style]);
 
   return <div ref={hostRef} className={className} aria-hidden="true" />;
 }
