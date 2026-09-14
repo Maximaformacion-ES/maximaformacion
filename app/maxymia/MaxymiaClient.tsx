@@ -68,6 +68,17 @@ function useCampusLink() {
 
 // ─── HERO SECTION ──────────────────────────────────────
 
+// "Explorar cursos": desplazamiento suave hasta #cursos (respetando
+// prefers-reduced-motion) y actualiza el hash sin el salto brusco del ancla.
+function scrollToCursos(e: React.MouseEvent<HTMLAnchorElement>) {
+  const target = document.getElementById('cursos');
+  if (!target) return; // sin sección → comportamiento nativo del ancla
+  e.preventDefault();
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  window.history.replaceState(null, '', '#cursos');
+}
+
 function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
   const { handleCampusClick } = useCampusLink();
 
@@ -148,33 +159,12 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               </Link>
               <a
                 href="#cursos"
+                onClick={scrollToCursos}
                 className="inline-flex items-center gap-2 border border-mx-blue text-mx-blue px-7 py-3.5 rounded-full text-body-sm font-medium hover:bg-mx-blue hover:text-white transition-colors"
               >
                 <Play size={16} />
                 Explorar cursos
               </a>
-            </m.div>
-
-            {/* Stats */}
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="flex items-center gap-6 pt-8 border-t border-mx-border"
-            >
-              {[
-                { value: '2.500+', label: 'Alumnado activo' },
-                { value: '44', label: 'Cursos especializados' },
-                { value: '98%', label: 'Satisfacción' },
-              ].map((stat, i) => (
-                <React.Fragment key={stat.label}>
-                  {i > 0 && <div className="w-px h-10 bg-mx-border" />}
-                  <div>
-                    <div className="text-mx-text text-heading-sm md:text-heading-md 2xl:text-heading-lg font-bold">{stat.value}</div>
-                    <div className="text-mx-text-muted text-label-md 2xl:text-label-lg">{stat.label}</div>
-                  </div>
-                </React.Fragment>
-              ))}
             </m.div>
           </div>
 
@@ -276,7 +266,7 @@ function CoursesSection({
   const { handleCampusClick } = useCampusLink();
 
   return (
-    <section id="cursos" className="py-24 md:py-32 relative border-t border-mx-border">
+    <section id="cursos" className="py-24 md:py-32 relative border-t border-mx-border scroll-mt-20 md:scroll-mt-24">
       <div className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
