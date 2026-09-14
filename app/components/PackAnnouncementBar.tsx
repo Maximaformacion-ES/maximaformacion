@@ -38,16 +38,20 @@ function isScrolled(): boolean {
   return window.scrollY > 40;
 }
 
-// Altura de la tira publicada como variable CSS en <html>
-// (--announcement-h). globals.css la usa como padding-top del body, así la
-// tira OCUPA sitio en el flujo y no tapa el arranque de los heros (que solo
-// cuentan con la altura del header fijo). Se mide con ResizeObserver (puede
+// La tira va DENTRO del header fijo, así que por sí sola no ocupa sitio y
+// tapa el arranque de las páginas (breadcrumbs, badges), que solo cuentan con
+// la altura del header. Solución: reservar su altura como padding-top del
+// <body>, aplicado en línea desde aquí (no vía CSS global, para no depender
+// de la recompilación de estilos) y publicada también como --announcement-h
+// por si algún sticky quiere descontarla. Se mide con ResizeObserver (puede
 // ocupar 1 o 2 líneas según el ancho) y NO se pone a 0 al ocultarse por
 // scroll: ese hueco queda arriba del todo, ya fuera de la vista, y así no hay
 // saltos de layout al pasar de 40 px. Solo vuelve a 0 al cerrarla o desmontar.
-const ANNOUNCEMENT_VAR = '--announcement-h';
 function setAnnouncementHeight(px: number) {
-  document.documentElement.style.setProperty(ANNOUNCEMENT_VAR, `${Math.round(px)}px`);
+  const h = `${Math.round(px)}px`;
+  document.documentElement.style.setProperty('--announcement-h', h);
+  document.body.style.transition = 'padding-top 0.25s ease';
+  document.body.style.paddingTop = h;
 }
 
 /**
