@@ -7,7 +7,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavUser } from "@/components/admin/nav-user";
+import { CampusNavUser } from "./nav-user";
 import { CampusBrand } from "./brand";
 import { CampusNavMain } from "./nav-main";
 import type { Locale } from "@/app/maxymia/types";
@@ -26,7 +26,7 @@ export function CampusSidebar({
         <CampusNavMain locale={locale} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <CampusNavUser locale={locale} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
