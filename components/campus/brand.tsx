@@ -14,7 +14,9 @@ export function CampusBrand() {
         {/* Misma altura (h-14) pero casi sin padding vertical, para que el
             logo ocupe el bloque: 44 px de alto en 56 px de contenedor. */}
         <SidebarMenuButton size="lg" asChild className="h-14 py-1 hover:bg-transparent flex items-center justify-center">
-          <Link href="/maxymia/campus" className="justify-center">
+          {/* El logo lleva a la landing de Maxymia; "Máxima Formación" (en la
+              cabecera) lleva a la web principal. */}
+          <Link href="/maxymia" className="justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo_maxymia_negro_sin_fondo.png"
