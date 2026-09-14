@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { ArrowUpRight, ChevronLeft, MessageCircle, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, ChevronLeft, MessageCircle } from "lucide-react";
+import { CourseSearch } from "./course-search";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -19,20 +19,12 @@ import type { Locale, MaxymiaCourse } from "@/app/maxymia/types";
  */
 export function CampusHeader({ locale, courses }: { locale: Locale; courses: MaxymiaCourse[] }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [q, setQ] = useState("");
   const [askOpen, setAskOpen] = useState(false);
 
   const isLesson = /\/maxymia\/campus\/[^/]+\/lesson\//.test(pathname);
   const segments = pathname.split("/");
   const courseSlug = segments[segments.indexOf("campus") + 1] || "";
   const course = courses.find((c) => c.slug === courseSlug);
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const term = q.trim();
-    router.push(term ? `/maxymia/campus/cursos?q=${encodeURIComponent(term)}` : "/maxymia/campus/cursos");
-  };
 
   return (
     <header className="bg-background sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b px-4">
@@ -49,16 +41,7 @@ export function CampusHeader({ locale, courses }: { locale: Locale; courses: Max
           {course && <span className="truncate text-sm text-muted-foreground">{course.title[locale]}</span>}
         </div>
       ) : (
-        <form onSubmit={submit} role="search" className="relative hidden w-full max-w-sm sm:block">
-          <Search className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2" aria-hidden="true" />
-          <Input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={locale === "es" ? "Buscar cursos…" : "Search courses…"}
-            className="h-9 pl-8"
-          />
-        </form>
+        <CourseSearch locale={locale} courses={courses} />
       )}
 
       {/* Ayuda, arriba a la derecha: escribir al tutor y volver a la web. */}

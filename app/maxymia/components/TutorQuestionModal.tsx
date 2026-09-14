@@ -142,14 +142,14 @@ export default function TutorQuestionModal({ open, onClose, locale = 'es', cours
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg overflow-hidden">
         <DialogHeader>
           <div className="flex items-start gap-3">
             <Avatar className="h-10 w-10 rounded-lg">
               <AvatarImage src={tutorAvatar} alt="" />
               <AvatarFallback className="rounded-lg bg-mx-blue/10 text-mx-blue">{initials}</AvatarFallback>
             </Avatar>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <DialogTitle>{t.title}</DialogTitle>
               <DialogDescription>{t.intro(tutorName)}</DialogDescription>
             </div>
@@ -168,12 +168,12 @@ export default function TutorQuestionModal({ open, onClose, locale = 'es', cours
             </DialogFooter>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} className="min-w-0 space-y-4">
             {!course && (
               <div className="space-y-2">
                 <Label htmlFor="tutor-course">{t.course}</Label>
                 <Select value={courseId} onValueChange={setCourseId}>
-                  <SelectTrigger id="tutor-course" className="w-full">
+                  <SelectTrigger id="tutor-course" className="w-full max-w-full [&>span]:truncate">
                     <SelectValue placeholder={t.choose} />
                   </SelectTrigger>
                   <SelectContent>
