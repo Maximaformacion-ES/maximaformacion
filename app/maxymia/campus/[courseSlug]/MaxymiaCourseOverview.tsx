@@ -352,7 +352,9 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
               transition={{ duration: 0.45 }}
               className="self-start max-w-full"
             >
-              <div className="inline-block max-w-full rounded-b-2xl bg-mx-bg px-5 py-3 shadow-[0_8px_24px_-12px_rgba(26,26,26,0.25)]">
+              <div className="relative inline-block max-w-full rounded-b-2xl bg-mx-bg px-5 py-3 shadow-[0_8px_24px_-12px_rgba(26,26,26,0.25)]">
+                <Fillet at="bl" className="top-0 -left-4" />
+                <Fillet at="br" className="top-0 -right-4" />
                 <Breadcrumb
                   items={[
                     { label: 'Campus', href: '/maxymia/campus' },
@@ -371,8 +373,10 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="mt-auto self-start w-full max-w-3xl rounded-t-2xl bg-mx-bg px-6 md:px-8 pt-6 md:pt-8 shadow-[0_-8px_24px_-12px_rgba(26,26,26,0.25)]"
+              className="relative mt-auto self-start w-full max-w-3xl rounded-t-2xl bg-mx-bg px-6 md:px-8 pt-6 md:pt-8 shadow-[0_-8px_24px_-12px_rgba(26,26,26,0.25)]"
             >
+              <Fillet at="tl" className="bottom-0 -left-4" />
+              <Fillet at="tr" className="bottom-0 -right-4" />
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
                   {maxymiaCategoryLabel(course.category, locale)}
@@ -703,6 +707,24 @@ function findResumeInfo(blocks: MaxymiaBlock[], lessonId: string | undefined) {
 }
 
 // ─── Stat Item ──────────────────────────────────────────────────────
+
+/**
+ * Esquina cóncava ("fillet"): cuadradito del color del fondo con un cuarto de
+ * círculo transparente, colocado fuera del panel en la unión con el borde al
+ * que está pegado. Hace que la pestaña se una con una curva, no en ángulo.
+ * `at` = esquina del cuadradito donde está el centro del círculo.
+ */
+function Fillet({ className, at }: { className: string; at: 'tl' | 'tr' | 'bl' | 'br' }) {
+  const cx = at.endsWith('l') ? '0%' : '100%';
+  const cy = at.startsWith('t') ? '0%' : '100%';
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute size-4 ${className}`}
+      style={{ background: `radial-gradient(circle at ${cx} ${cy}, transparent 15.5px, var(--color-mx-bg) 16px)` }}
+    />
+  );
+}
 
 function StatTile({ icon: Icon, label, value, hint }: { icon: React.ElementType; label: string; value: string; hint?: string }) {
   return (
