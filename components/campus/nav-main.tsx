@@ -43,9 +43,12 @@ export function CampusNavMain({ locale }: { locale: Locale }) {
       <SidebarGroupLabel>{locale === "es" ? "Menú" : "Menu"}</SidebarGroupLabel>
       <SidebarMenu>
         {MAIN.map((item) => {
+          // La página de un curso comprado (/maxymia/campus/<slug>) cuelga de
+          // "Mis cursos" a efectos de navegación.
+          const isCoursePage = /^\/maxymia\/campus\/(?!cursos|mis-cursos|notas)[^/]+/.test(pathname);
           const active = item.exact
             ? pathname === item.url
-            : pathname === item.url || pathname.startsWith(`${item.url}/`);
+            : pathname === item.url || pathname.startsWith(`${item.url}/`) || (isCoursePage && item.url.endsWith('/mis-cursos'));
           const label = item[locale];
           return (
             <SidebarMenuItem key={item.url}>

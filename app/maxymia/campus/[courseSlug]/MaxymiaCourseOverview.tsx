@@ -66,6 +66,10 @@ interface Props {
    *  profile is still loading we trust this so a non-buyer sees the purchase
    *  view immediately instead of the student view flashing. */
   initialHasAccess?: boolean;
+  /** `true`: la página va DENTRO del campus (CampusChrome: sidebar + cabecera).
+   *  La vista de alumno no pinta Header/Footer del sitio y el hero se adapta
+   *  al contenedor. `false`: sin matrícula, ficha de venta con chrome del sitio. */
+  embedded?: boolean;
   /** Avatares del equipo docente para la sección de compromiso con el alumnado. */
   teacherAvatars?: string[];
   /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
@@ -75,7 +79,7 @@ interface Props {
   allInstitutions?: Institution[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, embedded = false, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
   const { locale } = useLocale();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showTutorModal, setShowTutorModal] = useState(false);
@@ -258,14 +262,31 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   // never flashes; once loaded, the hook is the source of truth.
   const hasAccess = isLoading ? !!initialHasAccess : checkAccess(course.id, course.isPro);
 
+  // Sin chrome del campus (el servidor no vio matrícula) y el cliente acaba de
+  // confirmar acceso (checkout verificado arriba): la vista de alumno vive
+  // dentro del campus, que solo pinta el servidor → recarga una vez.
+  // sessionStorage evita un bucle si servidor y cliente discreparan.
+  useEffect(() => {
+    if (embedded || !hasAccess || isLoading) return;
+    const key = `maxymia-chrome-reload:${course.slug}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+    } catch {
+      /* sin sessionStorage: recarga igualmente */
+    }
+    window.location.replace(window.location.pathname);
+  }, [embedded, hasAccess, isLoading, course.slug]);
+
   // Show product/detail (purchase) page whenever the user isn't entitled.
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
-  if (!hasAccess) {
+  // Fuera del campus también mientras dura la recarga de arriba.
+  if (!hasAccess || !embedded) {
     return (
       <MaxymiaCourseDetail
         course={course}
-        standalone
+        standalone={!embedded}
         teacherAvatars={teacherAvatars}
         recommended={recommended}
         allBadges={allBadges}
@@ -325,19 +346,28 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   });
 
   return (
-    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip">
-      <FontStyles />
+    <div className={embedded ? 'w-full' : 'min-h-screen bg-mx-bg text-mx-text overflow-x-clip'}>
+      {!embedded && <FontStyles />}
       {/* Header/footer enlazan a /contacto?curso=<este curso> */}
       <ContactCourse title={course.title.es || course.title[locale]} />
-      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+      {!embedded && <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />}
 
-      <main className="relative z-10 pb-16 md:pb-24">
+      <main className={embedded ? 'relative' : 'relative z-10 pb-16 md:pb-24'}>
         {/* ─── 1. Hero a sangre (estilo ficha del pack): la imagen del curso
             ocupa todo el hero y el contenido va abajo a la izquierda sobre
             el fundido hacia el fondo de la página. ─── */}
         {/* Altura algo menor que la ventana (≈86 %) para que el borde inferior
             del panel blanco y sus curvas queden a la vista sin hacer scroll. */}
-        <section className="relative overflow-hidden mt-[72px] sm:mt-[96px] min-h-[calc(86dvh-72px)] sm:min-h-[calc(86dvh-96px)] flex flex-col">
+        <section
+          className={
+            embedded
+              // Dentro del campus: tarjeta a todo el ancho del contenido, con la
+              // pestaña del breadcrumb colgando de su borde superior y el panel
+              // saliendo del inferior (ambos hacia el fondo de la página).
+              ? 'relative overflow-hidden rounded-2xl min-h-[calc(78dvh-56px)] flex flex-col'
+              : 'relative overflow-hidden mt-[72px] sm:mt-[96px] min-h-[calc(86dvh-72px)] sm:min-h-[calc(86dvh-96px)] flex flex-col'
+          }
+        >
           {/* Imagen a sangre cubriendo TODO el hero, con fundidos para que el
               texto y la tarjeta de retomar (dentro del hero) se lean. */}
           <div className="absolute inset-0">
@@ -346,7 +376,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
             <div className="absolute inset-0 bg-black/[0.06]" />
           </div>
 
-          <div className="relative flex-1 flex flex-col max-w-[1400px] w-full mx-auto px-6 md:px-12">
+          <div className={`relative flex-1 flex flex-col w-full ${embedded ? 'px-5 md:px-8' : 'max-w-[1400px] mx-auto px-6 md:px-12'}`}>
             {/* Breadcrumb arriba del todo: pestaña blanca que "cuelga" del
                 header, con las esquinas inferiores redondeadas. */}
             <m.div
@@ -460,7 +490,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
           </div>
         </section>
 
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 mt-10 md:mt-14">
+        <div className={embedded ? 'mt-8 md:mt-10' : 'max-w-[1400px] mx-auto px-6 md:px-12 mt-10 md:mt-14'}>
           {/* ─── 2. Indicadores ─── */}
           <m.section {...fadeUp(0.08)} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
             <div className="rounded-xl border border-mx-border bg-mx-card p-4 flex items-center gap-4">
@@ -555,7 +585,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
 
             {/* Panel lateral: lo que NO está ya en la cabecera */}
             <aside className="lg:col-span-1">
-              <div className="lg:sticky lg:top-32 space-y-4">
+              <div className={`lg:sticky space-y-4 ${embedded ? 'lg:top-20' : 'lg:top-32'}`}>
                 {/* Siguiente lección */}
                 {!isFullyCompleted && (
                   <m.div {...fadeUp(0.16)} className="rounded-xl border border-mx-border bg-mx-card p-5">
@@ -652,7 +682,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
         </div>
       </main>
 
-      <Footer />
+      {!embedded && <Footer />}
 
       <TutorQuestionModal open={showTutorModal} onClose={() => setShowTutorModal(false)} locale={locale} course={course} />
 
