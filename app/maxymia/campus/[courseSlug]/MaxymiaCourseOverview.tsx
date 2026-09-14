@@ -62,6 +62,12 @@ interface Props {
    *  profile is still loading we trust this so a non-buyer sees the purchase
    *  view immediately instead of the student view flashing. */
   initialHasAccess?: boolean;
+  /** `true` cuando la página se pinta FUERA del CampusShell (sin matrícula en
+   *  servidor): la ficha de venta lleva su propio Header/Footer del sitio. Si
+   *  el cliente descubre acceso después (p. ej. checkout recién verificado),
+   *  recargamos para que el servidor pinte la vista de alumno dentro del
+   *  campus, en vez de renderizarla sin chrome. */
+  standalone?: boolean;
   /** Avatares del equipo docente para la sección de compromiso con el alumnado. */
   teacherAvatars?: string[];
   /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
@@ -71,7 +77,7 @@ interface Props {
   allInstitutions?: Institution[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, standalone = false, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
   const { locale } = useLocale();
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
@@ -247,16 +253,37 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   // never flashes; once loaded, the hook is the source of truth.
   const hasAccess = isLoading ? !!initialHasAccess : checkAccess(course.id, course.isPro);
 
+  // Ficha standalone (sin CampusShell) y el cliente acaba de confirmar acceso
+  // (checkout verificado arriba, o matrícula concedida en otra pestaña): la
+  // vista de alumno necesita el chrome del campus, que solo pinta el servidor
+  // → recarga una vez. sessionStorage evita un bucle si servidor y cliente
+  // discreparan de forma persistente.
+  useEffect(() => {
+    if (!standalone || !hasAccess || isLoading) return;
+    const key = `maxymia-chrome-reload:${course.slug}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+    } catch {
+      /* sin sessionStorage: recarga igualmente */
+    }
+    window.location.replace(window.location.pathname);
+  }, [standalone, hasAccess, isLoading, course.slug]);
+
   // Show product/detail (purchase) page whenever the user isn't entitled.
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
-  if (!hasAccess) {
+  // En modo standalone también mientras dura la recarga de arriba.
+  if (!hasAccess || standalone) {
     return (
-      <>
-        {/* El footer del campus enlaza a /contacto?curso=<este curso> */}
-        <ContactCourse title={course.title.es || course.title[locale]} />
-        <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} allBadges={allBadges} allInstitutions={allInstitutions} />
-      </>
+      <MaxymiaCourseDetail
+        course={course}
+        standalone={standalone}
+        teacherAvatars={teacherAvatars}
+        recommended={recommended}
+        allBadges={allBadges}
+        allInstitutions={allInstitutions}
+      />
     );
   }
 

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { m, AnimatePresence } from 'framer-motion';
 import {
@@ -11,18 +10,11 @@ import {
   ChevronDown,
   ShoppingCart,
   Loader2,
-  ShieldCheck,
   ArrowRight,
-  Mail,
-  Phone,
-  Lock,
-  Check,
-  Sparkles,
   Monitor,
   Globe,
   BarChart3,
   FileQuestion,
-  User,
   ListOrdered,
   Target,
   Users,
@@ -36,6 +28,13 @@ import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
 import { markdownToHtml } from '@/lib/markdown';
 import { MaxymiaMobileCTA } from '../../components/MaxymiaMobileCTA';
+import { FontStyles } from '@/app/components/FontStyles';
+import { Header } from '@/app/components/Header';
+import { Footer } from '@/app/components/Footer';
+import { ContactCourse } from '@/app/components/ContactCourseProvider';
+import { Breadcrumb } from '@/app/components/Breadcrumb';
+import { ProgramHeroSection, type HeroProgram } from '@/app/components/ProgramHeroSection';
+import { ProgramCTASection } from '@/app/components/ProgramCTASection';
 import { DocenteSection } from '@/app/components/DocenteSection';
 import { TeamCommitment } from '@/app/components/TeamCommitment';
 import MaxymiaCourseCard from '../../components/MaxymiaCourseCard';
@@ -119,60 +118,109 @@ interface Props {
   /** Set GLOBAL de sellos/instituciones: TODOS en todas las fichas. */
   allBadges?: Badge[];
   allInstitutions?: Institution[];
+  /**
+   * `true` (lo normal): ficha PÚBLICA de venta fuera del campus. Pinta la
+   * página completa con el Header/Footer del sitio, exactamente como
+   * /programas/[id] (ProgramDetailClient). La decide en servidor
+   * app/maxymia/campus/[courseSlug]/page.tsx cuando no hay matrícula.
+   *
+   * `false`: incrustada en el CampusShell. Solo ocurre como fallback en
+   * cliente (el alumno pierde el acceso después de cargar la vista de
+   * alumno); mantiene el comportamiento anterior (chrome del campus en claro).
+   */
+  standalone?: boolean;
 }
 
-export default function MaxymiaCourseDetail({ course, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
+/** Duración legible: horas manuales de Strapi o la suma de minutos de las lecciones. */
+function formatDuration(course: MaxymiaCourse, totalMinutes: number): string {
+  if (course.durationHours) return `${course.durationHours} horas`;
+  const h = Math.floor(totalMinutes / 60);
+  const min = totalMinutes % 60;
+  return h > 0 ? `${h}h ${min}min` : `${min} min`;
+}
+
+export default function MaxymiaCourseDetail({
+  course,
+  teacherAvatars,
+  recommended,
+  allBadges,
+  allInstitutions,
+  standalone = true,
+}: Props) {
   const { locale } = useLocale();
-  // This is the public course *sales* ficha — paint the whole campus chrome
-  // (header, footer, page bg) light + black logo while it's shown, and revert
-  // to dark when it unmounts (e.g. the user buys and the student view loads).
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Incrustada en el campus (fallback): pinta el chrome del campus en claro
+  // mientras se muestra y vuelve a oscuro al desmontar. En modo standalone
+  // no hay CampusShell (el contexto es el default, no-op).
   const { setLight } = useCampusTheme();
   useEffect(() => {
+    if (standalone) return;
     setLight(true);
     return () => setLight(false);
-  }, [setLight]);
-  const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
+  }, [setLight, standalone]);
 
-  return (
-    <div>
-      {/* Hero Section */}
-      <CourseHeroSection
-        course={course}
-        locale={locale}
-        totalLessons={totalLessons}
-        totalMinutes={totalMinutes}
+  const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
+  const title = course.title[locale];
+  const durationLabel = formatDuration(course, totalMinutes);
+
+  // Mismo hero que /programas (ProgramHeroSection): píldora de tipo = categoría
+  // del curso, tags como "topics", duración + nº de bloques como pills.
+  const heroProgram: HeroProgram = {
+    image: course.image,
+    title,
+    description: course.description[locale],
+    type: CATEGORY_LABELS[course.category]?.[locale] ?? course.category,
+    isPro: course.isPro,
+    topics: course.tags.map((tag) => ({ id: tag, name: tag })),
+    durationLabel,
+    modules: course.blocks,
+    modulesLabel: locale === 'es' ? 'bloques' : 'blocks',
+  };
+
+  const body = (
+    <>
+      {/* Mismo layout de 2 columnas que la ficha de /programas (MF-17):
+          IZQUIERDA hero + pestañas + confianza + compromiso + docentes + FAQ,
+          DERECHA panel de compra sticky. En móvil el panel se oculta y la
+          barra fija inferior (MaxymiaMobileCTA) es el único CTA. */}
+      <ProgramHeroSection
+        program={heroProgram}
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              { label: 'Maxymia', href: '/maxymia' },
+              { label: title },
+            ]}
+            className=""
+          />
+        }
         sidebar={
           <CourseSidebar
             course={course}
             locale={locale}
             totalLessons={totalLessons}
-            totalMinutes={totalMinutes}
+            durationLabel={durationLabel}
             totalExams={totalExams}
           />
         }
-        mobileSidebar={
-          <CourseSidebar
-            course={course}
-            locale={locale}
-            totalLessons={totalLessons}
-            totalMinutes={totalMinutes}
-            totalExams={totalExams}
-          />
-        }
-        tabs={
-          <CourseTabs course={course} locale={locale} totalLessons={totalLessons} />
-        }
+        tabs={<CourseTabs course={course} locale={locale} totalLessons={totalLessons} />}
         belowContent={
           <>
-            {/* Confianza primero, FAQ después. Mismo contenedor lg:col-span-2.
-                Componente compartido con la ficha de /programas. */}
+            {/* Mismas secciones y mismo orden que /programas: confianza →
+                compromiso con el alumnado → docentes → FAQ. */}
             <TrustBlock
               institutions={allInstitutions}
               certifications={allBadges}
               locale={locale}
             />
             <TeamCommitment locale={locale} avatars={teacherAvatars} />
-            <DocenteSection docentes={course.docentes} locale={locale} courseTitle={course.title[locale]} />
+            <DocenteSection
+              docentes={course.docentes}
+              locale={locale}
+              courseTitle={title}
+              {...(locale === 'es' ? { overline: 'Profesorado', title: 'Quién {imparte}' } : {})}
+            />
             {course.faqs && course.faqs.length > 0 && (
               <FAQSection
                 compact
@@ -185,229 +233,90 @@ export default function MaxymiaCourseDetail({ course, teacherAvatars, recommende
         }
       />
 
-      {/* Fila de cursos recomendados (sustituye al CTA "Listo para comenzar"). */}
-      {recommended && recommended.length > 0 ? (
+      {/* CTA de cierre a ancho completo, compartido con /programas. */}
+      <ProgramCTASection title={title} />
+
+      {/* Fila de recomendados, igual que la ficha de /programas. */}
+      {recommended && recommended.length > 0 && (
         <RecommendedCourses courses={recommended} locale={locale} />
-      ) : (
-        <CourseCTASection locale={locale} />
       )}
+    </>
+  );
+
+  if (!standalone) {
+    return (
+      <div>
+        {/* El footer del campus enlaza a /contacto?curso=<este curso> */}
+        <ContactCourse title={course.title.es || title} />
+        {body}
+        <MaxymiaMobileCTA course={course} />
+        <div className="h-20 lg:hidden" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip">
+      <FontStyles />
+      {/* Header/footer/CTAs enlazan a /contacto?curso=<este curso> */}
+      <ContactCourse title={course.title.es || title} />
+
+      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+
+      <main className="relative z-10">{body}</main>
+
+      <Footer />
 
       {/* Sticky mobile purchase bar */}
       <MaxymiaMobileCTA course={course} />
+      {/* Bottom spacing so footer isn't hidden behind the sticky bar */}
       <div className="h-20 lg:hidden" />
     </div>
   );
 }
 
-// ─── Hero Section ───────────────────────────────────────────────
-
-interface HeroProps {
-  course: MaxymiaCourse;
-  locale: Locale;
-  totalLessons: number;
-  totalMinutes: number;
-  sidebar?: React.ReactNode;
-  mobileSidebar?: React.ReactNode;
-  tabs?: React.ReactNode;
-  /** Extra content stacked in the LEFT column below the tabs (e.g. FAQ).
-   *  Lives inside the left column so the sticky sidebar spans its height,
-   *  matching the Máxima program ficha. */
-  belowContent?: React.ReactNode;
-}
-
-function CourseHeroSection({ course, locale, totalLessons, totalMinutes, sidebar, mobileSidebar, tabs, belowContent }: HeroProps) {
-  // overflow-visible on the <section> (clipping moved to the background
-  // wrapper below) so the right-column sidebar's position: sticky works — an
-  // overflow-hidden ancestor turns into the sticky scroll container and the
-  // card never pins as you scroll. Mirrors the Máxima ProgramHeroSection.
-  return (
-    <section className="relative pt-0 pb-12 md:pb-16 overflow-visible">
-      {/* Background image with dark overlays — clipped here, not on the
-          <section>, so it doesn't break the sidebar's sticky. */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-mx-bg/95 via-mx-bg/85 to-mx-bg/70 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-mx-bg via-mx-bg/40 to-transparent z-10" />
-        <img
-          src={course.image}
-          alt={course.title[locale]}
-          className="w-full  object-cover opacity-40"
-        />
-      </div>
-
-      <div className="relative z-20 max-w-[1800px] mx-auto px-6 md:px-[128px] pt-12 md:pt-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Left: Hero content */}
-          <div className="lg:col-span-2">
-            {/* Breadcrumb (como en las fichas de /programas) */}
-            <nav aria-label="breadcrumb" className="mb-5 font-body text-label-md text-mx-text-muted">
-              <Link href="/" className="hover:text-mx-orange transition-colors">Inicio</Link>
-              <span className="mx-2">/</span>
-              <Link href="/maxymia" className="hover:text-mx-orange transition-colors">Maxymia</Link>
-              <span className="mx-2">/</span>
-              <span className="text-mx-text-muted">{course.title[locale]}</span>
-            </nav>
-
-            {/* Badges */}
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mb-4 flex items-center gap-3 flex-wrap"
-            >
-              <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
-                {CATEGORY_LABELS[course.category]?.[locale] ?? course.category}
-              </span>
-              <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-black/[0.04] text-mx-text-muted">
-                {LEVEL_LABELS[course.level]?.[locale]}
-              </span>
-              {course.isPro && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-label-sm font-black tracking-wider uppercase bg-gradient-to-r from-[#f7a000] via-[#f7c948] to-[#f7a000] text-white rounded-full shadow-lg shadow-[#f7a000]/30">
-                  <Crown size={10} /> PRO
-                </span>
-              )}
-            </m.div>
-
-            {/* Title */}
-            <m.h1
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.6 }}
-              className="text-heading-md md:text-heading-lg lg:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-text"
-            >
-              {course.title[locale]}
-            </m.h1>
-
-            {/* Tags */}
-            {course.tags.length > 0 && (
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.5 }}
-                className="flex flex-wrap gap-2 mb-4"
-              >
-                {course.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-black/[0.04] backdrop-blur-md text-mx-text-muted text-label-md font-medium rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </m.div>
-            )}
-
-            {/* Description */}
-            <m.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="font-body text-body-md 2xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
-            >
-              {course.description[locale]}
-            </m.p>
-
-            {/* Instructor */}
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.5 }}
-              className="flex items-center gap-3 mb-6"
-            >
-              <div className="w-10 h-10 rounded-full bg-black/[0.04] flex items-center justify-center overflow-hidden">
-                {course.instructor.avatar ? (
-                  <Image
-                    src={course.instructor.avatar}
-                    alt={course.instructor.name}
-                    width={40}
-                    height={40}
-                    unoptimized
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User size={18} className="text-mx-text-muted" />
-                )}
-              </div>
-              <div>
-                <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>
-                <p className="font-body text-mx-text-muted text-label-md">{course.instructor.role}</p>
-              </div>
-            </m.div>
-
-            {/* Mobile Sidebar — before tabs so purchase is visible early */}
-            {mobileSidebar && (
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.5 }}
-                className="lg:hidden mb-8"
-              >
-                {mobileSidebar}
-              </m.div>
-            )}
-
-            {/* Tabs */}
-            {tabs && (
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                {tabs}
-              </m.div>
-            )}
-
-            {/* Extra content (e.g. FAQ) below the tabs, inside the left
-                column so the sticky sidebar spans its full height. */}
-            {belowContent}
-          </div>
-
-          {/* Right: Sidebar (desktop) */}
-          {sidebar && (
-            <div className="lg:col-span-1 hidden lg:block">{sidebar}</div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ─── Sidebar ────────────────────────────────────────────────────
+// Réplica 1:1 del ProgramSidebar de /programas (mismo contenedor, misma
+// rejilla de datos, mismo bloque de precio y mismos dos botones), con la
+// lógica de compra de Maxymia (checkout `maxymia-course`, acceso por
+// matrícula/PRO vía useUserCampus, enlace a la primera lección).
 
 interface SidebarProps {
   course: MaxymiaCourse;
   locale: Locale;
   totalLessons: number;
-  totalMinutes: number;
+  durationLabel: string;
   totalExams: number;
 }
 
-function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams }: SidebarProps) {
+function CourseSidebar({ course, locale, totalLessons, durationLabel, totalExams }: SidebarProps) {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const userStateKnown = isLoaded && !campusLoading;
   const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(course.id, course.isPro);
+  const hasAccess = userStateKnown && checkAccess(course.id, course.isPro);
   const includedInPro = isFreeWithPro(course, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
   const effectivePrice = getEffectivePrice(course, userHasPro);
   const proSavings = getProSavings(course, userHasPro);
   // Visitante NO-PRO viendo un curso incluido en PRO:
-  //  - proOnly (exclusivo PRO, no se vende) → mostramos SOLO "Gratis con PRO".
-  //  - isPro con precio (tipo "Fraude", también a la venta) → precio normal +
-  //    "Gratis con Pro · ahorras X" (más abajo, condicionado a course.isPro).
+  //  - proOnly (exclusivo PRO, no se vende) → SOLO "Gratis con PRO" y el CTA
+  //    lleva a /pricing (no hay checkout posible).
+  //  - isPro con precio (también a la venta) → precio normal + "Gratis para
+  //    usuarios Pro" clicable a la derecha del precio (igual que /programas).
   const proOnlyCourse = !!course.proOnly;
+  const showProFree = userStateKnown && !userHasPro && !!course.isPro && !proOnlyCourse;
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
       window.location.href = `/sign-in?redirect_url=/maxymia/campus/${course.slug}`;
       return;
     }
-
     setIsLoading(true);
     setError(null);
-
     trackBeginCheckout([
       {
         item_id: course.slug,
@@ -416,7 +325,6 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
         price: effectivePrice,
       },
     ]);
-
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -427,13 +335,10 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
           slug: course.slug,
         }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || 'Error al procesar el pago');
       }
-
       if (data.url) {
         window.location.href = data.url;
       }
@@ -447,101 +352,145 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
     { icon: Monitor, label: locale === 'es' ? 'Modalidad' : 'Format', value: 'Online' },
     { icon: Globe, label: locale === 'es' ? 'Idioma' : 'Language', value: LANGUAGE_LABELS[course.language] || course.language },
     { icon: BookOpen, label: locale === 'es' ? 'Lecciones' : 'Lessons', value: String(totalLessons) },
-    { icon: Clock, label: locale === 'es' ? 'Duración' : 'Duration', value: course.durationHours ? `${course.durationHours}h` : `${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}min` },
+    { icon: Clock, label: locale === 'es' ? 'Duración' : 'Duration', value: durationLabel },
     { icon: FileQuestion, label: locale === 'es' ? 'Exámenes' : 'Exams', value: String(totalExams) },
     { icon: BarChart3, label: locale === 'es' ? 'Nivel' : 'Level', value: LEVEL_LABELS[course.level]?.[locale] },
-  ];
+  ].filter((item) => item.value);
+
+  const firstLessonHref = `/maxymia/campus/${course.slug}/lesson/${course.blocks[0]?.lessons[0]?.id}`;
 
   return (
-    <div className="lg:sticky lg:top-24">
-      <div className="border border-mx-border bg-white overflow-hidden rounded-lg">
-        {/* Course Thumbnail */}
+    // top-32 (not top-24) so the pinned card keeps a margin below the fixed
+    // header instead of butting right up against it (MF-17).
+    <div className="sticky top-32">
+      <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
+        {/* Imagen de producto: la miniatura con branding de Maxymia (la misma
+            que usan las cards del catálogo). */}
         <CourseThumbnail course={course} locale={locale} />
 
         <div className="p-6 space-y-6">
-          {/* Info Grid */}
+          {/* Info */}
           <div className="grid grid-cols-2 gap-4">
             {infoItems.map((item) => (
               <div key={item.label} className="flex items-start gap-2">
                 <item.icon size={14} className="text-mx-orange shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-label-sm text-mx-text-muted uppercase tracking-widest">{item.label}</div>
+                  <div className="text-label-sm text-mx-text-muted uppercase tracking-widest">
+                    {item.label}
+                  </div>
                   <div className="text-mx-text text-body-sm font-medium">{item.value}</div>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Divider */}
           <div className="border-t border-mx-border" />
 
           {/* Pricing */}
           <div>
-            <div className="flex items-baseline gap-3">
-              {includedInPro ? (
-                <>
-                  <span className="text-mx-text-muted text-body-lg line-through">{course.price}€</span>
-                  <span className="flex items-center gap-2 text-mx-orange text-heading-md font-black">
-                    <Crown size={20} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
+            <div className="flex items-baseline justify-between gap-x-3 gap-y-1 flex-wrap">
+              <div className="flex items-baseline gap-3">
+                {includedInPro ? (
+                  <>
+                    <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                      {course.price}€
+                    </span>
+                    <span className="flex items-center gap-2 text-mx-orange text-heading-md md:text-heading-lg font-black">
+                      <Crown size={20} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
+                    </span>
+                  </>
+                ) : userStateKnown && !userHasPro && proOnlyCourse ? (
+                  <span className="flex items-center gap-2 text-mx-orange text-heading-md md:text-heading-lg font-black">
+                    <Crown size={20} /> {locale === 'es' ? 'Gratis con PRO' : 'Free with PRO'}
                   </span>
-                </>
-              ) : (!userHasPro && proOnlyCourse) ? (
-                <span className="flex items-center gap-2 text-mx-orange text-heading-md font-black">
-                  <Crown size={20} /> {locale === 'es' ? 'Gratis con PRO' : 'Free with PRO'}
-                </span>
-              ) : proDiscount ? (
-                <>
-                  <span className="text-mx-text-muted text-body-lg line-through">{course.price}€</span>
-                  <span className="text-mx-orange text-display-sm font-black">{effectivePrice}€</span>
-                </>
-              ) : (
-                <>
-                  {course.originalPrice != null && (
-                    <span className="text-mx-text-muted text-body-lg line-through">{course.originalPrice}€</span>
-                  )}
-                  <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-mx-text'} text-display-sm font-black`}>
-                    {course.price}€
-                  </span>
-                </>
-              )}
+                ) : proDiscount ? (
+                  <>
+                    <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                      {course.price}€
+                    </span>
+                    <span className="text-mx-orange text-heading-md md:text-display-sm font-black">
+                      {effectivePrice}€
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {course.originalPrice != null && (
+                      <span className="text-mx-text-muted text-body-sm md:text-body-md line-through">
+                        {course.originalPrice}€
+                      </span>
+                    )}
+                    <span className={`${course.originalPrice != null ? 'text-mx-orange' : 'text-mx-text'} text-heading-md md:text-display-sm font-black`}>
+                      {course.price}€
+                    </span>
+                  </>
+                )}
+              </div>
+              {/* A la derecha del precio: gratis con Pro (clicable) o ahorro -20%. */}
+              {showProFree ? (
+                <Link
+                  href="/pricing"
+                  title={locale === 'es' ? 'Suscríbete a Pro y accede gratis' : 'Subscribe to Pro and get free access'}
+                  className="group inline-flex items-center gap-1.5 rounded-full border border-mx-orange/40 bg-mx-orange/10 px-3 py-1 text-mx-orange text-label-md font-bold hover:bg-mx-orange/20 transition-colors"
+                >
+                  <Crown size={12} className="shrink-0" />
+                  {locale === 'es' ? 'Gratis para usuarios Pro' : 'Free for Pro users'}
+                  <ArrowRight size={11} className="shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              ) : userStateKnown && !userHasPro && proSavings > 0 ? (
+                <p className="flex items-center gap-1.5 text-mx-orange text-label-md font-medium">
+                  <span className="text-body-md font-bold">{course.price - proSavings}€</span>
+                  <Crown size={11} /> {locale === 'es' ? `Ahorras ${proSavings}€ con Pro` : `Save ${proSavings}€ with Pro`}
+                </p>
+              ) : null}
             </div>
             {includedInPro ? (
-              <div className="mt-1 text-mx-orange text-label-md font-bold flex items-center gap-1">
-                <Crown size={12} />
-                {locale === 'es' ? 'Tu suscripción Pro cubre este curso' : 'Your Pro plan covers this course'}
+              <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold flex items-center gap-1">
+                <Crown size={12} /> {locale === 'es' ? 'Tu suscripción Pro cubre este curso' : 'Your Pro plan covers this course'}
               </div>
             ) : proDiscount ? (
-              <div className="mt-1 text-mx-orange text-label-md font-bold flex items-center gap-1">
+              <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold flex items-center gap-1">
                 <Crown size={12} /> {locale === 'es' ? 'Descuento Pro -20%' : 'Pro discount -20%'} ({course.price - effectivePrice}€)
               </div>
             ) : (
-              course.originalPrice != null && (
-                <div className="mt-1 text-mx-orange text-label-md font-bold">
+              course.originalPrice != null && !proOnlyCourse && (
+                <div className="mt-1 text-mx-orange text-label-sm md:text-label-md font-bold">
                   {locale === 'es' ? 'Ahorra' : 'Save'} {course.originalPrice - course.price}€
                 </div>
               )
             )}
-            <p className="text-mx-text-muted text-label-md mt-1">
+            <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">
               {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
             </p>
           </div>
 
+          {/* Error */}
           {error && <p className="text-red-500 text-body-sm">{error}</p>}
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons: exactamente dos, como en /programas (MF-17). */}
           <div className="space-y-3">
-            {isLoaded && !campusLoading && hasAccess ? (
+            {hasAccess ? (
               <Link
-                href={`/maxymia/campus/${course.slug}/lesson/${course.blocks[0]?.lessons[0]?.id}`}
-                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
+                href={firstLessonHref}
+                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
               >
                 {locale === 'es' ? 'Acceder al Curso' : 'Access Course'}
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            ) : userStateKnown && !userHasPro && proOnlyCourse ? (
+              <Link
+                href="/pricing"
+                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
+              >
+                <Crown size={18} />
+                {locale === 'es' ? 'Hazte Pro y accede' : 'Go Pro and access'}
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             ) : (
               <m.button
                 onClick={handlePurchase}
                 disabled={isLoading}
-                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 whileHover={{ scale: isLoading ? 1 : 1.02 }}
                 whileTap={{ scale: isLoading ? 1 : 0.98 }}
               >
@@ -553,28 +502,22 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
                 ) : (
                   <>
                     <ShoppingCart size={18} />
+                    {/* Siempre la misma etiqueta: sin sesión, handlePurchase
+                        redirige a /sign-in antes del checkout. */}
                     {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
                   </>
                 )}
               </m.button>
             )}
 
-            {isLoaded && !campusLoading && !userHasPro && proSavings > 0 && (
+            {/* Secondary CTA: Pro upsell (mismo estilo que /programas). */}
+            {userStateKnown && !userHasPro && !hasAccess && (
               <Link
                 href="/pricing"
-                className="flex items-center justify-between gap-2 w-full rounded-lg border border-mx-orange/30 bg-mx-orange/10 px-3 py-2.5 hover:bg-mx-orange/15 hover:border-mx-orange/50 transition-colors group"
+                className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"
               >
-                <span className="flex items-center gap-2 text-mx-orange text-label-md font-medium">
-                  <Crown size={14} />
-                  {course.isPro
-                    ? (locale === 'es'
-                        ? `Gratis con Pro · ahorras ${proSavings}€`
-                        : `Free with Pro · save ${proSavings}€`)
-                    : (locale === 'es'
-                        ? `Con Pro pagarías ${course.price - proSavings}€ · ahorras ${proSavings}€`
-                        : `With Pro you'd pay ${course.price - proSavings}€ · save ${proSavings}€`)}
-                </span>
-                <ArrowRight size={14} className="text-mx-orange shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                <Crown size={16} />
+                {locale === 'es' ? 'O hazte Pro por €18/mes' : 'Or go Pro for €18/mo'}
               </Link>
             )}
           </div>
@@ -583,8 +526,6 @@ function CourseSidebar({ course, locale, totalLessons, totalMinutes, totalExams 
     </div>
   );
 }
-
-// ─── Markdown Renderer ──────────────────────────────────────────
 
 function MarkdownContent({ content, className = '' }: { content: string; className?: string }) {
   const [html, setHtml] = useState('');
@@ -661,25 +602,25 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
   return (
     <div>
       {/* Tab bar */}
-      <div className="relative flex border-b border-mx-border gap-1 sm:gap-6 lg:gap-8 w-full overflow-x-auto no-scrollbar -mx-2 px-2">
+      <div className="relative flex border-b border-mx-border gap-1 md:gap-6 xl:gap-8 w-full overflow-x-auto scrollbar-hide -mx-2 px-2">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`relative px-2 sm:px-3 py-3 text-label-md sm:text-body-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+            className={`relative px-2 md:px-3 py-3 text-label-sm md:text-label-md font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeTab === tab.value ? 'text-mx-orange' : 'text-mx-text-muted hover:text-mx-orange'
             }`}
           >
-            <span className="flex items-center gap-1 sm:gap-2">
-              <tab.icon className="size-3.5 sm:size-4" />
-              <span className="sm:hidden">
+            <span className="flex items-center gap-1 md:gap-2">
+              <tab.icon className="size-3.5 md:size-4" />
+              <span className="md:hidden">
                 {tab.value === 'descripcion' && introLabel}
                 {tab.value === 'contenido' && (locale === 'es' ? 'Temario' : 'Content')}
                 {tab.value === 'objetivos' && (locale === 'es' ? 'Objetivos' : 'Goals')}
                 {tab.value === 'audiencia' && (locale === 'es' ? 'Audiencia' : 'Audience')}
                 {tab.value === 'salidas' && (locale === 'es' ? 'Salidas' : 'Careers')}
               </span>
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden md:inline">{tab.label}</span>
             </span>
             {activeTab === tab.value && (
               <m.div
@@ -693,7 +634,7 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
       </div>
 
       {/* Tab content */}
-      <div className="pt-6 md:pt-4">
+      <div className="pt-10 md:pt-4">
         <AnimatePresence mode="wait">
           {activeTab === 'descripcion' && hasIntro && (
             <m.div
@@ -843,324 +784,24 @@ function CourseTabs({ course, locale, totalLessons }: TabsProps) {
 }
 
 
-// ─── Access Gate ─────────────────────────────────────────────────
+// ─── Recomendados ───────────────────────────────────────────────
 
-interface AccessGateProps {
-  course: MaxymiaCourse;
-  locale: Locale;
-}
-
-function CourseAccessGate({ course, locale }: AccessGateProps) {
-  const { isSignedIn } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const proFeatures =
-    locale === 'es'
-      ? [
-          'Acceso ilimitado a todos los cursos',
-          'Certificados descargables',
-          'Soporte prioritario 24/7',
-          'Recursos y materiales descargables',
-          'Sesiones de mentoría grupales',
-          'Comunidad exclusiva',
-        ]
-      : [
-          'Unlimited access to all courses',
-          'Downloadable certificates',
-          '24/7 priority support',
-          'Downloadable resources & materials',
-          'Group mentoring sessions',
-          'Exclusive community',
-        ];
-
-  const courseFeatures =
-    locale === 'es'
-      ? [
-          'Acceso permanente al curso',
-          'Certificado de finalización',
-          'Materiales del curso descargables',
-          'Actualizaciones gratuitas',
-        ]
-      : [
-          'Lifetime course access',
-          'Completion certificate',
-          'Downloadable course materials',
-          'Free updates',
-        ];
-
-  const handlePurchase = async () => {
-    if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect_url=/maxymia/campus/${course.slug}`;
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    trackBeginCheckout([
-      {
-        item_id: course.slug,
-        item_name: course.title.es,
-        item_category: 'maxymia-course',
-        price: course.price,
-      },
-    ]);
-
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'maxymia-course',
-          documentId: course.id,
-          slug: course.slug,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al procesar el pago');
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Error al procesar el pago'
-      );
-      setIsLoading(false);
-    }
-  };
-
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
-
-  return (
-    <section className="py-12 md:py-20 px-6 md:px-[128px] bg-mx-bg">
-      <div className="max-w-4xl mx-auto">
-        <m.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-8"
-        >
-          <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 flex items-center justify-center">
-            <Lock className="text-amber-500" size={22} />
-          </div>
-
-          <span className="inline-flex items-center gap-2 text-amber-500 text-label-md font-medium tracking-[0.3em] uppercase mb-3">
-            <Crown size={14} />
-            {locale === 'es' ? 'Contenido Premium' : 'Premium Content'}
-          </span>
-          <h2 className="text-heading-md md:text-heading-lg font-bold text-mx-text mb-4">
-            {locale === 'es' ? 'Accede a' : 'Access'} &quot;{course.title[locale]}&quot;
-          </h2>
-          <p className="text-mx-text-muted font-light text-body-sm md:text-body-md mb-8 max-w-xl mx-auto">
-            {locale === 'es'
-              ? 'Este curso es exclusivo. Elige la opción que mejor se adapte a ti.'
-              : 'This course is exclusive. Choose the option that suits you best.'}
-          </p>
-        </m.div>
-
-        {/* Two Options */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {/* Buy Course */}
-          <m.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="p-6 bg-black/[0.02] border border-mx-border hover:border-mx-border rounded-xl transition-all"
-          >
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <ShoppingCart className="text-mx-text" size={18} />
-              <span className="text-mx-text font-semibold text-body-sm">
-                {locale === 'es' ? 'Comprar este curso' : 'Buy this course'}
-              </span>
-            </div>
-
-            <div className="flex items-baseline justify-center gap-1 mb-1">
-              {course.originalPrice != null && course.originalPrice > course.price && (
-                <span className="text-mx-text-muted text-body-md line-through mr-2">
-                  {formatPrice(course.originalPrice)}
-                </span>
-              )}
-              <span className="text-heading-md font-black text-mx-text">{formatPrice(course.price)}</span>
-            </div>
-            <p className="text-mx-text-muted text-label-md mb-5 text-center">
-              {locale === 'es' ? 'Pago único • Acceso permanente' : 'One-time payment • Lifetime access'}
-            </p>
-
-            <div className="space-y-2.5 mb-6">
-              {courseFeatures.map((feature) => (
-                <div key={feature} className="flex items-center gap-3">
-                  <Check className="text-green-500 flex-shrink-0" size={16} />
-                  <span className="text-mx-text-muted text-body-sm">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            {error && <p className="text-red-400 text-body-sm mb-4 text-center">{error}</p>}
-
-            <button
-              onClick={handlePurchase}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 bg-mx-orange hover:bg-mx-orange-dark text-white px-5 py-3 rounded-full text-body-sm font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin" size={18} />
-                  {locale === 'es' ? 'Procesando...' : 'Processing...'}
-                </>
-              ) : (
-                <>
-                  <ShoppingCart size={18} />
-                  {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
-                </>
-              )}
-            </button>
-          </m.div>
-
-          {/* Pro Subscription */}
-          <m.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="p-6 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/30 rounded-xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 bg-amber-500 text-black text-label-sm font-bold px-3 py-0.5 rounded-bl-lg">
-              {locale === 'es' ? 'RECOMENDADO' : 'RECOMMENDED'}
-            </div>
-
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Crown className="text-amber-500" size={18} />
-              <span className="text-amber-500 font-semibold text-body-sm">
-                {locale === 'es' ? 'Suscripción Pro' : 'Pro Subscription'}
-              </span>
-            </div>
-
-            <div className="flex items-baseline justify-center gap-1 mb-1">
-              <span className="text-heading-md font-black text-mx-text">€18</span>
-              <span className="text-mx-text-muted text-body-sm">/{locale === 'es' ? 'mes' : 'mo'}</span>
-            </div>
-            <p className="text-mx-text-muted text-label-md mb-5 text-center">
-              {locale === 'es' ? 'Cancela cuando quieras' : 'Cancel anytime'}
-            </p>
-
-            <div className="space-y-2.5 mb-6">
-              {proFeatures.map((feature) => (
-                <div key={feature} className="flex items-center gap-3">
-                  <Sparkles className="text-amber-500 flex-shrink-0" size={16} />
-                  <span className="text-mx-text-muted text-body-sm">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <Link
-              href="/pricing"
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black px-5 py-3 rounded-full text-body-sm font-bold transition-all duration-300 shadow-lg shadow-amber-500/30"
-            >
-              <Crown size={18} />
-              {locale === 'es' ? 'Hazte Pro' : 'Go Pro'}
-              <ArrowRight size={18} />
-            </Link>
-
-            <p className="text-center text-mx-text-muted text-label-md mt-4">
-              {locale === 'es' ? 'Acceso a +50 cursos y masters' : 'Access to 50+ courses and masters'}
-            </p>
-          </m.div>
-        </div>
-
-        {/* Back Link */}
-        <m.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-8"
-        >
-          <Link
-            href="/maxymia/campus/cursos"
-            className="text-mx-text-muted hover:text-amber-500 transition-colors text-body-sm"
-          >
-            ← {locale === 'es' ? 'Volver al catálogo de cursos' : 'Back to course catalog'}
-          </Link>
-        </m.div>
-      </div>
-    </section>
-  );
-}
-
-// ─── CTA Section ────────────────────────────────────────────────
-
+/** "Otros alumnos también compraron": mismo contenedor y cabecera que la
+ *  fila de recomendados de /programas (RecommendedPrograms). */
 function RecommendedCourses({ courses, locale }: { courses: MaxymiaCourse[]; locale: Locale }) {
   return (
-    <section className="px-6 md:px-[128px] py-16 md:py-24">
-      <div className="max-w-[1800px] mx-auto">
+    <section className="py-16 md:py-24 px-6 md:px-12">
+      <div className="max-w-[1400px] mx-auto">
         <SectionHeader
           overline={locale === 'es' ? 'También te puede interesar' : 'You might also like'}
-          title={locale === 'es' ? 'Otros alumnos {también compraron}' : 'Other students also {bought}'}
+          title={locale === 'es' ? 'Otros alumnos también {compraron}' : 'Other students also {bought}'}
+          align="left"
         />
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {courses.map((c, i) => (
             <MaxymiaCourseCard key={c.id} course={c} locale={locale} index={i} light />
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-function CourseCTASection({ locale }: { locale: Locale }) {
-  return (
-    <section className="py-16 md:py-32 px-6 md:px-[128px]">
-      <div className="max-w-[1200px] mx-auto text-center">
-        <m.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-[#527be7] text-heading-lg md:text-display-sm lg:text-display-md font-black tracking-tight mb-6 md:mb-8">
-            {locale === 'es' ? '¿LISTO PARA ' : 'READY TO '}
-            <span className="text-stroke" style={{ WebkitTextFillColor: '#0b1018' }}>
-              {locale === 'es' ? 'COMENZAR?' : 'START?'}
-            </span>
-          </h2>
-          <p className="text-body-md md:text-heading-sm text-mx-text-muted font-light mb-8 md:mb-12 max-w-2xl mx-auto">
-            {locale === 'es'
-              ? 'Únete a cientos de profesionales que ya están transformando su carrera con este curso.'
-              : 'Join hundreds of professionals already transforming their careers with this course.'}
-          </p>
-        </m.div>
-
-        <m.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-8 text-mx-text-muted"
-        >
-          <a
-            href="mailto:cursos@maximaformacion.es"
-            className="flex items-center gap-3 hover:text-mx-orange transition-colors"
-          >
-            <Mail size={18} />
-            cursos@maximaformacion.es
-          </a>
-          <a
-            href="tel:+34635659391"
-            className="flex items-center gap-3 hover:text-mx-orange transition-colors"
-          >
-            <Phone size={18} />
-            +34 635 65 93 91
-          </a>
-        </m.div>
       </div>
     </section>
   );

@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { m } from 'framer-motion';
 import Link from 'next/link';
 import {
-  ArrowLeft,
   ArrowRight,
   Users,
   FlaskConical,
@@ -18,8 +17,7 @@ import {
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Header } from '../components/Header';
-import { MaxymiaFooter } from '../components/MaxymiaFooter';
-import { useSiteBranding } from '../components/SiteBrandingProvider';
+import { Footer } from '../components/Footer';
 import { FontStyles } from '../components/FontStyles';
 import { ColoredTitle, StyledTitle } from '../components/StyledTitle';
 import type { MaxymiaHomeData, MaxymiaCard } from '../../lib/strapi/types';
@@ -69,7 +67,8 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
   const { handleCampusClick } = useCampusLink();
 
   return (
-    <section className="relative flex items-center overflow-hidden pt-12">
+    // pt-* despeja el Header fijo del sitio (72px móvil / 96px escritorio).
+    <section className="relative flex items-center overflow-hidden pt-28 md:pt-36">
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-32 right-[30%] w-125 h-125 bg-mx-orange/5 rounded-full blur-[120px]" />
@@ -95,7 +94,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-display-sm md:text-display-md lg:text-display-md 2xl:text-display-lg font-black leading-[0.95] tracking-tight mb-8"
+              className="text-display-sm md:text-display-md lg:text-display-md 2xl:text-display-lg font-black leading-[0.95] tracking-tight mb-8 text-mx-blue"
             >
               <ColoredTitle text={hero.title} />
             </m.h1>
@@ -105,7 +104,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white/60 text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-lg mb-10"
+              className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-lg mb-10"
             >
               {hero.description}
             </m.p>
@@ -126,7 +125,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               </Link>
               <a
                 href="#cursos"
-                className="inline-flex items-center gap-2 border border-white/20 text-white px-7 py-3.5 rounded-full text-body-sm font-medium hover:bg-white/5 transition-colors"
+                className="inline-flex items-center gap-2 border border-mx-blue text-mx-blue px-7 py-3.5 rounded-full text-body-sm font-medium hover:bg-mx-blue hover:text-white transition-colors"
               >
                 <Play size={16} />
                 Explorar cursos
@@ -138,7 +137,7 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="flex items-center gap-6 pt-8 border-t border-white/10"
+              className="flex items-center gap-6 pt-8 border-t border-mx-border"
             >
               {[
                 { value: '2.500+', label: 'Alumnado activo' },
@@ -146,10 +145,10 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
                 { value: '98%', label: 'Satisfacción' },
               ].map((stat, i) => (
                 <React.Fragment key={stat.label}>
-                  {i > 0 && <div className="w-px h-10 bg-white/10" />}
+                  {i > 0 && <div className="w-px h-10 bg-mx-border" />}
                   <div>
-                    <div className="text-white text-heading-sm md:text-heading-md 2xl:text-heading-lg font-bold">{stat.value}</div>
-                    <div className="text-white/40 text-label-md 2xl:text-label-lg">{stat.label}</div>
+                    <div className="text-mx-text text-heading-sm md:text-heading-md 2xl:text-heading-lg font-bold">{stat.value}</div>
+                    <div className="text-mx-text-muted text-label-md 2xl:text-label-lg">{stat.label}</div>
                   </div>
                 </React.Fragment>
               ))}
@@ -178,8 +177,8 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
                 />
               </div>
               {/* Outer ring */}
-              <div className="absolute inset-0 rounded-full border-2 border-white/10" />
-              <div className="absolute inset-4 rounded-full border border-white/5" />
+              <div className="absolute inset-0 rounded-full border-2 border-mx-border" />
+              <div className="absolute inset-4 rounded-full border border-mx-border/60" />
               {/* Floating icons — alternating orange/blue bg, dark icon */}
               {[
                 { top: '2%', left: '45%', size: 48, color: 'orange' as const },
@@ -244,11 +243,11 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
             <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
           <h2
-            className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-white mb-6"
+            className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue mb-6"
           >
-            <ColoredTitle text={section.title}/> 
+            <ColoredTitle text={section.title}/>
           </h2>
-          <p className="text-white/50 text-body-md md:text-body-lg 2xl:text-heading-sm font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-heading-sm font-light max-w-2xl mx-auto leading-relaxed">
             {section.description}
           </p>
         </m.div>
@@ -264,23 +263,25 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group relative rounded-2xl border border-white/10 overflow-hidden h-[320px] md:h-[360px] hover:border-mx-orange/30 transition-all duration-500"
+                className="group relative rounded-2xl border border-mx-border overflow-hidden h-[320px] md:h-[360px] hover:border-mx-orange/30 transition-all duration-500 shadow-sm"
               >
-                {/* Background image from Strapi or gradient fallback */}
+                {/* Background image from Strapi or gradient fallback. Las
+                    tarjetas se mantienen oscuras (imagen + velo) para que el
+                    texto blanco encima siga siendo legible sobre la página clara. */}
                 {card.image ? (
                   <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${card.image})` }}
                   />
                 ) : (
-                  <div className={`absolute inset-0 bg-linear-to-br ${visual.gradient}`} />
+                  <div className={`absolute inset-0 bg-[#0b1018] bg-linear-to-br ${visual.gradient}`} />
                 )}
                 <div className="absolute inset-0 bg-[#0b1018]/60 group-hover:bg-[#0b1018]/50 transition-colors duration-500" />
 
                 {/* Content — pinned to top left */}
                 <div className="absolute top-0 left-0 right-0 p-8 md:p-10">
                   <h3 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2">{card.title}</h3>
-                  <p className="text-white/50 text-body-sm 2xl:text-body-md font-light leading-relaxed max-w-md">{card.description}</p>
+                  <p className="text-white/70 text-body-sm 2xl:text-body-md font-light leading-relaxed max-w-md">{card.description}</p>
                 </div>
               </m.div>
             );
@@ -303,7 +304,7 @@ function CoursesSection({
   const { handleCampusClick } = useCampusLink();
 
   return (
-    <section id="cursos" className="py-24 md:py-32 relative border-t border-white/5">
+    <section id="cursos" className="py-24 md:py-32 relative border-t border-mx-border">
       <div className="max-w-[1800px] mx-auto px-6 md:px-[128px]">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
@@ -317,10 +318,10 @@ function CoursesSection({
               <BookOpen size={14} className="text-mx-blue" />
               <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
             </div>
-            <h2 className="text-display-sm md:text-display-md font-black leading-[0.95] text-white mb-4">
-              <StyledTitle text={section.title} color="orange" mode="dark" />
+            <h2 className="text-display-sm md:text-display-md font-black leading-[0.95] text-mx-blue mb-4">
+              <StyledTitle text={section.title} color="orange" />
             </h2>
-            <p className="text-white/50 text-body-md 2xl:text-body-lg font-light max-w-md">
+            <p className="text-mx-text-muted text-body-md 2xl:text-body-lg font-light max-w-md">
               {section.description}
             </p>
           </m.div>
@@ -335,14 +336,14 @@ function CoursesSection({
             <Link
               href={CAMPUS_PUBLIC_HREF}
               onClick={handleCampusClick}
-              className="mt-6 md:mt-0 inline-flex items-center gap-2 text-white/50 hover:text-mx-orange text-label-lg font-light transition-colors border border-white/10 hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
+              className="mt-6 md:mt-0 inline-flex items-center gap-2 text-mx-text-muted hover:text-mx-orange text-label-lg font-light transition-colors border border-mx-border hover:border-mx-orange/30 px-5 py-2.5 rounded-full"
             >
               Ver cursos del campus
               <ArrowRight size={14} />
             </Link>
             <Link
               href="/programas"
-              className="md:mt-0 inline-flex items-center gap-2 text-white hover:text-mx-orange text-label-lg font-medium transition-colors border border-mx-orange/40 bg-mx-orange/10 hover:border-mx-orange px-5 py-2.5 rounded-full"
+              className="md:mt-0 inline-flex items-center gap-2 text-mx-text hover:text-mx-orange text-label-lg font-medium transition-colors border border-mx-orange/40 bg-mx-orange/10 hover:border-mx-orange px-5 py-2.5 rounded-full"
             >
               Catálogo completo de formaciones
               <ArrowRight size={14} />
@@ -351,7 +352,7 @@ function CoursesSection({
         </div>
 
         {/* Disclaimer to clarify these are campus-specific courses */}
-        <p className="text-white/40 text-body-sm font-light mb-8 -mt-4">
+        <p className="text-mx-text-muted text-body-sm font-light mb-8 -mt-4">
           Estos son los cursos que se imparten dentro del campus Maxymia (IA aplicada a ciencias).
           Si buscas másters, otros cursos especializados o formación en consultoría, explora el{' '}
           <Link href="/programas" className="text-mx-orange hover:underline">
@@ -368,6 +369,7 @@ function CoursesSection({
                 course={course}
                 locale="es"
                 index={i}
+                light
               />
             </div>
           ))}
@@ -397,8 +399,8 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
             <Check size={14} className="text-mx-blue" />
             <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
-          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-white mb-4">{section.title}</h2>
-          <p className="text-white/50 text-body-md font-light max-w-lg ml-auto leading-relaxed">
+          <h2 className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue mb-4">{section.title}</h2>
+          <p className="text-mx-text-muted text-body-md font-light max-w-lg ml-auto leading-relaxed">
             {section.description}
           </p>
         </m.div>
@@ -417,8 +419,8 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                 onClick={() => setActiveCard(i)}
                 className={`relative p-5 md:p-6 rounded-2xl border cursor-pointer transition-all duration-500 group ${
                   activeCard === i
-                    ? 'border-mx-orange/50 bg-white/5'
-                    : 'border-white/10 bg-white/0.02 hover:border-mx-orange/30 hover:bg-white/5'
+                    ? 'border-mx-orange/50 bg-mx-orange/5'
+                    : 'border-mx-border bg-mx-card hover:border-mx-orange/30 hover:bg-mx-orange/5'
                 }`}
               >
                 {activeCard === i && (
@@ -429,8 +431,8 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                 }`}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 relative z-10">{diff.title}</h3>
-                <p className="text-white/50 text-body-sm 2xl:text-body-md font-light leading-relaxed relative z-10">
+                <h3 className="text-mx-text text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 relative z-10">{diff.title}</h3>
+                <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light leading-relaxed relative z-10">
                   {diff.description}
                 </p>
               </m.div>
@@ -443,7 +445,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="hidden lg:block rounded-2xl overflow-hidden bg-[#0d1025] border border-white/5 aspect-4/3 sticky top-32"
+            className="hidden lg:block rounded-2xl overflow-hidden bg-mx-card border border-mx-border aspect-4/3 sticky top-32 shadow-sm"
           >
             {section.cards.map((card: MaxymiaCard, i: number) => {
               const visual = WHY_VISUALS[i % WHY_VISUALS.length];
@@ -476,7 +478,7 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
                   key={card.title}
                   onClick={() => setActiveCard(i)}
                   className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    activeCard === i ? 'bg-mx-orange w-6' : 'bg-white/20'
+                    activeCard === i ? 'bg-mx-orange w-6' : 'bg-white/60'
                   }`}
                 />
               ))}
@@ -492,11 +494,12 @@ function WhySection({ section }: { section: MaxymiaHomeData['whyMaxymia'] }) {
 
 function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
   const { handleCampusClick } = useCampusLink();
-  const { logoMaxymia } = useSiteBranding();
-  const ctaLogo = section.logo || logoMaxymia;
+  // Página clara → logo negro de Maxymia (el de Strapi es la versión blanca
+  // para fondo oscuro, la misma que usa el campus).
+  const ctaLogo = '/logo_maxymia_negro_sin_fondo.png';
 
   return (
-    <section className="py-32 md:py-40 relative overflow-hidden border-t border-white/5 border-b border-b-white/5">
+    <section className="py-32 md:py-40 relative overflow-hidden border-t border-mx-border">
       {/* Background blur */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-mx-orange/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -519,7 +522,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-white leading-tight mb-6"
+          className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-tight mb-6"
         >
           <ColoredTitle text={section.title}/>
         </m.h2>
@@ -529,7 +532,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-white/50 text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-2xl mx-auto mb-10"
+          className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-2xl mx-auto mb-10"
         >
           {section.description}
         </m.p>
@@ -556,7 +559,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-wrap items-center justify-center gap-6 text-white/60 text-label-lg"
+          className="flex flex-wrap items-center justify-center gap-6 text-mx-text-muted text-label-lg"
         >
           {[
             { icon: Check, text: 'Registro gratuito' },
@@ -585,24 +588,12 @@ export default function MaxymiaClient({ data, courses }: MaxymiaClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0b1018] text-white overflow-x-hidden relative">
-
-      {/* Sub-brand banner */}
-      <div className="relative top-0 left-0 right-0 z-60 bg-white/0.03 backdrop-blur-sm border-b border-white/5">
-        <div className="max-w-[1800px] mx-auto px-6 md:px-[128px] flex items-center justify-between h-8">
-          <Link
-            href="/"
-            className="group flex items-center gap-2 text-white/30 hover:text-mx-orange transition-colors text-label-sm tracking-wide"
-          >
-            <ArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden sm:inline">Volver a</span>
-            <span className="font-medium text-white/50 group-hover:text-mx-orange transition-colors">Máxima Formación</span>
-          </Link>
-          <span className="text-white/80 text-label-sm tracking-widest uppercase hidden md:block">Campus de IA Aplicada a Ciencias</span>
-        </div>
-      </div>
+    // Tema claro + Header/Footer del sitio (igual que el resto de páginas de
+    // marketing). La antigua tira "Volver a Máxima Formación" desaparece: el
+    // Header normal ya lleva toda la navegación del sitio.
+    <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip relative">
       <FontStyles />
-      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} variant="maxymia" />
+      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       <main className="relative z-10">
         <HeroSection hero={data.hero} />
@@ -612,7 +603,7 @@ export default function MaxymiaClient({ data, courses }: MaxymiaClientProps) {
         <CTASection section={data.ctaSection} />
       </main>
 
-      <MaxymiaFooter />
+      <Footer />
     </div>
   );
 }

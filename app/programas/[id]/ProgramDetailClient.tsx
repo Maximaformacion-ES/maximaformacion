@@ -7,6 +7,7 @@ import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { ContactCourse } from '../../components/ContactCourseProvider';
 import { ProgramHeroSection } from '../../components/ProgramHeroSection';
+import { BrochureDownloadButton } from '../../components/BrochureDownloadButton';
 import { ProgramTabs } from '../../components/ProgramTabs';
 import { ProgramSidebar, SIDEBAR_CTA_ANCHOR_ID } from '../../components/ProgramSidebar';
 import { ProgramFAQSection } from '../../components/ProgramFAQSection';
@@ -137,6 +138,7 @@ export default function ProgramDetailClient({
               initialUserState={initialUserState}
             />
           }
+          afterDescription={<BrochureDownloadButton program={program} />}
           tabs={<ProgramTabs program={program} richHtml={richHtml} />}
           belowContent={
             <>

@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Loader2, ArrowRight, Crown } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../i18n/LocaleProvider';
 import Link from 'next/link';
 import type { MaxymiaCourse } from '../types';
-import { getEffectivePrice, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
+import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
 interface MaxymiaMobileCTAProps {
@@ -19,12 +19,46 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
 
+  // Igual que ProgramMobileCTA: publica la altura real de la barra en el body
+  // para que el widget de Cookiebot (y cualquier flotante que lea
+  // --floating-cta-bottom) se coloque justo encima. Solo aplica en < lg.
+  useEffect(() => {
+    document.body.dataset.mobileCta = 'true';
+    const el = wrapperRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') {
+      return () => {
+        delete document.body.dataset.mobileCta;
+      };
+    }
+    const update = () => {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) {
+        document.body.style.setProperty('--mobile-cta-height', `${Math.round(h)}px`);
+      }
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      delete document.body.dataset.mobileCta;
+      document.body.style.removeProperty('--mobile-cta-height');
+    };
+  }, []);
+
+  const userStateKnown = isLoaded && !campusLoading;
   const userHasPro = !!isSignedIn && hasPro;
-  const hasAccess = checkAccess(course.id, course.isPro);
+  const hasAccess = userStateKnown && checkAccess(course.id, course.isPro);
   const includedInPro = isFreeWithPro(course, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(course, userHasPro);
   const effectivePrice = getEffectivePrice(course, userHasPro);
+  const proSavings = getProSavings(course, userHasPro);
+  const proOnlyCourse = !!course.proOnly;
+  // Curso gratis con Pro visto por alguien SIN Pro: mensaje clicable que
+  // invita a suscribirse (mismo criterio que el panel de escritorio).
+  const showProFree = userStateKnown && !userHasPro && !!course.isPro && !proOnlyCourse;
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
@@ -68,8 +102,14 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
     }
   };
 
+  // Full-width bar pinned to the bottom on mobile only. Hidden on lg+,
+  // where the sticky sidebar is the canonical CTA. Mismas clases que
+  // ProgramMobileCTA (/programas).
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom">
+    <div
+      ref={wrapperRef}
+      className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-mx-bg/95 backdrop-blur-md border-t border-mx-border px-4 pt-3 safe-bottom"
+    >
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
@@ -80,6 +120,10 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
                 <Crown size={14} /> {locale === 'es' ? 'Incluido en Pro' : 'Included in Pro'}
               </span>
             </>
+          ) : userStateKnown && !userHasPro && proOnlyCourse ? (
+            <span className="flex items-center gap-1 text-mx-orange text-heading-sm font-black">
+              <Crown size={14} /> {locale === 'es' ? 'Gratis con PRO' : 'Free with PRO'}
+            </span>
           ) : proDiscount ? (
             <>
               <span className="text-mx-text-muted text-body-sm line-through">{course.price}€</span>
@@ -106,41 +150,57 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
             </>
           )}
         </div>
-        {!userHasPro && isLoaded && !campusLoading && (
-          <Link href="/pricing" className="flex items-center gap-1 text-label-sm text-mx-orange font-medium">
-            <Crown size={12} />
-            {locale === 'es' ? 'o Pro €18/mes' : 'or Pro €18/mo'}
+        {/* A la derecha del precio: gratis con Pro (clicable) o ahorro -20%. */}
+        {showProFree ? (
+          <Link
+            href="/pricing"
+            className="flex items-center gap-1 text-mx-orange text-label-sm font-bold whitespace-nowrap"
+          >
+            <Crown size={11} className="shrink-0" /> {locale === 'es' ? 'Gratis con Pro' : 'Free with Pro'}
+            <ArrowRight size={11} className="shrink-0" />
           </Link>
-        )}
+        ) : userStateKnown && !userHasPro && proSavings > 0 ? (
+          <p className="flex items-center gap-1.5 text-mx-orange text-label-sm font-medium whitespace-nowrap">
+            <span className="text-body-sm font-bold">{course.price - proSavings}€</span>
+            <Crown size={11} className="shrink-0" /> {locale === 'es' ? `Ahorras ${proSavings}€ con Pro` : `Save ${proSavings}€ with Pro`}
+          </p>
+        ) : null}
       </div>
 
       {/* Row 2: CTA button full width */}
-      {isLoaded && !campusLoading && hasAccess ? (
+      {hasAccess ? (
         <Link
           href={`/maxymia/campus/${course.slug}/lesson/${course.blocks[0]?.lessons[0]?.id}`}
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-3 text-body-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
         >
           {locale === 'es' ? 'Acceder al Curso' : 'Access Course'}
-          <ArrowRight size={16} />
+          <ArrowRight size={12} />
+        </Link>
+      ) : userStateKnown && !userHasPro && proOnlyCourse ? (
+        <Link
+          href="/pricing"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all"
+        >
+          <Crown size={12} />
+          {locale === 'es' ? 'Hazte Pro y accede' : 'Go Pro and access'}
+          <ArrowRight size={12} />
         </Link>
       ) : (
         <button
           onClick={handlePurchase}
           disabled={isLoading}
-          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-3 text-body-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-4 py-2 text-label-sm font-medium rounded-lg hover:bg-mx-orange-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2 className="animate-spin" size={12} />
               {locale === 'es' ? 'Procesando...' : 'Processing...'}
             </>
           ) : (
             <>
-              <ShoppingCart size={16} />
-              {/* Match the desktop CTA (MaxymiaCourseDetail), which always
-                  reads "Matricúlate ahora". handlePurchase redirects to /sign-in
-                  when there's no session, so the signed-out label doesn't
-                  need to differ. */}
+              <ShoppingCart size={12} />
+              {/* Misma etiqueta que el panel de escritorio; handlePurchase
+                  redirige a /sign-in cuando no hay sesión. */}
               {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
             </>
           )}

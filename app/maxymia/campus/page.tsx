@@ -1,4 +1,5 @@
 import { fetchMaxymiaCourses } from '../data/queries';
+import CampusChrome from './CampusChrome';
 import CampusDashboard from './CampusDashboard';
 import { requireCampusLogin } from './require-campus-login';
 
@@ -11,5 +12,9 @@ export default async function CampusPage() {
   await requireCampusLogin('/maxymia/campus');
   const courses = await fetchMaxymiaCourses();
 
-  return <CampusDashboard courses={courses} />;
+  return (
+    <CampusChrome>
+      <CampusDashboard courses={courses} />
+    </CampusChrome>
+  );
 }

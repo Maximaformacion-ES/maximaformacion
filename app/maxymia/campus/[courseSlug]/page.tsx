@@ -6,6 +6,7 @@ import { getTeachers, getBadges, getInstitutions } from '@/lib/strapi/queries';
 import { JsonLd } from '@/app/components/JsonLd';
 import { maxymiaCourseSchema } from '@/lib/seo/jsonld';
 import MaxymiaCourseOverview from './MaxymiaCourseOverview';
+import CampusChrome from '../CampusChrome';
 
 interface PageProps {
   params: Promise<{ courseSlug: string }>;
@@ -76,17 +77,27 @@ export default async function CourseOverviewPage({ params }: PageProps) {
     durationHours: course.durationHours,
   });
 
+  const overview = (
+    <MaxymiaCourseOverview
+      course={course}
+      initialHasAccess={initialHasAccess}
+      standalone={!initialHasAccess}
+      teacherAvatars={teacherAvatars}
+      recommended={recommended}
+      allBadges={allBadges}
+      allInstitutions={allInstitutions}
+    />
+  );
+
+  // El chrome se decide en SERVIDOR con el acceso ya resuelto:
+  //  - con matrícula → vista de alumno dentro del campus (CampusShell);
+  //  - sin matrícula → ficha pública de venta con el Header/Footer del sitio,
+  //    exactamente como las fichas de /programas (la pinta MaxymiaCourseDetail
+  //    en modo `standalone`). Así no hay parpadeo de cabecera.
   return (
     <>
       <JsonLd data={jsonLd} />
-      <MaxymiaCourseOverview
-        course={course}
-        initialHasAccess={initialHasAccess}
-        teacherAvatars={teacherAvatars}
-        recommended={recommended}
-        allBadges={allBadges}
-        allInstitutions={allInstitutions}
-      />
+      {initialHasAccess ? <CampusChrome>{overview}</CampusChrome> : overview}
     </>
   );
 }
