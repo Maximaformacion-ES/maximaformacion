@@ -70,7 +70,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
 
 // ─── Course Thumbnail (replicates card style) ───────────────────
 
-function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Locale }) {
+export function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Locale }) {
   const title = course.thumbnailTitle?.[locale] || course.title[locale];
   const lines = title.split('\n');
 
