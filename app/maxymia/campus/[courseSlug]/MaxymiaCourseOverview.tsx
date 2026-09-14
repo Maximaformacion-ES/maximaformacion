@@ -23,6 +23,7 @@ import {
   Users,
   Briefcase,
   Trophy,
+  MessageCircle,
   RotateCcw,
   Award,
   X,
@@ -34,7 +35,7 @@ import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
-import { ContactCourse } from '@/app/components/ContactCourseProvider';
+import { ContactCourse, contactHrefFor } from '@/app/components/ContactCourseProvider';
 import { FontStyles } from '@/app/components/FontStyles';
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
@@ -331,18 +332,34 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                 <h1 className="text-[32px] text-balance md:text-display-sm font-black tracking-tight leading-tight text-mx-blue mb-3 max-w-3xl">
                   {course.title[locale]}
                 </h1>
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-9 h-9 rounded-full bg-black/[0.04] flex items-center justify-center overflow-hidden">
-                    {course.instructor.avatar ? (
-                      <Image src={course.instructor.avatar} alt={course.instructor.name} width={36} height={36} unoptimized className="w-full h-full object-cover" />
-                    ) : (
-                      <User size={16} className="text-mx-text-muted" />
-                    )}
+                {/* Caja "te resolvemos tus dudas": en vez de la ficha del
+                    docente, una invitación a contactar con el tutor. */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-mx-border bg-mx-card px-4 py-3.5 mb-6">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-11 h-11 rounded-full bg-mx-blue/10 flex items-center justify-center overflow-hidden shrink-0">
+                      {course.instructor.avatar ? (
+                        <Image src={course.instructor.avatar} alt={course.instructor.name} width={44} height={44} unoptimized className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={18} className="text-mx-blue" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-mx-text text-body-sm font-semibold">
+                        {locale === 'es' ? '¿Tienes dudas? Te las resolvemos' : 'Questions? We are here to help'}
+                      </p>
+                      <p className="text-mx-text-muted text-label-md truncate">
+                        {locale === 'es'
+                          ? `${course.instructor.name} es tu tutor en este curso y responde a tus preguntas.`
+                          : `${course.instructor.name} is your tutor for this course and answers your questions.`}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>
-                    <p className="text-mx-text-muted text-label-md">{course.instructor.role}</p>
-                  </div>
+                  <Link
+                    href={contactHrefFor(course.title.es || course.title[locale])}
+                    className="inline-flex items-center justify-center gap-2 shrink-0 rounded-lg border border-mx-blue text-mx-blue px-4 py-2.5 text-label-md font-medium hover:bg-mx-blue hover:text-white transition-colors"
+                  >
+                    <MessageCircle size={15} /> {locale === 'es' ? 'Contactar con el tutor' : 'Contact the tutor'}
+                  </Link>
                 </div>
                 <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-label-md text-mx-text-muted mb-8">
                   <MetaItem icon={Clock} label={durationLabel} />
