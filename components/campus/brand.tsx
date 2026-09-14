@@ -7,13 +7,15 @@ export function CampusBrand() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton size="lg" asChild className="h-14 hover:bg-transparent flex items-center justify-center">
+        {/* Misma altura (h-14) pero casi sin padding vertical, para que el
+            logo ocupe el bloque: 44 px de alto en 56 px de contenedor. */}
+        <SidebarMenuButton size="lg" asChild className="h-14 py-1 hover:bg-transparent flex items-center justify-center">
           <Link href="/maxymia/campus" className="justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo_maxymia_negro_sin_fondo.png"
               alt="Maxymia"
-              className="h-8 w-auto group-data-[collapsible=icon]:hidden"
+              className="h-11 w-auto max-w-full object-contain group-data-[collapsible=icon]:hidden"
             />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
