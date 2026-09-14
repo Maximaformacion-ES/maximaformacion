@@ -2,15 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  ArrowUpRight,
-  Award,
-  BookOpen,
-  GraduationCap,
-  LayoutDashboard,
-  MessageCircle,
-  type LucideIcon,
-} from "lucide-react";
+import { Award, BookOpen, GraduationCap, LayoutDashboard, type LucideIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -37,64 +29,36 @@ const MAIN: NavItem[] = [
 ];
 
 // Mismos estados que el sidebar del panel /admin (kit shadcn), con el acento
-// naranja de Maxymia para el activo.
+// naranja de Maxymia para el activo. La ayuda (tutor, volver a la web) vive
+// en la cabecera, arriba a la derecha (campus-header.tsx).
 const BUTTON_CLASS =
   "hover:bg-mx-orange/10 hover:text-mx-orange-dark data-[active=true]:bg-mx-orange/10 data-[active=true]:text-mx-orange-dark data-[active=true]:hover:bg-mx-orange/10 data-[active=true]:font-medium";
 
-export function CampusNavMain({ locale, onAskTutor }: { locale: Locale; onAskTutor: () => void }) {
+export function CampusNavMain({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
 
   return (
-    <>
-      <SidebarGroup>
-        <SidebarGroupLabel>{locale === "es" ? "Menú" : "Menu"}</SidebarGroupLabel>
-        <SidebarMenu>
-          {MAIN.map((item) => {
-            const active = item.exact
-              ? pathname === item.url
-              : pathname === item.url || pathname.startsWith(`${item.url}/`);
-            const label = item[locale];
-            return (
-              <SidebarMenuItem key={item.url}>
-                <SidebarMenuButton asChild isActive={active} tooltip={label} className={BUTTON_CLASS}>
-                  <Link href={item.url} onClick={() => setOpenMobile(false)}>
-                    <item.icon />
-                    <span>{label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
-      </SidebarGroup>
-
-      <SidebarGroup>
-        <SidebarGroupLabel>{locale === "es" ? "Ayuda" : "Help"}</SidebarGroupLabel>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={locale === "es" ? "Escribir al tutor" : "Write to the tutor"}
-              className={BUTTON_CLASS}
-              onClick={() => {
-                setOpenMobile(false);
-                onAskTutor();
-              }}
-            >
-              <MessageCircle />
-              <span>{locale === "es" ? "Escribir al tutor" : "Write to the tutor"}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Máxima Formación" className={BUTTON_CLASS}>
-              <Link href="/" onClick={() => setOpenMobile(false)}>
-                <ArrowUpRight />
-                <span>Máxima Formación</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
-    </>
+    <SidebarGroup>
+      <SidebarGroupLabel>{locale === "es" ? "Menú" : "Menu"}</SidebarGroupLabel>
+      <SidebarMenu>
+        {MAIN.map((item) => {
+          const active = item.exact
+            ? pathname === item.url
+            : pathname === item.url || pathname.startsWith(`${item.url}/`);
+          const label = item[locale];
+          return (
+            <SidebarMenuItem key={item.url}>
+              <SidebarMenuButton asChild isActive={active} tooltip={label} className={BUTTON_CLASS}>
+                <Link href={item.url} onClick={() => setOpenMobile(false)}>
+                  <item.icon />
+                  <span>{label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        })}
+      </SidebarMenu>
+    </SidebarGroup>
   );
 }

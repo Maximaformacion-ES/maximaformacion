@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronLeft, Search } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, MessageCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/app/maxymia/components/NotificationBell";
+import TutorQuestionModal from "@/app/maxymia/components/TutorQuestionModal";
 import type { Locale, MaxymiaCourse } from "@/app/maxymia/types";
 
 /**
@@ -20,6 +21,7 @@ export function CampusHeader({ locale, courses }: { locale: Locale; courses: Max
   const pathname = usePathname();
   const router = useRouter();
   const [q, setQ] = useState("");
+  const [askOpen, setAskOpen] = useState(false);
 
   const isLesson = /\/maxymia\/campus\/[^/]+\/lesson\//.test(pathname);
   const segments = pathname.split("/");
@@ -59,9 +61,33 @@ export function CampusHeader({ locale, courses }: { locale: Locale; courses: Max
         </form>
       )}
 
-      <div className="ml-auto flex items-center gap-1">
+      {/* Ayuda, arriba a la derecha: escribir al tutor y volver a la web. */}
+      <div className="ml-auto flex items-center gap-1 sm:gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setAskOpen(true)}
+          className="border-mx-orange/50 text-mx-orange-dark hover:bg-mx-orange/10 hover:text-mx-orange-dark"
+        >
+          <MessageCircle />
+          <span className="hidden sm:inline">{locale === "es" ? "Escribir al tutor" : "Write to the tutor"}</span>
+        </Button>
+        <Button asChild variant="ghost" size="sm" className="text-muted-foreground hidden md:inline-flex">
+          <Link href="/">
+            Máxima Formación <ArrowUpRight />
+          </Link>
+        </Button>
+        <Separator orientation="vertical" className="mx-1 hidden h-4 sm:block" />
         <NotificationBell courses={courses} />
       </div>
+      <TutorQuestionModal
+        open={askOpen}
+        onClose={() => setAskOpen(false)}
+        locale={locale}
+        course={isLesson ? course : undefined}
+        courses={courses}
+      />
     </header>
   );
 }
