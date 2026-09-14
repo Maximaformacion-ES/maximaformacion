@@ -384,12 +384,32 @@ export async function getPrograms(
   }
 }
 
+
+// Populate de campos que pueden no existir aún en el Strapi de destino (orden
+// de deploy CMS → web). Strapi v5 responde 400 ante una clave desconocida, así
+// que si la petición falla se reintenta sin esos campos: la ficha sigue
+// funcionando aunque el CMS todavía no esté desplegado.
+const OPTIONAL_POPULATES = ['&populate[extraSections]=true'];
+async function strapiRequestTolerantPopulate<T>(
+  path: string,
+  options: Parameters<typeof strapiRequest>[1],
+): Promise<T> {
+  try {
+    return await strapiRequest<T>(path, options);
+  } catch (error) {
+    const stripped = OPTIONAL_POPULATES.reduce((acc, key) => acc.replace(key, ''), path);
+    if (stripped === path) throw error;
+    console.warn('[strapi] reintentando sin populates opcionales:', error instanceof Error ? error.message : error);
+    return await strapiRequest<T>(stripped, options);
+  }
+}
+
 export async function getProgramById(
   id: number | string,
   draft = false
 ): Promise<Program | null> {
   try {
-    const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
+    const response = await strapiRequestTolerantPopulate<StrapiSingleResponse<StrapiProgram>>(
       `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
@@ -414,7 +434,7 @@ export async function getProgramBySlug(
   draft = false
 ): Promise<Program | null> {
   try {
-    const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
+    const response = await strapiRequestTolerantPopulate<StrapiResponse<StrapiProgram[]>>(
       `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
