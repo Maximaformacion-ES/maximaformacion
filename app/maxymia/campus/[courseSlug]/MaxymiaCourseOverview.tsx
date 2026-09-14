@@ -293,6 +293,36 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
       : (locale === 'es' ? 'Empezar el curso' : 'Start course');
   const primaryHref = isFullyCompleted ? lessonHref(course.blocks[0]?.lessons[0]?.id) : lessonHref(firstIncompleteLessonId);
 
+  // Indicadores: minutos pendientes y exámenes (lista plana con su bloque y
+  // el enlace al examen, que cuelga de la última lección del bloque).
+  let remainingMinutes = 0;
+  for (const block of course.blocks) {
+    for (const lesson of block.lessons) {
+      if (!isLessonComplete(lesson, completedSet)) remainingMinutes += lesson.estimatedMinutes;
+    }
+  }
+  const exams = course.blocks.flatMap((block, bi) =>
+    block.lessons.length
+      ? block.exams.map((exam, ei) => ({
+          exam,
+          blockIndex: bi,
+          href: `/maxymia/campus/${course.slug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam?index=${ei}`,
+          result: examResultsByExamId[exam.id],
+        }))
+      : [],
+  );
+  const examsPassed = exams.filter((e) => e.result?.passed).length;
+  const fmtMinutes = (min: number) =>
+    min >= 60 ? `${Math.floor(min / 60)}h ${min % 60 ? `${min % 60}min` : ''}`.trim() : `${min} min`;
+  const ringR = 26;
+  const ringC = 2 * Math.PI * ringR;
+
+  const fadeUp = (delay: number) => ({
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.45, delay },
+  });
+
   return (
     <div className="min-h-screen bg-mx-bg text-mx-text overflow-x-clip">
       <FontStyles />
@@ -308,16 +338,17 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
               { label: locale === 'es' ? 'Mis cursos' : 'My courses', href: '/maxymia/campus/mis-cursos' },
               { label: course.title[locale] },
             ]}
-            className="mb-6 md:mb-8"
+            className="mb-6"
           />
 
-          <div className="max-w-[960px]">
-            {/* ─── Columna única: sin card lateral. Con el curso comprado, el
-                progreso y el CTA viven en el panel de retomar; los datos del
-                curso van en una fila compacta bajo el título. ─── */}
-            <div className="min-w-0">
-              {/* Cabecera del curso */}
-              <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          {/* ─── 1. Cabecera del curso: tarjeta con imagen + retomar ─── */}
+          <m.section
+            {...fadeUp(0)}
+            className="relative overflow-hidden rounded-2xl border border-mx-border bg-mx-card shadow-sm mb-6"
+            aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-5">
+              <div className="lg:col-span-3 p-6 sm:p-8 lg:p-10">
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
                     {MAXYMIA_CATEGORY_LABELS[course.category]?.[locale] ?? course.category}
@@ -331,129 +362,119 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                     </span>
                   )}
                 </div>
-                <h1 className="text-[32px] text-balance md:text-display-sm font-black tracking-tight leading-tight text-mx-blue mb-3 max-w-3xl">
+                <h1 className="text-[30px] text-balance md:text-display-sm font-black tracking-tight leading-tight text-mx-blue mb-3">
                   {course.title[locale]}
                 </h1>
-                {/* Caja "te resolvemos tus dudas": en vez de la ficha del
-                    docente, una invitación a contactar con el tutor. */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-mx-border bg-mx-card px-4 py-3.5 mb-6">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-11 h-11 rounded-full bg-mx-blue/10 flex items-center justify-center overflow-hidden shrink-0">
-                      {course.instructor.avatar ? (
-                        <Image src={course.instructor.avatar} alt={course.instructor.name} width={44} height={44} unoptimized className="w-full h-full object-cover" />
-                      ) : (
-                        <User size={18} className="text-mx-blue" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-mx-text text-body-sm font-semibold">
-                        {locale === 'es' ? '¿Tienes dudas? Te las resolvemos' : 'Questions? We are here to help'}
-                      </p>
-                      <p className="text-mx-text-muted text-label-md truncate">
-                        {locale === 'es'
-                          ? `${course.instructor.name} es tu tutor en este curso y responde a tus preguntas.`
-                          : `${course.instructor.name} is your tutor for this course and answers your questions.`}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowTutorModal(true)}
-                    className="inline-flex items-center justify-center gap-2 shrink-0 rounded-lg border border-mx-blue text-mx-blue px-4 py-2.5 text-label-md font-medium hover:bg-mx-blue hover:text-white transition-colors"
-                  >
-                    <MessageCircle size={15} /> {locale === 'es' ? 'Contactar con el tutor' : 'Contact the tutor'}
-                  </button>
-                </div>
-                <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-label-md text-mx-text-muted mb-8">
-                  <MetaItem icon={Clock} label={durationLabel} />
-                  <MetaItem icon={BookOpen} label={`${totalLessons} ${locale === 'es' ? 'lecciones' : 'lessons'}`} />
-                  {totalExams > 0 && <MetaItem icon={FileQuestion} label={`${totalExams} ${locale === 'es' ? 'exámenes' : 'exams'}`} />}
-                  <MetaItem icon={GraduationCap} label={(course.level && LEVEL_LABELS[course.level]?.[locale]) || 'Principiante'} />
-                  <MetaItem icon={Globe} label={(course.language && LANGUAGE_LABELS[course.language]?.[locale]) || 'Español'} />
-                  <MetaItem icon={Monitor} label="Online" />
-                </ul>
-              </m.div>
+                <p className="text-mx-text-muted text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-6">
+                  {course.description[locale]}
+                </p>
 
-              {/* Panel "Continúa donde lo dejaste" — patrón Coursera/Platzi:
-                  lo primero que ve el alumno es cómo retomar, con el nombre de
-                  la siguiente lección y su progreso. */}
-              <m.section
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-5 md:p-6 mb-10"
-                aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
-              >
-                <div className="flex flex-col md:flex-row md:items-center gap-5 md:gap-8">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1.5">
-                      {isFullyCompleted
-                        ? (locale === 'es' ? 'Curso completado' : 'Course completed')
-                        : progress
-                          ? (locale === 'es' ? 'Continúa donde lo dejaste' : 'Pick up where you left off')
-                          : (locale === 'es' ? 'Tu primera lección' : 'Your first lesson')}
-                    </p>
-                    {isFullyCompleted ? (
-                      <p className="text-body-md md:text-body-lg font-semibold text-mx-text">
-                        {locale === 'es' ? 'Enhorabuena, has completado todas las lecciones.' : 'Congratulations, you completed every lesson.'}
-                      </p>
-                    ) : resumeInfo ? (
-                      <>
-                        <p className="text-body-md md:text-body-lg font-semibold text-mx-text line-clamp-2">
-                          {resumeInfo.lesson.title[locale]}
+                {/* Retomar */}
+                <div className="rounded-xl border border-mx-orange/30 bg-mx-orange/[0.06] p-4 sm:p-5">
+                  <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1">
+                    {isFullyCompleted
+                      ? (locale === 'es' ? 'Curso completado' : 'Course completed')
+                      : progress
+                        ? (locale === 'es' ? 'Continúa donde lo dejaste' : 'Pick up where you left off')
+                        : (locale === 'es' ? 'Tu primera lección' : 'Your first lesson')}
+                  </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex-1 min-w-0">
+                      {isFullyCompleted ? (
+                        <p className="text-body-md font-semibold text-mx-text">
+                          {locale === 'es' ? 'Enhorabuena, has completado todas las lecciones.' : 'Congratulations, you completed every lesson.'}
                         </p>
-                        <p className="text-label-md text-mx-text-muted mt-1">
-                          {locale === 'es' ? 'Bloque' : 'Block'} {resumeInfo.blockIndex + 1} · {resumeInfo.lesson.estimatedMinutes} min
-                        </p>
-                      </>
-                    ) : null}
-                    <div className="mt-4 flex items-center gap-3">
-                      <div className="flex-1 h-2 rounded-full bg-black/[0.06] overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-[width] duration-700 ${isFullyCompleted ? 'bg-amber-400' : 'bg-mx-orange'}`}
-                          style={{ width: `${progressPercent}%` }}
-                        />
-                      </div>
-                      <span className="text-label-md font-semibold text-mx-orange whitespace-nowrap">
-                        {progressPercent}% · {completedValidCount}/{totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
-                      </span>
+                      ) : resumeInfo ? (
+                        <>
+                          <p className="text-body-md font-semibold text-mx-text line-clamp-1">{resumeInfo.lesson.title[locale]}</p>
+                          <p className="text-label-md text-mx-text-muted mt-0.5">
+                            {locale === 'es' ? 'Bloque' : 'Block'} {resumeInfo.blockIndex + 1} · {resumeInfo.lesson.estimatedMinutes} min
+                          </p>
+                        </>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap gap-2 shrink-0">
+                      {isFullyCompleted && (
+                        <button
+                          onClick={() => setShowCertificate(true)}
+                          className="inline-flex items-center justify-center gap-2 bg-mx-orange text-white px-5 py-3 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
+                        >
+                          <Award size={16} /> {locale === 'es' ? 'Ver certificado' : 'View certificate'}
+                        </button>
+                      )}
+                      <Link
+                        href={primaryHref}
+                        className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-body-sm font-medium transition-colors ${
+                          isFullyCompleted
+                            ? 'border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10'
+                            : 'bg-mx-orange text-white hover:bg-mx-orange-dark'
+                        }`}
+                      >
+                        {isFullyCompleted ? <RotateCcw size={16} /> : <Play size={16} fill="currentColor" />}
+                        {primaryLabel}
+                      </Link>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
-                    {isFullyCompleted ? (
-                      <button
-                        onClick={() => setShowCertificate(true)}
-                        className="inline-flex items-center justify-center gap-2 bg-mx-orange text-white px-6 py-3.5 rounded-lg text-body-sm md:text-body-md font-medium hover:bg-mx-orange-dark transition-colors"
-                      >
-                        <Award size={18} /> {locale === 'es' ? 'Ver certificado' : 'View certificate'}
-                      </button>
-                    ) : null}
-                    <Link
-                      href={primaryHref}
-                      className={`inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg text-body-sm md:text-body-md font-medium transition-colors ${
-                        isFullyCompleted
-                          ? 'border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10'
-                          : 'bg-mx-orange text-white hover:bg-mx-orange-dark'
-                      }`}
-                    >
-                      {isFullyCompleted ? <RotateCcw size={18} /> : <Play size={18} fill="currentColor" />}
-                      {primaryLabel}
-                    </Link>
-                    {!isFullyCompleted && nextLessonId && nextLessonId !== firstIncompleteLessonId && (
-                      <Link
-                        href={lessonHref(nextLessonId)}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-body-sm font-light border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10 transition-colors"
-                      >
-                        <ArrowRight size={16} /> {locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
-                      </Link>
-                    )}
-                  </div>
+                </div>
+              </div>
+              <div className="relative lg:col-span-2 min-h-[200px] lg:min-h-full">
+                <Image src={course.image} alt="" fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" unoptimized priority />
+                <div className="absolute inset-0 bg-gradient-to-r from-mx-card via-mx-card/20 to-transparent lg:via-transparent" />
+              </div>
+            </div>
+          </m.section>
+
+          {/* ─── 2. Indicadores ─── */}
+          <m.section {...fadeUp(0.08)} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+            <div className="rounded-xl border border-mx-border bg-mx-card p-4 flex items-center gap-4">
+              <svg width="64" height="64" viewBox="0 0 64 64" className="shrink-0 -rotate-90" aria-hidden="true">
+                <circle cx="32" cy="32" r={ringR} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="6" />
+                <circle
+                  cx="32" cy="32" r={ringR} fill="none"
+                  stroke={isFullyCompleted ? '#f59e0b' : '#F7A000'} strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={ringC} strokeDashoffset={ringC * (1 - progressPercent / 100)}
+                  className="transition-[stroke-dashoffset] duration-700"
+                />
+              </svg>
+              <div>
+                <p className="text-label-sm uppercase tracking-widest text-mx-text-muted">{locale === 'es' ? 'Progreso' : 'Progress'}</p>
+                <p className="text-heading-md font-black text-mx-text leading-none mt-1">{progressPercent}%</p>
+              </div>
+            </div>
+            <StatTile icon={BookOpen} label={locale === 'es' ? 'Lecciones' : 'Lessons'} value={`${completedValidCount}/${totalLessons}`} hint={locale === 'es' ? 'completadas' : 'completed'} />
+            <StatTile icon={FileQuestion} label={locale === 'es' ? 'Exámenes' : 'Exams'} value={`${examsPassed}/${totalExams}`} hint={locale === 'es' ? 'aprobados' : 'passed'} />
+            <StatTile icon={Clock} label={locale === 'es' ? 'Te queda' : 'Remaining'} value={remainingMinutes > 0 ? fmtMinutes(remainingMinutes) : '0 min'} hint={`${locale === 'es' ? 'de' : 'of'} ${durationLabel}`} />
+          </m.section>
+
+          {/* ─── 3. Dos columnas: temario + panel lateral ─── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+            <div className="lg:col-span-2 min-w-0">
+              <m.section {...fadeUp(0.14)} className="mb-12">
+                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
+                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
+                  </h2>
+                  <p className="text-label-md text-mx-text-muted">
+                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {course.blocks.map((block, blockIdx) => (
+                    <ModuleCard
+                      key={block.id}
+                      block={block}
+                      blockIndex={blockIdx}
+                      courseSlug={course.slug}
+                      completedSet={completedSet}
+                      firstIncompleteLessonId={firstIncompleteLessonId}
+                      locale={locale}
+                      examResultsByExamId={examResultsByExamId}
+                    />
+                  ))}
                 </div>
               </m.section>
 
-              {/* Sobre el curso — descripción, objetivos, audiencia y salidas,
-                  antes del temario (contexto primero, contenido después). */}
-              <m.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="mb-14">
+              <m.section {...fadeUp(0.2)}>
                 <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue mb-4">
                   {locale === 'es' ? 'Sobre el curso' : 'About the course'}
                 </h2>
@@ -479,9 +500,7 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   })}
                 </div>
                 <div className="max-w-full">
-                  {activeTab === 'description' && hasDescription && (
-                    <MarkdownBlock content={course.description[locale]} />
-                  )}
+                  {activeTab === 'description' && hasDescription && <MarkdownBlock content={course.description[locale]} />}
                   {activeTab === 'objectives' && (
                     <MarkdownBlock content={course.objectives || (locale === 'es' ? 'Los objetivos de este curso se irán definiendo a medida que avances en el temario.' : 'Course objectives will be defined as you progress through the syllabus.')} />
                   )}
@@ -493,48 +512,103 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   )}
                 </div>
               </m.section>
-              {/* Contenido del curso — el temario es el contenido principal
-                  de la página (patrón Udemy/Domestika), con estado por lección. */}
-              <m.section
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
-                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
-                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
-                  </h2>
-                  <p className="text-label-md text-mx-text-muted">
-                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
-                    {totalExams > 0 ? ` · ${totalExams} ${locale === 'es' ? 'exámenes' : 'exams'}` : ''}
+            </div>
+
+            {/* Panel lateral: lo que NO está ya en la cabecera */}
+            <aside className="lg:col-span-1">
+              <div className="lg:sticky lg:top-32 space-y-4">
+                {/* Siguiente lección */}
+                {!isFullyCompleted && (
+                  <m.div {...fadeUp(0.16)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                    <p className="text-label-sm uppercase tracking-widest text-mx-text-muted mb-3">{locale === 'es' ? 'A continuación' : 'Up next'}</p>
+                    {(() => {
+                      const next = findResumeInfo(course.blocks, nextLessonId);
+                      const target = next && nextLessonId !== firstIncompleteLessonId ? next : resumeInfo;
+                      if (!target) return null;
+                      return (
+                        <Link href={lessonHref(target.lesson.id)} className="group block">
+                          <p className="text-body-md font-semibold text-mx-text group-hover:text-mx-orange transition-colors line-clamp-2">{target.lesson.title[locale]}</p>
+                          <p className="text-label-md text-mx-text-muted mt-1">
+                            {locale === 'es' ? 'Bloque' : 'Block'} {target.blockIndex + 1} · {target.lesson.estimatedMinutes} min
+                          </p>
+                          <span className="mt-3 inline-flex items-center gap-1.5 text-label-md font-medium text-mx-orange">
+                            {locale === 'es' ? 'Ir a la lección' : 'Go to lesson'} <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                          </span>
+                        </Link>
+                      );
+                    })()}
+                  </m.div>
+                )}
+
+                {/* Exámenes */}
+                {exams.length > 0 && (
+                  <m.div {...fadeUp(0.2)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-label-sm uppercase tracking-widest text-mx-text-muted">{locale === 'es' ? 'Exámenes' : 'Exams'}</p>
+                      <span className="text-label-md font-semibold text-mx-text">{examsPassed}/{exams.length}</span>
+                    </div>
+                    <ul className="space-y-1">
+                      {exams.map(({ exam, blockIndex, href, result }) => (
+                        <li key={exam.id}>
+                          <Link href={href} className="flex items-center gap-3 rounded-lg -mx-2 px-2 py-2 hover:bg-black/[0.03] transition-colors">
+                            <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${result ? (result.passed ? 'bg-green-500/10 text-green-700' : 'bg-red-500/10 text-red-700') : 'bg-black/[0.04] text-mx-text-muted'}`}>
+                              {result?.passed ? <CheckCircle size={13} /> : <FileQuestion size={13} />}
+                            </span>
+                            <span className="flex-1 min-w-0">
+                              <span className="block text-body-sm text-mx-text line-clamp-1">{exam.title[locale]}</span>
+                              <span className="block text-label-sm text-mx-text-muted">{locale === 'es' ? 'Bloque' : 'Block'} {blockIndex + 1}</span>
+                            </span>
+                            <span className={`text-label-md font-semibold shrink-0 ${result ? (result.passed ? 'text-green-700' : 'text-red-700') : 'text-mx-text-muted'}`}>
+                              {result ? `${result.score}%` : (locale === 'es' ? 'Pendiente' : 'Pending')}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </m.div>
+                )}
+
+                {/* Tutor */}
+                <m.div {...fadeUp(0.24)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-11 h-11 rounded-full bg-mx-blue/10 flex items-center justify-center overflow-hidden shrink-0">
+                      {course.instructor.avatar ? (
+                        <Image src={course.instructor.avatar} alt={course.instructor.name} width={44} height={44} unoptimized className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={18} className="text-mx-blue" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-body-sm font-semibold text-mx-text truncate">{course.instructor.name}</p>
+                      <p className="text-label-md text-mx-text-muted truncate">{course.instructor.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-label-md text-mx-text-muted mb-3">
+                    {locale === 'es' ? '¿Tienes dudas? Te las resolvemos.' : 'Questions? We are here to help.'}
                   </p>
-                </div>
-                <div className="space-y-3">
-                  {course.blocks.map((block, blockIdx) => (
-                    <ModuleCard
-                      key={block.id}
-                      block={block}
-                      blockIndex={blockIdx}
-                      courseSlug={course.slug}
-                      completedSet={completedSet}
-                      firstIncompleteLessonId={firstIncompleteLessonId}
-                      locale={locale}
-                      examResultsByExamId={examResultsByExamId}
-                    />
-                  ))}
-                </div>
-              </m.section>
+                  <button
+                    type="button"
+                    onClick={() => setShowTutorModal(true)}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-mx-blue text-mx-blue px-4 py-2.5 text-label-md font-medium hover:bg-mx-blue hover:text-white transition-colors"
+                  >
+                    <MessageCircle size={15} /> {locale === 'es' ? 'Contactar con el tutor' : 'Contact the tutor'}
+                  </button>
+                </m.div>
 
-            </div>
-
-            <div className="mt-12 text-center">
-              <Link
-                href="/maxymia/campus/mis-cursos"
-                className="text-label-md text-mx-text-muted hover:text-mx-orange transition-colors"
-              >
-                ← {locale === 'es' ? 'Volver a mis cursos' : 'Back to my courses'}
-              </Link>
-            </div>
+                {/* Ficha rápida */}
+                <m.div {...fadeUp(0.28)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                  <ul className="grid grid-cols-2 gap-x-4 gap-y-3 text-label-md text-mx-text-muted">
+                    <MetaItem icon={Globe} label={(course.language && LANGUAGE_LABELS[course.language]?.[locale]) || 'Español'} />
+                    <MetaItem icon={Monitor} label="Online" />
+                    <MetaItem icon={GraduationCap} label={(course.level && LEVEL_LABELS[course.level]?.[locale]) || 'Principiante'} />
+                    <MetaItem icon={Clock} label={durationLabel} />
+                  </ul>
+                  <Link href="/maxymia/campus/mis-cursos" className="mt-4 block text-label-md text-mx-text-muted hover:text-mx-orange transition-colors">
+                    ← {locale === 'es' ? 'Volver a mis cursos' : 'Back to my courses'}
+                  </Link>
+                </m.div>
+              </div>
+            </aside>
           </div>
         </div>
       </main>
@@ -599,6 +673,21 @@ function findResumeInfo(blocks: MaxymiaBlock[], lessonId: string | undefined) {
 }
 
 // ─── Stat Item ──────────────────────────────────────────────────────
+
+function StatTile({ icon: Icon, label, value, hint }: { icon: React.ElementType; label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-mx-border bg-mx-card p-4 flex items-center gap-4">
+      <div className="w-11 h-11 rounded-full bg-mx-orange/10 text-mx-orange flex items-center justify-center shrink-0">
+        <Icon size={18} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-label-sm uppercase tracking-widest text-mx-text-muted">{label}</p>
+        <p className="text-heading-sm font-black text-mx-text leading-tight mt-0.5">{value}</p>
+        {hint && <p className="text-label-sm text-mx-text-muted">{hint}</p>}
+      </div>
+    </div>
+  );
+}
 
 function MetaItem({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
