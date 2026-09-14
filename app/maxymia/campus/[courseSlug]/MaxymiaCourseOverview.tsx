@@ -347,6 +347,81 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, embedd
     transition: { duration: 0.45, delay },
   });
 
+  // Insignias y tarjeta "Retomar": en ≥sm van dentro del panel del hero; en
+  // móvil el panel solo lleva título y descripción y estas piezas bajan.
+  const badges = (
+    <div className="flex flex-wrap items-center gap-2 mb-4">
+      <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
+        {maxymiaCategoryLabel(course.category, locale)}
+      </span>
+      <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-mx-card/80 backdrop-blur-sm border border-mx-border text-mx-text-muted">
+        {LEVEL_LABELS[course.level]?.[locale]}
+      </span>
+      {isFullyCompleted && (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 text-label-sm font-bold tracking-wider uppercase rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/30">
+          <Trophy size={11} /> {locale === 'es' ? 'Completado' : 'Completed'}
+        </span>
+      )}
+    </div>
+  );
+  const resumeCard = (
+    <div
+      className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-4 sm:p-6 mb-5 md:mb-8"
+      aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
+    >
+      <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1.5">
+        {isFullyCompleted
+          ? (locale === 'es' ? 'Curso completado' : 'Course completed')
+          : progress
+            ? (locale === 'es' ? 'Continúa donde lo dejaste' : 'Pick up where you left off')
+            : (locale === 'es' ? 'Tu primera lección' : 'Your first lesson')}
+      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          {isFullyCompleted ? (
+            <p className="text-body-md font-semibold text-mx-text">
+              {locale === 'es' ? 'Enhorabuena, has completado todas las lecciones.' : 'Congratulations, you completed every lesson.'}
+            </p>
+          ) : resumeInfo ? (
+            <>
+              <p className="text-body-md md:text-body-lg font-semibold text-mx-text line-clamp-1">{resumeInfo.lesson.title[locale]}</p>
+              <p className="text-label-md text-mx-text-muted mt-0.5">
+                {locale === 'es' ? 'Bloque' : 'Block'} {resumeInfo.blockIndex + 1} · {resumeInfo.lesson.estimatedMinutes} min
+              </p>
+            </>
+          ) : null}
+          <div className="mt-3 flex items-center gap-3">
+            <div className="flex-1 h-1.5 rounded-full bg-black/[0.06] overflow-hidden">
+              <div className={`h-full rounded-full ${isFullyCompleted ? 'bg-amber-400' : 'bg-mx-orange'}`} style={{ width: `${progressPercent}%` }} />
+            </div>
+            <span className="text-label-md font-semibold text-mx-orange whitespace-nowrap">{progressPercent}%</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 shrink-0">
+          {isFullyCompleted && (
+            <button
+              onClick={() => setShowCertificate(true)}
+              className="inline-flex items-center justify-center gap-2 bg-mx-orange text-white px-5 py-3 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
+            >
+              <Award size={16} /> {locale === 'es' ? 'Ver certificado' : 'View certificate'}
+            </button>
+          )}
+          <Link
+            href={primaryHref}
+            className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-body-sm font-medium transition-colors ${
+              isFullyCompleted
+                ? 'border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10'
+                : 'bg-mx-orange text-white hover:bg-mx-orange-dark'
+            }`}
+          >
+            {isFullyCompleted ? <RotateCcw size={16} /> : <Play size={16} fill="currentColor" />}
+            {primaryLabel}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className={embedded ? 'w-full' : 'min-h-screen bg-mx-bg text-mx-text overflow-x-clip'}>
       {!embedded && <FontStyles />}
@@ -412,87 +487,24 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, embedd
             >
               <Fillet at="tl" className="bottom-0 -left-4" />
               <Fillet at="tr" className="bottom-0 -right-4" />
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
-                  {maxymiaCategoryLabel(course.category, locale)}
-                </span>
-                <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-mx-card/80 backdrop-blur-sm border border-mx-border text-mx-text-muted">
-                  {LEVEL_LABELS[course.level]?.[locale]}
-                </span>
-                {isFullyCompleted && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-label-sm font-bold tracking-wider uppercase rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/30">
-                    <Trophy size={11} /> {locale === 'es' ? 'Completado' : 'Completed'}
-                  </span>
-                )}
-              </div>
+              <div className="hidden sm:flex sm:flex-wrap sm:items-center">{badges}</div>
               <h1 className="text-[24px] sm:text-[30px] text-balance md:text-heading-lg lg:text-display-sm font-black tracking-tight leading-[1.05] text-mx-blue mb-3 max-w-3xl">
                 {course.title[locale]}
               </h1>
-              <p className="text-mx-text-muted text-label-md sm:text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-4 sm:mb-5">
+              <p className="text-mx-text-muted text-label-md sm:text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-5 sm:mb-5">
                 {course.description[locale]}
               </p>
-
-            {/* Retomar, dentro del panel */}
-            <div
-              className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-4 sm:p-6 mb-5 md:mb-8"
-              aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
-            >
-              <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1.5">
-                {isFullyCompleted
-                  ? (locale === 'es' ? 'Curso completado' : 'Course completed')
-                  : progress
-                    ? (locale === 'es' ? 'Continúa donde lo dejaste' : 'Pick up where you left off')
-                    : (locale === 'es' ? 'Tu primera lección' : 'Your first lesson')}
-              </p>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  {isFullyCompleted ? (
-                    <p className="text-body-md font-semibold text-mx-text">
-                      {locale === 'es' ? 'Enhorabuena, has completado todas las lecciones.' : 'Congratulations, you completed every lesson.'}
-                    </p>
-                  ) : resumeInfo ? (
-                    <>
-                      <p className="text-body-md md:text-body-lg font-semibold text-mx-text line-clamp-1">{resumeInfo.lesson.title[locale]}</p>
-                      <p className="text-label-md text-mx-text-muted mt-0.5">
-                        {locale === 'es' ? 'Bloque' : 'Block'} {resumeInfo.blockIndex + 1} · {resumeInfo.lesson.estimatedMinutes} min
-                      </p>
-                    </>
-                  ) : null}
-                  <div className="mt-3 flex items-center gap-3">
-                    <div className="flex-1 h-1.5 rounded-full bg-black/[0.06] overflow-hidden">
-                      <div className={`h-full rounded-full ${isFullyCompleted ? 'bg-amber-400' : 'bg-mx-orange'}`} style={{ width: `${progressPercent}%` }} />
-                    </div>
-                    <span className="text-label-md font-semibold text-mx-orange whitespace-nowrap">{progressPercent}%</span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 shrink-0">
-                  {isFullyCompleted && (
-                    <button
-                      onClick={() => setShowCertificate(true)}
-                      className="inline-flex items-center justify-center gap-2 bg-mx-orange text-white px-5 py-3 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
-                    >
-                      <Award size={16} /> {locale === 'es' ? 'Ver certificado' : 'View certificate'}
-                    </button>
-                  )}
-                  <Link
-                    href={primaryHref}
-                    className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-body-sm font-medium transition-colors ${
-                      isFullyCompleted
-                        ? 'border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10'
-                        : 'bg-mx-orange text-white hover:bg-mx-orange-dark'
-                    }`}
-                  >
-                    {isFullyCompleted ? <RotateCcw size={16} /> : <Play size={16} fill="currentColor" />}
-                    {primaryLabel}
-                  </Link>
-                </div>
-              </div>
-            </div>
+              <div className="hidden sm:block">{resumeCard}</div>
             </m.div>
           </div>
         </section>
 
-        <div className={embedded ? 'mt-8 md:mt-10' : 'max-w-[1400px] mx-auto px-6 md:px-12 mt-10 md:mt-14'}>
+        <div className={embedded ? 'mt-5 sm:mt-8 md:mt-10' : 'max-w-[1400px] mx-auto px-6 md:px-12 mt-6 sm:mt-10 md:mt-14'}>
+          {/* Móvil: insignias y "Retomar" fuera del hero para que el panel no ocupe media pantalla */}
+          <div className="sm:hidden">
+            {badges}
+            {resumeCard}
+          </div>
           {/* ─── 2. Indicadores ─── */}
           <m.section {...fadeUp(0.08)} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
             <div className="rounded-xl border border-mx-border bg-mx-card p-4 flex items-center gap-4">
