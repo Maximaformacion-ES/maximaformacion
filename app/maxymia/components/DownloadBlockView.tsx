@@ -88,18 +88,18 @@ export default function DownloadBlockView({ title, description, files }: Downloa
   };
 
   return (
-    <div className="my-8 rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10 bg-white/[0.03]">
+    <div className="my-8 rounded-xl border border-mx-border bg-mx-card overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-mx-border bg-black/[0.02]">
         <FolderDown size={18} className="text-mx-orange flex-shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="text-white font-medium text-body-sm">
+          <p className="text-mx-text font-medium text-body-sm">
             {title ?? 'Material descargable'}
           </p>
           {description && (
-            <p className="text-white/50 text-body-sm mt-0.5">{description}</p>
+            <p className="text-mx-text-muted text-body-sm mt-0.5">{description}</p>
           )}
         </div>
-        <span className="text-white/40 text-label-sm hidden sm:inline">
+        <span className="text-mx-text-muted text-label-sm hidden sm:inline">
           {files.length} {files.length === 1 ? 'archivo' : 'archivos'}
         </span>
         {files.length > 1 && (
@@ -115,11 +115,11 @@ export default function DownloadBlockView({ title, description, files }: Downloa
         )}
       </div>
       {zipError && (
-        <div className="px-5 py-2 bg-red-500/10 border-b border-red-500/30 text-red-300 text-label-sm">
+        <div className="px-5 py-2 bg-red-500/10 border-b border-red-500/30 text-red-700 text-label-sm">
           {zipError}
         </div>
       )}
-      <ul className="divide-y divide-white/5">
+      <ul className="divide-y divide-mx-border">
         {files.map((f, i) => (
           <DownloadRow key={`${f.name}-${i}`} file={f} />
         ))}
@@ -135,13 +135,13 @@ function DownloadRow({ file }: { file: DownloadFile }) {
   return (
     <li>
       <div className="flex items-center gap-3 px-5 py-3">
-        {fileIconEl(file.mime, 'text-white/60 flex-shrink-0')}
+        {fileIconEl(file.mime, 'text-mx-text-muted flex-shrink-0')}
         <div className="min-w-0 flex-1">
-          <p className="text-white text-body-sm truncate">{file.label}</p>
+          <p className="text-mx-text text-body-sm truncate">{file.label}</p>
           {file.description && (
-            <p className="text-white/50 text-body-sm truncate">{file.description}</p>
+            <p className="text-mx-text-muted text-body-sm truncate">{file.description}</p>
           )}
-          <p className="text-white/30 text-label-sm mt-0.5">
+          <p className="text-mx-text-muted/80 text-label-sm mt-0.5">
             {file.name} · {formatSize(file.sizeKB)}
           </p>
         </div>
@@ -150,7 +150,7 @@ function DownloadRow({ file }: { file: DownloadFile }) {
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}
-              className="flex items-center gap-1.5 text-white/60 hover:text-white text-label-sm transition-colors px-2.5 py-1.5 rounded hover:bg-white/5"
+              className="flex items-center gap-1.5 text-mx-text-muted hover:text-mx-text text-label-sm transition-colors px-2.5 py-1.5 rounded hover:bg-black/[0.03]"
               aria-expanded={expanded}
               aria-label={expanded ? 'Ocultar vista previa' : 'Ver vista previa'}
             >
@@ -177,14 +177,14 @@ function DownloadRow({ file }: { file: DownloadFile }) {
             <iframe
               src={file.url}
               title={file.label}
-              className="w-full h-[70vh] rounded-lg border border-white/10 bg-white"
+              className="w-full h-[70vh] rounded-lg border border-mx-border bg-white"
             />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={file.url}
               alt={file.label}
-              className="w-full h-auto max-h-[70vh] object-contain rounded-lg border border-white/10"
+              className="w-full h-auto max-h-[70vh] object-contain rounded-lg border border-mx-border"
             />
           )}
         </div>

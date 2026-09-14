@@ -19,8 +19,10 @@ interface ProgramCardProps {
  */
 export const ProgramCard: React.FC<ProgramCardProps> = ({ program, index = 0 }) => {
   const { isSignedIn } = useUser();
-  const { hasPro } = useUserCampus();
+  const { hasPro, hasAccess } = useUserCampus();
   const userHasPro = !!isSignedIn && hasPro;
+  // Comprado (o incluido en su Pro): la tarjeta lo indica y lleva al player.
+  const enrolled = !!isSignedIn && hasAccess(program.documentId || String(program.id), program.isPro);
 
-  return <ProgramCardView program={program} index={index} userHasPro={userHasPro} />;
+  return <ProgramCardView program={program} index={index} userHasPro={userHasPro} enrolled={enrolled} />;
 };

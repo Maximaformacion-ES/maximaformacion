@@ -1,4 +1,8 @@
 @import "tailwindcss";
+/* Animaciones de entrada/salida de los componentes shadcn (dropdown, dialog,
+   select, sheet, tooltip…): sin este import las clases animate-in/fade-in/
+   zoom-in no existen y los popups aparecen de golpe. */
+@import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));

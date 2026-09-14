@@ -4,11 +4,34 @@ import React from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { Clock, BookOpen, Award, Crown } from 'lucide-react';
-import type { Program } from '@/lib/strapi/types';
-import { BrochureDownloadButton } from './BrochureDownloadButton';
+
+/** Datos mínimos que necesita el hero. `Program` (Máxima) los cumple tal
+ *  cual; la ficha de Maxymia construye este objeto a partir de su
+ *  `MaxymiaCourse` para reutilizar EXACTAMENTE el mismo hero (misma
+ *  estructura, mismas clases) en las dos fichas. */
+export interface HeroProgram {
+  image: string;
+  title: string;
+  description: string;
+  /** Texto de la píldora principal. 'Master' → azul; cualquier otro → naranja. */
+  type: string;
+  isPro?: boolean;
+  featured?: boolean;
+  topics?: { id: number | string; name: string }[];
+  durationLabel?: string | null;
+  duration?: number;
+  ects?: number;
+  /** Solo se usa `.length` ("N módulos"). */
+  modules?: unknown[];
+  /** Sustantivo de la pill de módulos (Maxymia los llama "bloques"). */
+  modulesLabel?: string;
+}
 
 interface ProgramHeroSectionProps {
-  program: Program;
+  program: HeroProgram;
+  /** Nodo opcional justo debajo de la descripción corta (p. ej. el botón
+   *  de descarga del temario en las fichas de /programas). */
+  afterDescription?: React.ReactNode;
   sidebar?: React.ReactNode;
   tabs?: React.ReactNode;
   /** Extra content rendered in the LEFT column, below the tabs (e.g.
@@ -31,6 +54,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
   tabs,
   belowContent,
   breadcrumb,
+  afterDescription,
 }) => {
   // The hero always clears the fixed header. When a breadcrumb is
   // supplied, it sits at the top of the content area below the header
@@ -131,10 +155,9 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
               {program.description}
             </m.p>
 
-            {/* Temario download — placed right after the short description
-                (MF-17). Gated behind a lead-capture form (MF-18): opens the
-                Nombre+email modal and delivers the PDF on success. */}
-            <BrochureDownloadButton program={program} />
+            {/* Slot bajo la descripción: en /programas es la descarga del
+                temario (MF-17/MF-18); Maxymia no pasa nada. */}
+            {afterDescription}
 
             {/* Info pills */}
             <m.div
@@ -151,16 +174,16 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
                   </span>
                 </div>
               )}
-              {program.ects > 0 && (
+              {(program.ects ?? 0) > 0 && (
                 <div className="flex items-center gap-2 text-mx-text">
                   <BookOpen size={16} className="text-mx-orange" />
                   <span className="text-body-sm font-medium">{program.ects} créditos</span>
                 </div>
               )}
-              {program.modules.length > 0 && (
+              {(program.modules?.length ?? 0) > 0 && (
                 <div className="flex items-center gap-2 text-mx-text">
                   <Award size={16} className="text-mx-orange" />
-                  <span className="text-body-sm font-medium">{program.modules.length} módulos</span>
+                  <span className="text-body-sm font-medium">{program.modules!.length} {program.modulesLabel ?? 'módulos'}</span>
                 </div>
               )}
             </m.div>

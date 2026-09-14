@@ -3,16 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import "../styles/markdown.css";
-import {
-  ChevronDown,
-  Clock,
-  Users,
-  Briefcase,
-  Target,
-  BookOpen,
-  ListOrdered,
-  PlayCircle,
-} from "lucide-react";
+import { ChevronDown, Clock, Users, Briefcase, Target, BookOpen, ListOrdered, PlayCircle, Award, GraduationCap, FileText, Star } from 'lucide-react';
 import type { Program } from "@/lib/strapi/types";
 import type { LucideIcon } from "lucide-react";
 import type { ProgramRichHtml } from "@/app/programas/[id]/page";
@@ -55,6 +46,16 @@ interface ProgramTabsProps {
  * carries left padding to clear it, so the text content flows inline
  * the way the markdown intends.
  */
+// Icono de las pestañas personalizadas (valor del campo `icon` en Strapi).
+const EXTRA_ICONS: Record<string, LucideIcon> = {
+  award: Award,
+  graduation: GraduationCap,
+  briefcase: Briefcase,
+  book: BookOpen,
+  file: FileText,
+  star: Star,
+};
+
 const BULLET_MARKDOWN_CLASS =
   "text-body-sm md:text-body-md text-black font-light leading-relaxed " +
   "[&_ul]:space-y-3 md:[&_ul]:space-y-4 [&_ul]:list-none [&_ul]:pl-0 " +
@@ -120,8 +121,12 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
       });
     if (program.videoUrl)
       t.push({ value: "video", label: "Vídeo", icon: PlayCircle });
+    // Pestañas personalizadas desde Strapi (p. ej. "Acreditación universitaria").
+    (program.extraSections ?? []).forEach((x, i) => {
+      t.push({ value: `extra-${i}`, label: x.title, icon: EXTRA_ICONS[x.icon ?? "award"] ?? Award });
+    });
     return t;
-  }, [program.objectives, program.audience, program.careers, program.videoUrl, program.comos]);
+  }, [program.objectives, program.audience, program.careers, program.videoUrl, program.comos, program.extraSections]);
 
   return (
     <div>
@@ -146,6 +151,7 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
                 {tab.value === "audiencia" && "Audiencia"}
                 {tab.value === "salidas" && "Salidas"}
                 {tab.value === "video" && "Vídeo"}
+                {tab.value.startsWith("extra-") && tab.label}
               </span>
               <span className="hidden md:inline">{tab.label}</span>
             </span>
@@ -316,6 +322,12 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
               <VideoEmbed url={program.videoUrl} title={program.title} />
             </div>
           )}
+
+          {(richHtml.extraSections ?? []).map((x, i) => (
+            <div key={`extra-${i}`} role="tabpanel" id={`panel-extra-${i}`} hidden={activeTab !== `extra-${i}`}>
+              <MarkdownHtml html={x.html} className={BULLET_MARKDOWN_CLASS} />
+            </div>
+          ))}
       </div>
     </div>
   );

@@ -32,11 +32,11 @@ md.renderer.rules.fence = (tokens, idx) => {
   const language = (token.info || '').trim().split(/\s+/)[0];
   const escapedCode = md.utils.escapeHtml(code);
   const langLabel = language
-    ? `<span class="text-white/20 text-label-sm uppercase">${md.utils.escapeHtml(language)}</span>`
+    ? `<span class="text-white/40 text-label-sm uppercase">${md.utils.escapeHtml(language)}</span>`
     : '';
   return `
-    <div class="my-6 rounded-xl overflow-hidden border border-white/10 bg-[#0d1117] not-prose">
-      <div class="bg-white/[0.05] px-4 py-2 border-b border-white/10 flex items-center justify-between gap-2">
+    <div class="my-6 rounded-xl overflow-hidden border border-mx-border bg-[#0f1520] not-prose">
+      <div class="bg-white/[0.06] px-4 py-2 border-b border-white/10 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 min-w-0">${langLabel}</div>
         <button type="button" data-copy-code class="flex items-center gap-1.5 text-white/50 hover:text-white text-label-sm transition-colors px-2 py-1 rounded hover:bg-white/5 flex-shrink-0">
           <span data-copy-label>Copiar</span>
@@ -78,7 +78,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     case 'video': {
       if (block.provider === 'youtube' && block.youtubeId) {
         return (
-          <div className="my-8 aspect-video rounded-xl overflow-hidden border border-white/10">
+          <div className="my-8 aspect-video rounded-xl overflow-hidden border border-mx-border">
             <iframe
               src={`https://www.youtube.com/embed/${block.youtubeId}`}
               title={block.title || 'Video'}
@@ -104,7 +104,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     case 'embed':
       return (
         <div
-          className="my-8 [&_iframe]:w-full [&_iframe]:aspect-video [&_iframe]:rounded-xl [&_iframe]:border [&_iframe]:border-white/10"
+          className="my-8 [&_iframe]:w-full [&_iframe]:aspect-video [&_iframe]:rounded-xl [&_iframe]:border [&_iframe]:border-mx-border"
           dangerouslySetInnerHTML={{ __html: block.html }}
         />
       );
@@ -112,7 +112,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     case 'image':
       return (
         <figure className="my-8">
-          <div className="relative rounded-xl overflow-hidden border border-white/10">
+          <div className="relative rounded-xl overflow-hidden border border-mx-border">
             <Image
               src={block.src}
               alt={block.alt}
@@ -123,7 +123,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             />
           </div>
           {block.caption && (
-            <figcaption className="text-white/40 text-body-sm mt-3 text-center italic">
+            <figcaption className="text-mx-text-muted text-body-sm mt-3 text-center italic">
               {block.caption}
             </figcaption>
           )}
@@ -150,19 +150,19 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
           icon: Info,
           border: 'border-blue-500/30',
           bg: 'bg-blue-500/5',
-          iconColor: 'text-blue-400',
+          iconColor: 'text-blue-600',
         },
         warning: {
           icon: AlertTriangle,
-          border: 'border-yellow-500/30',
-          bg: 'bg-yellow-500/5',
-          iconColor: 'text-yellow-400',
+          border: 'border-yellow-500/40',
+          bg: 'bg-yellow-500/[0.07]',
+          iconColor: 'text-yellow-600',
         },
         tip: {
           icon: Lightbulb,
           border: 'border-green-500/30',
           bg: 'bg-green-500/5',
-          iconColor: 'text-green-400',
+          iconColor: 'text-green-600',
         },
       };
       const v = variants[block.variant];
@@ -174,9 +174,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             <Icon size={20} className={`${v.iconColor} flex-shrink-0 mt-0.5`} />
             <div>
               {block.title && (
-                <p className="text-white font-medium text-body-sm mb-1">{block.title}</p>
+                <p className="text-mx-text font-medium text-body-sm mb-1">{block.title}</p>
               )}
-              <p className="text-white/60 text-body-sm leading-relaxed">{block.content}</p>
+              <p className="text-mx-text-muted text-body-sm leading-relaxed">{block.content}</p>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@ function TextBlockRenderer({ html }: { html: string }) {
   return (
     <div
       ref={containerRef}
-      className="prose prose-invert prose-sm xl:prose-base 2xl:prose-lg max-w-none prose-headings:text-white prose-p:text-white/70 prose-li:text-white/70 prose-li:marker:text-mx-orange prose-strong:text-white prose-a:text-mx-blue prose-a:underline prose-a:decoration-mx-blue/40 hover:prose-a:decoration-mx-blue prose-em:text-mx-orange prose-em:font-medium prose-em:not-italic prose-img:rounded-xl prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-h4:text-mx-orange prose-h4:text-sm prose-h4:tracking-[0.15em] prose-h4:uppercase prose-h4:font-black prose-h4:border-l-2 prose-h4:border-mx-orange prose-h4:pl-3 prose-h4:mt-10 prose-h4:mb-4 prose-h5:text-mx-orange/70 prose-h5:text-base prose-h5:font-bold prose-h5:tracking-wide prose-h5:mt-8 prose-h5:mb-3"
+      className="prose prose-sm xl:prose-base 2xl:prose-lg max-w-none prose-headings:text-mx-text prose-p:text-mx-text-muted prose-li:text-mx-text-muted prose-li:marker:text-mx-orange prose-strong:text-mx-text prose-a:text-mx-blue prose-a:underline prose-a:decoration-mx-blue/40 hover:prose-a:decoration-mx-blue prose-em:text-mx-orange prose-em:font-medium prose-em:not-italic prose-img:rounded-xl prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-h4:text-mx-orange prose-h4:text-sm prose-h4:tracking-[0.15em] prose-h4:uppercase prose-h4:font-black prose-h4:border-l-2 prose-h4:border-mx-orange prose-h4:pl-3 prose-h4:mt-10 prose-h4:mb-4 prose-h5:text-mx-orange/70 prose-h5:text-base prose-h5:font-bold prose-h5:tracking-wide prose-h5:mt-8 prose-h5:mb-3"
       dangerouslySetInnerHTML={{ __html: rendered }}
     />
   );

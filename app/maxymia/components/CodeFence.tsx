@@ -23,14 +23,14 @@ export default function CodeFence({ code, language, fileName }: CodeFenceProps) 
   };
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden border border-white/10 bg-[#0d1117]">
-      <div className="bg-white/[0.05] px-4 py-2 border-b border-white/10 flex items-center justify-between gap-2">
+    <div className="my-6 rounded-xl overflow-hidden border border-mx-border bg-[#0f1520]">
+      <div className="bg-white/[0.06] px-4 py-2 border-b border-white/10 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {fileName && (
             <span className="text-white/50 text-label-md font-mono truncate">{fileName}</span>
           )}
           {language && (
-            <span className="text-white/20 text-label-sm uppercase">{language}</span>
+            <span className="text-white/40 text-label-sm uppercase">{language}</span>
           )}
         </div>
         <button

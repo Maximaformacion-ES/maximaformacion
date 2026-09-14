@@ -22,16 +22,16 @@ export default function MultipleChoiceQuestion({
 }: Props) {
   return (
     <div>
-      <p className="text-white font-medium mb-1">{question.question[locale]}</p>
-      <p className="text-white/40 text-label-md mb-4">
+      <p className="text-mx-text font-medium mb-1">{question.question[locale]}</p>
+      <p className="text-mx-text-muted text-label-md mb-4">
         {locale === 'es' ? 'Selecciona todas las respuestas correctas' : 'Select all correct answers'}
       </p>
       <div className="space-y-2">
         {question.options.map((option, i) => {
           const isSelected = selectedIndices.includes(i);
           const isCorrect = question.correctIndices.includes(i);
-          let borderClass = 'border-white/10';
-          let bgClass = 'bg-white/[0.03]';
+          let borderClass = 'border-mx-border';
+          let bgClass = 'bg-mx-card';
 
           if (submitted) {
             if (isCorrect && isSelected) {
@@ -61,11 +61,11 @@ export default function MultipleChoiceQuestion({
               {isSelected ? (
                 <CheckSquare size={18} className="text-mx-orange flex-shrink-0" />
               ) : (
-                <Square size={18} className="text-white/20 flex-shrink-0" />
+                <Square size={18} className="text-mx-text-muted/60 flex-shrink-0" />
               )}
-              <span className="text-white/80 text-body-sm flex-1">{option[locale]}</span>
-              {submitted && isCorrect && <CheckCircle size={14} className="text-green-400" />}
-              {submitted && isSelected && !isCorrect && <XCircle size={14} className="text-red-400" />}
+              <span className="text-mx-text text-body-sm flex-1">{option[locale]}</span>
+              {submitted && isCorrect && <CheckCircle size={14} className="text-green-600" />}
+              {submitted && isSelected && !isCorrect && <XCircle size={14} className="text-red-600" />}
             </button>
           );
         })}

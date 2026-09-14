@@ -18,29 +18,33 @@ import {
   Monitor,
   Globe,
   GraduationCap,
-  Mail,
-  Phone,
   ArrowRight,
   Target,
   Users,
   Briefcase,
-  Lock,
   Trophy,
+  MessageCircle,
   RotateCcw,
   Award,
   X,
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { trackPurchaseOnce, stripeCustomerToUserData, type AnalyticsUserData } from '@/lib/analytics';
+import { trackPurchaseOnce, stripeCustomerToUserData } from '@/lib/analytics';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../data/queries';
 import MaxymiaCourseDetail from './MaxymiaCourseDetail';
 import { ContactCourse } from '@/app/components/ContactCourseProvider';
+import { FontStyles } from '@/app/components/FontStyles';
+import { Header } from '@/app/components/Header';
+import { Footer } from '@/app/components/Footer';
+import { Breadcrumb } from '@/app/components/Breadcrumb';
+import { maxymiaCategoryLabel } from '../../data/labels';
 import Certificate from '../../components/Certificate';
-import type { MaxymiaCourse, MaxymiaBlock, MaxymiaTopic, MaxymiaCourseProgress, Locale } from '../../types';
-import type { Badge, Institution } from '@/lib/strapi/types';
+import TutorQuestionModal from '../../components/TutorQuestionModal';
+import type { MaxymiaCourse, MaxymiaBlock, MaxymiaCourseProgress, Locale } from '../../types';
+import type { Badge, Institution, VideoTestimonial } from '@/lib/strapi/types';
 
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   beginner: { es: 'Principiante', en: 'Beginner' },
@@ -62,6 +66,10 @@ interface Props {
    *  profile is still loading we trust this so a non-buyer sees the purchase
    *  view immediately instead of the student view flashing. */
   initialHasAccess?: boolean;
+  /** `true`: la página va DENTRO del campus (CampusChrome: sidebar + cabecera).
+   *  La vista de alumno no pinta Header/Footer del sitio y el hero se adapta
+   *  al contenedor. `false`: sin matrícula, ficha de venta con chrome del sitio. */
+  embedded?: boolean;
   /** Avatares del equipo docente para la sección de compromiso con el alumnado. */
   teacherAvatars?: string[];
   /** Cursos recomendados (relacionados) para la fila al pie de la ficha. */
@@ -69,17 +77,21 @@ interface Props {
   /** Set GLOBAL de sellos/instituciones: TODOS en todas las fichas. */
   allBadges?: Badge[];
   allInstitutions?: Institution[];
+  videoTestimonials?: VideoTestimonial[];
 }
 
-export default function MaxymiaCourseOverview({ course, initialHasAccess, teacherAvatars, recommended, allBadges, allInstitutions }: Props) {
+export default function MaxymiaCourseOverview({ course, initialHasAccess, embedded = false, teacherAvatars, recommended, allBadges, allInstitutions, videoTestimonials }: Props) {
   const { locale } = useLocale();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showTutorModal, setShowTutorModal] = useState(false);
   const { user } = useUser();
   const { hasAccess: checkAccess, courseProgress, isLoading, refetch } = useUserCampus();
   const { byExamId: examResultsByExamId } = useExamResults(course.id);
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
   const hasDescription = !!course.description?.[locale]?.trim();
-  const [activeTab, setActiveTab] = useState<TabId>(hasDescription ? 'description' : 'objectives');
+  // Objetivos como pestaña inicial (es lo que el alumno quiere ver primero).
+  const [activeTab, setActiveTab] = useState<TabId>('objectives');
   const [showCertificate, setShowCertificate] = useState(false);
   // El portal solo puede montarse en cliente; useMounted() da false en SSR/
   // hidratación y true tras montar, sin setState en efecto.
@@ -222,6 +234,10 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
     return course.blocks[0]?.lessons[0]?.id;
   }, [course, completedSet]);
 
+  // Lección y bloque de "Continúa donde lo dejaste" (la primera incompleta).
+  // Sin useMemo manual: el React Compiler lo memoiza por su cuenta.
+  const resumeInfo = findResumeInfo(course.blocks, firstIncompleteLessonId);
+
   // Find next lesson (first incomplete after last completed)
   const nextLessonId = useMemo(() => {
     let foundCurrent = false;
@@ -247,114 +263,268 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   // never flashes; once loaded, the hook is the source of truth.
   const hasAccess = isLoading ? !!initialHasAccess : checkAccess(course.id, course.isPro);
 
+  // Sin chrome del campus (el servidor no vio matrícula) y el cliente acaba de
+  // confirmar acceso (checkout verificado arriba): la vista de alumno vive
+  // dentro del campus, que solo pinta el servidor → recarga una vez.
+  // sessionStorage evita un bucle si servidor y cliente discreparan.
+  useEffect(() => {
+    if (embedded || !hasAccess || isLoading) return;
+    const key = `maxymia-chrome-reload:${course.slug}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+    } catch {
+      /* sin sessionStorage: recarga igualmente */
+    }
+    window.location.replace(window.location.pathname);
+  }, [embedded, hasAccess, isLoading, course.slug]);
+
   // Show product/detail (purchase) page whenever the user isn't entitled.
   // Defaulting to this during load means "Comprar" shows first and only
   // switches to the student view once we've confirmed a real purchase.
-  if (!hasAccess) {
+  // Fuera del campus también mientras dura la recarga de arriba.
+  if (!hasAccess || !embedded) {
     return (
-      <>
-        {/* El footer del campus enlaza a /contacto?curso=<este curso> */}
-        <ContactCourse title={course.title.es || course.title[locale]} />
-        <MaxymiaCourseDetail course={course} teacherAvatars={teacherAvatars} recommended={recommended} allBadges={allBadges} allInstitutions={allInstitutions} />
-      </>
+      <MaxymiaCourseDetail
+        course={course}
+        standalone={!embedded}
+        teacherAvatars={teacherAvatars}
+        recommended={recommended}
+        allBadges={allBadges}
+        allInstitutions={allInstitutions}
+        videoTestimonials={videoTestimonials}
+      />
     );
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [
+    { id: 'objectives', label: { es: 'Objetivos', en: 'Objectives' }, icon: Target },
     ...(hasDescription
       ? [{ id: 'description' as const, label: { es: 'Descripción', en: 'Description' }, icon: BookOpen }]
       : []),
-    { id: 'objectives', label: { es: 'Objetivos', en: 'Objectives' }, icon: Target },
     { id: 'audience', label: { es: 'A quién va dirigido', en: 'Who is this for' }, icon: Users },
     { id: 'careers', label: { es: 'Salidas profesionales', en: 'Career paths' }, icon: Briefcase },
   ];
 
+  const lessonHref = (id: string | undefined) => `/maxymia/campus/${course.slug}/lesson/${id}`;
+  const durationLabel = course.durationHours
+    ? `${course.durationHours} h`
+    : `${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}min`;
+  const primaryLabel = isFullyCompleted
+    ? (locale === 'es' ? 'Repasar el curso' : 'Review course')
+    : progress
+      ? (locale === 'es' ? 'Continuar' : 'Continue')
+      : (locale === 'es' ? 'Empezar el curso' : 'Start course');
+  const primaryHref = isFullyCompleted ? lessonHref(course.blocks[0]?.lessons[0]?.id) : lessonHref(firstIncompleteLessonId);
+
+  // Indicadores: minutos pendientes y exámenes (lista plana con su bloque y
+  // el enlace al examen, que cuelga de la última lección del bloque).
+  let remainingMinutes = 0;
+  for (const block of course.blocks) {
+    for (const lesson of block.lessons) {
+      if (!isLessonComplete(lesson, completedSet)) remainingMinutes += lesson.estimatedMinutes;
+    }
+  }
+  const exams = course.blocks.flatMap((block, bi) =>
+    block.lessons.length
+      ? block.exams.map((exam, ei) => ({
+          exam,
+          blockIndex: bi,
+          href: `/maxymia/campus/${course.slug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam?index=${ei}`,
+          result: examResultsByExamId[exam.id],
+        }))
+      : [],
+  );
+  const examsPassed = exams.filter((e) => e.result?.passed).length;
+  const fmtMinutes = (min: number) =>
+    min >= 60 ? `${Math.floor(min / 60)}h ${min % 60 ? `${min % 60}min` : ''}`.trim() : `${min} min`;
+  const ringR = 26;
+  const ringC = 2 * Math.PI * ringR;
+
+  const fadeUp = (delay: number) => ({
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.45, delay },
+  });
+
   return (
-    <div className="h-[calc(100dvh-65px)] md:h-[calc(100dvh-97px)] flex flex-col overflow-hidden">
-      {/* El footer del campus enlaza a /contacto?curso=<este curso> */}
+    <div className={embedded ? 'w-full' : 'min-h-screen bg-mx-bg text-mx-text overflow-x-clip'}>
+      {!embedded && <FontStyles />}
+      {/* Header/footer enlazan a /contacto?curso=<este curso> */}
       <ContactCourse title={course.title.es || course.title[locale]} />
-      {/* ─── Scrollable content ─── */}
-      <div className="flex-1 overflow-y-auto no-scrollbar">
-      {/* ─── Hero Section (two-column) ─────────────────────── */}
-      <m.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7 }}
-        className="relative overflow-hidden"
-      >
-        {/* Background course image */}
-        <div className="absolute inset-0">
-          <img
-            src={course.image}
-            alt=""
-            className="w-full object-cover object-top opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0b1018]/95 via-[#0b1018]/85 to-[#0b1018]/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0b1018] via-[#0b1018]/30 to-transparent" />
-        </div>
+      {!embedded && <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />}
 
-        <div className="relative px-6 md:px-[128px] py-16">
-          <div className="max-w-[1300px] mx-auto flex flex-col lg:flex-row gap-12 items-start">
+      <main className={embedded ? 'relative' : 'relative z-10 pb-16 md:pb-24'}>
+        {/* ─── 1. Hero a sangre (estilo ficha del pack): la imagen del curso
+            ocupa todo el hero y el contenido va abajo a la izquierda sobre
+            el fundido hacia el fondo de la página. ─── */}
+        {/* Altura algo menor que la ventana (≈86 %) para que el borde inferior
+            del panel blanco y sus curvas queden a la vista sin hacer scroll. */}
+        <section
+          className={
+            embedded
+              // Dentro del campus: tarjeta a todo el ancho del contenido, con la
+              // pestaña del breadcrumb colgando de su borde superior y el panel
+              // saliendo del inferior (ambos hacia el fondo de la página).
+              ? 'relative overflow-hidden rounded-2xl min-h-[calc(78dvh-56px)] flex flex-col'
+              : 'relative overflow-hidden mt-[72px] sm:mt-[96px] min-h-[calc(86dvh-72px)] sm:min-h-[calc(86dvh-96px)] flex flex-col'
+          }
+        >
+          {/* Imagen a sangre cubriendo TODO el hero, con fundidos para que el
+              texto y la tarjeta de retomar (dentro del hero) se lean. */}
+          <div className="absolute inset-0">
+            <Image src={course.image} alt="" fill priority sizes="100vw" className="object-cover object-center" unoptimized />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-mx-bg/60 to-transparent" />
+            <div className="absolute inset-0 bg-black/[0.06]" />
+          </div>
 
-            {/* ─── Left Column ─── */}
-            <div className="flex-1 min-w-0">
-              {/* Badges */}
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <span className="bg-mx-orange text-white text-[10px] tracking-[2px] uppercase font-black px-3 py-1 rounded-full">
-                  {course.category.replace('-', ' ')}
+          <div className={`relative flex-1 flex flex-col w-full ${embedded ? 'px-5 md:px-8' : 'max-w-[1400px] mx-auto px-6 md:px-12'}`}>
+            {/* Breadcrumb arriba del todo: pestaña blanca que "cuelga" del
+                header, con las esquinas inferiores redondeadas. */}
+            <m.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              className="self-start max-w-full"
+            >
+              <div className="relative inline-block max-w-full rounded-b-2xl bg-mx-bg px-5 py-3 shadow-[0_8px_24px_-12px_rgba(26,26,26,0.25)]">
+                <Fillet at="bl" className="top-0 -left-4" />
+                <Fillet at="br" className="top-0 -right-4" />
+                <Breadcrumb
+                  items={[
+                    { label: 'Campus', href: '/maxymia/campus' },
+                    { label: locale === 'es' ? 'Mis cursos' : 'My courses', href: '/maxymia/campus/mis-cursos' },
+                    { label: course.title[locale] },
+                  ]}
+                  className=""
+                />
+              </div>
+            </m.div>
+
+            {/* Contenido abajo a la izquierda: panel blanco que sale del borde
+                inferior del hero, con las esquinas superiores redondeadas
+                (espejo de la pestaña del breadcrumb). */}
+            <m.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              className="relative mt-auto self-start w-full max-w-3xl rounded-t-2xl bg-mx-bg px-4 sm:px-6 md:px-8 pt-5 sm:pt-6 md:pt-8 shadow-[0_-8px_24px_-12px_rgba(26,26,26,0.25)]"
+            >
+              <Fillet at="tl" className="bottom-0 -left-4" />
+              <Fillet at="tr" className="bottom-0 -right-4" />
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full bg-mx-orange text-white">
+                  {maxymiaCategoryLabel(course.category, locale)}
                 </span>
-                <span className="bg-white/10 text-white/70 text-[10px] tracking-[0.5px] uppercase font-medium px-3 py-1 rounded-full">
+                <span className="inline-block px-3 py-1 text-label-sm font-medium tracking-wider uppercase rounded-full bg-mx-card/80 backdrop-blur-sm border border-mx-border text-mx-text-muted">
                   {LEVEL_LABELS[course.level]?.[locale]}
                 </span>
+                {isFullyCompleted && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-label-sm font-bold tracking-wider uppercase rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/30">
+                    <Trophy size={11} /> {locale === 'es' ? 'Completado' : 'Completed'}
+                  </span>
+                )}
               </div>
-
-              {/* Title */}
-              <h1 className="text-heading-md md:text-heading-lg lg:text-display-sm font-black text-white tracking-tight leading-tight mb-6 max-w-3xl">
+              <h1 className="text-[24px] sm:text-[30px] text-balance md:text-heading-lg lg:text-display-sm font-black tracking-tight leading-[1.05] text-mx-blue mb-3 max-w-3xl">
                 {course.title[locale]}
               </h1>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {course.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="backdrop-blur-sm bg-white/10 text-white/60 text-xs px-3 py-1 rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Description */}
-              <p className="text-white/60 text-body-sm md:text-body-md font-light leading-relaxed mb-10 max-w-2xl">
+              <p className="text-mx-text-muted text-label-md sm:text-body-sm md:text-body-md leading-relaxed line-clamp-2 max-w-2xl mb-4 sm:mb-5">
                 {course.description[locale]}
               </p>
 
-              {/* Instructor */}
-              <div className="flex items-center gap-3 mb-12">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
-                  {course.instructor.avatar ? (
-                    <Image
-                      src={course.instructor.avatar}
-                      alt={course.instructor.name}
-                      width={40}
-                      height={40}
-                      unoptimized
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User size={18} className="text-white/40" />
-                  )}
+            {/* Retomar, dentro del panel */}
+            <div
+              className="rounded-2xl border border-mx-orange/30 bg-mx-orange/[0.06] p-4 sm:p-6 mb-5 md:mb-8"
+              aria-label={locale === 'es' ? 'Retomar el curso' : 'Resume course'}
+            >
+              <p className="text-label-sm font-semibold uppercase tracking-[0.18em] text-mx-orange mb-1.5">
+                {isFullyCompleted
+                  ? (locale === 'es' ? 'Curso completado' : 'Course completed')
+                  : progress
+                    ? (locale === 'es' ? 'Continúa donde lo dejaste' : 'Pick up where you left off')
+                    : (locale === 'es' ? 'Tu primera lección' : 'Your first lesson')}
+              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  {isFullyCompleted ? (
+                    <p className="text-body-md font-semibold text-mx-text">
+                      {locale === 'es' ? 'Enhorabuena, has completado todas las lecciones.' : 'Congratulations, you completed every lesson.'}
+                    </p>
+                  ) : resumeInfo ? (
+                    <>
+                      <p className="text-body-md md:text-body-lg font-semibold text-mx-text line-clamp-1">{resumeInfo.lesson.title[locale]}</p>
+                      <p className="text-label-md text-mx-text-muted mt-0.5">
+                        {locale === 'es' ? 'Bloque' : 'Block'} {resumeInfo.blockIndex + 1} · {resumeInfo.lesson.estimatedMinutes} min
+                      </p>
+                    </>
+                  ) : null}
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="flex-1 h-1.5 rounded-full bg-black/[0.06] overflow-hidden">
+                      <div className={`h-full rounded-full ${isFullyCompleted ? 'bg-amber-400' : 'bg-mx-orange'}`} style={{ width: `${progressPercent}%` }} />
+                    </div>
+                    <span className="text-label-md font-semibold text-mx-orange whitespace-nowrap">{progressPercent}%</span>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-white text-body-sm font-medium">{course.instructor.name}</p>
-                  <p className="text-white/40 text-label-md">{course.instructor.role}</p>
+                <div className="flex flex-wrap gap-2 shrink-0">
+                  {isFullyCompleted && (
+                    <button
+                      onClick={() => setShowCertificate(true)}
+                      className="inline-flex items-center justify-center gap-2 bg-mx-orange text-white px-5 py-3 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
+                    >
+                      <Award size={16} /> {locale === 'es' ? 'Ver certificado' : 'View certificate'}
+                    </button>
+                  )}
+                  <Link
+                    href={primaryHref}
+                    className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-body-sm font-medium transition-colors ${
+                      isFullyCompleted
+                        ? 'border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10'
+                        : 'bg-mx-orange text-white hover:bg-mx-orange-dark'
+                    }`}
+                  >
+                    {isFullyCompleted ? <RotateCcw size={16} /> : <Play size={16} fill="currentColor" />}
+                    {primaryLabel}
+                  </Link>
                 </div>
               </div>
+            </div>
+            </m.div>
+          </div>
+        </section>
 
-              {/* ─── Tabs ─── */}
-              <div className="border-b border-white/10 mb-8">
-                <div className="flex gap-0 overflow-x-auto no-scrollbar -mb-px">
+        <div className={embedded ? 'mt-8 md:mt-10' : 'max-w-[1400px] mx-auto px-6 md:px-12 mt-10 md:mt-14'}>
+          {/* ─── 2. Indicadores ─── */}
+          <m.section {...fadeUp(0.08)} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+            <div className="rounded-xl border border-mx-border bg-mx-card p-4 flex items-center gap-4">
+              <svg width="64" height="64" viewBox="0 0 64 64" className="shrink-0 -rotate-90" aria-hidden="true">
+                <circle cx="32" cy="32" r={ringR} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="6" />
+                <circle
+                  cx="32" cy="32" r={ringR} fill="none"
+                  stroke={isFullyCompleted ? '#f59e0b' : '#F7A000'} strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={ringC} strokeDashoffset={ringC * (1 - progressPercent / 100)}
+                  className="transition-[stroke-dashoffset] duration-700"
+                />
+              </svg>
+              <div>
+                <p className="text-label-sm uppercase tracking-widest text-mx-text-muted">{locale === 'es' ? 'Progreso' : 'Progress'}</p>
+                <p className="text-heading-md font-black text-mx-text leading-none mt-1">{progressPercent}%</p>
+              </div>
+            </div>
+            <StatTile icon={BookOpen} label={locale === 'es' ? 'Lecciones' : 'Lessons'} value={`${completedValidCount}/${totalLessons}`} hint={locale === 'es' ? 'completadas' : 'completed'} />
+            <StatTile icon={FileQuestion} label={locale === 'es' ? 'Exámenes' : 'Exams'} value={`${examsPassed}/${totalExams}`} hint={locale === 'es' ? 'aprobados' : 'passed'} />
+            <StatTile icon={Clock} label={locale === 'es' ? 'Te queda' : 'Remaining'} value={remainingMinutes > 0 ? fmtMinutes(remainingMinutes) : '0 min'} hint={`${locale === 'es' ? 'de' : 'of'} ${durationLabel}`} />
+          </m.section>
+
+          {/* ─── 3. Dos columnas: temario + panel lateral ─── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+            <div className="lg:col-span-2 min-w-0">
+              {/* Sobre el curso (objetivos, descripción, audiencia, salidas)
+                  ANTES del temario. */}
+              <m.section {...fadeUp(0.14)} className="mb-12">
+                <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue mb-4">
+                  {locale === 'es' ? 'Sobre el curso' : 'About the course'}
+                </h2>
+                <div className="relative flex border-b border-mx-border gap-1 md:gap-6 xl:gap-8 w-full overflow-x-auto scrollbar-hide -mx-2 px-2 mb-6">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -362,243 +532,161 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-3 py-3 text-sm font-medium whitespace-nowrap transition-colors relative shrink-0 ${
-                          isActive ? 'text-mx-orange' : 'text-white/40 hover:text-white/60'
+                        className={`relative px-2 md:px-3 py-3 text-label-sm md:text-label-md font-medium transition-colors whitespace-nowrap shrink-0 ${
+                          isActive ? 'text-mx-orange' : 'text-mx-text-muted hover:text-mx-orange'
                         }`}
                       >
-                        <Icon size={16} />
-                        {tab.label[locale]}
-                        {isActive && (
-                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mx-orange" />
-                        )}
+                        <span className="flex items-center gap-1 md:gap-2">
+                          <Icon className="size-3.5 md:size-4" />
+                          {tab.label[locale]}
+                        </span>
+                        {isActive && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mx-orange" />}
                       </button>
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Tab Content */}
-              <div className="max-w-full">
-                {activeTab === 'description' && hasDescription && (
-                  <MarkdownBlock content={course.description[locale]} />
-                )}
-                {activeTab === 'objectives' && (
-                  <MarkdownBlock content={course.objectives || (locale === 'es' ? 'Los objetivos de este curso se irán definiendo a medida que avances en el temario.' : 'Course objectives will be defined as you progress through the syllabus.')} />
-                )}
-                {activeTab === 'audience' && (
-                  <MarkdownBlock content={course.audiences || (locale === 'es' ? 'Este curso está dirigido a cualquier persona interesada en esta temática.' : 'This course is aimed at anyone interested in this subject.')} />
-                )}
-                {activeTab === 'careers' && (
-                  <MarkdownBlock content={course.careers || (locale === 'es' ? 'Las salidas profesionales relacionadas con este curso son amplias y diversas.' : 'Career opportunities related to this course are broad and diverse.')} />
-                )}
-              </div>
-            </div>
-
-            {/* ─── Right Column (Sidebar Card) ─── */}
-            <div className="w-full lg:w-[403px] shrink-0 lg:sticky lg:top-8">
-              <div className="bg-[#171c24] border border-white/15 rounded-[10px] overflow-hidden">
-                {/* Card image header */}
-                <div className="bg-mx-blue relative flex items-center justify-center py-20 overflow-hidden">
-                  <img
-                    src={course.image}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover opacity-20"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-[#0b1018]/50 blur-[15px] w-full h-[135px]" />
-                  </div>
-                  <div className="absolute left-2 top-1/2 -translate-y-1/2">
-                    <Image src="/iconBlue.svg" alt="" width={48} height={49} />
-                  </div>
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                    <Image src="/iconOrange.svg" alt="" width={48} height={49} />
-                  </div>
-                  <div className="relative px-12 text-center">
-                    <p className="text-white text-body-md font-black uppercase tracking-tight leading-tight">
-                      {course.thumbnailTitle?.[locale] || course.title[locale]}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Card body */}
-                <div className="p-6 flex flex-col gap-6">
-                  {/* Stats grid 2x3 */}
-                  <div className="grid grid-cols-2 gap-y-[12px]">
-                    <StatItem icon={Monitor} label={locale === 'es' ? 'Modalidad' : 'Modality'} value="Online" />
-                    <StatItem icon={Globe} label={locale === 'es' ? 'Idioma' : 'Language'} value={(course.language && LANGUAGE_LABELS[course.language]?.[locale]) || 'Español'} />
-                    <StatItem icon={BookOpen} label={locale === 'es' ? 'Lecciones' : 'Lessons'} value={String(totalLessons)} />
-                    <StatItem icon={Clock} label={locale === 'es' ? 'Duración' : 'Duration'} value={`${Math.round(totalMinutes / 60)}h ${totalMinutes % 60}min`} />
-                    <StatItem icon={FileQuestion} label={locale === 'es' ? 'Exámenes' : 'Exams'} value={String(totalExams)} />
-                    <StatItem icon={GraduationCap} label={locale === 'es' ? 'Nivel' : 'Level'} value={(course.level && LEVEL_LABELS[course.level]?.[locale]) || 'Principiante'} />
-                  </div>
-
-                  <div className="border-t border-white/10" />
-
-                  {isFullyCompleted ? (
-                    <>
-                      {/* Completed celebration — chevrons style */}
-                      <div className="relative flex items-center justify-center py-6">
-                        <Image src="/iconBlue.svg" alt="" width={32} height={33} className="absolute left-0" />
-                        <Image src="/iconOrange.svg" alt="" width={32} height={33} className="absolute right-0" />
-                        <div className="text-center px-10">
-                          <p className="text-mx-orange text-body-lg font-black tracking-[0.2em] uppercase">
-                            {locale === 'es' ? 'COMPLETADO' : 'COMPLETED'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full w-full" />
-                      </div>
-
-                      {/* Completed badge */}
-                      <div className="bg-amber-500/5 border border-amber-500/20 rounded-[10px] px-4 py-3 text-center">
-                        <p className="text-amber-400 text-xs font-black">
-                          {locale === 'es' ? 'Enhorabuena — Has completado este curso' : 'Congratulations — You completed this course'}
-                        </p>
-                      </div>
-
-                      {/* View certificate button */}
-                      <button
-                        onClick={() => setShowCertificate(true)}
-                        className="flex items-center justify-center gap-2 bg-mx-orange text-white px-6 py-3.5 rounded-[10px] font-medium text-sm hover:bg-mx-orange/90 transition-colors"
-                      >
-                        <Award size={16} />
-                        {locale === 'es' ? 'Ver certificado' : 'View certificate'}
-                      </button>
-
-                      {/* Review button */}
-                      <Link
-                        href={`/maxymia/campus/${course.slug}/lesson/${course.blocks[0]?.lessons[0]?.id}`}
-                        className="flex items-center justify-center gap-2 border border-white/10 text-white/80 px-6 py-3.5 rounded-[10px] font-light text-sm hover:border-amber-500/30 hover:text-amber-400 transition-colors"
-                      >
-                        <RotateCcw size={16} />
-                        {locale === 'es' ? 'Repasar curso' : 'Review course'}
-                      </Link>
-                    </>
-                  ) : (
-                    <>
-                      {/* Progress section */}
-                      <div className="flex flex-col gap-3">
-                        <p className="text-white/93 text-2xl font-bold">
-                          {locale === 'es' ? 'Tu progreso' : 'Your progress'}
-                        </p>
-                        <p className="text-white/40 text-xs">
-                          {completedValidCount} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones completadas' : 'lessons completed'}
-                        </p>
-                        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-mx-orange rounded-full transition-all duration-700"
-                            style={{ width: `${progressPercent}%` }}
-                          />
-                        </div>
-                        <p className="text-mx-orange text-heading-md font-black">
-                          {progressPercent}%
-                        </p>
-                      </div>
-
-                      {/* CTA buttons */}
-                      <div className="flex flex-col gap-3">
-                        <Link
-                          href={`/maxymia/campus/${course.slug}/lesson/${firstIncompleteLessonId}`}
-                          className="flex items-center justify-center gap-3 bg-mx-orange text-white px-6 py-4 rounded-[10px] font-medium text-base hover:bg-mx-orange/90 transition-colors"
-                        >
-                          <Play size={18} fill="currentColor" />
-                          {progress
-                            ? (locale === 'es' ? 'Continuar curso' : 'Continue course')
-                            : (locale === 'es' ? 'Comenzar curso' : 'Start course')
-                          }
-                        </Link>
-                        <Link
-                          href={`/maxymia/campus/${course.slug}/lesson/${nextLessonId}`}
-                          className="flex items-center justify-center gap-2 border border-white/10 text-white/80 px-6 py-3.5 rounded-[10px] font-light text-sm hover:border-white/20 transition-colors"
-                        >
-                          <ArrowRight size={16} />
-                          {locale === 'es' ? 'Ir a la siguiente lección' : 'Go to next lesson'} →
-                        </Link>
-                      </div>
-                    </>
+                <div className="max-w-full">
+                  {activeTab === 'description' && hasDescription && <MarkdownBlock content={course.description[locale]} />}
+                  {activeTab === 'objectives' && (
+                    <MarkdownBlock content={course.objectives || (locale === 'es' ? 'Los objetivos de este curso se irán definiendo a medida que avances en el temario.' : 'Course objectives will be defined as you progress through the syllabus.')} />
+                  )}
+                  {activeTab === 'audience' && (
+                    <MarkdownBlock content={course.audiences || (locale === 'es' ? 'Este curso está dirigido a cualquier persona interesada en esta temática.' : 'This course is aimed at anyone interested in this subject.')} />
+                  )}
+                  {activeTab === 'careers' && (
+                    <MarkdownBlock content={course.careers || (locale === 'es' ? 'Las salidas profesionales relacionadas con este curso son amplias y diversas.' : 'Career opportunities related to this course are broad and diverse.')} />
                   )}
                 </div>
+              </m.section>
+              <m.section {...fadeUp(0.2)}>
+                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
+                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
+                  </h2>
+                  <p className="text-label-md text-mx-text-muted">
+                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {course.blocks.map((block, blockIdx) => (
+                    <ModuleCard
+                      key={block.id}
+                      block={block}
+                      blockIndex={blockIdx}
+                      courseSlug={course.slug}
+                      completedSet={completedSet}
+                      firstIncompleteLessonId={firstIncompleteLessonId}
+                      locale={locale}
+                      examResultsByExamId={examResultsByExamId}
+                    />
+                  ))}
+                </div>
+              </m.section>
+
+            </div>
+
+            {/* Panel lateral: lo que NO está ya en la cabecera */}
+            <aside className="lg:col-span-1">
+              <div className={`lg:sticky space-y-4 ${embedded ? 'lg:top-20' : 'lg:top-32'}`}>
+                {/* Siguiente lección */}
+                {!isFullyCompleted && (
+                  <m.div {...fadeUp(0.16)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                    <p className="text-label-sm uppercase tracking-widest text-mx-text-muted mb-3">{locale === 'es' ? 'A continuación' : 'Up next'}</p>
+                    {(() => {
+                      const next = findResumeInfo(course.blocks, nextLessonId);
+                      const target = next && nextLessonId !== firstIncompleteLessonId ? next : resumeInfo;
+                      if (!target) return null;
+                      return (
+                        <Link href={lessonHref(target.lesson.id)} className="group block">
+                          <p className="text-body-md font-semibold text-mx-text group-hover:text-mx-orange transition-colors line-clamp-2">{target.lesson.title[locale]}</p>
+                          <p className="text-label-md text-mx-text-muted mt-1">
+                            {locale === 'es' ? 'Bloque' : 'Block'} {target.blockIndex + 1} · {target.lesson.estimatedMinutes} min
+                          </p>
+                          <span className="mt-3 inline-flex items-center gap-1.5 text-label-md font-medium text-mx-orange">
+                            {locale === 'es' ? 'Ir a la lección' : 'Go to lesson'} <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                          </span>
+                        </Link>
+                      );
+                    })()}
+                  </m.div>
+                )}
+
+                {/* Exámenes */}
+                {exams.length > 0 && (
+                  <m.div {...fadeUp(0.2)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-label-sm uppercase tracking-widest text-mx-text-muted">{locale === 'es' ? 'Exámenes' : 'Exams'}</p>
+                      <span className="text-label-md font-semibold text-mx-text">{examsPassed}/{exams.length}</span>
+                    </div>
+                    <ul className="space-y-1">
+                      {exams.map(({ exam, blockIndex, href, result }) => (
+                        <li key={exam.id}>
+                          <Link href={href} className="flex items-center gap-3 rounded-lg -mx-2 px-2 py-2 hover:bg-black/[0.03] transition-colors">
+                            <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${result ? (result.passed ? 'bg-green-500/10 text-green-700' : 'bg-red-500/10 text-red-700') : 'bg-black/[0.04] text-mx-text-muted'}`}>
+                              {result?.passed ? <CheckCircle size={13} /> : <FileQuestion size={13} />}
+                            </span>
+                            <span className="flex-1 min-w-0">
+                              <span className="block text-body-sm text-mx-text line-clamp-1">{exam.title[locale]}</span>
+                              <span className="block text-label-sm text-mx-text-muted">{locale === 'es' ? 'Bloque' : 'Block'} {blockIndex + 1}</span>
+                            </span>
+                            <span className={`text-label-md font-semibold shrink-0 ${result ? (result.passed ? 'text-green-700' : 'text-red-700') : 'text-mx-text-muted'}`}>
+                              {result ? `${result.score}%` : (locale === 'es' ? 'Pendiente' : 'Pending')}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </m.div>
+                )}
+
+                {/* Tutor */}
+                <m.div {...fadeUp(0.24)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-11 h-11 rounded-full bg-mx-blue/10 flex items-center justify-center overflow-hidden shrink-0">
+                      {course.instructor.avatar ? (
+                        <Image src={course.instructor.avatar} alt={course.instructor.name} width={44} height={44} unoptimized className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={18} className="text-mx-blue" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-body-sm font-semibold text-mx-text truncate">{course.instructor.name}</p>
+                      <p className="text-label-md text-mx-text-muted truncate">{course.instructor.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-label-md text-mx-text-muted mb-3">
+                    {locale === 'es' ? '¿Tienes dudas? Te las resolvemos.' : 'Questions? We are here to help.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowTutorModal(true)}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-mx-blue text-mx-blue px-4 py-2.5 text-label-md font-medium hover:bg-mx-blue hover:text-white transition-colors"
+                  >
+                    <MessageCircle size={15} /> {locale === 'es' ? 'Contactar con el tutor' : 'Contact the tutor'}
+                  </button>
+                </m.div>
+
+                {/* Ficha rápida */}
+                <m.div {...fadeUp(0.28)} className="rounded-xl border border-mx-border bg-mx-card p-5">
+                  <ul className="grid grid-cols-2 gap-x-4 gap-y-3 text-label-md text-mx-text-muted">
+                    <MetaItem icon={Globe} label={(course.language && LANGUAGE_LABELS[course.language]?.[locale]) || 'Español'} />
+                    <MetaItem icon={Monitor} label="Online" />
+                    <MetaItem icon={GraduationCap} label={(course.level && LEVEL_LABELS[course.level]?.[locale]) || 'Principiante'} />
+                    <MetaItem icon={Clock} label={durationLabel} />
+                  </ul>
+                  <Link href="/maxymia/campus/mis-cursos" className="mt-4 block text-label-md text-mx-text-muted hover:text-mx-orange transition-colors">
+                    ← {locale === 'es' ? 'Volver a mis cursos' : 'Back to my courses'}
+                  </Link>
+                </m.div>
               </div>
-            </div>
+            </aside>
           </div>
         </div>
-      </m.section>
+      </main>
 
-      {/* ─── Course Content Section ──────────────────────────── */}
-      <m.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="pb-32 px-6 md:px-[128px]"
-      >
-        <div className="max-w-[1024px] mx-auto">
-          {/* Section header */}
-          <div className="flex flex-col items-center gap-4 mb-10">
-            <h2 className="text-white text-heading-md md:text-heading-lg font-bold tracking-tight text-center">
-              {locale === 'es' ? 'Contenido del curso' : 'Course content'}
-            </h2>
-            <p className="text-white/60 text-body-sm md:text-body-md font-light text-center">
-              {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {Math.round(totalMinutes / 60)}h {totalMinutes % 60}min · {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'}
-            </p>
-          </div>
+      {!embedded && <Footer />}
 
-          {/* Stats + progress bar */}
-          <div className="mb-10">
-            <div className="flex items-center justify-center gap-6 mb-4 text-white/50 text-body-sm">
-              <span className="flex items-center gap-1.5">
-                <BookOpen size={14} className="text-mx-orange" />
-                {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock size={14} className="text-mx-orange" />
-                {Math.round(totalMinutes / 60)}h {totalMinutes % 60}min
-              </span>
-              <span className="flex items-center gap-1.5">
-                <FileQuestion size={14} className="text-mx-orange" />
-                {totalExams} {locale === 'es' ? 'exámenes' : 'exams'}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-mx-orange rounded-full transition-all duration-700"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="text-mx-orange text-sm text-center mt-2">
-              {progressPercent}% {locale === 'es' ? 'completado' : 'completed'} · {completedValidCount} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'}
-            </p>
-          </div>
-
-          {/* Module cards */}
-          <div className="space-y-4 mb-10">
-            {course.blocks.map((block, blockIdx) => (
-              <ModuleCard
-                key={block.id}
-                block={block}
-                blockIndex={blockIdx}
-                courseSlug={course.slug}
-                completedSet={completedSet}
-                firstIncompleteLessonId={firstIncompleteLessonId}
-                locale={locale}
-                examResultsByExamId={examResultsByExamId}
-              />
-            ))}
-          </div>
-
-          {/* Back link */}
-          <div className="text-center">
-            <Link
-              href="/maxymia/campus/cursos"
-              className="text-white/50 text-body-sm hover:text-mx-orange transition-colors"
-            >
-              ← {locale === 'es' ? 'Volver al catálogo de cursos' : 'Back to course catalog'}
-            </Link>
-          </div>
-        </div>
-      </m.section>
-      </div>{/* end scrollable content */}
+      <TutorQuestionModal open={showTutorModal} onClose={() => setShowTutorModal(false)} locale={locale} course={course} />
 
       {/* Certificate modal — portaled to body to escape any transformed ancestor */}
       {portalReady && createPortal(
@@ -647,19 +735,55 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   );
 }
 
+function findResumeInfo(blocks: MaxymiaBlock[], lessonId: string | undefined) {
+  for (let b = 0; b < blocks.length; b++) {
+    const lesson = blocks[b].lessons.find((l) => l.id === lessonId);
+    if (lesson) return { lesson, blockIndex: b };
+  }
+  return null;
+}
+
 // ─── Stat Item ──────────────────────────────────────────────────────
 
-function StatItem({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+/**
+ * Esquina cóncava ("fillet"): cuadradito del color del fondo con un cuarto de
+ * círculo transparente, colocado fuera del panel en la unión con el borde al
+ * que está pegado. Hace que la pestaña se una con una curva, no en ángulo.
+ * `at` = esquina del cuadradito donde está el centro del círculo.
+ */
+function Fillet({ className, at }: { className: string; at: 'tl' | 'tr' | 'bl' | 'br' }) {
+  const cx = at.endsWith('l') ? '0%' : '100%';
+  const cy = at.startsWith('t') ? '0%' : '100%';
   return (
-    <div className="flex items-start gap-2">
-      <div className="pt-0.5">
-        <Icon size={14} className="text-mx-orange" />
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute size-4 ${className}`}
+      style={{ background: `radial-gradient(circle at ${cx} ${cy}, transparent 15.5px, var(--color-mx-bg) 16px)` }}
+    />
+  );
+}
+
+function StatTile({ icon: Icon, label, value, hint }: { icon: React.ElementType; label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-mx-border bg-mx-card p-4 flex items-center gap-4">
+      <div className="w-11 h-11 rounded-full bg-mx-orange/10 text-mx-orange flex items-center justify-center shrink-0">
+        <Icon size={18} />
       </div>
-      <div>
-        <p className="text-white/40 text-[10px] tracking-[1px] uppercase font-medium">{label}</p>
-        <p className="text-white text-sm font-medium">{value}</p>
+      <div className="min-w-0">
+        <p className="text-label-sm uppercase tracking-widest text-mx-text-muted">{label}</p>
+        <p className="text-heading-sm font-black text-mx-text leading-tight mt-0.5">{value}</p>
+        {hint && <p className="text-label-sm text-mx-text-muted">{hint}</p>}
       </div>
     </div>
+  );
+}
+
+function MetaItem({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
+  return (
+    <li className="inline-flex items-center gap-1.5">
+      <Icon size={13} className="text-mx-orange shrink-0" aria-hidden="true" />
+      {label}
+    </li>
   );
 }
 
@@ -691,7 +815,7 @@ function MarkdownBlock({ content }: { content: string }) {
       // Bullet en absoluto (no flex+gap): si el <li> es flex, un <strong>
       // seguido de texto se parte en dos flex items y el `gap` mete el
       // hueco visible alrededor de la negrita. Mismo patrón que ProgramTabs.
-      className="markdown-content markdown-on-dark text-body-sm sm:text-body-md font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:relative [&_li]:pl-5 sm:[&_li]:pl-6 [&_li]:before:content-[''] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
+      className="markdown-content text-body-sm sm:text-body-md text-mx-text-muted font-light [&_ul]:space-y-3 sm:[&_ul]:space-y-4 [&_li]:relative [&_li]:pl-5 sm:[&_li]:pl-6 [&_li]:before:content-[''] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-[0.55em] [&_li]:before:w-1.5 [&_li]:before:h-1.5 [&_li]:before:rounded-full [&_li]:before:bg-mx-orange [&_ul]:list-none [&_ul]:pl-0 [&_p]:mb-3 sm:[&_p]:mb-4"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -727,15 +851,15 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
   };
 
   return (
-    <div className={`overflow-hidden rounded-lg ${blockCompleted ? 'bg-amber-500/[0.03] border border-amber-500/20' : 'bg-white/[0.03] border border-white/10'}`}>
+    <div className={`overflow-hidden rounded-lg border ${blockCompleted ? 'bg-amber-500/[0.04] border-amber-500/30' : 'bg-mx-card border-mx-border'}`}>
       <button
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-white/[0.02] duration-200 transition-colors group"
+        className="w-full p-5 md:p-6 flex items-center justify-between text-left hover:bg-black/[0.02] duration-200 transition-colors group"
       >
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
             {blockCompleted ? (
-              <span className="flex items-center gap-1.5 text-amber-400 text-label-md font-bold">
+              <span className="flex items-center gap-1.5 text-amber-600 text-label-md font-bold">
                 <CheckCircle size={12} />
                 {locale === 'es' ? 'Bloque' : 'Block'} {blockIndex + 1}
               </span>
@@ -744,17 +868,17 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                 {locale === 'es' ? 'Bloque' : 'Block'} {blockIndex + 1}
               </span>
             )}
-            <span className="flex items-center gap-1.5 text-white/30 text-label-md">
+            <span className="flex items-center gap-1.5 text-mx-text-muted text-label-md">
               {completedInBlock}/{total}
             </span>
-            <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden hidden sm:block">
+            <div className="w-12 h-1.5 bg-black/[0.06] rounded-full overflow-hidden hidden sm:block">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${blockCompleted ? 'bg-amber-400' : 'bg-mx-orange'}`}
                 style={{ width: `${blockProgress}%` }}
               />
             </div>
           </div>
-          <h3 className="text-body-md md:text-body-lg font-bold text-white group-hover:text-mx-orange transition-colors duration-300">
+          <h3 className="text-body-md md:text-body-lg font-bold text-mx-text group-hover:text-mx-orange transition-colors duration-300">
             {block.title[locale]}
           </h3>
         </div>
@@ -763,7 +887,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
           transition={{ duration: 0.3 }}
           className="ml-4 shrink-0"
         >
-          <ChevronDown size={20} className="text-white/30" />
+          <ChevronDown size={20} className="text-mx-text-muted" />
         </m.div>
       </button>
 
@@ -776,7 +900,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-white/10 space-y-2">
+            <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-mx-border space-y-2">
               {block.lessons.map((lesson, lessonIndex) => {
                 const isCompleted = isLessonComplete(lesson, completedSet);
                 const isCurrent = lesson.id === firstIncompleteLessonId;
@@ -798,7 +922,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                           ? 'bg-mx-orange/5'
                           : isCompleted
                           ? 'bg-mx-orange/[0.03]'
-                          : 'hover:bg-white/[0.03]'
+                          : 'hover:bg-black/[0.03]'
                       }`}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -807,21 +931,21 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                         ) : isCurrent ? (
                           <Play size={14} className="text-mx-orange shrink-0" fill="currentColor" />
                         ) : (
-                          <div className="w-4 h-4 rounded-full border border-white/15 shrink-0" />
+                          <div className="w-4 h-4 rounded-full border border-mx-border shrink-0" />
                         )}
                         <span className={`text-body-sm ${
                           isCurrent
-                            ? 'text-white font-medium'
+                            ? 'text-mx-text font-medium'
                             : isCompleted
-                            ? 'text-mx-orange/50 line-through decoration-mx-orange/30'
-                            : 'text-white/70 font-light group-hover:text-white/90'
+                            ? 'text-mx-text-muted line-through decoration-mx-orange/40'
+                            : 'text-mx-text-muted font-light group-hover:text-mx-text'
                         }`}>
                           {lesson.title[locale]}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 ml-4 shrink-0">
                         <span className={`text-label-md ${
-                          isCurrent ? 'text-mx-orange' : isCompleted ? 'text-mx-orange/40' : 'text-white/30'
+                          isCurrent ? 'text-mx-orange' : isCompleted ? 'text-mx-orange/60' : 'text-mx-text-muted'
                         }`}>
                           {isCompleted ? '✓' : `${lesson.estimatedMinutes} min`}
                         </span>
@@ -830,7 +954,7 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                             animate={{ rotate: isLessonExpanded ? 180 : 0 }}
                             transition={{ duration: 0.2 }}
                           >
-                            <ChevronDown size={14} className="text-white/30" />
+                            <ChevronDown size={14} className="text-mx-text-muted" />
                           </m.div>
                         )}
                       </div>
@@ -846,14 +970,14 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                           transition={{ duration: 0.2 }}
                           className="overflow-hidden"
                         >
-                          <div className="ml-7 pl-4 border-l border-white/5 py-1 space-y-0.5">
+                          <div className="ml-7 pl-4 border-l border-mx-border py-1 space-y-0.5">
                             {lesson.topics!.map((topic, topicIdx) => (
                               <Link
                                 key={topic.id}
                                 href={`/maxymia/campus/${courseSlug}/lesson/${lesson.id}#${topic.anchorId}`}
-                                className="flex items-center gap-2 py-1.5 px-2 rounded text-white/40 hover:text-white/70 hover:bg-white/[0.03] transition-colors"
+                                className="flex items-center gap-2 py-1.5 px-2 rounded text-mx-text-muted hover:text-mx-text hover:bg-black/[0.03] transition-colors"
                               >
-                                <span className="text-[10px] text-white/20 shrink-0">{topicIdx + 1}.</span>
+                                <span className="text-[10px] text-mx-text-muted/70 shrink-0">{topicIdx + 1}.</span>
                                 <span className="text-label-md line-clamp-1">{topic.title[locale]}</span>
                               </Link>
                             ))}
@@ -870,25 +994,25 @@ function ModuleCard({ block, blockIndex, courseSlug, completedSet, firstIncomple
                   <Link
                     key={exam.id}
                     href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam?index=${examIdx}`}
-                    className="flex items-center gap-3 py-3 -mx-3 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
+                    className="flex items-center gap-3 py-3 -mx-3 px-3 rounded-lg hover:bg-black/[0.03] transition-colors group"
                   >
-                    <FileQuestion size={14} className="shrink-0 text-purple-300/70" />
-                    <span className="text-body-sm text-purple-300/70 group-hover:text-purple-200 flex-1">
+                    <FileQuestion size={14} className="shrink-0 text-purple-600" />
+                    <span className="text-body-sm text-purple-700 group-hover:text-purple-900 flex-1">
                       {exam.title[locale]}
                     </span>
                     {examResult ? (
                       <span
                         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold ${
                           examResult.passed
-                            ? 'bg-green-500/10 text-green-400 border border-green-500/30'
-                            : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                            ? 'bg-green-500/10 text-green-700 border border-green-500/30'
+                            : 'bg-red-500/10 text-red-700 border border-red-500/30'
                         }`}
                       >
                         {examResult.passed ? <CheckCircle size={12} /> : null}
                         {examResult.score}%
                       </span>
                     ) : (
-                      <span className="text-white/30 text-label-sm">
+                      <span className="text-mx-text-muted text-label-sm">
                         {locale === 'es' ? 'Pendiente' : 'Pending'}
                       </span>
                     )}

@@ -6,11 +6,16 @@ import { Phone, Mail, ArrowRight } from 'lucide-react';
 import type { Program } from '@/lib/strapi/types';
 
 interface ProgramCTASectionProps {
-  program: Program;
+  /** Programa de Máxima. Si se omite (ficha de Maxymia), hay que pasar `title`. */
+  program?: Program;
+  /** Título del curso para el asunto del mailto cuando no hay `program`. */
+  title?: string;
 }
 
-export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program }) => {
-  const isMaster = program.type === 'Master';
+/** CTA de cierre compartido por las fichas de /programas y de Maxymia. */
+export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program, title }) => {
+  const isMaster = program?.type === 'Master';
+  const courseTitle = program?.title ?? title ?? '';
 
   return (
     <section className="py-24 md:py-32 px-6 md:px-12 bg-mx-bg">
@@ -44,7 +49,7 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program })
             className="mb-12"
           >
             <a
-              href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${program.title}`)}`}
+              href={`mailto:cursos@maximaformacion.es?subject=${encodeURIComponent(`Consulta sobre ${courseTitle}`)}`}
               className="inline-flex items-center gap-3 bg-mx-orange text-white px-8 py-4 text-body-sm md:text-body-md font-medium rounded-lg hover:bg-mx-orange-dark transition-all duration-300"
             >
               <Mail size={18} />

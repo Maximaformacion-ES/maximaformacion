@@ -22,13 +22,13 @@ export default function SingleChoiceQuestion({
 }: Props) {
   return (
     <div>
-      <p className="text-white font-medium mb-4">{question.question[locale]}</p>
+      <p className="text-mx-text font-medium mb-4">{question.question[locale]}</p>
       <div className="space-y-2">
         {question.options.map((option, i) => {
           const isSelected = selectedIndex === i;
           const isCorrect = i === question.correctIndex;
-          let borderClass = 'border-white/10';
-          let bgClass = 'bg-white/[0.03]';
+          let borderClass = 'border-mx-border';
+          let bgClass = 'bg-mx-card';
 
           if (submitted) {
             if (isCorrect) {
@@ -53,13 +53,13 @@ export default function SingleChoiceQuestion({
               }`}
             >
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                isSelected ? 'border-mx-orange' : 'border-white/20'
+                isSelected ? 'border-mx-orange' : 'border-mx-text-muted/40'
               }`}>
                 {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-mx-orange" />}
               </div>
-              <span className="text-white/80 text-body-sm flex-1">{option[locale]}</span>
-              {submitted && isCorrect && <CheckCircle size={16} className="text-green-400" />}
-              {submitted && isSelected && !isCorrect && <XCircle size={16} className="text-red-400" />}
+              <span className="text-mx-text text-body-sm flex-1">{option[locale]}</span>
+              {submitted && isCorrect && <CheckCircle size={16} className="text-green-600" />}
+              {submitted && isSelected && !isCorrect && <XCircle size={16} className="text-red-600" />}
             </button>
           );
         })}

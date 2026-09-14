@@ -1,5 +1,7 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import {
   Search,
@@ -47,7 +49,17 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
   );
 
   // State
-  const [search, setSearch] = useState('');
+  // El buscador de la barra superior del campus llega como ?q=…
+  const searchParams = useSearchParams();
+  const initialQ = searchParams.get('q') ?? '';
+  const [search, setSearch] = useState(initialQ);
+  // Si se vuelve a buscar desde la barra superior estando ya en el catálogo,
+  // sincroniza (ajuste de estado durante el render al cambiar la prop).
+  const [prevQ, setPrevQ] = useState(initialQ);
+  if (initialQ !== prevQ) {
+    setPrevQ(initialQ);
+    setSearch(initialQ);
+  }
   const [category, setCategory] = useState<MaxymiaCategory | null>(null);
   const [level, setLevel] = useState<MaxymiaLevel | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
@@ -184,32 +196,22 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
 
   return (
     <div>
-      {/* ── Hero ── */}
-      <section className="relative py-12 sm:py-16 lg:py-32 overflow-hidden">
-        {/* Chevron SVGs with color gradient rectangles behind — hidden on mobile, smaller on tablet */}
-        <div className="hidden sm:flex absolute left-4 sm:left-10 lg:left-20 top-1/2 -translate-y-1/2 items-center">
-          <img src="/iconBlue.svg" alt="" className="relative z-10 w-28 sm:w-36 lg:w-56 h-auto" />
-          <div className="absolute left-14 sm:left-18 lg:left-23 top-1/2 h-8/10 bottom-0 w-[40vw] bg-linear-to-r from-mx-blue/60 to-transparent blur-sm pointer-events-none -translate-y-1/2" />
-        </div>
-        <div className="hidden sm:flex absolute right-4 sm:right-10 lg:right-20 top-1/2 -translate-y-1/2 items-center">
-          <img src="/iconOrange.svg" alt="" className="relative z-10 w-28 sm:w-36 lg:w-56 h-auto" />
-          <div className="absolute right-14 sm:right-18 lg:right-23 h-8/10 top-1/2 bottom-0 w-[40vw] bg-linear-to-l from-mx-orange/60 to-transparent blur-sm pointer-events-none -translate-y-1/2" />
-        </div>
-
-        <div className="relative z-10 text-center px-6">
-          <h1 className="text-heading-md sm:text-heading-lg lg:text-display-sm 2xl:text-display-md font-black tracking-tight text-white mb-3 lg:mb-4">
+      {/* ── Cabecera de página ── */}
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
             {t('courses.title')}
           </h1>
-          <p className="text-white/50 text-label-md sm:text-body-sm lg:text-body-md 2xl:text-body-lg max-w-xl mx-auto">
+          <p className="text-mx-text-muted text-body-sm mt-1 max-w-xl">
             {t('courses.subtitle')}
           </p>
         </div>
-      </section>
+      </div>
 
       {/* ── Filters Bar ── */}
-      <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-32" ref={filtersRef}>
+      <div className="w-full" ref={filtersRef}>
         <FilterBar
-          variant="dark"
+          variant="light"
           filtersExpanded={filtersExpanded}
           onToggleFilters={() => {
             setFiltersExpanded((prev) => !prev);
@@ -230,7 +232,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
               isOpen={openDropdown === 'sort'}
               onToggle={() => toggleDropdown('sort')}
               sortLabel={t('sort.label')}
-              variant="dark"
+              variant="light"
             />
           }
           paginationSlot={
@@ -238,17 +240,17 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 text-white/50 hover:border-white/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border bg-mx-card text-mx-text-muted hover:border-mx-orange/40 hover:text-mx-text disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronLeft size={14} />
               </button>
-              <span className="text-white/60 text-body-sm px-2 tabular-nums">
+              <span className="text-mx-text-muted text-body-sm px-2 tabular-nums">
                 {currentPage}/{totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 text-white/50 hover:border-white/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="w-8 h-8 rounded-full flex items-center justify-center border border-mx-border bg-mx-card text-mx-text-muted hover:border-mx-orange/40 hover:text-mx-text disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronRight size={14} />
               </button>
@@ -258,14 +260,14 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             <div className="relative w-full">
               <Search
                 size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-mx-text-muted"
               />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('campus.searchPlaceholder')}
-                className="pl-9 pr-4 py-1.5 rounded-full text-body-sm bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[#527be7]/50  transition-all w-full"
+                className="pl-9 pr-4 py-2 rounded-lg text-body-sm bg-mx-card border border-mx-border text-mx-text placeholder:text-mx-text-muted focus:outline-none focus:ring-2 focus:ring-mx-orange/40 transition-all w-full"
               />
             </div>
           }
@@ -279,7 +281,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             onChange={(v) => setCategory(v as MaxymiaCategory | null)}
             isOpen={openDropdown === 'category'}
             onToggle={() => toggleDropdown('category')}
-            variant="dark"
+            variant="light"
           />
           <RangeFilterDropdown
             id="price"
@@ -293,7 +295,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             formatValue={(v) => `${v}\u20AC`}
             isOpen={openDropdown === 'price'}
             onToggle={() => toggleDropdown('price')}
-            variant="dark"
+            variant="light"
           />
           <FilterDropdown
             id="level"
@@ -304,7 +306,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             onChange={(v) => setLevel(v as MaxymiaLevel | null)}
             isOpen={openDropdown === 'level'}
             onToggle={() => toggleDropdown('level')}
-            variant="dark"
+            variant="light"
           />
           <RangeFilterDropdown
             id="duration"
@@ -318,15 +320,15 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
             formatValue={(v) => v < 60 ? `${v}min` : `${Math.floor(v / 60)}h${v % 60 ? ` ${v % 60}min` : ''}`}
             isOpen={openDropdown === 'duration'}
             onToggle={() => toggleDropdown('duration')}
-            variant="dark"
+            variant="light"
           />
         </FilterBar>
       </div>
 
       {/* ── Course Grid ── */}
-      <div className="max-w-[1800px] mx-auto px-4 md:px-8 lg:px-32 pb-16">
+      <div className="w-full pb-8">
         {paginatedCourses.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {paginatedCourses.map((course, idx) => (
               <MaxymiaCourseCard
                 key={course.id}
@@ -335,12 +337,14 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
                 progress={courseProgress[course.id] ? { courseId: course.id, completedLessons: courseProgress[course.id].completedLessons, currentLessonId: courseProgress[course.id].currentLessonId, examResults: {}, startedAt: courseProgress[course.id].startedAt ?? '', lastAccessedAt: courseProgress[course.id].lastAccessedAt ?? '' } : undefined}
                 enrolled={hasAccess(course.id, course.isPro) || !!courseProgress[course.id]}
                 index={idx}
+                light
               />
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <p className="text-white/40 text-body-sm">{t('campus.noResults')}</p>
+          <div className="rounded-xl border border-mx-border bg-mx-card p-10 text-center">
+            <Search className="mx-auto text-mx-text-muted mb-3" size={28} />
+            <p className="text-mx-text-muted text-body-sm">{t('campus.noResults')}</p>
           </div>
         )}
 
@@ -349,7 +353,7 @@ export default function CourseCatalog({ courses }: CourseCatalogProps) {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
-          variant="dark"
+          variant="light"
         />
       </div>
     </div>

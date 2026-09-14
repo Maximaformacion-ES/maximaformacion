@@ -92,19 +92,21 @@ export default function MyGrades({ courses }: Props) {
   }, [filtered]);
 
   return (
-    <div className="px-6 md:px-12 py-10 max-w-6xl mx-auto">
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Award className="text-mx-orange" size={24} />
-          <h1 className="text-white text-heading-md md:text-heading-lg font-bold">
-            {locale === 'es' ? 'Mis calificaciones' : 'My grades'}
-          </h1>
-        </div>
-        <p className="text-white/50 text-body-sm">
+    <div className="w-full">
+      <header className="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-3">
+            <Award className="text-mx-orange" size={24} />
+            <h1 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
+              {locale === 'es' ? 'Mis calificaciones' : 'My grades'}
+            </h1>
+          </div>
+          <p className="text-mx-text-muted text-body-sm mt-1">
           {locale === 'es'
             ? 'Resultados de todos los exámenes de bloque que has realizado.'
             : 'Results of all block exams you have completed.'}
-        </p>
+          </p>
+        </div>
       </header>
 
       {!isLoading && rows.length > 0 && (
@@ -129,11 +131,11 @@ export default function MyGrades({ courses }: Props) {
 
       {!isLoading && rows.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <Filter size={14} className="text-white/40" />
+          <Filter size={14} className="text-mx-text-muted" />
           <select
             value={filterCourseId}
             onChange={(e) => setFilterCourseId(e.target.value)}
-            className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-1.5 text-body-sm text-white/80 focus:outline-none focus:border-mx-orange/50"
+            className="rounded-lg border border-mx-border bg-mx-card px-3 py-2 text-body-sm text-mx-text focus:outline-none focus:ring-2 focus:ring-mx-orange/40"
           >
             <option value="all">{locale === 'es' ? 'Todos los cursos' : 'All courses'}</option>
             {courseOptions.map((c) => (
@@ -145,7 +147,7 @@ export default function MyGrades({ courses }: Props) {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as 'all' | 'passed' | 'failed')}
-            className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-1.5 text-body-sm text-white/80 focus:outline-none focus:border-mx-orange/50"
+            className="rounded-lg border border-mx-border bg-mx-card px-3 py-2 text-body-sm text-mx-text focus:outline-none focus:ring-2 focus:ring-mx-orange/40"
           >
             <option value="all">{locale === 'es' ? 'Todos' : 'All'}</option>
             <option value="passed">{locale === 'es' ? 'Aprobados' : 'Passed'}</option>
@@ -155,16 +157,16 @@ export default function MyGrades({ courses }: Props) {
       )}
 
       {isLoading ? (
-        <div className="py-12 text-center text-white/40 text-body-sm">
+        <div className="py-12 text-center text-mx-text-muted text-body-sm">
           {locale === 'es' ? 'Cargando…' : 'Loading…'}
         </div>
       ) : rows.length === 0 ? (
         <EmptyState locale={locale} />
       ) : (
-        <div className="rounded-xl border border-white/10 overflow-hidden">
+        <div className="rounded-xl border border-mx-border bg-mx-card shadow-sm overflow-hidden">
           <table className="w-full text-body-sm">
-            <thead className="bg-white/[0.03] border-b border-white/10">
-              <tr className="text-left text-white/40 text-label-md">
+            <thead className="bg-black/[0.02] border-b border-mx-border">
+              <tr className="text-left text-mx-text-muted text-label-md">
                 <th className="px-4 py-3 font-medium">{locale === 'es' ? 'Curso' : 'Course'}</th>
                 <th className="px-4 py-3 font-medium">{locale === 'es' ? 'Bloque' : 'Block'}</th>
                 <th className="px-4 py-3 font-medium text-right">{locale === 'es' ? 'Nota' : 'Score'}</th>
@@ -176,23 +178,23 @@ export default function MyGrades({ courses }: Props) {
               {filtered.map((r, i) => (
                 <tr
                   key={`${r.courseId}-${r.examTitle}-${i}`}
-                  className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors"
+                  className="border-b border-mx-border last:border-b-0 hover:bg-black/[0.03] transition-colors"
                 >
-                  <td className="px-4 py-3 text-white truncate max-w-[200px]">{r.courseTitle}</td>
-                  <td className="px-4 py-3 text-white/60 truncate max-w-[220px]">{r.blockTitle}</td>
+                  <td className="px-4 py-3 text-mx-text truncate max-w-[200px]">{r.courseTitle}</td>
+                  <td className="px-4 py-3 text-mx-text-muted truncate max-w-[220px]">{r.blockTitle}</td>
                   <td className="px-4 py-3 text-right">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold ${
                         r.passed
-                          ? 'bg-green-500/10 text-green-400 border border-green-500/30'
-                          : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                          ? 'bg-green-500/10 text-green-700 border border-green-500/30'
+                          : 'bg-red-500/10 text-red-700 border border-red-500/30'
                       }`}
                     >
                       {r.passed ? <CheckCircle size={12} /> : <XCircle size={12} />}
                       {r.score}%
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-white/40 text-label-md hidden md:table-cell">
+                  <td className="px-4 py-3 text-mx-text-muted text-label-md hidden md:table-cell">
                     {new Date(r.completedAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', {
                       day: '2-digit',
                       month: 'short',
@@ -203,7 +205,7 @@ export default function MyGrades({ courses }: Props) {
                     {r.lastLessonId && (
                       <Link
                         href={`/maxymia/campus/${r.courseSlug}/lesson/${r.lastLessonId}/exam?index=${r.examIndex}`}
-                        className="inline-flex items-center gap-1 text-mx-orange hover:text-mx-orange/80 text-label-md"
+                        className="inline-flex items-center gap-1 text-mx-orange hover:text-mx-orange-dark text-label-md font-medium"
                       >
                         {locale === 'es' ? 'Reintentar' : 'Retry'}
                       </Link>
@@ -221,27 +223,33 @@ export default function MyGrades({ courses }: Props) {
 
 function StatCard({ label, value, tone }: { label: string; value: string; tone: 'neutral' | 'good' | 'bad' }) {
   const toneClass =
-    tone === 'good' ? 'text-green-400' : tone === 'bad' ? 'text-red-400' : 'text-mx-orange';
+    tone === 'good' ? 'text-green-700' : tone === 'bad' ? 'text-red-700' : 'text-mx-orange';
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-      <p className="text-white/40 text-label-md mb-1">{label}</p>
-      <p className={`text-heading-sm font-bold ${toneClass}`}>{value}</p>
+    <div className="rounded-xl border border-mx-border bg-mx-card p-5">
+      <p className="text-label-sm uppercase tracking-widest text-mx-text-muted mb-1">{label}</p>
+      <p className={`text-heading-md font-black ${toneClass}`}>{value}</p>
     </div>
   );
 }
 
 function EmptyState({ locale }: { locale: 'es' | 'en' }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-10 text-center">
-      <FileQuestion className="mx-auto text-white/20 mb-3" size={32} />
-      <p className="text-white/60 text-body-sm mb-1">
+    <div className="rounded-xl border border-mx-border bg-mx-card p-10 text-center">
+      <FileQuestion className="mx-auto text-mx-text-muted mb-3" size={32} />
+      <p className="text-mx-text text-body-sm font-medium mb-1">
         {locale === 'es' ? 'Aún no has hecho ningún examen' : 'You have not taken any exam yet'}
       </p>
-      <p className="text-white/30 text-label-md">
+      <p className="text-mx-text-muted text-label-md mb-5">
         {locale === 'es'
           ? 'Completa un bloque con examen para ver tus notas aquí.'
           : 'Complete a block with an exam to see your grades here.'}
       </p>
+      <Link
+        href="/maxymia/campus/mis-cursos"
+        className="inline-flex items-center px-5 py-2.5 bg-mx-orange hover:bg-mx-orange-dark text-white text-body-sm font-medium rounded-lg transition-colors"
+      >
+        {locale === 'es' ? 'Ir a mis cursos' : 'Go to my courses'}
+      </Link>
     </div>
   );
 }

@@ -24,7 +24,7 @@ import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { contactHrefFor } from './ContactCourseProvider';
-import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings } from '@/lib/pricing';
+import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings, klarnaInstallment } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
@@ -293,7 +293,12 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                   </div>
                 )
               )}
-              <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">Pago único • Acceso permanente</p>
+              {/* Klarna "Paga en 3": que se vea que se puede fraccionar, no solo pagar de golpe. */}
+              <p className="text-mx-text-muted text-label-sm md:text-label-md mt-1">
+                {klarnaInstallment(effectivePrice)
+                  ? <>Pago único o <span className="text-mx-text font-medium">3 plazos de {klarnaInstallment(effectivePrice)} €</span> sin intereses con Klarna • Acceso permanente</>
+                  : 'Pago único • Acceso permanente'}
+              </p>
             </div>
 
             {/* Error */}

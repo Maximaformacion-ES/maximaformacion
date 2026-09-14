@@ -5,11 +5,14 @@ import { createContext, useContext } from 'react';
 export type SiteBranding = {
   logoMaximaformacion: string;
   logoMaxymia: string;
+  /** Favicon del sitio (Site Metadata de Strapi); '' si no hay. */
+  favicon: string;
 };
 
 const Ctx = createContext<SiteBranding>({
   logoMaximaformacion: '',
   logoMaxymia: '',
+  favicon: '',
 });
 
 export function SiteBrandingProvider({

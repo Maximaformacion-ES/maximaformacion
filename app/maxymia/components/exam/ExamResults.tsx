@@ -34,13 +34,13 @@ export default function ExamResults({
     }`}>
       <div className="mb-4">
         {passed ? (
-          <Trophy className="mx-auto text-green-400" size={48} />
+          <Trophy className="mx-auto text-green-600" size={48} />
         ) : (
-          <XCircle className="mx-auto text-red-400" size={48} />
+          <XCircle className="mx-auto text-red-600" size={48} />
         )}
       </div>
 
-      <h3 className="text-white text-heading-md font-bold mb-2">
+      <h3 className="text-mx-text text-heading-md font-bold mb-2">
         {passed
           ? (locale === 'es' ? '¡Examen aprobado!' : 'Exam passed!')
           : (locale === 'es' ? 'No superado' : 'Not passed')
@@ -48,10 +48,10 @@ export default function ExamResults({
       </h3>
 
       <div className="text-display-sm font-black mb-2">
-        <span className={passed ? 'text-green-400' : 'text-red-400'}>{score}%</span>
+        <span className={passed ? 'text-green-700' : 'text-red-700'}>{score}%</span>
       </div>
 
-      <p className="text-white/50 text-body-sm mb-6">
+      <p className="text-mx-text-muted text-body-sm mb-6">
         {correctCount}/{totalQuestions}{' '}
         {locale === 'es' ? 'respuestas correctas' : 'correct answers'}
         {' · '}
@@ -60,7 +60,7 @@ export default function ExamResults({
 
       {passed ? (
         <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-2 text-green-400">
+          <div className="flex items-center gap-2 text-green-700">
             <CheckCircle size={16} />
             <span className="text-body-sm">
               {locale === 'es' ? 'Resultado guardado' : 'Result saved'}
@@ -69,10 +69,10 @@ export default function ExamResults({
           {nextLesson && (
             <Link
               href={nextLesson.href}
-              className="inline-flex items-center gap-2 bg-mx-orange text-black px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange/90 transition-colors"
+              className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
             >
               {locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
-              <span className="text-black/70 truncate max-w-[220px] hidden sm:inline">
+              <span className="text-white/80 truncate max-w-[220px] hidden sm:inline">
                 · {nextLesson.lessonTitle[locale]}
               </span>
               <ArrowRight size={16} />
@@ -82,7 +82,7 @@ export default function ExamResults({
       ) : (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange/90 transition-colors"
+          className="inline-flex items-center gap-2 bg-mx-orange text-white px-5 py-2.5 rounded-lg text-body-sm font-medium hover:bg-mx-orange-dark transition-colors"
         >
           <RefreshCw size={16} />
           {locale === 'es' ? 'Intentar de nuevo' : 'Try again'}

@@ -47,6 +47,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
   const [localUnits, setLocalUnits] = useState<string[]>([]);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileIndexOpen, setMobileIndexOpen] = useState(false);
   // Track which topic is selected (null = lesson index view)
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
 
@@ -298,7 +299,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
   }, [selectedTopicId, topicSections, hasTopics, handleSelectTopic, handleAdvanceToTopic, handleAdvanceLesson]);
 
   return (
-    <div className="flex h-[calc(100dvh-57px)] overflow-hidden">
+    <div className="flex h-full overflow-hidden bg-mx-bg text-mx-text">
       {/* Sidebar */}
       <AnimatePresence initial={false}>
         {sidebarOpen && (
@@ -307,9 +308,12 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
             animate={{ width: 320, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="shrink-0 overflow-hidden"
+            // Solo en lg+: en móvil el índice va en un cajón (drawer) propio y
+            // este envoltorio de 320 px dejaba al contenido sin ancho.
+            className="hidden lg:block shrink-0 overflow-hidden"
           >
             <MaxymiaLessonSidebar
+              variant="desktop"
               course={course}
               currentLessonId={lesson.id}
               completedLessons={completedSet}
@@ -321,15 +325,33 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
           </m.div>
         )}
       </AnimatePresence>
+      {/* Índice móvil: botón flotante + cajón, siempre montado en <lg y
+          controlado también desde el botón de la barra del contenido. */}
+      <MaxymiaLessonSidebar
+        variant="mobile"
+        course={course}
+        currentLessonId={lesson.id}
+        completedLessons={completedSet}
+        updatedUnits={updates}
+        locale={locale}
+        onNavigate={navigateToLesson}
+        selectedTopicId={selectedTopicId}
+        mobileOpen={mobileIndexOpen}
+        onMobileOpenChange={setMobileIndexOpen}
+      />
 
       {/* Main content — only this part scrolls */}
       <div id="lesson-content-area" className="flex-1 min-w-0 overflow-y-auto">
         {/* Header bar */}
-        <div className="sticky top-0 z-30 bg-[#0b1018]/80 backdrop-blur-sm border-b border-white/5 px-6 py-3 flex items-center justify-between gap-4">
+        <div className="sticky top-0 z-30 h-14 bg-mx-bg/85 backdrop-blur-sm border-b border-mx-border px-6 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => setSidebarOpen((v) => !v)}
-              className="text-[#6b7280] hover:text-mx-orange transition-colors shrink-0"
+              onClick={() => {
+                // En escritorio pliega/despliega el panel; en móvil abre el cajón.
+                if (window.matchMedia('(min-width: 1024px)').matches) setSidebarOpen((v) => !v);
+                else setMobileIndexOpen(true);
+              }}
+              className="text-mx-text-muted hover:text-mx-orange transition-colors shrink-0"
               title={sidebarOpen ? (locale === 'es' ? 'Ocultar índice' : 'Hide index') : (locale === 'es' ? 'Mostrar índice' : 'Show index')}
             >
               {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
@@ -337,30 +359,30 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
             {selectedTopicId ? (
               <button
                 onClick={handleBackToIndex}
-                className="text-white/40 hover:text-mx-orange transition-colors shrink-0"
+                className="text-mx-text-muted hover:text-mx-orange transition-colors shrink-0"
               >
                 <ChevronLeft size={18} />
               </button>
             ) : (
               <Link
                 href={`/maxymia/campus/${course.slug}`}
-                className="text-white/40 hover:text-mx-orange transition-colors shrink-0"
+                className="text-mx-text-muted hover:text-mx-orange transition-colors shrink-0"
               >
                 <ChevronLeft size={18} />
               </Link>
             )}
             <div className="min-w-0">
-              <p className="text-white/30 text-label-sm tracking-widest uppercase truncate">
+              <p className="text-mx-text-muted text-label-sm tracking-widest uppercase truncate">
                 {block.title[locale]}
               </p>
-              <p className="text-white text-body-sm font-medium truncate">
+              <p className="text-mx-text text-body-sm font-medium truncate">
                 {selectedSection ? selectedSection.topic.title[locale] : lesson.title[locale]}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {nav && (
-              <span className="text-white/30 text-label-md hidden sm:inline">
+              <span className="text-mx-text-muted text-label-md hidden sm:inline">
                 {nav.currentIndex + 1}/{nav.totalLessons}
               </span>
             )}
@@ -369,7 +391,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
                 onClick={() => navigateToLesson(nav.prev!.lessonId)}
                 title={locale === 'es' ? 'Lección anterior' : 'Previous lesson'}
                 aria-label={locale === 'es' ? 'Lección anterior' : 'Previous lesson'}
-                className="w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-white/60 hover:text-mx-orange hover:border-mx-orange/30 active:scale-90 active:bg-mx-orange/10 transition-all duration-150"
+                className="w-9 h-9 rounded-full flex items-center justify-center border border-mx-border text-mx-text-muted hover:text-mx-orange hover:border-mx-orange/30 active:scale-90 active:bg-mx-orange/10 transition-all duration-150"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -398,7 +420,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
           {selectedSection ? (
             /* ─── Topic content view ─── */
             <>
-              <h1 className="text-white text-heading-md md:text-heading-lg font-bold mb-8">
+              <h1 className="text-mx-text text-heading-md md:text-heading-lg font-bold mb-8">
                 {selectedSection.topic.title[locale]}
               </h1>
               <LessonContentRenderer content={selectedSection.blocks} locale={locale} />
@@ -406,7 +428,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
           ) : hasTopics ? (
             /* ─── Lesson index view (title + intro blocks + topic buttons) ─── */
             <>
-              <h1 className="text-white text-heading-md md:text-heading-lg font-bold mb-6">
+              <h1 className="text-mx-text text-heading-md md:text-heading-lg font-bold mb-6">
                 {lesson.title[locale]}
               </h1>
 
@@ -422,13 +444,13 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
                   <button
                     key={section.topic.id}
                     onClick={() => handleSelectTopic(section.topic)}
-                    className="w-full flex items-center gap-4 px-5 py-4 border border-white/10 rounded-lg hover:border-mx-orange/40 hover:bg-white/[0.02] transition-colors text-left group"
+                    className="w-full flex items-center gap-4 px-5 py-4 border border-mx-border bg-mx-card rounded-xl hover:border-mx-orange/40 hover:bg-black/[0.02] transition-colors text-left group"
                   >
                     <span className="text-mx-orange text-body-sm font-bold">{idx + 1}.</span>
-                    <span className="text-white/80 text-body-sm md:text-body-md xl:text-[16px] 2xl:text-[20px] font-medium group-hover:text-white transition-colors flex-1">
+                    <span className="text-mx-text text-body-sm md:text-body-md xl:text-[16px] 2xl:text-[20px] font-medium group-hover:text-mx-orange transition-colors flex-1">
                       {section.topic.title[locale]}
                     </span>
-                    <ArrowRight size={16} className="text-white/20 group-hover:text-mx-orange transition-colors shrink-0" />
+                    <ArrowRight size={16} className="text-mx-text-muted/60 group-hover:text-mx-orange transition-colors shrink-0" />
                   </button>
                 ))}
               </div>
@@ -436,7 +458,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
           ) : (
             /* ─── No topics — intro + flat content ─── */
             <>
-              <h1 className="text-white text-heading-md md:text-heading-lg font-bold mb-6">
+              <h1 className="text-mx-text text-heading-md md:text-heading-lg font-bold mb-6">
                 {lesson.title[locale]}
               </h1>
               {introBlocks.length > 0 && (
@@ -467,11 +489,11 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
             />
           ) : nav && !selectedTopicId ? (
             /* ─── Lesson-level navigation ─── */
-            <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
+            <div className="flex items-center justify-between pt-8 border-t border-mx-border mt-8">
               {nav.prev ? (
                 <button
                   onClick={() => navigateToLesson(nav.prev!.lessonId)}
-                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
+                  className="flex items-center gap-2 text-mx-text-muted hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
                 >
                   <ArrowLeft size={16} />
                   <span className="hidden sm:inline">{nav.prev.title[locale]}</span>
@@ -483,7 +505,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
               {hasTopics && topicSections.length > 0 ? (
                 <button
                   onClick={handleNextStep}
-                  className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
+                  className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange-dark active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
                 >
                   <span className="hidden sm:inline">{topicSections[0].topic.title[locale]}</span>
                   <span className="sm:hidden">{locale === 'es' ? 'Empezar' : 'Start'}</span>
@@ -492,7 +514,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
               ) : nextIsExam ? (
                 <button
                   onClick={handleNextStep}
-                  className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
+                  className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange-dark active:scale-95 active:brightness-110 transition-all duration-150 text-body-sm font-medium"
                 >
                   <span>{locale === 'es' ? 'Examen del bloque' : 'Block exam'}</span>
                   <ArrowRight size={16} />
@@ -500,7 +522,7 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
               ) : nav.next ? (
                 <button
                   onClick={handleNextStep}
-                  className="flex items-center gap-2 text-white/50 hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
+                  className="flex items-center gap-2 text-mx-text-muted hover:text-mx-orange active:scale-95 active:opacity-70 transition-all duration-150 text-body-sm"
                 >
                   <span className="hidden sm:inline">{nav.next.title[locale]}</span>
                   <span className="sm:hidden">{locale === 'es' ? 'Siguiente' : 'Next'}</span>
@@ -511,8 +533,8 @@ export default function MaxymiaLessonPlayer({ course, block: initialBlock, lesso
                   onClick={handleNextStep}
                   className={`flex items-center gap-2 active:scale-95 transition-all duration-150 text-body-sm ${
                     isCompleted
-                      ? 'text-green-400 hover:text-green-300'
-                      : 'bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange/90 active:brightness-110'
+                      ? 'text-green-700 hover:text-green-800'
+                      : 'bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange-dark active:brightness-110'
                   }`}
                 >
                   {isCompleted
@@ -563,12 +585,12 @@ function TopicNavigation({
   const isLast = currentIdx === topicSections.length - 1;
 
   return (
-    <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
+    <div className="flex items-center justify-between pt-8 border-t border-mx-border mt-8">
       {/* Previous */}
       {prevTopic ? (
         <button
           onClick={() => onSelectTopic(prevTopic.topic)}
-          className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
+          className="flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors text-body-sm"
         >
           <ArrowLeft size={16} />
           <span className="hidden sm:inline">{prevTopic.topic.title[locale]}</span>
@@ -577,7 +599,7 @@ function TopicNavigation({
       ) : isFirst && prevLesson ? (
         <button
           onClick={() => onNavigateLesson(prevLesson.lessonId)}
-          className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
+          className="flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors text-body-sm"
         >
           <ArrowLeft size={16} />
           <span className="hidden sm:inline">{prevLesson.title[locale]}</span>
@@ -586,7 +608,7 @@ function TopicNavigation({
       ) : isFirst ? (
         <button
           onClick={onBackToIndex}
-          className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
+          className="flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors text-body-sm"
         >
           <ArrowLeft size={16} />
           <span>{locale === 'es' ? 'Índice de la lección' : 'Lesson index'}</span>
@@ -599,7 +621,7 @@ function TopicNavigation({
       {nextTopic ? (
         <button
           onClick={() => onAdvanceToTopic(nextTopic.topic)}
-          className="flex items-center gap-2 text-white/50 hover:text-mx-orange transition-colors text-body-sm"
+          className="flex items-center gap-2 text-mx-text-muted hover:text-mx-orange transition-colors text-body-sm"
         >
           <span className="hidden sm:inline">{nextTopic.topic.title[locale]}</span>
           <span className="sm:hidden">{locale === 'es' ? 'Siguiente' : 'Next'}</span>
@@ -608,7 +630,7 @@ function TopicNavigation({
       ) : isLast ? (
         <button
           onClick={onNextLesson}
-          className="flex items-center gap-2 bg-mx-orange text-black px-4 py-2 rounded-lg hover:bg-mx-orange/90 transition-colors text-body-sm font-medium"
+          className="flex items-center gap-2 bg-mx-orange text-white px-4 py-2 rounded-lg hover:bg-mx-orange-dark transition-colors text-body-sm font-medium"
         >
           <span>
             {nextIsExam

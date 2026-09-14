@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, m } from 'framer-motion';
 import { GraduationCap, X } from 'lucide-react';
@@ -38,6 +38,22 @@ function isScrolled(): boolean {
   return window.scrollY > 40;
 }
 
+// La tira va DENTRO del header fijo, así que por sí sola no ocupa sitio y
+// tapa el arranque de las páginas (breadcrumbs, badges), que solo cuentan con
+// la altura del header. Solución: reservar su altura como padding-top del
+// <body>, aplicado en línea desde aquí (no vía CSS global, para no depender
+// de la recompilación de estilos) y publicada también como --announcement-h
+// por si algún sticky quiere descontarla. Se mide con ResizeObserver (puede
+// ocupar 1 o 2 líneas según el ancho) y NO se pone a 0 al ocultarse por
+// scroll: ese hueco queda arriba del todo, ya fuera de la vista, y así no hay
+// saltos de layout al pasar de 40 px. Solo vuelve a 0 al cerrarla o desmontar.
+function setAnnouncementHeight(px: number) {
+  const h = `${Math.round(px)}px`;
+  document.documentElement.style.setProperty('--announcement-h', h);
+  document.body.style.transition = 'padding-top 0.25s ease';
+  document.body.style.paddingTop = h;
+}
+
 /**
  * Tira anunciadora del Pack 3 Cursos Universitarios, pegada al borde inferior
  * del header fijo. Dos cuidados deliberados:
@@ -53,6 +69,25 @@ export function PackAnnouncementBar() {
   const scrolled = useSyncExternalStore(subscribeScroll, isScrolled, () => true);
 
   const visible = !dismissed && !scrolled;
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // Mide la tira mientras está visible y publica su altura; al cerrar (o al
+  // desmontar el header, p. ej. entrando al campus) libera el hueco.
+  useEffect(() => {
+    if (dismissed) {
+      setAnnouncementHeight(0);
+      return;
+    }
+    const el = barRef.current;
+    if (!el) return;
+    const measure = () => setAnnouncementHeight(el.getBoundingClientRect().height);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [dismissed, visible]);
+
+  useEffect(() => () => setAnnouncementHeight(0), []);
 
   return (
     <AnimatePresence initial={false}>
@@ -64,7 +99,7 @@ export function PackAnnouncementBar() {
           transition={{ duration: 0.25 }}
           className="overflow-hidden bg-mx-orange text-white"
         >
-          <div className="relative flex items-center justify-center gap-2 px-10 py-2 text-center">
+          <div ref={barRef} className="relative flex items-center justify-center gap-2 px-10 py-2 text-center">
             <GraduationCap size={15} className="hidden sm:block shrink-0" />
             <Link
               href="/pack-cursos-universitarios"

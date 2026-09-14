@@ -29,11 +29,11 @@ const CHANGE_LABEL = {
  *  va en el tooltip para no partir a dos líneas en el índice estrecho. */
 function ChangeBadge({ change, locale }: { change: UnitChange; locale: Locale }) {
   const label = CHANGE_LABEL[locale][change];
-  const color = change === 'new' ? 'text-amber-300' : 'text-sky-300';
+  const color = change === 'new' ? 'text-amber-500' : 'text-sky-600';
   const Icon = change === 'new' ? Star : RefreshCw;
   return (
     <span className={`${color} flex-shrink-0`} title={label} aria-label={label}>
-      <Icon size={13} className={change === 'new' ? 'fill-amber-300/40' : ''} />
+      <Icon size={13} className={change === 'new' ? 'fill-amber-400/40' : ''} />
     </span>
   );
 }
@@ -48,6 +48,12 @@ interface MaxymiaLessonSidebarProps {
    *  sin ir al servidor. El player pinta desde el curso ya cargado. */
   onNavigate?: (lessonId: string, topic?: MaxymiaTopic) => void;
   selectedTopicId?: string | null;
+  /** 'desktop': solo el panel lateral (lg+). 'mobile': solo el botón flotante y
+   *  el cajón (<lg). 'both' (por defecto): ambos. */
+  variant?: 'desktop' | 'mobile' | 'both';
+  /** Cajón móvil controlado desde fuera (p. ej. el botón de la barra del player). */
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 export default function MaxymiaLessonSidebar({
@@ -58,8 +64,16 @@ export default function MaxymiaLessonSidebar({
   locale,
   onNavigate,
   selectedTopicId,
+  variant = 'both',
+  mobileOpen: mobileOpenProp,
+  onMobileOpenChange,
 }: MaxymiaLessonSidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpenState, setMobileOpenState] = useState(false);
+  const mobileOpen = mobileOpenProp ?? mobileOpenState;
+  const setMobileOpen = (v: boolean) => {
+    setMobileOpenState(v);
+    onMobileOpenChange?.(v);
+  };
 
   // Al navegar desde el sidebar cerramos el drawer móvil (en desktop es no-op).
   const handleNavigate = (lessonId: string, topic?: MaxymiaTopic) => {
@@ -72,15 +86,16 @@ export default function MaxymiaLessonSidebar({
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      {/* Progress header */}
-      <div className="p-4 border-b border-white/10">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-white/60 text-label-md">
+      {/* Progress header — mismo alto (h-14) que la barra sticky del
+          contenido, para que las dos líneas inferiores queden alineadas. */}
+      <div className="h-14 shrink-0 px-4 border-b border-mx-border flex flex-col justify-center gap-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-mx-text-muted text-label-md">
             {completedCount}/{totalLessons} {locale === 'es' ? 'completadas' : 'completed'}
           </span>
           <span className="text-mx-orange text-label-md font-semibold">{progressPercent}%</span>
         </div>
-        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-black/[0.06] rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-mx-orange to-amber-400 rounded-full transition-all"
             style={{ width: `${progressPercent}%` }}
@@ -110,10 +125,13 @@ export default function MaxymiaLessonSidebar({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-80 min-w-80 flex-shrink-0 border-r border-white/10 bg-white/[0.02] h-full overflow-hidden">
-        {sidebarContent}
-      </aside>
-
+      {variant !== 'mobile' && (
+        <aside className="hidden lg:block w-80 min-w-80 flex-shrink-0 border-r border-mx-border bg-mx-card h-full overflow-hidden">
+          {sidebarContent}
+        </aside>
+      )}
+      {variant === 'desktop' ? null : (
+      <>
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
@@ -130,7 +148,7 @@ export default function MaxymiaLessonSidebar({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 z-50 lg:hidden"
+              className="fixed inset-0 bg-black/40 z-50 lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <m.div
@@ -138,14 +156,14 @@ export default function MaxymiaLessonSidebar({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className="fixed left-0 top-0 bottom-0 w-80 bg-[#0a0d1a] z-50 lg:hidden"
+              className="fixed left-0 top-0 bottom-0 w-80 bg-mx-card border-r border-mx-border z-50 lg:hidden"
             >
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <span className="text-white text-body-sm font-medium">
+              <div className="flex items-center justify-between p-4 border-b border-mx-border">
+                <span className="text-mx-text text-body-sm font-medium">
                   {locale === 'es' ? 'Contenido' : 'Content'}
                 </span>
                 <button onClick={() => setMobileOpen(false)}>
-                  <X size={18} className="text-white/40" />
+                  <X size={18} className="text-mx-text-muted" />
                 </button>
               </div>
               {sidebarContent}
@@ -153,6 +171,8 @@ export default function MaxymiaLessonSidebar({
           </>
         )}
       </AnimatePresence>
+      </>
+      )}
     </>
   );
 }
@@ -168,6 +188,12 @@ interface SidebarBlockProps {
   locale: Locale;
   onNavigate?: (lessonId: string, topic?: MaxymiaTopic) => void;
   selectedTopicId?: string | null;
+  /** 'desktop': solo el panel lateral (lg+). 'mobile': solo el botón flotante y
+   *  el cajón (<lg). 'both' (por defecto): ambos. */
+  variant?: 'desktop' | 'mobile' | 'both';
+  /** Cajón móvil controlado desde fuera (p. ej. el botón de la barra del player). */
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, updatedUnits, locale, onNavigate, selectedTopicId }: SidebarBlockProps) {
@@ -204,17 +230,17 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
   };
 
   return (
-    <div className="border-b border-white/5">
+    <div className="border-b border-mx-border">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.03] transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] transition-colors"
       >
         <div className="flex items-center gap-2 text-left">
-          <BookOpen size={14} className="text-white/30 flex-shrink-0" />
-          <span className="text-white/70 text-label-md font-medium line-clamp-1">{block.title[locale]}</span>
-          <span className="text-white/20 text-label-sm">{completedInBlock}/{block.lessons.length}</span>
+          <BookOpen size={14} className="text-mx-text-muted flex-shrink-0" />
+          <span className="text-mx-text text-label-md font-medium line-clamp-1">{block.title[locale]}</span>
+          <span className="text-mx-text-muted/70 text-label-sm">{completedInBlock}/{block.lessons.length}</span>
         </div>
-        {open ? <ChevronUp size={14} className="text-white/30" /> : <ChevronDown size={14} className="text-white/30" />}
+        {open ? <ChevronUp size={14} className="text-mx-text-muted" /> : <ChevronDown size={14} className="text-mx-text-muted" />}
       </button>
 
       <AnimatePresence initial={false}>
@@ -244,17 +270,17 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
                   {/* Lesson row — link to lesson + chevron to expand topics */}
                   <div className={`flex items-center gap-2.5 px-4 pl-8 py-2.5 text-label-md transition-colors ${
                     isCurrent && !selectedTopicId
-                      ? 'bg-mx-orange/10 text-mx-orange border-l-2 border-mx-orange'
+                      ? 'bg-mx-orange/10 text-mx-text border-l-2 border-mx-orange'
                       : isCurrent
-                      ? 'bg-mx-orange/5 text-mx-orange/70'
-                      : 'text-white/50 hover:text-white/80 hover:bg-white/[0.03]'
+                      ? 'bg-mx-orange/5 text-mx-text'
+                      : 'text-mx-text-muted hover:text-mx-text hover:bg-black/[0.03]'
                   }`}>
                     {isCompleted ? (
                       <CheckCircle size={13} className="text-mx-orange flex-shrink-0" />
                     ) : lessonChange ? (
                       <ChangeBadge change={lessonChange} locale={locale} />
                     ) : (
-                      <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-white/20'}`} />
+                      <div className={`w-3.5 h-3.5 rounded-full border flex-shrink-0 ${isCurrent ? 'border-mx-orange' : 'border-mx-border'}`} />
                     )}
                     <button
                       onClick={() => onNavigate?.(lesson.id)}
@@ -268,8 +294,8 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
                         className="flex-shrink-0 p-0.5"
                       >
                         {isLessonExpanded
-                          ? <ChevronUp size={12} className="text-white/30" />
-                          : <ChevronDown size={12} className="text-white/30" />
+                          ? <ChevronUp size={12} className="text-mx-text-muted" />
+                          : <ChevronDown size={12} className="text-mx-text-muted" />
                         }
                       </button>
                     )}
@@ -300,11 +326,11 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
                                 isCurrent
                                   ? isSelected
                                     ? 'text-mx-orange font-medium'
-                                    : 'text-mx-orange/60 hover:text-mx-orange'
-                                  : 'text-white/35 hover:text-white/60'
+                                    : 'text-mx-orange/70 hover:text-mx-orange'
+                                  : 'text-mx-text-muted hover:text-mx-text'
                               }`}
                             >
-                              <span className={`text-[10px] flex-shrink-0 ${isSelected ? 'text-mx-orange' : 'text-white/20'}`}>{topicIdx + 1}.</span>
+                              <span className={`text-[10px] flex-shrink-0 ${isSelected ? 'text-mx-orange' : 'text-mx-text-muted/60'}`}>{topicIdx + 1}.</span>
                               <span className="line-clamp-1">{topic.title[locale]}</span>
                               {newStar}
                             </button>
@@ -320,7 +346,7 @@ function SidebarBlock({ block, courseSlug, currentLessonId, completedLessons, up
               <Link
                 key={exam.id}
                 href={`/maxymia/campus/${courseSlug}/lesson/${block.lessons[block.lessons.length - 1].id}/exam?index=${examIdx}`}
-                className="flex items-center gap-2 px-4 pl-8 py-2.5 text-label-md text-purple-400/70 hover:text-purple-300 hover:bg-white/[0.03] transition-colors"
+                className="flex items-center gap-2 px-4 pl-8 py-2.5 text-label-md text-purple-700 hover:text-purple-900 hover:bg-black/[0.03] transition-colors"
               >
                 <FileQuestion size={11} className="flex-shrink-0" />
                 <span className="line-clamp-1">{exam.title[locale]}</span>

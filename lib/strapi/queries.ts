@@ -38,6 +38,8 @@ import type {
   StrapiProResource,
   ProResourceCard,
   ProResource,
+  StrapiVideoTestimonial,
+  VideoTestimonial,
 } from './types';
 import type { ContentBlock } from '@/app/maxymia/types';
 
@@ -97,6 +99,9 @@ function transformProgram(strapi: StrapiProgram): Program {
     audience: strapi.audiences || '',
     careers: strapi.careers || '',
     objectives: strapi.objectives || '',
+    extraSections: (strapi.extraSections ?? [])
+      .filter((x) => x?.title && x?.content)
+      .map((x) => ({ title: x.title, content: x.content, icon: x.icon ?? null })),
     isPro: strapi.isPro,
     proOnly: strapi.proOnly ?? false,
     haveDiscount: strapi.haveDiscount ?? false,
@@ -379,13 +384,33 @@ export async function getPrograms(
   }
 }
 
+
+// Populate de campos que pueden no existir aún en el Strapi de destino (orden
+// de deploy CMS → web). Strapi v5 responde 400 ante una clave desconocida, así
+// que si la petición falla se reintenta sin esos campos: la ficha sigue
+// funcionando aunque el CMS todavía no esté desplegado.
+const OPTIONAL_POPULATES = ['&populate[extraSections]=true'];
+async function strapiRequestTolerantPopulate<T>(
+  path: string,
+  options: Parameters<typeof strapiRequest>[1],
+): Promise<T> {
+  try {
+    return await strapiRequest<T>(path, options);
+  } catch (error) {
+    const stripped = OPTIONAL_POPULATES.reduce((acc, key) => acc.replace(key, ''), path);
+    if (stripped === path) throw error;
+    console.warn('[strapi] reintentando sin populates opcionales:', error instanceof Error ? error.message : error);
+    return await strapiRequest<T>(stripped, options);
+  }
+}
+
 export async function getProgramById(
   id: number | string,
   draft = false
 ): Promise<Program | null> {
   try {
-    const response = await strapiRequest<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+    const response = await strapiRequestTolerantPopulate<StrapiSingleResponse<StrapiProgram>>(
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -409,8 +434,8 @@ export async function getProgramBySlug(
   draft = false
 ): Promise<Program | null> {
   try {
-    const response = await strapiRequest<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
+    const response = await strapiRequestTolerantPopulate<StrapiResponse<StrapiProgram[]>>(
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],
@@ -1117,6 +1142,32 @@ export async function getLogos(limit = 100): Promise<Logo[]> {
       }));
   } catch (error) {
     console.error('Error fetching logos:', error);
+    return [];
+  }
+}
+
+// ============ Video testimonial Queries ============
+
+/** Testimonios en vídeo (conjunto GLOBAL). Devuelve [] si no hay ninguno o si
+ *  la colección aún no existe en ese Strapi (robusto al orden de deploy). */
+export async function getVideoTestimonials(): Promise<VideoTestimonial[]> {
+  try {
+    const response = await strapiRequest<StrapiResponse<StrapiVideoTestimonial[]>>(
+      '/api/video-testimonials?populate[video]=true&populate[poster]=true&pagination[pageSize]=50&sort=order:asc',
+      { revalidate: 600, tags: ['video-testimonials'] }
+    );
+    return response.data
+      .map((t) => ({
+        id: t.id,
+        name: t.name,
+        role: t.role ?? null,
+        quote: t.quote ?? null,
+        videoUrl: (t.videoUrl && t.videoUrl.trim()) || (t.video ? getStrapiMediaUrl(t.video) : ''),
+        posterUrl: t.poster ? getStrapiMediaUrl(t.poster) : null,
+      }))
+      .filter((t) => t.videoUrl);
+  } catch (error) {
+    console.warn('[getVideoTestimonials] sin testimonios:', error instanceof Error ? error.message : error);
     return [];
   }
 }
