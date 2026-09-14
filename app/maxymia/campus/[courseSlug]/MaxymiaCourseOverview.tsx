@@ -33,7 +33,7 @@ import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useExamResults, type ExamResult } from '@/app/hooks/useExamResults';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta, getCourseProgressStats, isLessonComplete } from '../../data/queries';
-import MaxymiaCourseDetail, { CourseThumbnail } from './MaxymiaCourseDetail';
+import MaxymiaCourseDetail from './MaxymiaCourseDetail';
 import { ContactCourse } from '@/app/components/ContactCourseProvider';
 import { FontStyles } from '@/app/components/FontStyles';
 import { Header } from '@/app/components/Header';
@@ -308,9 +308,11 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
             className="mb-6 md:mb-8"
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-            {/* ─── Columna principal ─── */}
-            <div className="lg:col-span-2 min-w-0">
+          <div className="max-w-[960px]">
+            {/* ─── Columna única: sin card lateral. Con el curso comprado, el
+                progreso y el CTA viven en el panel de retomar; los datos del
+                curso van en una fila compacta bajo el título. ─── */}
+            <div className="min-w-0">
               {/* Cabecera del curso */}
               <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                 <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -342,6 +344,14 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                     <p className="text-mx-text-muted text-label-md">{course.instructor.role}</p>
                   </div>
                 </div>
+                <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-label-md text-mx-text-muted mb-8">
+                  <MetaItem icon={Clock} label={durationLabel} />
+                  <MetaItem icon={BookOpen} label={`${totalLessons} ${locale === 'es' ? 'lecciones' : 'lessons'}`} />
+                  {totalExams > 0 && <MetaItem icon={FileQuestion} label={`${totalExams} ${locale === 'es' ? 'exámenes' : 'exams'}`} />}
+                  <MetaItem icon={GraduationCap} label={(course.level && LEVEL_LABELS[course.level]?.[locale]) || 'Principiante'} />
+                  <MetaItem icon={Globe} label={(course.language && LANGUAGE_LABELS[course.language]?.[locale]) || 'Español'} />
+                  <MetaItem icon={Monitor} label="Online" />
+                </ul>
               </m.div>
 
               {/* Panel "Continúa donde lo dejaste" — patrón Coursera/Platzi:
@@ -409,6 +419,14 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                       {isFullyCompleted ? <RotateCcw size={18} /> : <Play size={18} fill="currentColor" />}
                       {primaryLabel}
                     </Link>
+                    {!isFullyCompleted && nextLessonId && nextLessonId !== firstIncompleteLessonId && (
+                      <Link
+                        href={lessonHref(nextLessonId)}
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-body-sm font-light border border-mx-orange/50 text-mx-orange hover:bg-mx-orange/10 transition-colors"
+                      >
+                        <ArrowRight size={16} /> {locale === 'es' ? 'Siguiente lección' : 'Next lesson'}
+                      </Link>
+                    )}
                   </div>
                 </div>
               </m.section>
@@ -489,91 +507,14 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
 
             </div>
 
-            {/* ─── Panel lateral sticky: resumen y acciones ─── */}
-            <aside className="lg:col-span-1">
-              <div className="lg:sticky lg:top-32">
-                <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
-                  <CourseThumbnail course={course} locale={locale} />
-                  <div className="p-6 space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                      <StatItem icon={Monitor} label={locale === 'es' ? 'Modalidad' : 'Modality'} value="Online" />
-                      <StatItem icon={Globe} label={locale === 'es' ? 'Idioma' : 'Language'} value={(course.language && LANGUAGE_LABELS[course.language]?.[locale]) || 'Español'} />
-                      <StatItem icon={BookOpen} label={locale === 'es' ? 'Lecciones' : 'Lessons'} value={String(totalLessons)} />
-                      <StatItem icon={Clock} label={locale === 'es' ? 'Duración' : 'Duration'} value={durationLabel} />
-                      <StatItem icon={FileQuestion} label={locale === 'es' ? 'Exámenes' : 'Exams'} value={String(totalExams)} />
-                      <StatItem icon={GraduationCap} label={locale === 'es' ? 'Nivel' : 'Level'} value={(course.level && LEVEL_LABELS[course.level]?.[locale]) || 'Principiante'} />
-                    </div>
-
-                    <div className="border-t border-mx-border" />
-
-                    <div>
-                      <div className="flex items-baseline justify-between mb-2">
-                        <p className="text-body-md font-bold text-mx-text">{locale === 'es' ? 'Tu progreso' : 'Your progress'}</p>
-                        <p className={`text-heading-sm font-black ${isFullyCompleted ? 'text-amber-500' : 'text-mx-orange'}`}>{progressPercent}%</p>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-black/[0.06] overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-[width] duration-700 ${isFullyCompleted ? 'bg-amber-400' : 'bg-mx-orange'}`}
-                          style={{ width: `${progressPercent}%` }}
-                        />
-                      </div>
-                      <p className="text-label-md text-mx-text-muted mt-2">
-                        {completedValidCount} {locale === 'es' ? 'de' : 'of'} {totalLessons} {locale === 'es' ? 'lecciones completadas' : 'lessons completed'}
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      {isFullyCompleted ? (
-                        <>
-                          <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.06] px-4 py-3 text-center">
-                            <p className="text-amber-600 text-label-md font-bold">
-                              {locale === 'es' ? 'Enhorabuena, has completado este curso' : 'Congratulations, you completed this course'}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => setShowCertificate(true)}
-                            className="flex items-center justify-center gap-2 w-full bg-mx-orange text-white px-6 py-3.5 rounded-lg text-body-sm md:text-body-md font-medium hover:bg-mx-orange-dark transition-colors"
-                          >
-                            <Award size={18} /> {locale === 'es' ? 'Ver certificado' : 'View certificate'}
-                          </button>
-                          <Link
-                            href={lessonHref(course.blocks[0]?.lessons[0]?.id)}
-                            className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 rounded-lg text-body-sm font-light hover:bg-mx-orange/10 transition-colors"
-                          >
-                            <RotateCcw size={16} /> {locale === 'es' ? 'Repasar el curso' : 'Review course'}
-                          </Link>
-                        </>
-                      ) : (
-                        <>
-                          <Link
-                            href={lessonHref(firstIncompleteLessonId)}
-                            className="group flex items-center justify-center gap-3 w-full bg-mx-orange text-white px-6 py-4 rounded-lg text-body-sm md:text-body-md font-medium hover:bg-mx-orange-dark transition-colors"
-                          >
-                            <Play size={18} fill="currentColor" />
-                            {progress ? (locale === 'es' ? 'Continuar curso' : 'Continue course') : (locale === 'es' ? 'Comenzar curso' : 'Start course')}
-                          </Link>
-                          {nextLessonId && nextLessonId !== firstIncompleteLessonId && (
-                            <Link
-                              href={lessonHref(nextLessonId)}
-                              className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 rounded-lg text-body-sm font-light hover:bg-mx-orange/10 transition-colors"
-                            >
-                              <ArrowRight size={16} /> {locale === 'es' ? 'Ir a la siguiente lección' : 'Go to next lesson'}
-                            </Link>
-                          )}
-                        </>
-                      )}
-                    </div>
-
-                    <Link
-                      href="/maxymia/campus/mis-cursos"
-                      className="block text-center text-label-md text-mx-text-muted hover:text-mx-orange transition-colors"
-                    >
-                      ← {locale === 'es' ? 'Volver a mis cursos' : 'Back to my courses'}
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </aside>
+            <div className="mt-12 text-center">
+              <Link
+                href="/maxymia/campus/mis-cursos"
+                className="text-label-md text-mx-text-muted hover:text-mx-orange transition-colors"
+              >
+                ← {locale === 'es' ? 'Volver a mis cursos' : 'Back to my courses'}
+              </Link>
+            </div>
           </div>
         </div>
       </main>
@@ -637,17 +578,12 @@ function findResumeInfo(blocks: MaxymiaBlock[], lessonId: string | undefined) {
 
 // ─── Stat Item ──────────────────────────────────────────────────────
 
-function StatItem({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function MetaItem({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
-    <div className="flex items-start gap-2">
-      <div className="pt-0.5">
-        <Icon size={14} className="text-mx-orange" />
-      </div>
-      <div>
-        <p className="text-label-sm text-mx-text-muted uppercase tracking-widest">{label}</p>
-        <p className="text-mx-text text-body-sm font-medium">{value}</p>
-      </div>
-    </div>
+    <li className="inline-flex items-center gap-1.5">
+      <Icon size={13} className="text-mx-orange shrink-0" aria-hidden="true" />
+      {label}
+    </li>
   );
 }
 
