@@ -63,8 +63,13 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                   {course.description[locale]}
                 </p>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-full bg-mx-blue/10 text-mx-blue flex items-center justify-center font-semibold text-body-sm">
-                    {course.instructor.name.charAt(0)}
+                  <div className="w-9 h-9 rounded-full bg-mx-blue/10 text-mx-blue flex items-center justify-center font-semibold text-body-sm overflow-hidden">
+                    {course.instructor.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={course.instructor.avatar} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      course.instructor.name.trim().charAt(0).toUpperCase() || 'M'
+                    )}
                   </div>
                   <div>
                     <p className="text-mx-text text-body-sm font-medium">{course.instructor.name}</p>

@@ -1,18 +1,20 @@
+import { cookies } from 'next/headers';
 import CampusShell from './CampusShell';
 import { fetchMaxymiaCourses } from '../data/queries';
 
 /**
- * Chrome del campus (cabecera propia oscura + footer de Maxymia) para las
- * rutas que SON campus: dashboard, catálogo, mis cursos, notas, vista de
- * alumno de un curso y player de lección.
- *
- * Antes vivía en app/maxymia/campus/layout.tsx y envolvía también la ficha
- * pública de venta (/maxymia/campus/[slug] sin matrícula). Esa ficha ahora
- * lleva el Header/Footer del sitio, igual que las fichas de /programas, así
- * que el shell se aplica por ruta y la página del curso decide en servidor
- * cuál de los dos chromes pinta (sin parpadeo de cabecera).
+ * Chrome del campus (sidebar + cabecera del kit shadcn) para las rutas que
+ * SON campus: dashboard, catálogo, mis cursos, notas y player de lección.
+ * La ficha pública y la vista de alumno del curso van con el Header/Footer
+ * del sitio (ver [courseSlug]/page.tsx).
  */
 export default async function CampusChrome({ children }: { children: React.ReactNode }) {
-  const courses = await fetchMaxymiaCourses();
-  return <CampusShell courses={courses}>{children}</CampusShell>;
+  const [courses, cookieStore] = await Promise.all([fetchMaxymiaCourses(), cookies()]);
+  // Estado colapsado del sidebar persistido por cookie (como en /admin).
+  const defaultOpen = cookieStore.get('sidebar_state')?.value !== 'false';
+  return (
+    <CampusShell courses={courses} defaultOpen={defaultOpen}>
+      {children}
+    </CampusShell>
+  );
 }
