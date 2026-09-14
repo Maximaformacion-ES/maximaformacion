@@ -19,9 +19,14 @@ interface HeroCarouselProps {
   courses: MaxymiaCourse[];
   locale: Locale;
   t: (key: string) => string;
+  /** Acceso del alumno: con acceso se ofrece continuar/empezar y no se
+   *  muestra precio; sin acceso, "Ver curso" con el precio. */
+  hasAccess: (id: string, isPro?: boolean | null) => boolean;
+  progressMap: Record<string, MaxymiaCourseProgress>;
+  userHasPro: boolean;
 }
 
-function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
+function HeroCarousel({ courses, locale, t, hasAccess, progressMap, userHasPro }: HeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Auto-rotate every 10 seconds, reset timer on manual change
@@ -42,6 +47,10 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
       <AnimatePresence mode="wait">
         {courses.map((course, i) => {
           if (i !== activeIndex) return null;
+          const progress = progressMap[course.id];
+          const enrolled = hasAccess(course.id, course.isPro) || !!progress;
+          const started = !!progress && progress.completedLessons.length > 0;
+          const includedInPro = !!course.isPro && userHasPro;
           return (
             <m.div
               key={course.id}
@@ -77,20 +86,41 @@ function HeroCarousel({ courses, locale, t }: HeroCarouselProps) {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
-                  <Link
-                    href={`/maxymia/campus/${course.slug}`}
-                    className="inline-flex items-center gap-2 px-5 py-3 bg-mx-orange hover:bg-mx-orange-dark text-white font-medium rounded-lg transition-colors text-body-sm"
-                  >
-                    <Play size={16} fill="currentColor" />
-                    {t('campus.startLearning')}
-                    <ArrowRight size={16} />
-                  </Link>
-                  <div className="flex items-baseline gap-2">
-                    {course.originalPrice && course.originalPrice > course.price && (
-                      <span className="text-mx-text-muted text-body-sm line-through">{course.originalPrice}&euro;</span>
-                    )}
-                    <span className="text-mx-orange text-heading-sm font-black">{course.price}&euro;</span>
-                  </div>
+                  {enrolled ? (
+                    // Ya lo tiene: retomar, sin precio.
+                    <Link
+                      href={`/maxymia/campus/${course.slug}`}
+                      className="inline-flex items-center gap-2 px-5 py-3 bg-mx-orange hover:bg-mx-orange-dark text-white font-medium rounded-lg transition-colors text-body-sm"
+                    >
+                      <Play size={16} fill="currentColor" />
+                      {started
+                        ? (locale === 'es' ? 'Continuar curso' : 'Continue course')
+                        : (locale === 'es' ? 'Empezar el curso' : 'Start course')}
+                      <ArrowRight size={16} />
+                    </Link>
+                  ) : (
+                    <>
+                      <Link
+                        href={`/maxymia/campus/${course.slug}`}
+                        className="inline-flex items-center gap-2 px-5 py-3 bg-mx-orange hover:bg-mx-orange-dark text-white font-medium rounded-lg transition-colors text-body-sm"
+                      >
+                        {locale === 'es' ? 'Ver curso' : 'View course'}
+                        <ArrowRight size={16} />
+                      </Link>
+                      <div className="flex items-baseline gap-2">
+                        {includedInPro ? (
+                          <span className="text-mx-orange text-body-md font-bold">{locale === 'es' ? 'Incluido en tu Pro' : 'Included in your Pro'}</span>
+                        ) : (
+                          <>
+                            {course.originalPrice && course.originalPrice > course.price && (
+                              <span className="text-mx-text-muted text-body-sm line-through">{course.originalPrice}&euro;</span>
+                            )}
+                            <span className="text-mx-orange text-heading-sm font-black">{course.price}&euro;</span>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               {/* Imagen */}
@@ -226,7 +256,7 @@ interface CampusDashboardProps {
 export default function CampusDashboard({ courses }: CampusDashboardProps) {
   const { locale } = useLocale();
   const t = (key: string) => getTranslation(locale, key);
-  const { courseProgress, hasAccess, isLoading } = useUserCampus();
+  const { courseProgress, hasAccess, hasPro, isLoading } = useUserCampus();
   const { user } = useUser();
 
   // Build progress map
@@ -314,7 +344,14 @@ export default function CampusDashboard({ courses }: CampusDashboardProps) {
       )}
 
       {/* Destacado / nuevo */}
-      <HeroCarousel courses={heroSlides} locale={locale} t={t} />
+      <HeroCarousel
+        courses={heroSlides}
+        locale={locale}
+        t={t}
+        hasAccess={hasAccess}
+        progressMap={progressMap}
+        userHasPro={hasPro}
+      />
 
       {/* Course rows */}
       <div id="courses" className="w-full">
