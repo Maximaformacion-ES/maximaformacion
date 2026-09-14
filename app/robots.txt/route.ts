@@ -28,7 +28,9 @@ const RESTRICTIVE_BODY = `User-agent: *\nDisallow: /\n`;
 const DISALLOW_PATHS = [
   '/api/',
   '/perfil/',
-  '/cursos/',
+  // '/cursos/' NO se bloquea: es privado (login + matrícula, redirige a
+  // /sign-in) y no hay nada que indexar. Además, el legacy de WordPress es
+  // /curso/ en singular y Google debe poder rastrearlo para procesar los 301.
   '/sign-in',
   '/sign-up',
   // Campus Maxymia: NO bloquear el área entera. Las fichas de curso
@@ -76,7 +78,6 @@ ${aiAgentLines}
 Allow: /
 ${disallowLines}
 
-Host: ${SITE_URL}
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
 
