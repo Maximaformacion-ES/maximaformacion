@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext } from 'react';
+import { usePathname } from 'next/navigation';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { CampusSidebar } from '@/components/campus/campus-sidebar';
 import { CampusHeader } from '@/components/campus/campus-header';
@@ -35,14 +36,23 @@ interface CampusShellProps {
 
 function ShellInner({ children, courses, defaultOpen }: Required<Omit<CampusShellProps, 'defaultOpen'>> & { defaultOpen: boolean }) {
   const { locale } = useLocale();
+  const pathname = usePathname();
+  // Player de lección/examen: ocupa exactamente la ventana menos la cabecera
+  // (57 px) y SOLO hacen scroll su índice y su contenido, cada uno por su
+  // lado. Sin padding ni ancho máximo, y con la página bloqueada.
+  const isLessonPage = /\/maxymia\/campus\/[^/]+\/lesson\//.test(pathname);
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <CampusSidebar locale={locale} />
-      <SidebarInset className="bg-mx-bg text-mx-text">
+      <SidebarInset className={`bg-mx-bg text-mx-text ${isLessonPage ? 'h-svh max-h-svh overflow-hidden' : ''}`}>
         <CampusHeader locale={locale} courses={courses} />
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mx-auto w-full max-w-[1400px]">{children}</div>
-        </main>
+        {isLessonPage ? (
+          <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+        ) : (
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-[1400px]">{children}</div>
+          </main>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );
