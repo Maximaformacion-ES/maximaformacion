@@ -67,13 +67,14 @@ export default function DnaHelix({ className = '' }: { className?: string }) {
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    return mountParticleScene(host, {
+    const scene = mountParticleScene(host, {
       spin: buildHelix(),
       still: buildHalo(),
       tiltZ: THREE.MathUtils.degToRad(-20),
       speed: 0.18,
       visibleHeight: HEIGHT * VISIBLE,
     });
+    return scene.dispose;
   }, []);
   return <div ref={hostRef} className={className} aria-hidden="true" />;
 }

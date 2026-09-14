@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { BLUE, ORANGE, Cloud, gauss, mountParticleScene } from './particles';
+import { BLUE, ORANGE, Cloud, gauss, mountParticleScene, type ParticleSceneHandle } from './particles';
 
 /**
  * Figuras de partículas para las tarjetas "¿Qué es Maxymia?" de la landing.
@@ -117,21 +117,48 @@ const BUILDERS: Record<ParticleShape, () => THREE.BufferGeometry> = {
   path: buildPath,
 };
 
-export default function ParticleFigure({ shape, className = '' }: { shape: ParticleShape; className?: string }) {
+/**
+ * `active`: la figura está quieta por defecto; con `active` (hover de la
+ * tarjeta) las partículas tiemblan suavemente y el conjunto se balancea un
+ * poco. No rota nunca.
+ */
+export default function ParticleFigure({
+  shape,
+  active = false,
+  className = '',
+}: {
+  shape: ParticleShape;
+  active?: boolean;
+  className?: string;
+}) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<ParticleSceneHandle | null>(null);
+
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    return mountParticleScene(host, {
+    const scene = mountParticleScene(host, {
       spin: BUILDERS[shape](),
       tiltZ: shape === 'seal' ? 0 : THREE.MathUtils.degToRad(-12),
       tiltX: shape === 'seal' ? THREE.MathUtils.degToRad(35) : THREE.MathUtils.degToRad(10),
-      speed: 0.22,
+      speed: 0,
+      idleUntilActive: true,
+      wobble: 0.035,
       visibleHeight: 3.2,
       // Figuras ~2.5 unidades de alto (la hélice mide 18): partícula mucho
       // más pequeña para que se vea el grano y no manchas.
       scale: 34,
     });
+    sceneRef.current = scene;
+    return () => {
+      scene.dispose();
+      sceneRef.current = null;
+    };
   }, [shape]);
+
+  useEffect(() => {
+    sceneRef.current?.setActive(active);
+  }, [active]);
+
   return <div ref={hostRef} className={className} aria-hidden="true" />;
 }

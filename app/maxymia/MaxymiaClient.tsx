@@ -184,6 +184,45 @@ function HeroSection({ hero }: { hero: MaxymiaHomeData['hero'] }) {
 
 // ─── FEATURES SECTION ──────────────────────────────────
 
+/** Tarjeta "¿Qué es Maxymia?": la figura de partículas está quieta y solo se
+ *  mueve (sin rotar) mientras el ratón está sobre la tarjeta. */
+function FeatureCard({ card, index }: { card: MaxymiaCard; index: number }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative rounded-2xl border border-mx-border bg-mx-card overflow-hidden h-[320px] md:h-[360px] hover:border-mx-orange/40 hover:shadow-[0_16px_40px_-16px_rgba(26,26,26,0.18)] transition-all duration-500"
+    >
+      {/* Figura de partículas (Three.js) en la mitad derecha, fundida hacia
+          el texto. Sustituye a la imagen de fondo. */}
+      <div
+        className="absolute inset-y-0 right-0 w-[62%] pointer-events-none"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
+        }}
+      >
+        <ParticleFigure
+          shape={FEATURE_SHAPES[index % FEATURE_SHAPES.length]}
+          active={hovered}
+          className="absolute inset-0"
+        />
+      </div>
+
+      {/* Content — pinned to top left */}
+      <div className="absolute top-0 left-0 p-8 md:p-10 max-w-[70%] md:max-w-[58%]">
+        <h3 className="text-mx-text text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 group-hover:text-mx-orange transition-colors">{card.title}</h3>
+        <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light leading-relaxed">{card.description}</p>
+      </div>
+    </m.div>
+  );
+}
+
 function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'] }) {
   return (
     <section className="py-24 md:py-32 relative">
@@ -213,32 +252,7 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {section.cards.map((card: MaxymiaCard, i: number) => (
-            <m.div
-              key={card.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="group relative rounded-2xl border border-mx-border bg-mx-card overflow-hidden h-[320px] md:h-[360px] hover:border-mx-orange/40 hover:shadow-[0_16px_40px_-16px_rgba(26,26,26,0.18)] transition-all duration-500"
-            >
-              {/* Figura de partículas (Three.js) en la mitad derecha, fundida
-                  hacia el texto. Sustituye a la imagen de fondo. */}
-              <div
-                className="absolute inset-y-0 right-0 w-[62%] pointer-events-none"
-                style={{
-                  maskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
-                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
-                }}
-              >
-                <ParticleFigure shape={FEATURE_SHAPES[i % FEATURE_SHAPES.length]} className="absolute inset-0" />
-              </div>
-
-              {/* Content — pinned to top left */}
-              <div className="absolute top-0 left-0 p-8 md:p-10 max-w-[70%] md:max-w-[58%]">
-                <h3 className="text-mx-text text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 group-hover:text-mx-orange transition-colors">{card.title}</h3>
-                <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light leading-relaxed">{card.description}</p>
-              </div>
-            </m.div>
+            <FeatureCard key={card.title} card={card} index={i} />
           ))}
         </div>
       </div>

@@ -24,13 +24,22 @@ export const VERT = /* glsl */ `
   uniform float uPixelRatio;
   uniform float uFocus;   // z (en espacio de cámara) del plano enfocado
   uniform float uScale;   // factor de tamaño global (px)
+  uniform float uMotion;  // 0 = quieto, 1 = partículas "vivas" (hover)
+  uniform float uWobble;  // amplitud del temblor por partícula (unidades)
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
-    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    // Movimiento sin rotación: cada partícula tiembla suavemente alrededor de
+    // su sitio (fase propia por semilla). Solo cuando uMotion > 0.
+    vec3 p = position + uMotion * uWobble * vec3(
+      sin(uTime * 1.3 + aSeed * 21.0),
+      cos(uTime * 1.1 + aSeed * 37.0),
+      sin(uTime * 0.9 + aSeed * 53.0)
+    );
+    vec4 mv = modelViewMatrix * vec4(p, 1.0);
     float dz = abs(mv.z - uFocus);
     float blur = 1.0 + dz * 0.35;
-    float twinkle = 0.85 + 0.15 * sin(uTime * 1.6 + aSeed * 6.2831);
+    float twinkle = 1.0 - uMotion * (0.15 - 0.15 * sin(uTime * 1.6 + aSeed * 6.2831));
     vAlpha = 0.9 * twinkle / (1.0 + dz * dz * 0.4);
     vColor = aColor;
     gl_PointSize = aSize * blur * uPixelRatio * (uScale / -mv.z);
@@ -113,8 +122,17 @@ export interface ParticleSceneOptions {
   /** Inclinación fija del conjunto (rad). */
   tiltZ?: number;
   tiltX?: number;
-  /** Velocidad de giro (rad/s). */
+  /** Velocidad de giro (rad/s). 0 = no rota. */
   speed?: number;
+  /**
+   * Modo "quieto hasta hover": no anima nada por defecto; `setActive(true)`
+   * enciende un temblor suave de las partículas y un leve balanceo (sin
+   * rotación) y `setActive(false)` lo apaga con fundido. Si es false, la
+   * escena anima siempre (hélice del hero).
+   */
+  idleUntilActive?: boolean;
+  /** Amplitud del temblor por partícula en modo activo (unidades). */
+  wobble?: number;
   /** Alto visible del mundo (unidades) que debe caber en el lienzo. */
   visibleHeight: number;
   /** Desplazamiento horizontal del centro de la figura (unidades). */
@@ -124,11 +142,18 @@ export interface ParticleSceneOptions {
   fov?: number;
 }
 
+export interface ParticleSceneHandle {
+  dispose: () => void;
+  /** Solo con `idleUntilActive`: enciende/apaga el movimiento (hover). */
+  setActive: (active: boolean) => void;
+}
+
 /**
- * Monta la escena en `host` y devuelve la función de limpieza. Encapsula
- * renderer, cámara, bucle (pausado fuera de pantalla) y reduced-motion.
+ * Monta la escena en `host` y devuelve un manejador con `dispose` y
+ * `setActive`. Encapsula renderer, cámara, bucle (pausado fuera de pantalla)
+ * y reduced-motion.
  */
-export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): () => void {
+export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): ParticleSceneHandle {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fov = o.fov ?? 34;
   const half = THREE.MathUtils.degToRad(fov / 2);
@@ -158,6 +183,10 @@ export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): 
       uPixelRatio: { value: pr },
       uFocus: { value: -dist + 0.6 },
       uScale: { value: o.scale ?? 140 },
+      // La hélice (siempre animada) parpadea desde el principio; las figuras
+      // quietas arrancan en 0 y suben a 1 con el hover.
+      uMotion: { value: o.idleUntilActive ? 0 : 1 },
+      uWobble: { value: o.wobble ?? 0 },
     },
   });
 
@@ -187,17 +216,44 @@ export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): 
   let last = performance.now();
   let time = 0;
   const speed = o.speed ?? 0.18;
+  const idle = !!o.idleUntilActive;
+  let active = !idle; // objetivo del movimiento
+  let motion = idle ? 0 : 1; // valor actual (se funde hacia `active`)
+
   const loop = (now: number) => {
     raf = requestAnimationFrame(loop);
     if (!visible) return;
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     time += dt;
-    spin.rotation.y += dt * speed;
+    if (idle) {
+      // Fundido del movimiento (≈0,4 s) y, al llegar a 0, parar el bucle.
+      const target = active ? 1 : 0;
+      motion += (target - motion) * Math.min(1, dt * 6);
+      if (!active && motion < 0.01) {
+        motion = 0;
+        mat.uniforms.uMotion.value = 0;
+        spin.position.y = 0;
+        renderer.render(scene, camera);
+        cancelAnimationFrame(raf);
+        raf = 0;
+        return;
+      }
+      mat.uniforms.uMotion.value = motion;
+      // Leve balanceo vertical del conjunto, sin rotación.
+      spin.position.y = Math.sin(time * 1.2) * 0.05 * motion;
+    } else {
+      spin.rotation.y += dt * speed;
+    }
     mat.uniforms.uTime.value = time;
     renderer.render(scene, camera);
   };
-  if (!reduceMotion) raf = requestAnimationFrame(loop);
+  const start = () => {
+    if (raf || reduceMotion) return;
+    last = performance.now();
+    raf = requestAnimationFrame(loop);
+  };
+  if (!idle) start();
 
   const io = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
@@ -205,14 +261,21 @@ export function mountParticleScene(host: HTMLElement, o: ParticleSceneOptions): 
   });
   io.observe(host);
 
-  return () => {
-    cancelAnimationFrame(raf);
-    io.disconnect();
-    ro.disconnect();
-    o.spin.dispose();
-    o.still?.dispose();
-    mat.dispose();
-    renderer.dispose();
-    if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
+  return {
+    setActive: (v: boolean) => {
+      if (!idle) return;
+      active = v;
+      if (v) start();
+    },
+    dispose: () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      ro.disconnect();
+      o.spin.dispose();
+      o.still?.dispose();
+      mat.dispose();
+      renderer.dispose();
+      if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
+    },
   };
 }
