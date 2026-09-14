@@ -9,7 +9,6 @@ import {
   Users,
   FlaskConical,
   Award,
-  Route,
   Check,
   BookOpen,
   Play,
@@ -28,17 +27,14 @@ import MaxymiaCourseCard from './components/MaxymiaCourseCard';
 // Three.js solo en cliente y fuera del bundle inicial (WPO): la hélice es
 // decorativa y no debe retrasar el LCP del hero.
 const DnaHelix = dynamic(() => import('./components/DnaHelix'), { ssr: false });
+const ParticleFigure = dynamic(() => import('./components/ParticleFigure'), { ssr: false });
+
+// Figura de partículas por tarjeta "¿Qué es Maxymia?" (por orden en Strapi):
+// mentorías → red de nodos; certificación → sello; labs → átomo; rutas → camino.
+const FEATURE_SHAPES = ['network', 'seal', 'atom', 'path'] as const;
 
 const CAMPUS_URL = '/maxymia/campus';
 const CAMPUS_PUBLIC_HREF = '/sign-in?redirect_url=/maxymia/campus';
-
-// Icon/gradient maps for cards that don't have images from Strapi
-const FEATURE_VISUALS = [
-  { icon: Users, gradient: 'from-blue-600/30 via-indigo-500/20 to-transparent' },
-  { icon: Award, gradient: 'from-mx-orange/25 via-amber-500/15 to-transparent' },
-  { icon: FlaskConical, gradient: 'from-emerald-600/25 via-teal-500/15 to-transparent' },
-  { icon: Route, gradient: 'from-purple-600/25 via-violet-500/15 to-transparent' },
-];
 
 const WHY_VISUALS = [
   { icon: BookOpen, gradient: 'from-blue-600/20 via-cyan-500/10 to-transparent', accent: 'text-blue-400/10' },
@@ -205,49 +201,45 @@ function FeaturesSection({ section }: { section: MaxymiaHomeData['whatIsSection'
             <span className="text-mx-blue text-label-md tracking-wider">{section.overline}</span>
           </div>
           <h2
-            className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-6"
+            className="text-heading-lg md:text-display-sm 2xl:text-display-sm font-black text-mx-blue leading-[0.95] tracking-tight mb-6"
           >
             <ColoredTitle text={section.title}/>
           </h2>
-          <p className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-heading-sm font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-body-lg font-light max-w-2xl mx-auto leading-relaxed">
             {section.description}
           </p>
         </m.div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {section.cards.map((card: MaxymiaCard, i: number) => {
-            const visual = FEATURE_VISUALS[i % FEATURE_VISUALS.length];
-            return (
-              <m.div
-                key={card.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group relative rounded-2xl border border-mx-border overflow-hidden h-[320px] md:h-[360px] hover:border-mx-orange/30 transition-all duration-500 shadow-sm"
+          {section.cards.map((card: MaxymiaCard, i: number) => (
+            <m.div
+              key={card.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="group relative rounded-2xl border border-mx-border bg-mx-card overflow-hidden h-[320px] md:h-[360px] hover:border-mx-orange/40 hover:shadow-[0_16px_40px_-16px_rgba(26,26,26,0.18)] transition-all duration-500"
+            >
+              {/* Figura de partículas (Three.js) en la mitad derecha, fundida
+                  hacia el texto. Sustituye a la imagen de fondo. */}
+              <div
+                className="absolute inset-y-0 right-0 w-[62%] pointer-events-none"
+                style={{
+                  maskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
+                }}
               >
-                {/* Background image from Strapi or gradient fallback. Las
-                    tarjetas se mantienen oscuras (imagen + velo) para que el
-                    texto blanco encima siga siendo legible sobre la página clara. */}
-                {card.image ? (
-                  <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${card.image})` }}
-                  />
-                ) : (
-                  <div className={`absolute inset-0 bg-[#0b1018] bg-linear-to-br ${visual.gradient}`} />
-                )}
-                <div className="absolute inset-0 bg-[#0b1018]/60 group-hover:bg-[#0b1018]/50 transition-colors duration-500" />
+                <ParticleFigure shape={FEATURE_SHAPES[i % FEATURE_SHAPES.length]} className="absolute inset-0" />
+              </div>
 
-                {/* Content — pinned to top left */}
-                <div className="absolute top-0 left-0 right-0 p-8 md:p-10">
-                  <h3 className="text-white text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2">{card.title}</h3>
-                  <p className="text-white/70 text-body-sm 2xl:text-body-md font-light leading-relaxed max-w-md">{card.description}</p>
-                </div>
-              </m.div>
-            );
-          })}
+              {/* Content — pinned to top left */}
+              <div className="absolute top-0 left-0 p-8 md:p-10 max-w-[70%] md:max-w-[58%]">
+                <h3 className="text-mx-text text-body-lg md:text-heading-sm 2xl:text-heading-md font-bold mb-2 group-hover:text-mx-orange transition-colors">{card.title}</h3>
+                <p className="text-mx-text-muted text-body-sm 2xl:text-body-md font-light leading-relaxed">{card.description}</p>
+              </div>
+            </m.div>
+          ))}
         </div>
       </div>
     </section>
@@ -484,7 +476,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-heading-lg md:text-display-sm 2xl:text-display-md font-black text-mx-blue leading-[0.95] tracking-tight mb-6"
+          className="text-heading-lg md:text-display-sm 2xl:text-display-sm font-black text-mx-blue leading-[0.95] tracking-tight mb-6"
         >
           <ColoredTitle text={section.title}/>
         </m.h2>
@@ -494,7 +486,7 @@ function CTASection({ section }: { section: MaxymiaHomeData['ctaSection'] }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-heading-sm font-light leading-relaxed max-w-2xl mx-auto mb-10"
+          className="text-mx-text-muted text-body-md md:text-body-lg 2xl:text-body-lg font-light leading-relaxed max-w-2xl mx-auto mb-10"
         >
           {section.description}
         </m.p>
