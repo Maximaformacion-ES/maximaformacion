@@ -85,7 +85,8 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   const { totalLessons, totalMinutes, totalExams } = getCourseMeta(course);
   const searchParams = useSearchParams();
   const hasDescription = !!course.description?.[locale]?.trim();
-  const [activeTab, setActiveTab] = useState<TabId>(hasDescription ? 'description' : 'objectives');
+  // Objetivos como pestaña inicial (es lo que el alumno quiere ver primero).
+  const [activeTab, setActiveTab] = useState<TabId>('objectives');
   const [showCertificate, setShowCertificate] = useState(false);
   // El portal solo puede montarse en cliente; useMounted() da false en SSR/
   // hidratación y true tras montar, sin setState en efecto.
@@ -274,10 +275,10 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
   }
 
   const tabs: { id: TabId; label: Record<Locale, string>; icon: React.ElementType }[] = [
+    { id: 'objectives', label: { es: 'Objetivos', en: 'Objectives' }, icon: Target },
     ...(hasDescription
       ? [{ id: 'description' as const, label: { es: 'Descripción', en: 'Description' }, icon: BookOpen }]
       : []),
-    { id: 'objectives', label: { es: 'Objetivos', en: 'Objectives' }, icon: Target },
     { id: 'audience', label: { es: 'A quién va dirigido', en: 'Who is this for' }, icon: Users },
     { id: 'careers', label: { es: 'Salidas profesionales', en: 'Career paths' }, icon: Briefcase },
   ];
@@ -485,32 +486,9 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
           {/* ─── 3. Dos columnas: temario + panel lateral ─── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
             <div className="lg:col-span-2 min-w-0">
+              {/* Sobre el curso (objetivos, descripción, audiencia, salidas)
+                  ANTES del temario. */}
               <m.section {...fadeUp(0.14)} className="mb-12">
-                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
-                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
-                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
-                  </h2>
-                  <p className="text-label-md text-mx-text-muted">
-                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
-                  </p>
-                </div>
-                <div className="space-y-3">
-                  {course.blocks.map((block, blockIdx) => (
-                    <ModuleCard
-                      key={block.id}
-                      block={block}
-                      blockIndex={blockIdx}
-                      courseSlug={course.slug}
-                      completedSet={completedSet}
-                      firstIncompleteLessonId={firstIncompleteLessonId}
-                      locale={locale}
-                      examResultsByExamId={examResultsByExamId}
-                    />
-                  ))}
-                </div>
-              </m.section>
-
-              <m.section {...fadeUp(0.2)}>
                 <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue mb-4">
                   {locale === 'es' ? 'Sobre el curso' : 'About the course'}
                 </h2>
@@ -548,6 +526,31 @@ export default function MaxymiaCourseOverview({ course, initialHasAccess, teache
                   )}
                 </div>
               </m.section>
+              <m.section {...fadeUp(0.2)}>
+                <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                  <h2 className="text-heading-md md:text-heading-lg font-black tracking-tight text-mx-blue">
+                    {locale === 'es' ? 'Contenido del curso' : 'Course content'}
+                  </h2>
+                  <p className="text-label-md text-mx-text-muted">
+                    {course.blocks.length} {locale === 'es' ? 'bloques' : 'blocks'} · {totalLessons} {locale === 'es' ? 'lecciones' : 'lessons'} · {durationLabel}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {course.blocks.map((block, blockIdx) => (
+                    <ModuleCard
+                      key={block.id}
+                      block={block}
+                      blockIndex={blockIdx}
+                      courseSlug={course.slug}
+                      completedSet={completedSet}
+                      firstIncompleteLessonId={firstIncompleteLessonId}
+                      locale={locale}
+                      examResultsByExamId={examResultsByExamId}
+                    />
+                  ))}
+                </div>
+              </m.section>
+
             </div>
 
             {/* Panel lateral: lo que NO está ya en la cabecera */}
