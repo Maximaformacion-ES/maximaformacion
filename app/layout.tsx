@@ -217,6 +217,11 @@ gtag('consent', 'default', {
                 data-cbid={COOKIEBOT_ID}
                 data-blockingmode="auto"
                 data-culture="ES"
+                // Sin el icono flotante permanente ("Privacy trigger"): una vez
+                // aceptadas o rechazadas las cookies no queda nada en pantalla.
+                // El consentimiento se puede cambiar desde "Configurar cookies"
+                // en el footer (Cookiebot.renew()), que es lo que exige el RGPD.
+                data-widget-enabled="false"
                 strategy="afterInteractive"
               />
             </>
