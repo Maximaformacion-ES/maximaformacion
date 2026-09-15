@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { getBlogPostBySlug, getRelatedPosts, getAllBlogSlugs } from '@/lib/strapi/queries';
+import { rethrowIfStrapiUnavailable } from '@/lib/strapi/client';
+import { notFound } from 'next/navigation';
 import { JsonLd } from '@/app/components/JsonLd';
 import { blogPostSchema, breadcrumbSchema } from '@/lib/seo/jsonld';
 import BlogDetailClient from './BlogDetailClient';
@@ -65,9 +67,15 @@ export default async function BlogPage({ params }: BlogPageProps) {
       post = strapiPost;
       relatedPosts = await getRelatedPosts(strapiPost, 3);
     }
-  } catch {
-    // Strapi unavailable
+  } catch (e) {
+    // Strapi caído → relanzar: ISR conserva la última versión buena en vez de
+    // cachear un 404. Otros errores → seguimos con post = null.
+    rethrowIfStrapiUnavailable(e);
   }
+
+  // Slug inexistente → 404 real. Antes se devolvía 200 con una vista "404",
+  // y Google indexaba como páginas válidas cualquier URL mal escrita del blog.
+  if (!post) notFound();
 
   const schemas = post
     ? [

@@ -13,6 +13,7 @@ const PAGES: SitemapEntry[] = [
   { loc: '/contacto', changefreq: 'yearly', priority: 0.4 },
   { loc: '/pricing', changefreq: 'monthly', priority: 0.6 },
   { loc: '/maxymia', changefreq: 'monthly', priority: 0.5 },
+  { loc: '/pack-cursos-universitarios', changefreq: 'weekly', priority: 0.7 },
   { loc: '/politica-de-privacidad', changefreq: 'yearly', priority: 0.2 },
   { loc: '/aviso-legal', changefreq: 'yearly', priority: 0.2 },
   { loc: '/politica-de-cookies', changefreq: 'yearly', priority: 0.2 },

@@ -59,6 +59,7 @@ const isPublicRoute = createRouteMatcher([
   '/autores(.*)',
   '/sitemap-autores.xml',
   '/robots.txt',
+  '/llms.txt',
   '/sitemap.xml',
   '/sitemap-pages.xml',
   '/sitemap-cursos.xml',

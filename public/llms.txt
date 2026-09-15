@@ -1,0 +1,69 @@
+# Máxima Formación
+
+> Máxima Formación ofrece formación online en estadística aplicada, ciencia de datos, inteligencia artificial, investigación y docencia digital, con acompañamiento humano individualizado por especialistas. Su web reúne los programas de formación, el área Maxymia de IA aplicada a ciencias y los servicios de consultoría estadística y bioestadística.
+
+El sitio público de referencia es https://www.maximaformacion.es/. La formación se dirige a profesionales, investigadores, estudiantes, docentes, interinos y opositores, según el programa. La bioestadística es una especialidad del servicio de consultoría; el catálogo formativo incluye estadística aplicada y metodología de investigación en salud.
+
+Las fichas de cada programa contienen su temario, destinatarios y condiciones. Los precios, disponibilidad, duración, requisitos y certificación deben comprobarse en la ficha correspondiente. La titulación o el aval de un programa no se extienden automáticamente al resto del catálogo. La formación orientada a acreditaciones docentes está sujeta a los requisitos de cada convocatoria y a la valoración de la Administración competente.
+
+Este índice enlaza páginas públicas en HTML. Las descripciones resumen su contenido y no sustituyen la información detallada de cada página.
+
+## Información de la organización
+
+- [Inicio](https://www.maximaformacion.es/): Presentación de Máxima Formación y acceso a sus áreas de actividad.
+- [Conócenos](https://www.maximaformacion.es/conocenos): Historia, misión y equipo de Máxima Formación.
+- [Profesorado](https://www.maximaformacion.es/profesorado): Perfiles y especialidades del equipo docente.
+- [Contacto](https://www.maximaformacion.es/contacto): Atención sobre programas, necesidades formativas y formación para empresas.
+- [Catálogo de programas](https://www.maximaformacion.es/programas): Consulta de la oferta de cursos y másteres.
+
+## Moodle, eXeLearning y docencia digital
+
+- [Curso de Moodle y eXeLearning para docentes](https://www.maximaformacion.es/programas/curso-moodle-para-docentes-con-exelearning): Tutoría virtual, actividades, evaluación y creación de materiales educativos con eXeLearning. Información del programa orientado a docentes y a determinados procedimientos de acreditación.
+- [Curso de Administrador de Moodle](https://www.maximaformacion.es/programas/curso-de-administrador-moodle): Configuración y administración del campus, cursos, usuarios, roles, permisos y matriculación.
+- [Curso de H5P en Moodle](https://www.maximaformacion.es/programas/curso-h5p-en-moodle-actividades-interactivas): Creación, integración y reutilización de actividades interactivas para el aprendizaje y la evaluación.
+
+## Másteres en estadística y machine learning
+
+- [Máster en Estadística Aplicada para Data Science con R](https://www.maximaformacion.es/programas/master-de-estadistica-aplicada-con-r-software): Itinerario de análisis de datos con R, inferencia, diseño experimental, métodos multivariantes y Trabajo Fin de Máster.
+- [Máster en Machine Learning con R](https://www.maximaformacion.es/programas/master-de-machine-learning-con-r): Programación en R, preparación de datos, aprendizaje supervisado y no supervisado, evaluación de modelos e introducción a redes neuronales.
+
+## Cursos de análisis de datos con R
+
+- [Introducción a R y RStudio](https://www.maximaformacion.es/programas/curso-de-introduccion-a-r-software): Iniciación al lenguaje, trabajo con datos e informes reproducibles.
+- [Diseño experimental e inferencia con R](https://www.maximaformacion.es/programas/curso-de-diseno-experimental-e-inferencia-con-r): Planificación de experimentos, hipótesis, ANOVA y diseños factoriales.
+- [Correlación y regresión lineal con R](https://www.maximaformacion.es/programas/curso-de-analisis-de-correlacion-y-regresion-lineal-con-r): Relaciones entre variables, modelización, diagnóstico e interpretación de resultados.
+- [Análisis de componentes principales con R](https://www.maximaformacion.es/programas/curso-de-analisis-de-componentes-principales-pca-con-r): Preparación de datos multivariantes, reducción de dimensionalidad e interpretación del PCA.
+- [Series temporales con R](https://www.maximaformacion.es/programas/curso-de-analisis-practico-de-series-temporales-con-r): Análisis temporal, modelos ARIMA y SARIMA y evaluación de predicciones.
+- [Árboles de decisión con R](https://www.maximaformacion.es/programas/curso-de-arboles-de-decision-con-r): Árboles y modelos ensemble para clasificación y regresión.
+- [Machine Learning con caret en R](https://www.maximaformacion.es/programas/curso-de-machine-learning-con-caret-en-r): Entrenamiento, comparación y ajuste de modelos mediante un flujo común de trabajo.
+- [Análisis cluster con R](https://www.maximaformacion.es/programas/curso-de-machine-learning-analisis-cluster-con-r): Aprendizaje no supervisado, agrupación jerárquica, k-medias y evaluación de segmentaciones.
+
+## Cursos de ciencia de datos con Python
+
+- [Introducción a Python para ciencia de datos](https://www.maximaformacion.es/programas/curso-de-introduccion-a-python-para-la-ciencia-de-datos): Programación desde cero, manipulación de datos y visualización.
+- [Regresión lineal con Python](https://www.maximaformacion.es/programas/curso-de-regresion-lineal-con-python): Modelización de relaciones, regularización y modelos logísticos.
+- [Árboles de decisión con Python](https://www.maximaformacion.es/programas/curso-de-arboles-de-decision-con-python): Modelos ensemble e interpretación de predicciones con PDP, LIME y SHAP.
+
+## Investigación y estadística aplicada a la salud
+
+- [Investigación y comunicación científica](https://www.maximaformacion.es/programas/formacion-en-investigacion-y-comunicacion-cientifica): Búsqueda y lectura crítica de literatura, referencias bibliográficas y redacción científica.
+- [Metodología de investigación cualitativa](https://www.maximaformacion.es/programas/metodologia-de-investigacion-cualitativa-nivel-basico): Diseño de estudios cualitativos, entrevistas, observación y análisis de discursos en salud.
+- [Fundamentos de estadística aplicada a la salud](https://www.maximaformacion.es/programas/fundamentos-de-estadistica-aplicada-a-la-salud-estadistica-elemental): Nivel elemental para comprender datos clínicos y epidemiológicos y resultados de investigación.
+
+## Maxymia e inteligencia artificial aplicada
+
+- [Maxymia](https://www.maximaformacion.es/maxymia): Área de Máxima Formación dedicada a inteligencia artificial aplicada a ciencias.
+- [IA para científicos](https://www.maximaformacion.es/maxymia/campus/ia-para-cientificos-automatizacion-inteligente): Herramientas de IA para búsquedas bibliográficas, comunicación científica y automatización de tareas, sin conocimientos previos de programación.
+- [Prompt Engineering](https://www.maximaformacion.es/maxymia/campus/el-arte-de-preguntar-mastering-prompt-engineering): Formulación y mejora de instrucciones para herramientas de inteligencia artificial generativa.
+- [Análisis seguro de datos con IA](https://www.maximaformacion.es/maxymia/campus/analisis-de-datos-con-ia-seguridad-preparacion-exploracion-y-automatizacion): Privacidad, anonimización, preparación, exploración, automatización y gobernanza de datos.
+- [Detección de fraude de datos con R](https://www.maximaformacion.es/maxymia/campus/deteccion-de-fraude-de-datos-con-r-benford-iqr-mad-e-isolation-forest): Métodos de Benford, IQR, MAD e Isolation Forest para identificar anomalías y priorizar su revisión. Las anomalías no constituyen por sí solas una prueba de fraude.
+
+## Consultoría
+
+- [Consultoría estadística y bioestadística](https://www.maximaformacion.es/consultoria): Diseño y planificación de estudios, tamaño muestral, preparación y análisis de datos, visualización e interpretación para investigación y organizaciones.
+
+## Optional
+
+- [Blog](https://www.maximaformacion.es/blog): Artículos y recursos sobre las áreas de especialización de Máxima Formación.
+- [Aviso legal](https://www.maximaformacion.es/aviso-legal): Identificación del titular y condiciones legales del sitio.
+- [Política de privacidad](https://www.maximaformacion.es/politica-de-privacidad): Información sobre tratamiento de datos personales.

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { rethrowIfStrapiUnavailable } from '@/lib/strapi/client';
 import { draftMode } from 'next/headers';
 import {
   getResourceBySlug,
@@ -64,9 +66,14 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
       bodyHtml = strapiResource.body ? await markdownToHtml(strapiResource.body) : '';
       relatedResources = await getRelatedResources(strapiResource, 3);
     }
-  } catch {
-    // Strapi unavailable
+  } catch (e) {
+    // Strapi caído → relanzar: ISR conserva la última versión buena en vez de
+    // cachear un 404. Otros errores → seguimos con resource = null.
+    rethrowIfStrapiUnavailable(e);
   }
+
+  // Slug inexistente → 404 real (antes 200 con vista "no encontrado").
+  if (!resource) notFound();
 
   return (
     <RecursoDetailClient
