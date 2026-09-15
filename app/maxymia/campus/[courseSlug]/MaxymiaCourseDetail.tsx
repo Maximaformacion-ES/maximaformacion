@@ -65,40 +65,10 @@ const LANGUAGE_LABELS: Record<string, string> = {
 // ─── Course Thumbnail (replicates card style) ───────────────────
 
 export function CourseThumbnail({ course, locale }: { course: MaxymiaCourse; locale: Locale }) {
-  const title = course.thumbnailTitle?.[locale] || course.title[locale];
-  const lines = title.split('\n');
-
+  // Solo la imagen del curso, sin el fondo azul, el título ni los chevrones.
   return (
-    <div className="relative aspect-video bg-[#527be7] overflow-hidden flex items-center justify-center">
-      {/* Background image faded */}
-      <img
-        src={course.image}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-20"
-      />
-      {/* Dark glow */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-full h-[60%] bg-[#0b1018]/50 blur-[30px]" />
-      </div>
-      {/* Left chevron */}
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 z-10">
-        <img src="/iconBlue.svg" alt="" className="w-12 h-auto" />
-      </div>
-      {/* Right chevron */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10">
-        <img src="/iconOrange.svg" alt="" className="w-12 h-auto" />
-      </div>
-      {/* Title */}
-      <div className="relative z-10 text-center px-12">
-        {lines.length > 1 ? (
-          <>
-            <p className="text-white/70 text-label-md tracking-widest uppercase font-medium">{lines[0]}</p>
-            <p className="text-white text-heading-md font-black tracking-tight leading-tight">{lines.slice(1).join(' ')}</p>
-          </>
-        ) : (
-          <p className="text-white text-heading-sm font-black tracking-tight leading-tight uppercase">{lines[0]}</p>
-        )}
-      </div>
+    <div className="relative aspect-video overflow-hidden bg-mx-border">
+      <img src={course.image} alt={course.title[locale]} className="absolute inset-0 w-full h-full object-cover" />
     </div>
   );
 }
