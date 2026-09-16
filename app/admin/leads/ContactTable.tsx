@@ -12,6 +12,12 @@ import {
 } from '@/components/ui/dialog';
 import type { ContactMessage } from '@/lib/admin/leads';
 
+/** El formulario guarda en `subject` el curso elegido ('general' = sin curso). */
+function courseOf(c: ContactMessage): string | null {
+  const s = c.subject?.trim();
+  return s && s.toLowerCase() !== 'general' ? s : null;
+}
+
 function fmt(d: string): string {
   return new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 }
@@ -27,6 +33,7 @@ export default function ContactTable({ messages }: { messages: ContactMessage[] 
             <TableHead>Nombre</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Teléfono</TableHead>
+            <TableHead>Curso</TableHead>
             <TableHead>Mensaje</TableHead>
             <TableHead>Fecha</TableHead>
           </TableRow>
@@ -42,6 +49,13 @@ export default function ContactTable({ messages }: { messages: ContactMessage[] 
               <TableCell className="font-medium">{c.name}</TableCell>
               <TableCell className="text-muted-foreground">{c.email}</TableCell>
               <TableCell className="text-xs text-muted-foreground">{c.phone?.trim() || '—'}</TableCell>
+              <TableCell className="max-w-[220px] truncate text-xs" title={courseOf(c) ?? undefined}>
+                {courseOf(c) ? (
+                  <span className="rounded-full bg-mx-orange/10 px-2 py-0.5 font-medium text-mx-orange-dark">{courseOf(c)}</span>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                )}
+              </TableCell>
               <TableCell className="max-w-[280px] truncate text-xs text-muted-foreground">
                 {c.message}
               </TableCell>
@@ -74,6 +88,8 @@ export default function ContactTable({ messages }: { messages: ContactMessage[] 
               <div className="grid grid-cols-[110px_1fr] gap-3 py-2">
                 <span className="text-xs font-medium text-muted-foreground">Recibido</span>
                 <span className="text-sm">{fmt(selected.createdAt)}</span>
+                <span className="text-xs font-medium text-muted-foreground">Curso</span>
+                <span className="text-sm">{courseOf(selected) ?? 'Sin curso (consulta general)'}</span>
               </div>
 
               <div>

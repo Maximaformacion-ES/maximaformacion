@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getAuthorBySlug } from '@/lib/strapi/queries';
 import { sendEmail } from '@/lib/email/client';
+import { db } from '@/lib/db/client';
+import { contactMessages } from '@/lib/db/schema';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -41,6 +43,23 @@ export async function POST(request: Request) {
     const docente = await getAuthorBySlug(docenteSlug);
     if (!docente?.email) {
       return NextResponse.json({ error: 'Este docente no tiene contacto disponible.' }, { status: 404 });
+    }
+
+    // Guardar en contact_messages (fuente del panel /admin/leads) con el curso
+    // en `subject`, igual que el formulario de /contacto. Best-effort: si la BD
+    // falla, el email al docente se envía igual.
+    try {
+      await db.insert(contactMessages).values({
+        name,
+        email,
+        phone: null,
+        subject: courseTitle || null,
+        message: `[Consulta al tutor ${docente.name ?? docenteSlug}]\n${message}`,
+        referer: request.headers.get('referer'),
+        userAgent: request.headers.get('user-agent'),
+      });
+    } catch (err) {
+      console.error('[docente-contact] no se pudo guardar en contact_messages:', err);
     }
 
     const safeMsg = escapeHtml(message).replace(/\n/g, '<br/>');
