@@ -3,8 +3,9 @@
 // Estos cursos NO existen todavía en Strapi ni en el campus: son estudios
 // propios de la UCAV en fase de lanzamiento (inicio previsto: octubre 2026,
 // según los anexos de solicitud). La página /pack-cursos-universitarios y la
-// ficha individual del SAAC (/programas/atencion-educativa-saac) cobran por
-// Stripe sin crear matrícula; el acceso se asigna después desde el admin.
+// ficha del SAAC (/programas/atencion-educativa-saac, programa de Strapi)
+// cobran por Stripe sin crear matrícula; el acceso se asigna después desde el
+// admin.
 // Fuente del temario: ANEXO_CU_*.docx (solicitud de aprobación UCAV, jul-2026).
 //
 // Precios (sep-2026, cambio pedido por el cliente): ya NO es un 3×2. Cada curso
@@ -34,25 +35,12 @@ export interface PackCourse {
   moduleDetails?: { title: string; theory: string; practice: string }[];
   /** Portada (webp optimizado en public/pack/); opcional hasta tenerlas todas. */
   image?: string;
-  /** Ficha individual (solo los cursos con campaña propia; hoy, el de SAAC).
-   *  Se pinta con los MISMOS componentes que /programas/[slug] (misma ficha
-   *  que el resto de formación), así que el contenido va en markdown como en
-   *  Strapi. Ruta: /programas/<slug> (ruta estática, gana a [id]). */
-  ficha?: {
-    slug: string;
-    /** Pestaña Descripción (markdown). */
-    longDescription: string;
-    /** Pestaña Objetivos (markdown, lista). */
-    objectives: string;
-    /** Pestaña A quién va dirigido (markdown, lista). */
-    audience: string;
-    /** Pestaña Salidas profesionales (markdown). */
-    careers: string;
-    /** Pestañas extra (p. ej. la plaza de profesorado, la acreditación UCAV). */
-    extraSections: { title: string; content: string; icon?: string }[];
-    /** Preguntas frecuentes propias de la ficha. */
-    faqs: { question: string; answer: string }[];
-  };
+  /** Ficha individual en /programas: el programa existe EN STRAPI (el cliente
+   *  edita título, descripción, temario, pestañas, FAQ… desde el admin) con
+   *  este slug. Lo único que aporta este fichero es el vínculo curso↔item de
+   *  compra: /programas/[id] detecta el slug y cobra sin cuenta por
+   *  /api/pack/checkout. Alta inicial: scripts/seed-saac-program.mjs. */
+  ficha?: { slug: string };
 }
 
 export const PACK_COURSES: PackCourse[] = [
@@ -185,104 +173,7 @@ export const PACK_COURSES: PackCourse[] = [
         practice: 'Diseño de una situación de aprendizaje inclusiva para un alumno con discapacidad motora incorporando adaptaciones y un SAAC.',
       },
     ],
-    ficha: {
-      slug: 'atencion-educativa-saac',
-      longDescription: `El **Curso Universitario en Atención Educativa al Alumnado con Discapacidad Motora y Sistemas Aumentativos y Alternativos de Comunicación (SAAC)** es un título propio de la **Universidad Católica de Ávila (UCAV)** de 6 créditos ECTS (150 horas), 100 % online y a tu ritmo, impartido por Máxima Formación.
-
-Está pensado para docentes y profesionales de apoyo que necesitan dar una **respuesta educativa real** al alumnado con discapacidad motora: desde la evaluación psicopedagógica y las adaptaciones de acceso al currículo hasta las tecnologías de apoyo y, muy especialmente, los **Sistemas Aumentativos y Alternativos de Comunicación**: sistemas pictográficos (ARASAAC, SPC), comunicadores dinámicos, acceso alternativo y diseño de situaciones de aprendizaje inclusivas.
-
-Es, además, la formación específica que se pide en la **convocatoria de plaza de profesorado publicada recientemente** (consulta la pestaña "Plaza de profesorado").
-
-**Matrícula abierta.** El curso arranca el **5 de octubre de 2026**: al matricularte ahora reservas tu plaza y te avisamos por email en cuanto se abra el acceso al campus. Al superarlo recibirás el **Certificado Universitario** de la UCAV con la denominación exacta del curso.`,
-      objectives: `- Comprender la **educación inclusiva** y el marco normativo de atención a la diversidad (NEAE, DUA, accesibilidad educativa).
-- Conocer la **discapacidad motora**: concepto, clasificación, características del alumnado e implicaciones educativas.
-- Interpretar una **evaluación psicopedagógica** y elaborar propuestas de intervención en coordinación con los equipos de orientación.
-- Diseñar **adaptaciones de acceso y curriculares**, metodologías inclusivas y organización del aula.
-- Evaluar y seleccionar **tecnologías y productos de apoyo** para distintos perfiles de alumnado.
-- Dominar los fundamentos de los **SAAC**: clasificación, criterios de selección y principios de intervención.
-- Diseñar **tableros y materiales de comunicación** con sistemas pictográficos (ARASAAC, SPC, agendas visuales, lectura fácil).
-- Configurar **comunicadores** y recursos tecnológicos: aplicaciones móviles, seguimiento ocular, pulsadores y dispositivos de acceso alternativo.
-- Planificar la **implementación educativa** de un SAAC en el aula, con la familia y con seguimiento del alumnado.
-- Diseñar una **situación de aprendizaje inclusiva** completa para un alumno con discapacidad motora.`,
-      audience: `- **Docentes** de Educación Infantil, Primaria y Secundaria que optan a plazas de atención a la diversidad.
-- Maestros y maestras de **Pedagogía Terapéutica** y **Audición y Lenguaje**.
-- **Orientadores, pedagogos y psicopedagogos**.
-- Profesionales de **apoyo educativo** (PTIS, educadores, auxiliares) que trabajan con alumnado con necesidades de comunicación.
-- Opositores y aspirantes a **plazas de profesorado** que requieren formación acreditada en atención al alumnado con discapacidad motora y SAAC.`,
-      careers: `- Acreditar la **formación específica exigida** en la convocatoria de plaza de profesorado para la atención al alumnado con discapacidad motora y SAAC.
-- Puntuar como **formación universitaria** (6 ECTS, Certificado Universitario UCAV) en baremos de oposiciones, bolsas de trabajo e interinidades.
-- Ejercer como docente de apoyo, **PT o AL** con alumnado usuario de SAAC.
-- Asesorar a centros y familias en la **selección e implantación de sistemas de comunicación** y tecnologías de apoyo.`,
-      extraSections: [
-        {
-          title: 'Plaza de profesorado',
-          icon: 'briefcase',
-          // TODO (cliente): organismo convocante, plazo de presentación,
-          // requisitos de la plaza y enlace a las bases. Hasta entonces, texto
-          // genérico.
-          content: `## Formación necesaria para la plaza de profesorado
-
-Este Curso Universitario cubre la **formación específica que se pide en la convocatoria de plaza de profesorado publicada recientemente**: atención educativa al alumnado con discapacidad motora y manejo de Sistemas Aumentativos y Alternativos de Comunicación (SAAC).
-
-- **Certificado Universitario** de la Universidad Católica de Ávila (UCAV) con la denominación exacta del curso.
-- **6 créditos ECTS (150 horas)**, acreditables como formación universitaria.
-- **Matrícula abierta ya**: reservas tu plaza hoy y el curso arranca el 5 de octubre de 2026. Te avisamos por email en cuanto se abra el acceso.
-
-¿Dudas sobre si este curso encaja con los requisitos de tu convocatoria? Escríbenos a [cursos@maximaformacion.es](mailto:cursos@maximaformacion.es) y te lo confirmamos.`,
-        },
-        {
-          title: 'Acreditación universitaria',
-          icon: 'graduation',
-          content: `## Certificado Universitario UCAV
-
-- Título propio de la **Universidad Católica de Ávila (UCAV)**: "Curso Universitario en Atención Educativa al Alumnado con Discapacidad Motora y Sistemas Aumentativos y Alternativos de Comunicación (SAAC)".
-- **6 ECTS · 150 horas** de trabajo del estudiante, organizadas en 10 módulos con evaluación continua.
-- Calificación numérica de 0 a 10 (Real Decreto 1125/2003).
-- Modalidad **a distancia**; enseñanza en español e inglés.
-- La gestión administrativa (matrícula, actas y certificados) la realiza el centro solicitante (BIOMÁXIMA INFORMACIÓN Y EXPERIMENTACIÓN CIENTÍFICA, S.L.U.). El coste de expedición del certificado no está incluido en la matrícula.
-- Los títulos propios no tienen carácter oficial: su valor es curricular y profesional.
-
-¿Te interesan también los cursos de **IA con eXeLearning** y **H5P e IA para Moodle**? Con el [Pack 3 Cursos Universitarios](/pack-cursos-universitarios) tienes los tres (14 ECTS) por 290 €.`,
-        },
-      ],
-      faqs: [
-        {
-          question: '¿Puedo matricularme aunque el curso todavía no haya empezado?',
-          answer:
-            'Sí. La matrícula está abierta y el curso arranca el 5 de octubre de 2026. Al completar el pago reservas tu plaza y recibes la confirmación y la factura por email; en cuanto abramos el acceso al campus te contactaremos con las instrucciones para empezar.',
-        },
-        {
-          question: '¿Qué título obtendré al finalizar?',
-          answer:
-            'Un Certificado Universitario de la Universidad Católica de Ávila (UCAV) con la denominación exacta del curso: "Curso Universitario en Atención Educativa al Alumnado con Discapacidad Motora y Sistemas Aumentativos y Alternativos de Comunicación (SAAC)". Es un título propio (no oficial), de valor curricular y profesional.',
-        },
-        {
-          question: '¿Cuál es la carga lectiva?',
-          answer:
-            '6 créditos ECTS. Un crédito equivale a 25 horas de trabajo del estudiante, por lo que el curso suma 150 horas repartidas en 10 módulos con evaluación continua.',
-        },
-        {
-          question: '¿Es este el curso que se pide para la plaza de profesorado?',
-          answer:
-            'Sí: el curso cubre la formación específica en atención educativa al alumnado con discapacidad motora y SAAC. Si quieres que revisemos los requisitos concretos de tu convocatoria, escríbenos a cursos@maximaformacion.es.',
-        },
-        {
-          question: '¿Necesito una cuenta para comprar?',
-          answer:
-            'No. Solo te pedimos nombre y email antes de ir al pago seguro de Stripe. Con ese email te confirmaremos la compra, te enviaremos la factura y te avisaremos cuando el acceso esté disponible.',
-        },
-        {
-          question: '¿Puedo comprarlo junto con los otros dos cursos universitarios?',
-          answer:
-            'Sí. El Pack 3 Cursos Universitarios incluye este curso más "Inteligencia Artificial y eXeLearning" y "H5P e Inteligencia Artificial" (14 ECTS en total) por 290 € en lugar de 385 €.',
-        },
-        {
-          question: '¿Cómo se evalúa?',
-          answer:
-            'Mediante evaluación continua: la calificación final se obtiene a partir de las actividades de cada módulo, con nota numérica de 0 a 10 según el Real Decreto 1125/2003.',
-        },
-      ],
-    },
+    ficha: { slug: 'atencion-educativa-saac' },
   },
 ];
 

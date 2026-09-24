@@ -3,11 +3,13 @@ import Stripe from 'stripe';
 import { eq } from 'drizzle-orm';
 import { db, isDbConfigured } from '@/lib/db/client';
 import { packPurchases } from '@/lib/db/schema';
+import { getProgramBySlug } from '@/lib/strapi/queries';
 import { getSiteUrl } from '@/lib/site-url';
 import {
   PACK_PATH,
   packReturnPaths,
   PACK_ITEM_ID,
+  getPackCourse,
   packItemEcts,
   packItemPrice,
   PACK_TITLE,
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
     const email = body.email?.trim().toLowerCase() || '';
     const name = body.name?.trim().slice(0, 120) || undefined;
 
-    const title = packItemTitle(item);
+    let title = packItemTitle(item);
     if (!title) {
       return NextResponse.json({ error: 'Curso no válido' }, { status: 400 });
     }
@@ -121,8 +123,18 @@ export async function POST(request: Request) {
     }
 
     const isPack = item === PACK_ITEM_ID;
-    const price = packItemPrice(item);
-    const ects = packItemEcts(item);
+    let price = packItemPrice(item);
+    let ects = packItemEcts(item);
+    // Curso con ficha en Strapi (p. ej. SAAC): el precio y los ECTS que ve el
+    // comprador son los del CMS, así que se cobra eso (si Strapi no responde,
+    // los de app/data/pack-cursos.ts).
+    const fichaSlug = getPackCourse(item)?.ficha?.slug;
+    if (fichaSlug) {
+      const program = await getProgramBySlug(fichaSlug, false).catch(() => null);
+      if (program?.price) price = program.price;
+      if (program?.ects) ects = program.ects;
+      if (program?.title) title = program.title;
+    }
     if (!price || !ects) {
       return NextResponse.json({ error: 'Curso no válido' }, { status: 400 });
     }

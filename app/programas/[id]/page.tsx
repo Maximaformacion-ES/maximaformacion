@@ -7,6 +7,7 @@ import { markdownToHtml } from '@/lib/markdown';
 import { JsonLd } from '@/app/components/JsonLd';
 import { breadcrumbSchema, courseSchema, faqSchema } from '@/lib/seo/jsonld';
 import { getServerUserState } from '@/lib/auth/server-user-state';
+import { getPackCourseByFichaSlug } from '@/app/data/pack-cursos';
 import ProgramDetailClient from './ProgramDetailClient';
 
 export interface ProgramRichHtml {
@@ -90,6 +91,16 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   // versión anterior).
   if (!program) notFound();
 
+  // Cursos universitarios del pack UCAV (p. ej. Atención Educativa y SAAC):
+  // el programa vive en Strapi como cualquier otro (el cliente edita la ficha
+  // desde el admin), pero NO existe en el campus, así que se compra SIN cuenta
+  // por /api/pack/checkout (modal nombre+email del pack) y el acceso se asigna
+  // a mano después. El slug de Strapi tiene que coincidir con `ficha.slug`.
+  const packCourse = getPackCourseByFichaSlug(program.slug);
+  const guestPurchase = packCourse
+    ? { item: packCourse.id, returnPath: `/programas/${program.slug}` }
+    : undefined;
+
   // Avatares del equipo docente completo (sección "Atención al alumnado").
   const teacherAvatars = teachers
     .map((t) => t.avatarUrl)
@@ -172,6 +183,7 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
         allBadges={allBadges}
         videoTestimonials={videoTestimonials}
         allInstitutions={allInstitutions}
+        guestPurchase={guestPurchase}
       />
     </>
   );
