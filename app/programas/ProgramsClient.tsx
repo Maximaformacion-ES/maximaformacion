@@ -344,13 +344,13 @@ export default function ProgramsClient({ initialPrograms, initialPage = 1 }: Pro
               </p>
               <p className="text-body-sm md:text-body-md font-bold text-mx-text leading-snug">
                 Pack 3 Cursos Universitarios para docentes: IA + eXeLearning, H5P + IA para Moodle y
-                Atención Educativa (SAAC) — 12 ECTS
+                Atención Educativa (SAAC) — 14 ECTS
               </p>
             </div>
             <div className="shrink-0 flex items-center gap-3">
               <div className="text-right">
-                <p className="text-heading-sm font-black text-mx-orange leading-none">190 €</p>
-                <p className="text-[13px] text-mx-text-muted">o 95 € por curso</p>
+                <p className="text-heading-sm font-black text-mx-orange leading-none">290 €</p>
+                <p className="text-[13px] text-mx-text-muted">o desde 95 € por curso</p>
               </div>
               <ArrowRight size={20} className="text-mx-orange group-hover:translate-x-1 transition-transform" />
             </div>

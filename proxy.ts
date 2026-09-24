@@ -49,6 +49,7 @@ const isPublicRoute = createRouteMatcher([
   // Pack de cursos universitarios: landing de venta pública con checkout de
   // invitado (los compradores llegan de campañas externas, sin cuenta).
   '/pack-cursos-universitarios(.*)',
+  '/cursos-universitarios(.*)',
   '/api/pack(.*)',
   '/politica-de-privacidad(.*)',
   '/aviso-legal(.*)',

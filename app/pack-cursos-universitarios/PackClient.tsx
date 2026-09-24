@@ -2,271 +2,42 @@
 
 import React, { useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { m, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import {
+  ArrowRight,
   Award,
   BookOpen,
   CheckCircle2,
   ChevronDown,
   Clock,
   GraduationCap,
-  Loader2,
   Mail,
-  Send,
   ShieldCheck,
   Sparkles,
-  X,
 } from 'lucide-react';
 import { FontStyles } from '../components/FontStyles';
 import { FAQSection } from '../components/FAQSection';
 import { DocenteSection, type Docente } from '../components/DocenteSection';
 import { PACK_FAQ_GROUPS } from './faqs';
+import { ConsultaForm, PurchaseModal } from './shared';
 import { MarketingHeader as Header } from '../components/MarketingHeader';
 import { Footer } from '../components/Footer';
 import {
-  COURSE_PRICE,
   PACK_COURSES,
+  PACK_INDIVIDUAL_TOTAL,
   PACK_ITEM_ID,
   PACK_PRICE,
+  PACK_SAVINGS,
   PACK_TITLE,
+  PACK_TOTAL_ECTS,
+  PACK_TOTAL_HOURS,
+  courseLandingPath,
   type PackCourse,
 } from '../data/pack-cursos';
 
-const INDIVIDUAL_TOTAL = COURSE_PRICE * PACK_COURSES.length;
-const SAVINGS = INDIVIDUAL_TOTAL - PACK_PRICE;
-
-/** Modal de compra: pedimos nombre y email ANTES de ir a Stripe porque el
- *  email es la clave de deduplicación (quien compró el pack no puede volver a
- *  comprar un curso suelto) y queda fijado como customer_email del checkout. */
-function PurchaseModal({
-  item,
-  title,
-  price,
-  onClose,
-}: {
-  item: string;
-  title: string;
-  price: number;
-  onClose: () => void;
-}) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (sending) return;
-    setError(null);
-    setSending(true);
-    try {
-      const res = await fetch('/api/pack/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item, email, name }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.url) {
-        throw new Error(data.error || 'No se pudo iniciar el pago. Inténtalo de nuevo.');
-      }
-      window.location.href = data.url;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo iniciar el pago.');
-      setSending(false);
-    }
-  };
-
-  return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-      onClick={onClose}
-    >
-      <m.div
-        initial={{ opacity: 0, y: 24, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 24, scale: 0.98 }}
-        className="w-full max-w-md bg-mx-card rounded-2xl border border-mx-border p-8 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-4 mb-2">
-          <h3 className="text-heading-sm font-bold text-mx-blue leading-tight">{title}</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar"
-            className="shrink-0 text-mx-text-muted hover:text-mx-text transition-colors cursor-pointer"
-          >
-            <X size={20} />
-          </button>
-        </div>
-        <p className="text-body-sm text-mx-text-muted mb-6">
-          Importe: <span className="font-bold text-mx-text">{price} €</span> · pago único y seguro con Stripe.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="pack-name" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
-              Nombre y apellidos
-            </label>
-            <input
-              id="pack-name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Tu nombre completo"
-              className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-3 text-body-sm text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50"
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="pack-email" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
-              Email
-            </label>
-            <input
-              id="pack-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              className="w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-3 text-body-sm text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50"
-            />
-            <p className="text-[13px] text-mx-text-muted/80 leading-snug">
-              Usaremos este email para confirmarte la compra y avisarte cuando tu acceso esté disponible.
-            </p>
-          </div>
-
-          {error && (
-            <p className="text-body-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={sending}
-            className="group w-full bg-mx-orange text-white py-4 rounded-xl font-bold text-label-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {sending ? (
-              <>
-                <Loader2 size={18} className="animate-spin" /> Preparando el pago…
-              </>
-            ) : (
-              <>Continuar al pago seguro</>
-            )}
-          </button>
-        </form>
-      </m.div>
-    </m.div>
-  );
-}
-
-/** Formulario de consulta sobre el pack. Reutiliza el endpoint público de
- *  /contacto fijando `subject` al título del pack: el aviso llega al equipo
- *  etiquetado como consulta del pack (asunto del email + fila "Asunto") y
- *  queda guardado igual en campus.contact_messages. */
-function PackConsultaForm() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [sending, setSending] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (sending) return;
-    setSending(true);
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, subject: PACK_TITLE }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'No se pudo enviar la consulta');
-      }
-      toast.success('Consulta enviada. Te responderemos muy pronto.');
-      setForm({ name: '', email: '', message: '' });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'No se pudo enviar la consulta', {
-        description: 'Inténtalo de nuevo o escríbenos a cursos@maximaformacion.es.',
-      });
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const inputCls =
-    'w-full bg-mx-bg border border-mx-border rounded-xl px-4 py-4 text-body-sm text-mx-text focus:outline-none focus:border-mx-orange transition-colors placeholder:text-mx-text-muted/50';
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label htmlFor="consulta-nombre" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
-            Nombre
-          </label>
-          <input
-            id="consulta-nombre"
-            type="text"
-            required
-            value={form.name}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            placeholder="Tu nombre"
-            className={inputCls}
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="consulta-email" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
-            Email
-          </label>
-          <input
-            id="consulta-email"
-            type="email"
-            required
-            value={form.email}
-            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-            placeholder="tu@email.com"
-            className={inputCls}
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="consulta-mensaje" className="text-label-sm uppercase tracking-widest text-mx-text-muted font-medium">
-          Tu consulta
-        </label>
-        <textarea
-          id="consulta-mensaje"
-          required
-          rows={4}
-          value={form.message}
-          onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-          placeholder="Cuéntanos qué te gustaría saber sobre el pack o sobre alguno de los cursos…"
-          className={`${inputCls} resize-none`}
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={sending}
-        className="group w-full sm:w-auto bg-mx-orange text-white px-10 py-4 rounded-xl font-bold text-label-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-mx-orange-dark transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {sending ? (
-          <>
-            <Loader2 size={18} className="animate-spin" /> Enviando…
-          </>
-        ) : (
-          <>
-            Enviar consulta
-            <Send size={16} className="group-hover:translate-x-1 transition-transform" />
-          </>
-        )}
-      </button>
-    </form>
-  );
-}
+const PACK_PATH = '/pack-cursos-universitarios';
 
 // Barra de matrícula fija inferior: aparece pasado el hero para que el CTA y
 // el precio acompañen durante toda la lectura (el momento de decisión no
@@ -295,11 +66,13 @@ function StickyBuyBar({ onBuy }: { onBuy: () => void }) {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-3 flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-body-sm font-bold truncate">Pack 3 Cursos Universitarios · 12 ECTS</p>
+              <p className="text-body-sm font-bold truncate">
+                Pack 3 Cursos Universitarios · {PACK_TOTAL_ECTS} ECTS
+              </p>
               <p className="text-[13px] text-white/75">
-                <s className="text-white/50">{INDIVIDUAL_TOTAL} €</s>{' '}
-                <span className="font-black text-white text-body-sm">{PACK_PRICE} €</span> · el tercer
-                curso, gratis
+                <s className="text-white/50">{PACK_INDIVIDUAL_TOTAL} €</s>{' '}
+                <span className="font-black text-white text-body-sm">{PACK_PRICE} €</span> · ahorras{' '}
+                {PACK_SAVINGS} €
               </p>
             </div>
             <button
@@ -388,7 +161,7 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
 
       <div className="mt-auto pt-6 border-t border-mx-border flex items-center justify-between gap-4">
         <div>
-          <p className="text-heading-sm font-black text-mx-text">{COURSE_PRICE} €</p>
+          <p className="text-heading-sm font-black text-mx-text">{course.price} €</p>
           <p className="text-[13px] text-mx-text-muted">Curso individual</p>
         </div>
         <button
@@ -399,6 +172,12 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
           Matricúlate
         </button>
       </div>
+      <Link
+        href={courseLandingPath(course.id)}
+        className="mt-4 inline-flex items-center gap-2 text-body-sm font-bold text-mx-orange hover:underline underline-offset-4"
+      >
+        Ver ficha completa del curso <ArrowRight size={16} />
+      </Link>
       </div>
     </m.article>
   );
@@ -452,7 +231,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
                 Tres Cursos Universitarios con certificación, pensados para llevar la innovación a tu
                 aula: Inteligencia Artificial con eXeLearning, actividades interactivas con H5P e IA
                 para Moodle, y atención educativa al alumnado con discapacidad motora y SAAC.
-                <span className="font-bold text-mx-text"> 4 ECTS por curso — 12 ECTS en total.</span>
+                <span className="font-bold text-mx-text"> {PACK_TOTAL_ECTS} ECTS en total con Certificado Universitario de la UCAV.</span>
               </p>
             </m.div>
 
@@ -467,25 +246,26 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
               <div className="relative flex flex-col lg:flex-row lg:items-center gap-10">
                 <div className="flex-1">
                   <p className="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 text-label-sm uppercase tracking-widest font-bold mb-6">
-                    <Sparkles size={14} /> Oferta de lanzamiento · 3×2
+                    <Sparkles size={14} /> Oferta de lanzamiento · Pack completo
                   </p>
                   <div className="flex flex-wrap items-end gap-x-4 gap-y-2 mb-3">
                     <span className="text-heading-md text-white/50 line-through font-bold leading-none">
-                      {INDIVIDUAL_TOTAL} €
+                      {PACK_INDIVIDUAL_TOTAL} €
                     </span>
                     <span className="text-display-sm md:text-display-md font-black leading-none">
                       {PACK_PRICE} €
                     </span>
                     <span className="bg-mx-orange text-white text-label-sm font-bold uppercase tracking-widest rounded-full px-4 py-2 mb-1">
-                      Ahorras {SAVINGS} €
+                      Ahorras {PACK_SAVINGS} €
                     </span>
                   </div>
                   <p className="text-body-md font-bold mb-1">
-                    Paga dos cursos y llévate el tercero gratis: 12 ECTS con certificación
-                    universitaria.
+                    Los tres Cursos Universitarios juntos: {PACK_TOTAL_ECTS} ECTS con certificación
+                    universitaria por {PACK_PRICE} € en lugar de {PACK_INDIVIDUAL_TOTAL} €.
                   </p>
                   <p className="text-body-sm text-white/70">
-                    También puedes matricularte en cada curso por separado por {COURSE_PRICE} €.
+                    También puedes matricularte en cada curso por separado: 95 € los cursos de IA y
+                    195 € el de Atención Educativa y SAAC (6 ECTS).
                   </p>
                 </div>
 
@@ -525,7 +305,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
             >
               {[
                 { icon: GraduationCap, text: 'Certificación universitaria' },
-                { icon: Award, text: '12 ECTS · 300 horas en total' },
+                { icon: Award, text: `${PACK_TOTAL_ECTS} ECTS · ${PACK_TOTAL_HOURS} horas en total` },
                 { icon: Clock, text: '100 % online, a tu ritmo' },
                 { icon: ShieldCheck, text: 'Pago seguro y factura automática' },
               ].map((item) => (
@@ -556,7 +336,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
                   key={course.id}
                   course={course}
                   index={i}
-                  onBuy={() => setBuying({ item: course.id, title: course.title, price: COURSE_PRICE })}
+                  onBuy={() => setBuying({ item: course.id, title: course.title, price: course.price })}
                 />
               ))}
             </div>
@@ -587,7 +367,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
               </h2>
               <ul className="space-y-4">
                 {[
-                  'Certificación universitaria de cada curso (4 ECTS, 100 horas por curso).',
+                  'Certificación universitaria de cada curso: 4 ECTS (100 h) los cursos de IA y 6 ECTS (150 h) el de Atención Educativa y SAAC.',
                   'Formación 100 % online, a tu ritmo, con evaluación continua.',
                   'Temario práctico y actualizado, diseñado para docentes en activo.',
                   'Factura de tu compra emitida automáticamente.',
@@ -610,7 +390,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
               </h2>
               <ol className="space-y-4">
                 {[
-                  'Elige el pack completo (190 €) o el curso que te interese (95 €).',
+                  `Elige el pack completo (${PACK_PRICE} €) o el curso que te interese (95 € o 195 €).`,
                   'Completa el pago seguro con Stripe: recibirás la confirmación y tu factura por email.',
                   'En cuanto abramos el acceso, te contactaremos con las instrucciones para empezar. No tienes que hacer nada más.',
                 ].map((t, i) => (
@@ -672,7 +452,10 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
               transition={{ duration: 0.8, delay: 0.1 }}
               className="lg:col-span-3 bg-mx-card border border-mx-border rounded-2xl p-8"
             >
-              <PackConsultaForm />
+              <ConsultaForm
+                subject={PACK_TITLE}
+                placeholder="Cuéntanos qué te gustaría saber sobre el pack o sobre alguno de los cursos…"
+              />
             </m.div>
           </div>
         </section>
@@ -687,11 +470,11 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-heading-md md:text-heading-lg font-black text-mx-blue leading-heading mb-6">
-                PAGA 2 CURSOS, <span className="text-stroke text-mx-orange">LLÉVATE 3</span>
+                LOS 3 CURSOS, <span className="text-stroke text-mx-orange">UN SOLO PACK</span>
               </h2>
               <p className="text-body-md text-mx-text-muted mb-10 max-w-2xl mx-auto">
-                Los tres Cursos Universitarios (12 ECTS) por {PACK_PRICE} €: exactamente el precio de
-                dos.
+                Los tres Cursos Universitarios ({PACK_TOTAL_ECTS} ECTS) por {PACK_PRICE} € en lugar de{' '}
+                {PACK_INDIVIDUAL_TOTAL} €: ahorras {PACK_SAVINGS} €.
               </p>
 
               {/* Los 3 cursos en versión mini (curso + curso + curso): la
@@ -717,7 +500,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
                       )}
                       <div className="px-4 py-3">
                         <p className="text-body-sm font-bold text-mx-text leading-snug">{course.shortTitle}</p>
-                        <p className="text-[13px] text-mx-text-muted">{course.ects} ECTS · {COURSE_PRICE} €</p>
+                        <p className="text-[13px] text-mx-text-muted">{course.ects} ECTS · {course.price} €</p>
                       </div>
                     </div>
                   </React.Fragment>
@@ -744,6 +527,7 @@ export default function PackClient({ docentes }: { docentes?: Docente[] }) {
             item={buying.item}
             title={buying.title}
             price={buying.price}
+            returnPath={PACK_PATH}
             onClose={() => setBuying(null)}
           />
         )}

@@ -16,12 +16,12 @@ export const PACK_FAQ_GROUPS: {
       {
         question: '¿Cuál es el precio del pack de tres cursos y qué incluye?',
         answer:
-          'El pack completo con los tres cursos tiene un precio de 190 €. Este precio incluye la matrícula en los tres cursos universitarios. El coste de expedición del certificado no está incluido en el precio de la matrícula.',
+          'El pack completo con los tres cursos tiene un precio de 290 € (frente a los 380 € que suman por separado). Este precio incluye la matrícula en los tres cursos universitarios. El coste de expedición del certificado no está incluido en el precio de la matrícula.',
       },
       {
         question: '¿Puedo matricularme en los cursos por separado o es obligatorio comprar el pack?',
         answer:
-          'Sí, puedes matricularte en los cursos de forma individual. Cada curso tiene un precio de matrícula de 95 €. Sin embargo, el pack de tres cursos por 190 € ofrece un ahorro significativo.',
+          'Sí, puedes matricularte en los cursos de forma individual: 95 € los cursos de Inteligencia Artificial (eXeLearning y H5P) y 195 € el curso de Atención Educativa y SAAC (6 ECTS). El pack de tres cursos por 290 € supone un ahorro de 90 €.',
       },
       {
         question: '¿Cuál es la fecha de inicio de los cursos?',
@@ -30,7 +30,7 @@ export const PACK_FAQ_GROUPS: {
       {
         question: '¿Cuál es la carga lectiva de cada curso?',
         answer:
-          'Cada uno de los tres cursos tiene una carga lectiva de 4 créditos ECTS. Un crédito ECTS equivale a 25 horas de trabajo del estudiante, lo que suma un total de 100 horas por curso.',
+          'Los cursos de Inteligencia Artificial (eXeLearning y H5P) tienen una carga lectiva de 4 créditos ECTS cada uno, y el curso de Atención Educativa y SAAC, de 6 créditos ECTS. Un crédito ECTS equivale a 25 horas de trabajo del estudiante: 100 horas por curso de IA y 150 horas el de Atención Educativa y SAAC (350 horas y 14 ECTS en total).',
       },
       {
         question: '¿Cómo se gestiona la matrícula y la parte administrativa?',
@@ -63,7 +63,7 @@ export const PACK_FAQ_GROUPS: {
       {
         question: '¿Cuál es la estructura de cada curso?',
         answer:
-          'Los tres cursos tienen una estructura similar y están organizados en 10 módulos de 0,4 ECTS cada uno. Cada módulo aborda un aspecto clave de la temática del curso.',
+          'Los tres cursos tienen una estructura similar y están organizados en 10 módulos, cada uno centrado en un aspecto clave de la temática del curso. En los cursos de IA cada módulo equivale a 0,4 ECTS; en el de Atención Educativa y SAAC, ampliado a 6 ECTS, a 0,6 ECTS.',
       },
       {
         question: '¿Los cursos son en español o en inglés?',
@@ -138,7 +138,7 @@ export const PACK_FAQ_GROUPS: {
       {
         question: '¿Qué pasa si solo quiero hacer uno de los cursos?',
         answer:
-          'Puedes hacerlo. Cada curso se puede adquirir por separado por 95 €. El pack es una opción para quienes quieran una formación más completa y ahorrar.',
+          'Puedes hacerlo. Cada curso se puede adquirir por separado (95 € los de IA, 195 € el de Atención Educativa y SAAC). El pack es una opción para quienes quieran una formación más completa y ahorrar 90 €.',
       },
     ],
   },

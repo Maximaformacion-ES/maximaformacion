@@ -65,7 +65,15 @@ export interface NavItem {
 const PACK_NAV_LINK = {
   label: 'Pack 3 Cursos Universitarios',
   href: '/pack-cursos-universitarios',
-  description: '¡Nuevo! 12 ECTS · 190 €',
+  description: '¡Nuevo! 14 ECTS · 290 €',
+};
+
+// Ficha individual del curso de Atención Educativa y SAAC (campaña propia:
+// es el curso que se pide para una plaza de profesorado).
+const SAAC_NAV_LINK = {
+  label: 'Curso Universitario · Atención Educativa y SAAC',
+  href: '/cursos-universitarios/atencion-educativa-saac',
+  description: '6 ECTS · 195 €',
 };
 
 export const NAV_ITEMS: NavItem[] = [
@@ -82,6 +90,7 @@ export const NAV_ITEMS: NavItem[] = [
             { label: 'Másters', href: '/programas?type=Master', description: 'Programas largos' },
             { label: 'Cursos', href: '/programas?type=Curso', description: 'Programas cortos' },
             PACK_NAV_LINK,
+            SAAC_NAV_LINK,
           ],
         },
         {
@@ -782,7 +791,7 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
       const packColumn =
         columns.find((c) => c.title.toLowerCase().includes('moodle')) ?? columns[0];
       if (packColumn && !packColumn.links.some((l) => l.href === PACK_NAV_LINK.href)) {
-        packColumn.links.unshift(PACK_NAV_LINK);
+        packColumn.links.unshift(PACK_NAV_LINK, SAAC_NAV_LINK);
       }
       return {
         ...item,
@@ -897,7 +906,10 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
         {/* Tira anunciadora del pack universitario: pegada bajo la barra de
             navegación, dentro del nav fijo. Fuera de Maxymia (marca oscura),
             de Consultoría (marca verde propia) y de la landing del pack. */}
-        {!isDark && !isConsultoria && !pathname?.startsWith('/pack-cursos-universitarios') && (
+        {!isDark &&
+          !isConsultoria &&
+          !pathname?.startsWith('/pack-cursos-universitarios') &&
+          !pathname?.startsWith('/cursos-universitarios') && (
           <PackAnnouncementBar />
         )}
       </m.nav>

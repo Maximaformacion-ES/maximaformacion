@@ -5,9 +5,10 @@ import { db, isDbConfigured } from '@/lib/db/client';
 import { packPurchases } from '@/lib/db/schema';
 import { getSiteUrl } from '@/lib/site-url';
 import {
-  COURSE_PRICE,
+  COURSES_BASE_PATH,
   PACK_ITEM_ID,
-  PACK_PRICE,
+  packItemEcts,
+  packItemPrice,
   PACK_TITLE,
   packItemTitle,
 } from '@/app/data/pack-cursos';
@@ -69,6 +70,8 @@ export async function POST(request: Request) {
       item?: string;
       email?: string;
       name?: string;
+      /** Página desde la que se compra: si el usuario cancela en Stripe vuelve a ella. */
+      returnPath?: string;
     };
 
     const item = body.item?.trim() || '';
@@ -117,8 +120,21 @@ export async function POST(request: Request) {
     }
 
     const isPack = item === PACK_ITEM_ID;
-    const amountCents = (isPack ? PACK_PRICE : COURSE_PRICE) * 100;
+    const price = packItemPrice(item);
+    const ects = packItemEcts(item);
+    if (!price || !ects) {
+      return NextResponse.json({ error: 'Curso no válido' }, { status: 400 });
+    }
+    const amountCents = price * 100;
     const baseUrl = getSiteUrl('http://localhost:3000');
+    // Solo aceptamos como retorno la landing del pack o una ficha individual
+    // (nunca una URL arbitraria del cliente).
+    const returnPath =
+      typeof body.returnPath === 'string' &&
+      (body.returnPath === '/pack-cursos-universitarios' ||
+        new RegExp(`^${COURSES_BASE_PATH}/[a-z0-9-]+$`).test(body.returnPath))
+        ? body.returnPath
+        : '/pack-cursos-universitarios';
     const accountTaxIds = await getAccountTaxIds(stripe);
 
     const session = await stripe.checkout.sessions.create({
@@ -130,14 +146,14 @@ export async function POST(request: Request) {
             currency: 'eur',
             unit_amount: amountCents,
             product_data: {
-              name: isPack ? `${PACK_TITLE} (12 ECTS)` : `${title} (4 ECTS)`,
+              name: `${title} (${ects} ECTS)`,
               metadata: { type: 'pack', packItem: item },
             },
           },
         },
       ],
       success_url: `${baseUrl}/pack-cursos-universitarios/gracias?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/pack-cursos-universitarios?cancelado=true`,
+      cancel_url: `${baseUrl}${returnPath}?cancelado=true`,
       customer_email: email,
       invoice_creation: {
         enabled: true,

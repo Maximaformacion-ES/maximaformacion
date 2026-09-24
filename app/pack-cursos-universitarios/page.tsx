@@ -6,7 +6,7 @@ import PackClient from './PackClient';
 export const metadata: Metadata = {
   title: 'Pack 3 Cursos Universitarios en Innovación Docente | Máxima Formación',
   description:
-    'Tres Cursos Universitarios (4 ECTS cada uno, 12 ECTS en total): IA y eXeLearning, H5P e IA para Moodle, y Atención Educativa al alumnado con discapacidad motora y SAAC. Pack completo por 190 € o 95 € por curso.',
+    'Tres Cursos Universitarios de la UCAV (14 ECTS en total): IA y eXeLearning, H5P e IA para Moodle, y Atención Educativa al alumnado con discapacidad motora y SAAC. Pack completo por 290 € (ahorras 90 €) o cada curso por separado desde 95 €.',
   alternates: { canonical: '/pack-cursos-universitarios' },
 };
 
