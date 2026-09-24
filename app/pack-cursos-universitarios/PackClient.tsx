@@ -32,12 +32,11 @@ import {
   PACK_SAVINGS,
   PACK_TITLE,
   PACK_TOTAL_ECTS,
+  PACK_PATH,
   PACK_TOTAL_HOURS,
-  courseLandingPath,
+  courseFichaPath,
   type PackCourse,
 } from '../data/pack-cursos';
-
-const PACK_PATH = '/pack-cursos-universitarios';
 
 // Barra de matrícula fija inferior: aparece pasado el hero para que el CTA y
 // el precio acompañen durante toda la lectura (el momento de decisión no
@@ -172,12 +171,14 @@ function CourseCard({ course, index, onBuy }: { course: PackCourse; index: numbe
           Matricúlate
         </button>
       </div>
-      <Link
-        href={courseLandingPath(course.id)}
-        className="mt-4 inline-flex items-center gap-2 text-body-sm font-bold text-mx-orange hover:underline underline-offset-4"
-      >
-        Ver ficha completa del curso <ArrowRight size={16} />
-      </Link>
+      {courseFichaPath(course) && (
+        <Link
+          href={courseFichaPath(course)!}
+          className="mt-4 inline-flex items-center gap-2 text-body-sm font-bold text-mx-orange hover:underline underline-offset-4"
+        >
+          Ver ficha completa del curso <ArrowRight size={16} />
+        </Link>
+      )}
       </div>
     </m.article>
   );

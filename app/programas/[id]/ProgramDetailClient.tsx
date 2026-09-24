@@ -21,6 +21,7 @@ import { SectionHeader } from '../../components/SectionHeader';
 import { ProgramCard } from '../../components/ProgramCard';
 import ProGateWrapper from './ProGateWrapper';
 import { Breadcrumb } from '../../components/Breadcrumb';
+import { PurchaseModal } from '@/app/pack-cursos-universitarios/shared';
 import type { Program, Badge, Institution, VideoTestimonial } from '@/lib/strapi/types';
 import type { ProgramRichHtml } from './page';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
@@ -41,6 +42,12 @@ interface ProgramDetailClientProps {
   allInstitutions?: Institution[];
   /** Testimonios en vídeo (globales). Opcional: sin datos no hay sección. */
   videoTestimonials?: VideoTestimonial[];
+  /**
+   * Compra SIN cuenta (cursos universitarios del pack UCAV, que no existen en
+   * Strapi ni en el campus): los CTAs abren el modal nombre+email del pack y
+   * cobran por /api/pack/checkout. El resto de la ficha es idéntico.
+   */
+  guestPurchase?: { item: string; returnPath: string };
 }
 
 /** "Otros alumnos también compraron": fila de programas recomendados al pie. */
@@ -74,8 +81,11 @@ export default function ProgramDetailClient({
   allBadges,
   allInstitutions,
   videoTestimonials,
+  guestPurchase,
 }: ProgramDetailClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [guestBuying, setGuestBuying] = useState(false);
+  const onGuestPurchase = guestPurchase ? () => setGuestBuying(true) : undefined;
 
   if (!program) {
     return (
@@ -140,6 +150,7 @@ export default function ProgramDetailClient({
               program={program}
               stickyAnchorId={SIDEBAR_CTA_ANCHOR_ID}
               initialUserState={initialUserState}
+              onGuestPurchase={onGuestPurchase}
             />
           }
           afterDescription={<BrochureDownloadButton program={program} />}
@@ -181,9 +192,23 @@ export default function ProgramDetailClient({
       <Footer />
 
       {/* Sticky mobile purchase bar */}
-      <ProgramMobileCTA program={program} initialUserState={initialUserState} />
+      <ProgramMobileCTA
+        program={program}
+        initialUserState={initialUserState}
+        onGuestPurchase={onGuestPurchase}
+      />
       {/* Bottom spacing so footer isn't hidden behind the sticky bar */}
       <div className="h-20 lg:hidden" />
+
+      {guestPurchase && guestBuying && (
+        <PurchaseModal
+          item={guestPurchase.item}
+          title={program.title}
+          price={program.price}
+          returnPath={guestPurchase.returnPath}
+          onClose={() => setGuestBuying(false)}
+        />
+      )}
     </div>
   );
 }

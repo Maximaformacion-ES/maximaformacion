@@ -51,6 +51,12 @@ interface ProgramSidebarProps {
    * checkout in another tab).
    */
   initialUserState?: ServerUserState;
+  /**
+   * Compra SIN cuenta (cursos universitarios del pack UCAV): el CTA llama a
+   * esto (abre el modal nombre+email → Stripe) en vez de exigir sesión y
+   * pasar por /api/checkout. Sin acceso ni descuentos Pro: precio fijo.
+   */
+  onGuestPurchase?: () => void;
 }
 
 export const SIDEBAR_CTA_ANCHOR_ID = 'program-purchase-cta-anchor';
@@ -59,6 +65,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   program,
   stickyAnchorId,
   initialUserState,
+  onGuestPurchase,
 }) => {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
@@ -77,14 +84,19 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   const useServer = authLoading && !!initialUserState;
   // "Known" means we have something authoritative to render — either
   // the hooks finished or the page handed us a server snapshot.
-  const userStateKnown = !authLoading || !!initialUserState;
-  const userHasPro = useServer
-    ? initialUserState!.isSignedIn && initialUserState!.hasPro
-    : !!isSignedIn && hasPro;
-  const hasAccess = useServer
-    ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
-      || (program.isPro === true && initialUserState!.hasPro)
-    : checkAccess(program.documentId, program.isPro);
+  const userStateKnown = !authLoading || !!initialUserState || !!onGuestPurchase;
+  // Compra de invitado: ni Pro ni acceso previo influyen (precio fijo, sin cuenta).
+  const userHasPro = onGuestPurchase
+    ? false
+    : useServer
+      ? initialUserState!.isSignedIn && initialUserState!.hasPro
+      : !!isSignedIn && hasPro;
+  const hasAccess = onGuestPurchase
+    ? false
+    : useServer
+      ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
+        || (program.isPro === true && initialUserState!.hasPro)
+      : checkAccess(program.documentId, program.isPro);
 
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
@@ -96,6 +108,10 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   const showProFree = userStateKnown && !userHasPro && !!program.isPro;
 
   const handlePurchaseCourse = async () => {
+    if (onGuestPurchase) {
+      onGuestPurchase();
+      return;
+    }
     if (!isSignedIn) {
       window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
       return;
@@ -313,7 +329,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                * still need the "Cargando…" placeholder while Clerk +
                * campus profile load on the client — kept as a fallback
                * for pages that haven't migrated yet. */}
-              {authLoading && !initialUserState ? (
+              {authLoading && !initialUserState && !onGuestPurchase ? (
                 <button
                   {...(stickyAnchorId ? { id: stickyAnchorId } : {})}
                   disabled
@@ -363,7 +379,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                   CTA above and this one. The brochure/"Descarga el temario"
                   button was removed from the sidebar (the temario still
                   lives in the program tabs). */}
-              {userStateKnown && !userHasPro && (
+              {userStateKnown && !userHasPro && !onGuestPurchase && (
                 <Link
                   href="/pricing"
                   className="flex items-center justify-center gap-2 w-full border border-mx-orange/50 text-mx-orange px-6 py-3 text-body-sm font-light rounded-lg hover:bg-mx-orange/10 transition-colors"

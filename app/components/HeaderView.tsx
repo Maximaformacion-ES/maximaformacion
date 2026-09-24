@@ -72,7 +72,7 @@ const PACK_NAV_LINK = {
 // es el curso que se pide para una plaza de profesorado).
 const SAAC_NAV_LINK = {
   label: 'Curso Universitario · Atención Educativa y SAAC',
-  href: '/cursos-universitarios/atencion-educativa-saac',
+  href: '/programas/atencion-educativa-saac',
   description: '6 ECTS · 195 €',
 };
 
@@ -906,10 +906,7 @@ export const HeaderView: React.FC<HeaderViewProps> = ({
         {/* Tira anunciadora del pack universitario: pegada bajo la barra de
             navegación, dentro del nav fijo. Fuera de Maxymia (marca oscura),
             de Consultoría (marca verde propia) y de la landing del pack. */}
-        {!isDark &&
-          !isConsultoria &&
-          !pathname?.startsWith('/pack-cursos-universitarios') &&
-          !pathname?.startsWith('/cursos-universitarios') && (
+        {!isDark && !isConsultoria && !pathname?.startsWith('/pack-cursos-universitarios') && (
           <PackAnnouncementBar />
         )}
       </m.nav>

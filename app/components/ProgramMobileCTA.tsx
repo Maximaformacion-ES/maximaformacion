@@ -17,6 +17,8 @@ interface ProgramMobileCTAProps {
   /** See ProgramSidebar — same purpose: server-resolved access state so
    *  the sticky bar shows the right CTA on the first paint. */
   initialUserState?: ServerUserState;
+  /** Compra sin cuenta (ver ProgramSidebar.onGuestPurchase). */
+  onGuestPurchase?: () => void;
 }
 
 /**
@@ -28,7 +30,7 @@ interface ProgramMobileCTAProps {
  * therefore `lg:hidden` and only handles the small-screen case, where the
  * sidebar can't be pinned and a full-width bottom bar is the right pattern.
  */
-export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, initialUserState }) => {
+export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, initialUserState, onGuestPurchase }) => {
   const { isSignedIn, isLoaded } = useUser();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
@@ -69,13 +71,17 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
   // (see ProgramSidebar for the same pattern).
   const authLoading = !isLoaded || campusLoading;
   const useServer = authLoading && !!initialUserState;
-  const userHasPro = useServer
-    ? initialUserState!.isSignedIn && initialUserState!.hasPro
-    : !!isSignedIn && hasPro;
-  const hasAccess = useServer
-    ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
-      || (program.isPro === true && initialUserState!.hasPro)
-    : checkAccess(program.documentId, program.isPro);
+  const userHasPro = onGuestPurchase
+    ? false
+    : useServer
+      ? initialUserState!.isSignedIn && initialUserState!.hasPro
+      : !!isSignedIn && hasPro;
+  const hasAccess = onGuestPurchase
+    ? false
+    : useServer
+      ? initialUserState!.enrolledProgramDocumentIds.includes(program.documentId)
+        || (program.isPro === true && initialUserState!.hasPro)
+      : checkAccess(program.documentId, program.isPro);
   const includedInPro = isFreeWithPro(program, userHasPro);
   const proDiscount = !includedInPro && shouldApplyProDiscount(program, userHasPro);
   const effectivePrice = getEffectivePrice(program, userHasPro);
@@ -85,6 +91,10 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
   const showProFree = !userHasPro && !!program.isPro;
 
   const handlePurchaseCourse = async () => {
+    if (onGuestPurchase) {
+      onGuestPurchase();
+      return;
+    }
     if (!isSignedIn) {
       window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
       return;
@@ -218,7 +228,7 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
       {/* Row 2: CTA button full width. If the page handed us a server-
           resolved state, render the correct CTA from the first paint.
           Without that we still need the "Cargando…" placeholder. */}
-      {authLoading && !initialUserState ? (
+      {authLoading && !initialUserState && !onGuestPurchase ? (
         <button
           disabled
           className="flex items-center justify-center gap-2 w-full bg-mx-orange/70 text-white px-4 py-2 text-label-sm font-medium rounded-lg cursor-wait"

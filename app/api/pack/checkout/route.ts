@@ -5,7 +5,8 @@ import { db, isDbConfigured } from '@/lib/db/client';
 import { packPurchases } from '@/lib/db/schema';
 import { getSiteUrl } from '@/lib/site-url';
 import {
-  COURSES_BASE_PATH,
+  PACK_PATH,
+  packReturnPaths,
   PACK_ITEM_ID,
   packItemEcts,
   packItemPrice,
@@ -130,11 +131,9 @@ export async function POST(request: Request) {
     // Solo aceptamos como retorno la landing del pack o una ficha individual
     // (nunca una URL arbitraria del cliente).
     const returnPath =
-      typeof body.returnPath === 'string' &&
-      (body.returnPath === '/pack-cursos-universitarios' ||
-        new RegExp(`^${COURSES_BASE_PATH}/[a-z0-9-]+$`).test(body.returnPath))
+      typeof body.returnPath === 'string' && packReturnPaths().includes(body.returnPath)
         ? body.returnPath
-        : '/pack-cursos-universitarios';
+        : PACK_PATH;
     const accountTaxIds = await getAccountTaxIds(stripe);
 
     const session = await stripe.checkout.sessions.create({
@@ -152,7 +151,7 @@ export async function POST(request: Request) {
           },
         },
       ],
-      success_url: `${baseUrl}/pack-cursos-universitarios/gracias?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}${PACK_PATH}/gracias?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}${returnPath}?cancelado=true`,
       customer_email: email,
       invoice_creation: {
