@@ -16,12 +16,12 @@ export const PACK_FAQ_GROUPS: {
       {
         question: '¿Cuál es el precio del pack de tres cursos y qué incluye?',
         answer:
-          'El pack completo con los tres cursos tiene un precio de 290 € (frente a los 380 € que suman por separado). Este precio incluye la matrícula en los tres cursos universitarios. El coste de expedición del certificado no está incluido en el precio de la matrícula.',
+          'El pack completo con los tres cursos tiene un precio de 290 € (frente a los 385 € que suman por separado). Este precio incluye la matrícula en los tres cursos universitarios. El coste de expedición del certificado no está incluido en el precio de la matrícula.',
       },
       {
         question: '¿Puedo matricularme en los cursos por separado o es obligatorio comprar el pack?',
         answer:
-          'Sí, puedes matricularte en los cursos de forma individual: 95 € los cursos de Inteligencia Artificial (eXeLearning y H5P) y 195 € el curso de Atención Educativa y SAAC (6 ECTS). El pack de tres cursos por 290 € supone un ahorro de 90 €.',
+          'Sí, puedes matricularte en los cursos de forma individual: 95 € los cursos de Inteligencia Artificial (eXeLearning y H5P) y 195 € el curso de Atención Educativa y SAAC (6 ECTS). El pack de tres cursos por 290 € supone un ahorro de 95 €.',
       },
       {
         question: '¿Cuál es la fecha de inicio de los cursos?',
@@ -138,7 +138,7 @@ export const PACK_FAQ_GROUPS: {
       {
         question: '¿Qué pasa si solo quiero hacer uno de los cursos?',
         answer:
-          'Puedes hacerlo. Cada curso se puede adquirir por separado (95 € los de IA, 195 € el de Atención Educativa y SAAC). El pack es una opción para quienes quieran una formación más completa y ahorrar 90 €.',
+          'Puedes hacerlo. Cada curso se puede adquirir por separado (95 € los de IA, 195 € el de Atención Educativa y SAAC). El pack es una opción para quienes quieran una formación más completa y ahorrar 95 €.',
       },
     ],
   },

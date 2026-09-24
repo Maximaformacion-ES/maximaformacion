@@ -106,7 +106,7 @@ export function PackAnnouncementBar() {
               className="text-[13px] sm:text-body-sm font-medium leading-snug hover:underline underline-offset-2"
             >
               <span className="font-black uppercase tracking-wide">Nuevo</span>
-              {' · '}Pack 3 Cursos Universitarios para docentes: 14 ECTS por 290 € (ahorras 90 €)
+              {' · '}Pack 3 Cursos Universitarios para docentes: 14 ECTS por 290 € (ahorras 95 €)
               <span className="font-bold whitespace-nowrap"> → Ver el pack</span>
             </Link>
             <button

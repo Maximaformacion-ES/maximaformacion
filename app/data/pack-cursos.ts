@@ -9,7 +9,7 @@
 //
 // Precios (sep-2026, cambio pedido por el cliente): ya NO es un 3×2. Cada curso
 // tiene su precio (95 € los de IA, 195 € el de Atención Educativa y SAAC, que
-// sube a 6 ECTS / 150 h) y el pack con los tres vale 290 € (380 € sueltos).
+// sube a 6 ECTS / 150 h) y el pack con los tres vale 290 € (385 € sueltos, ahorro de 95 €).
 
 export const PACK_ITEM_ID = 'pack';
 export const PACK_PRICE = 290;
