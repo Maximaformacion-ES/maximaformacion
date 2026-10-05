@@ -33,6 +33,8 @@ const DISALLOW_PATHS = [
   // /curso/ en singular y Google debe poder rastrearlo para procesar los 301.
   '/sign-in',
   '/sign-up',
+  // Página de compra directa (paso transaccional, también lleva noindex).
+  '/comprar/',
   // Campus Maxymia: NO bloquear el área entera. Las fichas de curso
   // (/maxymia/campus/[slug]) son páginas públicas de marketing y deben
   // indexarse (SEO). Bloqueamos solo lo privado: las áreas personales con

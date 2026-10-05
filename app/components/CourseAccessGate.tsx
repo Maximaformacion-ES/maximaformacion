@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
@@ -27,6 +28,7 @@ export default function CourseAccessGate({
   userHasPro,
 }: CourseAccessGateProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const proFeatures = [
@@ -47,8 +49,8 @@ export default function CourseAccessGate({
 
   const handlePurchaseCourse = async () => {
     if (!isSignedIn) {
-      // Redirect to sign in with return URL
-      window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
+      // Sin sesión: página de compra directa (registro/login + checkout automático).
+      router.push(`/comprar/${program.slug}`);
       return;
     }
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Loader2, ArrowRight, Crown } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../i18n/LocaleProvider';
 import Link from 'next/link';
@@ -17,6 +18,7 @@ interface MaxymiaMobileCTAProps {
 export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) => {
   const { locale } = useLocale();
   const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -62,7 +64,8 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect_url=/maxymia/campus/${course.slug}`;
+      // Sin sesión: página de compra directa (registro/login + checkout automático).
+      router.push(`/comprar/maxymia/${course.slug}`);
       return;
     }
 
@@ -200,7 +203,7 @@ export const MaxymiaMobileCTA: React.FC<MaxymiaMobileCTAProps> = ({ course }) =>
             <>
               <ShoppingCart size={12} />
               {/* Misma etiqueta que el panel de escritorio; handlePurchase
-                  redirige a /sign-in cuando no hay sesión. */}
+                  lleva a /comprar/maxymia/[slug] cuando no hay sesión. */}
               {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
             </>
           )}

@@ -33,6 +33,9 @@ const isPublicRoute = createRouteMatcher([
   '/blog(.*)',
   '/contacto(.*)',
   '/pricing(.*)',
+  // Compra directa: resumen + registro/login embebido + checkout. Pública
+  // porque el formulario de cuenta está dentro de la propia página.
+  '/comprar(.*)',
   '/maxymia(.*)',
   '/verificar(.*)',
   '/recursos(.*)',

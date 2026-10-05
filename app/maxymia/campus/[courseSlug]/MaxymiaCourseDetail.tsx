@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import { useLocale } from '../../i18n/LocaleProvider';
 import { getCourseMeta } from '../../data/queries';
@@ -259,6 +260,7 @@ interface SidebarProps {
 
 function CourseSidebar({ course, locale, totalLessons, durationLabel, totalExams }: SidebarProps) {
   const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -280,7 +282,8 @@ function CourseSidebar({ course, locale, totalLessons, durationLabel, totalExams
 
   const handlePurchase = async () => {
     if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect_url=/maxymia/campus/${course.slug}`;
+      // Sin sesión: página de compra directa (registro/login + checkout automático).
+      router.push(`/comprar/maxymia/${course.slug}`);
       return;
     }
     setIsLoading(true);
@@ -477,7 +480,7 @@ function CourseSidebar({ course, locale, totalLessons, durationLabel, totalExams
                   <>
                     <ShoppingCart size={18} />
                     {/* Siempre la misma etiqueta: sin sesión, handlePurchase
-                        redirige a /sign-in antes del checkout. */}
+                        lleva a /comprar/maxymia/[slug] (cuenta + checkout). */}
                     {locale === 'es' ? 'Matricúlate ahora' : 'Enroll now'}
                   </>
                 )}

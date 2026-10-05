@@ -19,6 +19,7 @@ import {
 // Note: ShieldCheck (garantía badge) and the Pro-savings hint were removed
 // in MF-17 to keep the panel compact enough to stay sticky on screen.
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
@@ -68,6 +69,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   onGuestPurchase,
 }) => {
   const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,7 +115,9 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
       return;
     }
     if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
+      // Sin sesión: página de compra directa (resumen + registro/login en la
+      // misma pantalla; al terminar, el checkout se abre solo).
+      router.push(`/comprar/${program.slug}`);
       return;
     }
 
@@ -366,8 +370,8 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
                     <>
                       <ShoppingCart size={18} />
                       {/* Always the same label. If the visitor isn't signed
-                          in, handlePurchaseCourse redirects them to
-                          /sign-in (register or log in) before checkout. */}
+                          in, handlePurchaseCourse sends them to /comprar/[slug]
+                          (register or log in + checkout, same screen). */}
                       Matricúlate ahora
                     </>
                   )}

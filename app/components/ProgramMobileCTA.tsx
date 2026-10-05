@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Loader2, ArrowRight, Crown, Mail } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { useUserCampus } from '@/app/hooks/useUserCampus';
 import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
@@ -32,6 +33,7 @@ interface ProgramMobileCTAProps {
  */
 export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, initialUserState, onGuestPurchase }) => {
   const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
   const { hasPro, hasAccess: checkAccess, isLoading: campusLoading } = useUserCampus();
   const [isLoading, setIsLoading] = useState(false);
   // Master "Consultar precio" opens a chooser (form vs videollamada).
@@ -96,7 +98,9 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
       return;
     }
     if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect_url=/programas/${program.slug}`;
+      // Sin sesión: página de compra directa (resumen + registro/login en la
+      // misma pantalla; al terminar, el checkout se abre solo).
+      router.push(`/comprar/${program.slug}`);
       return;
     }
 
@@ -259,8 +263,8 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
           ) : (
             <>
               <ShoppingCart size={12} />
-              {/* Always the same label; handlePurchaseCourse redirects to
-                  /sign-in (register or log in) when there's no session. */}
+              {/* Always the same label; handlePurchaseCourse sends to
+                  /comprar/[slug] (register or log in + checkout) without session. */}
               Matricúlate ahora
             </>
           )}
