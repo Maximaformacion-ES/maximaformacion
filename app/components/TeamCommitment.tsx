@@ -53,8 +53,8 @@ export function TeamCommitment({
         <SectionHeader overline={t.overline} title={t.title} align="center" />
 
         <m.figure
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="mt-8 flex flex-col items-center text-center"

@@ -182,8 +182,8 @@ export function DocenteSection({
         <SectionHeader overline={overline ?? t.overline} title={title ?? t.title} align={align} />
 
         <m.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="mt-10 flex flex-col gap-12"

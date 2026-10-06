@@ -108,8 +108,8 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
     <section className={`relative overflow-hidden bg-transparent ${compact ? 'py-8 md:py-12' : 'py-16 md:py-32 bg-mx-bg'}`}>
       <div className="max-w-[900px] mx-auto px-6 md:px-12 relative">
         <m.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           className="text-mx-orange text-label-sm md:text-label-md xl:text-label-lg leading-label tracking-[0.3em] uppercase mb-6 text-center"
         >
@@ -117,8 +117,8 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
         </m.p>
 
         <m.h2
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 40 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           className={`text-mx-blue font-black text-center ${
             compact
@@ -131,8 +131,8 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
 
         {grouped && (
           <m.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            whileInView={{ y: 0 }}
             viewport={{ once: true }}
             className="flex flex-wrap justify-center gap-2 mb-8"
           >
@@ -156,8 +156,8 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
         )}
 
         <m.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 30 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >

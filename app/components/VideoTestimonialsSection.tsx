@@ -202,8 +202,8 @@ export function VideoTestimonialsSection({
         <SectionHeader overline={t.overline} title={t.title} description={t.description} />
 
         <m.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="relative mt-10"

@@ -196,8 +196,8 @@ export function CourseCard({
 
   return (
     <m.article
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ y: 24 }}
+      whileInView={{ y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ delay: Math.min(index, 5) * 0.06, duration: 0.45 }}
       className="group relative h-full"

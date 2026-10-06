@@ -201,6 +201,9 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
                     className="bg-mx-card border border-mx-border overflow-hidden rounded-lg"
                   >
                     <button
+                      type="button"
+                      aria-expanded={expandedModule === index}
+                      aria-controls={`modulo-${index + 1}-unidades`}
                       onClick={() =>
                         setExpandedModule(
                           expandedModule === index ? null : index,
@@ -242,39 +245,31 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
                       </m.div>
                     </button>
 
-                    <AnimatePresence>
-                      {expandedModule === index && (
-                        <m.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-mx-border">
-                            <h4 className="text-label-sm md:text-label-md font-bold text-mx-text-muted uppercase tracking-widest mb-3">
-                              Unidades del Módulo
-                            </h4>
-                            <div className="grid md:grid-cols-1">
-                              {module.units?.map((unit, unitIndex) => (
-                                <m.div
-                                  key={unitIndex}
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: unitIndex * 0.05 }}
-                                  className="flex items-start gap-3 text-mx-text py-4 border-b last:border-0 border-mx-border"
-                                >
-                                  <div className="w-1 h-1 rounded-full bg-mx-orange mt-2 shrink-0" />
-                                  <span className="font-light text-body-sm">
-                                    {unit.title}
-                                  </span>
-                                </m.div>
-                              ))}
-                            </div>
+                    {/* SEO: las unidades de TODOS los módulos van en el HTML
+                        (antes solo se montaba el módulo abierto y Googlebot no
+                        veía las de los demás). Cerrado = oculto por CSS. */}
+                    <div
+                      id={`modulo-${index + 1}-unidades`}
+                      hidden={expandedModule !== index}
+                      className="px-5 md:px-6 pb-5 md:pb-6 pt-3 border-t border-mx-border"
+                    >
+                      <h4 className="text-label-sm md:text-label-md font-bold text-mx-text-muted uppercase tracking-widest mb-3">
+                        Unidades del Módulo
+                      </h4>
+                      <div className="grid md:grid-cols-1">
+                        {module.units?.map((unit, unitIndex) => (
+                          <div
+                            key={unitIndex}
+                            className="flex items-start gap-3 text-mx-text py-4 border-b last:border-0 border-mx-border"
+                          >
+                            <div className="w-1 h-1 rounded-full bg-mx-orange mt-2 shrink-0" />
+                            <span className="font-light text-body-sm">
+                              {unit.title}
+                            </span>
                           </div>
-                        </m.div>
-                      )}
-                    </AnimatePresence>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

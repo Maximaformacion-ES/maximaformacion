@@ -21,8 +21,8 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program, t
     <section className="py-24 md:py-32 px-6 md:px-12 bg-mx-bg">
       <div className="max-w-[1200px] mx-auto text-center">
         <m.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ y: 40 }}
+          whileInView={{ y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
@@ -42,8 +42,8 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program, t
 
         {isMaster && (
           <m.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ y: 20 }}
+            whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.8 }}
             className="mb-12"
@@ -61,8 +61,6 @@ export const ProgramCTASection: React.FC<ProgramCTASectionProps> = ({ program, t
 
         {/* Contact Info */}
         <m.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.8 }}
           className="flex flex-col md:flex-row items-center justify-center gap-8 text-body-sm md:text-body-md text-mx-text-muted"

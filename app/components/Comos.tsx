@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
 type Como = { question: string; answer: string };
@@ -58,21 +58,12 @@ export function Comos({
           </m.span>
         </button>
 
-        <AnimatePresence initial={false}>
-          {isOpen && (
-            <m.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <p className="font-body text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed whitespace-pre-line pb-5 md:pb-6">
-                {c.answer}
-              </p>
-            </m.div>
-          )}
-        </AnimatePresence>
+        {/* SEO: la respuesta siempre está en el HTML; cerrada se oculta por CSS. */}
+        <div hidden={!isOpen}>
+          <p className="font-body text-mx-text-muted text-body-sm md:text-body-md font-light leading-relaxed whitespace-pre-line pb-5 md:pb-6">
+            {c.answer}
+          </p>
+        </div>
       </div>
     );
   };
@@ -81,21 +72,12 @@ export function Comos({
     <div className={className}>
       {comos.slice(0, VISIBLE).map((c, i) => renderItem(c, i))}
 
-      {/* Resto: despliegue/plegado animado por altura */}
-      <AnimatePresence initial={false}>
-        {expanded && hasMore && (
-          <m.div
-            key="comos-extra"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            {comos.slice(VISIBLE).map((c, j) => renderItem(c, VISIBLE + j))}
-          </m.div>
-        )}
-      </AnimatePresence>
+      {/* Resto: también en el HTML (SEO); plegado = oculto por CSS. */}
+      {hasMore && (
+        <div hidden={!expanded}>
+          {comos.slice(VISIBLE).map((c, j) => renderItem(c, VISIBLE + j))}
+        </div>
+      )}
 
       {/* Peek: deja entrever el siguiente Cómo cuando está plegado */}
       {!expanded && hasMore && (

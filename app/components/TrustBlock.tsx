@@ -240,8 +240,8 @@ export function TrustBlock({
         {/* ── Instituciones / clientes ─────────────────────────────────── */}
         {hasInst && (
           <m.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ y: 30 }}
+            whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
@@ -278,8 +278,8 @@ export function TrustBlock({
         {/* ── Certificaciones / valoraciones / reconocimientos ─────────── */}
         {hasCert && (
           <m.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ y: 30 }}
+            whileInView={{ y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className={hasInst ? 'mt-16 md:mt-24' : ''}

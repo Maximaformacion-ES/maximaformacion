@@ -1,8 +1,10 @@
 'use client';
 
+// SEO: el hero NO lleva animación de entrada. Googlebot capturaba la página
+// con el H1 y la descripción aún a opacity 0 (Motion animando) y los daba por
+// invisibles. Todo el contenido indexable del hero sale ya visible del SSR.
 import React from 'react';
 import Image from 'next/image';
-import { m } from 'framer-motion';
 import { Clock, BookOpen, Award, Crown } from 'lucide-react';
 import { getEnrollmentStatus, type EnrollmentStatus } from '@/lib/programs/enrollment';
 import { EnrollmentBadge } from './EnrollmentBadge';
@@ -96,12 +98,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
               the 2-column content layout below). */}
           <div className={sidebar ? 'lg:col-span-2' : 'lg:col-span-3'}>
             {/* Badges row */}
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mb-4 flex items-center gap-3 flex-wrap"
-            >
+            <div className="mb-4 flex items-center gap-3 flex-wrap">
               <span className={`inline-block px-3 py-1 text-label-sm font-black tracking-[0.2em] uppercase rounded-full ${
                 program.type === 'Master'
                   ? 'bg-mx-blue text-white'
@@ -120,26 +117,18 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
                 </span>
               )}
               <EnrollmentBadge status={program.enrollment ?? getEnrollmentStatus(program.startDate)} size="sm" />
-            </m.div>
+            </div>
 
             {/* Title */}
-            <m.h1
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.6 }}
+            <h1
               className="text-[32px] text-balance md:text-display-sm 2xl:text-display-sm font-black tracking-tight mb-3 max-w-3xl leading-tight text-mx-blue"
             >
               {program.title}
-            </m.h1>
+            </h1>
 
             {/* Topics badges */}
             {program.topics && program.topics.length > 0 && (
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.5 }}
-                className="flex flex-wrap gap-2 mb-4"
-              >
+              <div className="flex flex-wrap gap-2 mb-4">
                 {program.topics.map((topic) => (
                   <span
                     key={topic.id}
@@ -148,30 +137,22 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
                     {topic.name}
                   </span>
                 ))}
-              </m.div>
+              </div>
             )}
 
             {/* Description */}
-            <m.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
+            <p
               className="text-body-sm md:text-body-md xl:text-body-lg text-mx-text-muted font-light mb-6 max-w-2xl"
             >
               {program.description}
-            </m.p>
+            </p>
 
             {/* Slot bajo la descripción: en /programas es la descarga del
                 temario (MF-17/MF-18); Maxymia no pasa nada. */}
             {afterDescription}
 
             {/* Info pills */}
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex flex-wrap items-center gap-6 mb-8"
-            >
+            <div className="flex flex-wrap items-center gap-6 mb-8">
               {(program.durationLabel || program.duration) && (
                 <div className="flex items-center gap-2 text-mx-text">
                   <Clock size={16} className="text-mx-orange" />
@@ -192,18 +173,10 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
                   <span className="text-body-sm font-medium">{program.modules!.length} {program.modulesLabel ?? 'módulos'}</span>
                 </div>
               )}
-            </m.div>
+            </div>
 
             {/* Tabs below hero text */}
-            {tabs && (
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                {tabs}
-              </m.div>
-            )}
+            {tabs && <div>{tabs}</div>}
 
             {/* Extra content (teachers, FAQ) stacked below the tabs, still
                 inside the left column so the right-hand card spans it all. */}

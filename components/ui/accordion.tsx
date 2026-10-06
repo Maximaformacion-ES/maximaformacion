@@ -53,9 +53,14 @@ function AccordionContent({
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
   return (
+    // SEO: `forceMount` deja la respuesta en el DOM aunque el acordeón esté
+    // cerrado (Radix la desmontaba y Googlebot no hace clic); cerrado se oculta
+    // por CSS (`hidden`). Se pierde la animación de cierre, se mantiene la de
+    // apertura.
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden"
+      forceMount
+      className="data-[state=closed]:hidden data-[state=open]:animate-accordion-down overflow-hidden"
       {...props}
     >
       <div className={cn("font-body pt-0 pb-5 text-mx-text-muted text-[12px] md:text-body-md 2xl:text-body-lg font-light leading-relaxed", className)}>{children}</div>
