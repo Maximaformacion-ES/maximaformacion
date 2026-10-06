@@ -26,6 +26,7 @@ import type { Program, Badge, Institution, VideoTestimonial } from '@/lib/strapi
 import type { ProgramRichHtml } from './page';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
+
 interface ProgramDetailClientProps {
   program: Program | null;
   richHtml: ProgramRichHtml;
@@ -157,14 +158,14 @@ export default function ProgramDetailClient({
           tabs={<ProgramTabs program={program} richHtml={richHtml} />}
           belowContent={
             <>
-              {/* Mismas secciones que la ficha de Maxymia: confianza →
-                  compromiso con el alumnado → docentes → FAQ. */}
+              {/* Mismas secciones que la ficha de Maxymia: testimonios en
+                  vídeo → confianza → compromiso con el alumnado → docentes → FAQ. */}
+              <VideoTestimonialsSection block={program.videoTestimonials} testimonials={videoTestimonials} />
               <TrustBlock
                 institutions={allInstitutions}
                 certifications={allBadges}
               />
               <TeamCommitment avatars={teacherAvatars} />
-              <VideoTestimonialsSection testimonials={videoTestimonials} />
               <DocenteSection
                 docentes={docentes}
                 courseTitle={program.title}

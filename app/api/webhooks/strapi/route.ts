@@ -22,6 +22,8 @@ const MODEL_TAG_MAP: Record<string, string[]> = {
   'maxymia-course': ['maxymia-courses'],
   logo: ['logos'],
   badge: ['badges'],
+  institution: ['institutions'],
+  'video-testimonial': ['video-testimonials'], // Testimonios globales de las fichas
   metadata: ['site-metadata'],
 };
 

@@ -152,6 +152,8 @@ export interface StrapiProgram {
   objectives: string | null;
   /** Pestañas personalizadas de la ficha (componente program.extra-section). */
   extraSections?: { title: string; content: string; icon?: string | null }[] | null;
+  /** Testimonios en vídeo propios de la ficha (componente general.video-testimonials-section). */
+  videoTestimonials?: StrapiVideoTestimonialsSection | null;
   docentes?: StrapiAuthor[] | null;
   noIndex?: boolean | null;
   createdAt: string;
@@ -283,6 +285,8 @@ export interface Program {
   objectives: string;
   /** Pestañas personalizadas (markdown) que se añaden tras las estándar. */
   extraSections?: { title: string; content: string; icon?: string | null }[];
+  /** Testimonios en vídeo PROPIOS de la ficha. Sin ellos se muestran los globales. */
+  videoTestimonials?: VideoTestimonialsBlock | null;
   isPro: boolean;
   /** Exclusivo PRO: ni se vende ni aparece en catálogo (solo con suscripción). */
   proOnly?: boolean;
@@ -395,12 +399,34 @@ export interface StrapiVideoTestimonial {
 
 export interface VideoTestimonial {
   id: number;
-  name: string;
+  /** Solo los de la colección global llevan nombre/rol/cita; los vídeos
+   *  propios de una ficha son únicamente el archivo. */
+  name: string | null;
   role: string | null;
   quote: string | null;
   /** URL de YouTube/Vimeo o del archivo de vídeo subido a Strapi. */
   videoUrl: string;
   posterUrl: string | null;
+}
+
+/** Componente `general.video-testimonials-section` tal y como lo devuelve Strapi
+ *  (REST en programas, GraphQL en cursos Maxymia): copy + vídeos subidos. */
+export interface StrapiVideoTestimonialsSection {
+  id?: number;
+  overline: string | null;
+  title: string | null;
+  description: string | null;
+  videos: (StrapiMedia | { url: string })[] | null;
+}
+
+/** Apartado de testimonios en vídeo PROPIO de una ficha (programa o curso
+ *  Maxymia). Opcional: si no tiene `items`, la ficha enseña el conjunto global.
+ *  `overline`/`title`/`description` vacíos → la sección usa el copy por defecto. */
+export interface VideoTestimonialsBlock {
+  overline: string | null;
+  title: string | null;
+  description: string | null;
+  items: VideoTestimonial[];
 }
 
 // ============ Institution Types (clientes con logos) ============
@@ -1188,6 +1214,7 @@ export interface StrapiMaxymiaCourse {
   comos?: { question: string; answer: string }[] | null;
   badges?: { name: string; badge: { url: string } | null; category?: string | null }[] | null;
   institutions?: { name: string; logo: { url: string } | null }[] | null;
+  videoTestimonials?: StrapiVideoTestimonialsSection | null;
 }
 
 // GraphQL response wrappers

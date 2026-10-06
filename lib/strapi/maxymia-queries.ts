@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 import { strapiGraphQL, getStrapiMediaUrl } from './client';
+import { transformVideoTestimonialsSection } from './video-testimonials';
 import type {
   StrapiMaxymiaContentBlock,
   StrapiMaxymiaExamQuestion,
@@ -245,6 +246,7 @@ const MAXYMIA_COURSE_OVERVIEW_QUERY = `
         badges { name, category, badge { url } }
         docentes { documentId, slug, name, role, roleDescription, avatar { url }, avatarUrl, bio, linkedin, email }
         institutions { name, logo { url } }
+        videoTestimonials { overline, title, description, videos { url } }
         image { url, alternativeText }
         thumbnailTitle
         publishedAt
@@ -599,6 +601,7 @@ function transformCourse(course: StrapiMaxymiaCourse): MaxymiaCourse {
           .filter((i) => i.logo?.url)
           .map((i) => ({ name: i.name, imageUrl: getStrapiMediaUrl(i.logo) }))
       : undefined,
+    videoTestimonials: transformVideoTestimonialsSection(course.videoTestimonials),
   };
 }
 

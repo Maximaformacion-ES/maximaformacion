@@ -41,6 +41,7 @@ import type {
   StrapiVideoTestimonial,
   VideoTestimonial,
 } from './types';
+import { transformVideoTestimonial, transformVideoTestimonialsSection } from './video-testimonials';
 import type { ContentBlock } from '@/app/maxymia/types';
 
 // Default values for missing program data
@@ -102,6 +103,7 @@ function transformProgram(strapi: StrapiProgram): Program {
     extraSections: (strapi.extraSections ?? [])
       .filter((x) => x?.title && x?.content)
       .map((x) => ({ title: x.title, content: x.content, icon: x.icon ?? null })),
+    videoTestimonials: transformVideoTestimonialsSection(strapi.videoTestimonials),
     isPro: strapi.isPro,
     proOnly: strapi.proOnly ?? false,
     haveDiscount: strapi.haveDiscount ?? false,
@@ -390,7 +392,10 @@ export async function getPrograms(
 // de deploy CMS → web). Strapi v5 responde 400 ante una clave desconocida, así
 // que si la petición falla se reintenta sin esos campos: la ficha sigue
 // funcionando aunque el CMS todavía no esté desplegado.
-const OPTIONAL_POPULATES = ['&populate[extraSections]=true'];
+const OPTIONAL_POPULATES = [
+  '&populate[extraSections]=true',
+  '&populate[videoTestimonials][populate][videos]=true',
+];
 async function strapiRequestTolerantPopulate<T>(
   path: string,
   options: Parameters<typeof strapiRequest>[1],
@@ -413,7 +418,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequestTolerantPopulate<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[videoTestimonials][populate][videos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -439,7 +444,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequestTolerantPopulate<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[videoTestimonials][populate][videos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],
@@ -1169,16 +1174,7 @@ export async function getVideoTestimonials(): Promise<VideoTestimonial[]> {
       '/api/video-testimonials?populate[video]=true&populate[poster]=true&pagination[pageSize]=50&sort=order:asc',
       { revalidate: 600, tags: ['video-testimonials'] }
     );
-    return response.data
-      .map((t) => ({
-        id: t.id,
-        name: t.name,
-        role: t.role ?? null,
-        quote: t.quote ?? null,
-        videoUrl: (t.videoUrl && t.videoUrl.trim()) || (t.video ? getStrapiMediaUrl(t.video) : ''),
-        posterUrl: t.poster ? getStrapiMediaUrl(t.poster) : null,
-      }))
-      .filter((t) => t.videoUrl);
+    return response.data.map(transformVideoTestimonial).filter((t) => t.videoUrl);
   } catch (error) {
     console.warn('[getVideoTestimonials] sin testimonios:', error instanceof Error ? error.message : error);
     return [];

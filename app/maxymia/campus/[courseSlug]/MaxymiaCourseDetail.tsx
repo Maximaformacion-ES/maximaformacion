@@ -51,6 +51,7 @@ import type { Badge, Institution, VideoTestimonial } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, isFreeWithPro, shouldApplyProDiscount, klarnaInstallment } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
 
+
 const LEVEL_LABELS: Record<string, Record<Locale, string>> = {
   beginner: { es: 'Principiante', en: 'Beginner' },
   intermediate: { es: 'Intermedio', en: 'Intermediate' },
@@ -175,15 +176,15 @@ export default function MaxymiaCourseDetail({
         tabs={<CourseTabs course={course} locale={locale} totalLessons={totalLessons} />}
         belowContent={
           <>
-            {/* Mismas secciones y mismo orden que /programas: confianza →
-                compromiso con el alumnado → docentes → FAQ. */}
+            {/* Mismas secciones y mismo orden que /programas: testimonios en
+                vídeo → confianza → compromiso con el alumnado → docentes → FAQ. */}
+            <VideoTestimonialsSection block={course.videoTestimonials} testimonials={videoTestimonials} locale={locale} />
             <TrustBlock
               institutions={allInstitutions}
               certifications={allBadges}
               locale={locale}
             />
             <TeamCommitment locale={locale} avatars={teacherAvatars} />
-            <VideoTestimonialsSection testimonials={videoTestimonials} locale={locale} />
             <DocenteSection
               docentes={course.docentes}
               locale={locale}

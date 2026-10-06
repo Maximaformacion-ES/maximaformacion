@@ -1,3 +1,5 @@
+import type { VideoTestimonialsBlock } from '@/lib/strapi/types';
+
 // ============ Internationalization ============
 
 export type Locale = 'es' | 'en';
@@ -190,6 +192,9 @@ export interface MaxymiaCourse {
   /** "Cómos": pregunta-problema ("¿Cómo…?") + respuesta. Sustituye a la
    *  Descripción en la ficha cuando hay alguno (más llamativo). */
   comos?: { question: string; answer: string }[];
+  /** Testimonios en vídeo PROPIOS de la ficha (apartado opcional en Strapi).
+   *  Sin ellos, la ficha enseña el conjunto global de `video-testimonial`. */
+  videoTestimonials?: VideoTestimonialsBlock | null;
 }
 
 // ============ Exam Question Types ============
