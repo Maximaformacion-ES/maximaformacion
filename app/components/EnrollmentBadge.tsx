@@ -43,7 +43,7 @@ export function EnrollmentBadge({
   }
   return (
     <span className={`${base} bg-mx-text/10 text-mx-text-muted`}>
-      Próximamente
+      {status.kind === 'closed' ? 'Matrícula cerrada' : 'Próximamente'}
     </span>
   );
 }

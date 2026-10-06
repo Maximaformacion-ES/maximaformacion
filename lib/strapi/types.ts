@@ -1,3 +1,4 @@
+import type { EnrollmentStatus } from '@/lib/programs/enrollment';
 // Strapi response wrapper types
 export interface StrapiMeta {
   pagination?: {
@@ -136,6 +137,9 @@ export interface StrapiProgram {
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
   startDate: string | null;
+  /** Estado de matrícula (enum) y fecha de la próxima convocatoria. */
+  enrollmentStatus?: 'abierta' | 'fecha' | 'cerrada' | null;
+  startsOn?: string | null;
   topics: StrapiTopic[] | null;
   certification: string | null;
   price: number | null;
@@ -264,7 +268,10 @@ export interface Program {
   image: string;
   format: 'Online' | 'Presencial' | 'Híbrido';
   language: 'Español' | 'Inglés' | 'Bilingüe';
+  /** Texto corto de "Inicio" ya resuelto (p. ej. "Matrícula abierta" o la fecha formateada). */
   startDate: string;
+  /** Estado de matrícula resuelto (fuente: enrollmentStatus/startsOn de Strapi). */
+  enrollment?: EnrollmentStatus | null;
   certification: string;
   price: number;
   priceLabel?: string | null;

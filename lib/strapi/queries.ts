@@ -42,6 +42,7 @@ import type {
   VideoTestimonial,
 } from './types';
 import { transformVideoTestimonial, transformVideoTestimonialsSection } from './video-testimonials';
+import { resolveEnrollment, enrollmentLabel } from '@/lib/programs/enrollment';
 import type { ContentBlock } from '@/app/maxymia/types';
 
 // Default values for missing program data
@@ -49,6 +50,7 @@ const DEFAULT_PROGRAM_IMAGE = '/placeholder-course.svg';
 
 // Transform Strapi Program to frontend Program
 function transformProgram(strapi: StrapiProgram): Program {
+  const enrollment = resolveEnrollment(strapi);
   const imageUrl = strapi.image
     ? getStrapiMediaUrl(strapi.image)
     : strapi.imageUrl || DEFAULT_PROGRAM_IMAGE;
@@ -81,7 +83,8 @@ function transformProgram(strapi: StrapiProgram): Program {
     image: imageUrl,
     format: strapi.format || 'Online',
     language: strapi.language || 'Español',
-    startDate: strapi.startDate || 'Próximamente',
+    enrollment,
+    startDate: enrollmentLabel(enrollment) ?? (strapi.startDate || 'Próximamente'),
     certification: strapi.certification || (strapi.type === 'Master' ? 'Título Propio Universidad' : 'Certificado de Experto'),
     // 0 means "no price assigned in Strapi" — UI renders 'Consultar precio'
     // in that case rather than a fake number. Common for Masters whose

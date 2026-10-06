@@ -169,7 +169,7 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
 
   // "Matrícula abierta" sale de la rejilla (donde nadie lo leía) y pasa a ser
   // la pastilla verde de arriba. La fila "Inicio" solo queda para fechas.
-  const enrollment = getEnrollmentStatus(program.startDate);
+  const enrollment = program.enrollment ?? getEnrollmentStatus(program.startDate);
   const infoItems = [
     { icon: Monitor, label: 'Modalidad', value: program.format },
     { icon: Globe, label: 'Idioma', value: program.language },

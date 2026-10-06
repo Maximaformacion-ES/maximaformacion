@@ -4,7 +4,7 @@ import React from "react";
 import { Clock, GraduationCap, Layers } from "lucide-react";
 import { Program } from "@/lib/strapi/types";
 import { CourseCard, type CourseCardData } from "./CourseCard";
-import { isEnrollmentOpen } from "@/lib/programs/enrollment";
+import { isEnrollmentOpen, getEnrollmentStatus } from "@/lib/programs/enrollment";
 
 /**
  * Adaptador Program → <CourseCard>, SIN Clerk. Recibe `userHasPro` como prop.
@@ -57,7 +57,7 @@ export function programToCardData(program: Program, enrolled = false): CourseCar
       consult: isMaster || !program.price,
     },
     enrolled,
-    enrollmentOpen: isEnrollmentOpen(program.startDate),
+    enrollmentOpen: isEnrollmentOpen(program.enrollment ?? getEnrollmentStatus(program.startDate)),
   };
 }
 
