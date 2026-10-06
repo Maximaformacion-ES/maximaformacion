@@ -334,7 +334,11 @@ function CourseSidebar({ course, locale, totalLessons, durationLabel, totalExams
   return (
     // top-32 (not top-24) so the pinned card keeps a margin below the fixed
     // header instead of butting right up against it (MF-17).
-    <div className="sticky top-32">
+    // Pantallas poco altas: si la tarjeta no cabe bajo el header, se limita a
+    // la altura visible y hace scroll por dentro (barra oculta); si no, el
+    // botón de comprar quedaba fuera de la ventana y no se podía pulsar. En
+    // pantallas normales no cambia nada: el límite no llega a aplicarse.
+    <div className="sticky top-32 max-h-[calc(100dvh-9rem)] overflow-y-auto overscroll-contain no-scrollbar -mx-1 px-1 pb-1">
       <div className="border border-mx-border bg-mx-card overflow-hidden rounded-lg shadow-sm">
         {/* Imagen de producto: la miniatura con branding de Maxymia (la misma
             que usan las cards del catálogo). */}
