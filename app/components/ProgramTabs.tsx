@@ -325,6 +325,18 @@ export const ProgramTabs: React.FC<ProgramTabsProps> = ({ program, richHtml }) =
 
           {(richHtml.extraSections ?? []).map((x, i) => (
             <div key={`extra-${i}`} role="tabpanel" id={`panel-extra-${i}`} hidden={activeTab !== `extra-${i}`}>
+              {/* Logo de la universidad acreditadora (relación `university` del
+                  programa) en la pestaña de acreditación, salvo que el texto ya
+                  traiga su propia imagen (contenido antiguo con el logo pegado). */}
+              {program.university && /acredit|universi|homolog|titulaci/i.test(x.title) && !/<img\b/i.test(x.html) && (
+                <div className="mb-6 flex items-center gap-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={program.university.logoUrl} alt={program.university.name} className="h-14 w-auto max-w-[220px] object-contain" />
+                  <div className="text-mx-text-muted text-body-sm">
+                    Titulación acreditada por <span className="font-semibold text-mx-text">{program.university.name}</span>
+                  </div>
+                </div>
+              )}
               <MarkdownHtml html={x.html} className={BULLET_MARKDOWN_CLASS} />
             </div>
           ))}

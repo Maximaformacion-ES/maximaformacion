@@ -27,6 +27,8 @@ import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { contactHrefFor } from './ContactCourseProvider';
 import { getEffectivePrice, shouldApplyProDiscount, isFreeWithPro, getProSavings, klarnaInstallment } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
+import { getEnrollmentStatus } from '@/lib/programs/enrollment';
+import { EnrollmentBadge } from './EnrollmentBadge';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
 
 interface ProgramSidebarProps {
@@ -165,10 +167,13 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
     ? `${program.duration} horas`
     : null;
 
+  // "Matrícula abierta" sale de la rejilla (donde nadie lo leía) y pasa a ser
+  // la pastilla verde de arriba. La fila "Inicio" solo queda para fechas.
+  const enrollment = getEnrollmentStatus(program.startDate);
   const infoItems = [
     { icon: Monitor, label: 'Modalidad', value: program.format },
     { icon: Globe, label: 'Idioma', value: program.language },
-    { icon: Calendar, label: 'Inicio', value: program.startDate },
+    { icon: Calendar, label: 'Inicio', value: enrollment?.kind === 'date' ? enrollment.label : null },
     { icon: Award, label: 'Certificación', value: program.certification },
     { icon: Clock, label: 'Duración', value: durationDisplay },
     { icon: GraduationCap, label: 'Créditos', value: program.ects },
@@ -199,6 +204,18 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
         )}
 
         <div className="p-6 space-y-6">
+        {/* Estado de matrícula: lo primero que se ve en la tarjeta. */}
+        {enrollment && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <EnrollmentBadge status={enrollment} />
+            {enrollment.kind === 'open' && (
+              <span className="text-mx-text-muted text-label-sm md:text-label-md">
+                Acceso inmediato · empieza cuando quieras
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Info */}
         <div className="grid grid-cols-2 gap-4">
           {infoItems.map((item) => (
@@ -213,6 +230,34 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
             </div>
           ))}
         </div>
+
+        {/* Universidad acreditadora (solo programas con titulación
+            universitaria): entre la rejilla de datos y el precio. */}
+        {program.university && (
+          <div className="flex items-center gap-4 rounded-lg border border-mx-border bg-mx-bg/60 px-4 py-3">
+            <div className="min-w-0">
+              <div className="text-label-sm text-mx-text-muted uppercase tracking-widest">
+                Titulación acreditada por
+              </div>
+              <div className="text-mx-text text-body-sm font-semibold truncate">{program.university.name}</div>
+            </div>
+            {program.university.url ? (
+              <a
+                href={program.university.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto shrink-0"
+                title={program.university.name}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={program.university.logoUrl} alt={program.university.name} className="h-10 w-auto max-w-[120px] object-contain" />
+              </a>
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={program.university.logoUrl} alt={program.university.name} className="ml-auto h-10 w-auto max-w-[120px] shrink-0 object-contain" />
+            )}
+          </div>
+        )}
 
         {/* Divider */}
         <div className="border-t border-mx-border" />

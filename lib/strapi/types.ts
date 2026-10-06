@@ -155,6 +155,8 @@ export interface StrapiProgram {
   /** Testimonios en vídeo propios de la ficha (componente general.video-testimonials-section). */
   videoTestimonials?: StrapiVideoTestimonialsSection | null;
   docentes?: StrapiAuthor[] | null;
+  /** Universidad que acredita/homologa el programa (relación `university`). */
+  university?: { name: string; logo: StrapiMedia | null; url?: string | null } | null;
   noIndex?: boolean | null;
   createdAt: string;
   updatedAt: string;
@@ -278,6 +280,9 @@ export interface Program {
   badges?: { name: string; imageUrl: string; category?: string | null }[];
   /** Instituciones/clientes específicos del programa (relación `institution`). */
   institutions?: { name: string; imageUrl: string }[];
+  /** Universidad acreditadora: logo en la tarjeta de precio y en la pestaña
+   *  de acreditación. Solo programas con titulación universitaria. */
+  university?: ProgramUniversity | null;
   subjectArea?: 'Inteligencia Artificial' | 'Ciencia de Datos' | 'Moodle / Exelearning / H5P' | 'Salud basada en datos' | 'Educación' | null;
   modules: ProgramModule[];
   audience: string;
@@ -442,6 +447,12 @@ export interface StrapiInstitution {
 export interface Institution {
   name: string;
   imageUrl: string;
+}
+
+export interface ProgramUniversity {
+  name: string;
+  logoUrl: string;
+  url: string | null;
 }
 
 // ============ Team Member Types ============

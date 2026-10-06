@@ -9,6 +9,7 @@ import Link from 'next/link';
 import type { Program } from '@/lib/strapi/types';
 import { getEffectivePrice, getProSavings, shouldApplyProDiscount, isFreeWithPro } from '@/lib/pricing';
 import { trackBeginCheckout } from '@/lib/analytics';
+import { isEnrollmentOpen } from '@/lib/programs/enrollment';
 import ConsultaGratuitaChooser from './ConsultaGratuitaChooser';
 import { contactHrefFor } from './ContactCourseProvider';
 import type { ServerUserState } from '@/lib/auth/server-user-state';
@@ -170,6 +171,16 @@ export const ProgramMobileCTA: React.FC<ProgramMobileCTAProps> = ({ program, ini
 
   return (
     <div ref={wrapperRef} className={stickyWrapperClass}>
+      {/* Matrícula abierta: señal verde encima del precio, también en móvil. */}
+      {isEnrollmentOpen(program.startDate) && (
+        <div className="mb-1.5 flex items-center gap-1.5 text-label-sm font-black uppercase tracking-wider text-emerald-700">
+          <span className="relative flex h-2 w-2" aria-hidden="true">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
+          </span>
+          Matrícula abierta · acceso inmediato
+        </div>
+      )}
       {/* Row 1: Price info */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">

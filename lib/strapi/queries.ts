@@ -126,6 +126,9 @@ function transformProgram(strapi: StrapiProgram): Program {
           .filter((i) => i.logo)
           .map((i) => ({ name: i.name, imageUrl: getStrapiMediaUrl(i.logo) }))
       : undefined,
+    university: strapi.university?.logo
+      ? { name: strapi.university.name, logoUrl: getStrapiMediaUrl(strapi.university.logo), url: strapi.university.url?.trim() || null }
+      : null,
     noIndex: !!strapi.noIndex,
   };
 }
@@ -395,6 +398,7 @@ export async function getPrograms(
 const OPTIONAL_POPULATES = [
   '&populate[extraSections]=true',
   '&populate[videoTestimonials][populate][videos]=true',
+  '&populate[university][populate]=logo',
 ];
 async function strapiRequestTolerantPopulate<T>(
   path: string,
@@ -418,7 +422,7 @@ export async function getProgramById(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequestTolerantPopulate<StrapiSingleResponse<StrapiProgram>>(
-      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[videoTestimonials][populate][videos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
+      `/api/programs/${id}?populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[videoTestimonials][populate][videos]=true&populate[university][populate]=logo&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId`,
       {
         revalidate: 60,
         tags: ['programs', `program-${id}`],
@@ -444,7 +448,7 @@ export async function getProgramBySlug(
 ): Promise<Program | null> {
   try {
     const response = await strapiRequestTolerantPopulate<StrapiResponse<StrapiProgram[]>>(
-      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[videoTestimonials][populate][videos]=true&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
+      `/api/programs?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[image]=true&populate[brochurePdf]=true&populate[modules][populate][units]=true&populate[faqs]=true&populate[comos]=true&populate[extraSections]=true&populate[videoTestimonials][populate][videos]=true&populate[university][populate]=logo&populate[badges][populate]=badge&populate[institutions][populate]=logo&populate[topics][fields][0]=name&populate[topics][fields][1]=documentId&populate[docentes][populate]=avatar`,
       {
         revalidate: 60,
         tags: ['programs', `program-slug-${slug}`],

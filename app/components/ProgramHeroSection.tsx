@@ -4,6 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { Clock, BookOpen, Award, Crown } from 'lucide-react';
+import { getEnrollmentStatus } from '@/lib/programs/enrollment';
+import { EnrollmentBadge } from './EnrollmentBadge';
 
 /** Datos mínimos que necesita el hero. `Program` (Máxima) los cumple tal
  *  cual; la ficha de Maxymia construye este objeto a partir de su
@@ -17,6 +19,8 @@ export interface HeroProgram {
   type: string;
   isPro?: boolean;
   featured?: boolean;
+  /** Texto libre "Inicio" de Strapi; de él se deriva la pastilla de matrícula. */
+  startDate?: string | null;
   topics?: { id: number | string; name: string }[];
   durationLabel?: string | null;
   duration?: number;
@@ -114,6 +118,7 @@ export const ProgramHeroSection: React.FC<ProgramHeroSectionProps> = ({
                   <Award size={10} /> Destacado
                 </span>
               )}
+              <EnrollmentBadge status={getEnrollmentStatus(program.startDate)} size="sm" />
             </m.div>
 
             {/* Title */}

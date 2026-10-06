@@ -75,6 +75,8 @@ export interface CourseCardData {
   progress?: CourseCardProgress;
   /** Matriculado sin progreso aún. */
   enrolled?: boolean;
+  /** Matrícula abierta: etiqueta verde sobre la imagen (catálogo). */
+  enrollmentOpen?: boolean;
 }
 
 interface CourseCardProps {
@@ -105,6 +107,7 @@ const COPY = {
     completed: 'Completado',
     lessons: 'lecciones',
     purchased: 'Ya lo tienes',
+    enrollmentOpen: 'Matrícula abierta',
   },
   en: {
     master: 'Master',
@@ -123,6 +126,7 @@ const COPY = {
     completed: 'Completed',
     lessons: 'lessons',
     purchased: 'Enrolled',
+    enrollmentOpen: 'Enrolment open',
   },
 } as const;
 
@@ -216,8 +220,16 @@ export function CourseCard({
             unoptimized={data.image.startsWith('http')}
           />
           <div className="absolute inset-x-0 top-0 p-3 flex items-start justify-between gap-2">
-            <span className={`px-3 py-1 rounded-full text-label-sm font-black tracking-[0.18em] uppercase shadow-sm ${badgeClass}`}>
-              {badgeLabel}
+            <span className="flex items-center gap-1.5 flex-wrap">
+              <span className={`px-3 py-1 rounded-full text-label-sm font-black tracking-[0.18em] uppercase shadow-sm ${badgeClass}`}>
+                {badgeLabel}
+              </span>
+              {data.enrollmentOpen && !data.enrolled && !progress && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-black tracking-wider uppercase bg-emerald-600 text-white shadow-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+                  {t.enrollmentOpen}
+                </span>
+              )}
             </span>
             <span className="flex items-center gap-1.5">
               {progress?.isCompleted && (
