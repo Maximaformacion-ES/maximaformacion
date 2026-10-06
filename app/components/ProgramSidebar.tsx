@@ -9,7 +9,6 @@ import {
   Crown,
   ArrowRight,
   Monitor,
-  Globe,
   Calendar,
   Award,
   Clock,
@@ -170,9 +169,10 @@ export const ProgramSidebar: React.FC<ProgramSidebarProps> = ({
   // "Matrícula abierta" sale de la rejilla (donde nadie lo leía) y pasa a ser
   // la pastilla verde de arriba. La fila "Inicio" solo queda para fechas.
   const enrollment = program.enrollment ?? getEnrollmentStatus(program.startDate);
+  // Sin fila de idioma: con ella la rejilla se iba a 3 filas y la tarjeta se
+  // hacía demasiado alta en móvil. Quedan 4 datos = 2 filas.
   const infoItems = [
     { icon: Monitor, label: 'Modalidad', value: program.format },
-    { icon: Globe, label: 'Idioma', value: program.language },
     { icon: Calendar, label: 'Inicio', value: enrollment?.kind === 'date' ? enrollment.label : null },
     { icon: Award, label: 'Certificación', value: program.certification },
     { icon: Clock, label: 'Duración', value: durationDisplay },

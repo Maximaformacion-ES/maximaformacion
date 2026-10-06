@@ -94,13 +94,14 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: siteMetadata.canonicalUrl ?? '/',
     },
-    ...(siteMetadata.favicon && {
-      icons: {
-        icon: siteMetadata.favicon,
-        shortcut: siteMetadata.favicon,
-        apple: siteMetadata.favicon,
-      },
-    }),
+    // Un único favicon, el de Strapi, servido desde el propio dominio ya
+    // convertido a PNG 192×192 (app/favicon.png/route.ts). Antes se enlazaba
+    // el archivo original del CDN (WebP de 140 px) y Google no lo aceptaba.
+    icons: {
+      icon: [{ url: '/favicon.png', sizes: '192x192', type: 'image/png' }],
+      shortcut: '/favicon.png',
+      apple: '/favicon.png',
+    },
     robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
       title: siteMetadata.ogTitle,
